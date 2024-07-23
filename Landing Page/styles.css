@@ -1,0 +1,459 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: url('b3sdriver.png') no-repeat right bottom;
+    background-size: contain;
+    background-color: #193075;
+    color: #ffffff;
+    padding: 5% 0;
+    overflow: hidden;
+    min-height: 50vh;
+    position: relative;
+}
+
+.header-container {
+    width: 80%;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.text-section {
+    flex: 1 1 45%;
+    text-align: left;
+    margin-top: 5%;
+}
+
+.text-section h1 {
+    color: #f6d92b;
+    font-weight: bold;
+    font-size: 3vw;
+    line-height: 1.0;
+    transition: color 0.3s, transform 0.3s, text-shadow 0.3s;
+}
+
+.text-section p {
+    margin-top: 2%;
+    font-size: 1.5vw;
+    transition: color 0.3s, transform 0.3s;
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+.text-section h1:hover {
+    color: #ffeb3b;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+}
+
+.text-section p:hover {
+    color: #ffeb3b;
+    transform: scale(1.05);
+}
+
+#enrollNowBtn {
+    background-color: #ffc107; 
+    border-color: #ffc107; 
+    color: #193075; 
+    padding: 1% 2%;
+    font-size: 1.2vw;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, color 0.3s, transform 0.3s; 
+    margin-top: 2%; 
+}
+
+#enrollNowBtn:hover {
+    background-color: #e0a800; 
+    border-color: #e0a800;
+    color: #ffffff; 
+    transform: translateY(-2px); 
+}
+
+.white-section {
+    background-color: #ffffff;
+    height: 10px;
+    width: 100%;
+    position: relative;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.section-header {
+    color: #142a76; 
+    font-size: 4vw;
+    font-weight: bold;
+}
+
+.testimonial {
+    flex: 1 1 30%;
+    margin: 2%;
+    background-color: #ffffff;
+    padding: 5%;
+    border: 4px solid #ddd;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    transition: transform 0.3s, box-shadow 0.3s; 
+}
+
+.testimonial p {
+    text-align: justify; 
+    margin: 2% 0; 
+    flex-grow: 1;
+}
+
+.testimonial h5 {
+    color: #142a76;
+    font-weight: bold;
+    margin-top: 2%; 
+}
+
+.testimonial:hover {
+    transform: translateY(-10px); 
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+}
+
+.quote-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f6d92b;
+}
+
+.quote-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.card {
+    transition: transform 0.3s, box-shadow 0.3s; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+}
+
+.card-title {
+    color: #142a76;
+    font-weight: bold;
+}
+
+.card-body {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.about-section-header {
+    margin-bottom: 3%; 
+    font-weight: bold; 
+    font-size: 5vw;
+}
+
+.about-text {
+    font-size: 1.5vw; 
+    font-weight: normal;
+    text-align: justify; 
+}
+
+.carousel-item img {
+    height: 30vh;
+    object-fit: cover; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: #000; 
+    border-radius: 50%; 
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 5%; 
+}
+
+.read-more-btn {
+    background-color: #28a745; 
+    border-color: #28a745; 
+    color: white; 
+}
+
+.read-more-btn:hover {
+    background-color: #ffffff; 
+    border-color: #ffff; 
+}
+
+.text-left p {
+    margin-top: 2%; 
+}
+
+.btn-primary {
+    background-color: #004085;
+    border-color: #004085;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.text-blue {
+    font-weight: bold;
+    font-size: 5vw; 
+    margin-bottom: 5%;
+}
+
+.image-section {
+    flex: 1 1 45%;
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+}
+
+.car-img {
+    width: 100%;
+}
+
+footer {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 2% 0;
+}
+
+.footer-logo {
+    width: 10%; 
+    margin-bottom: 1%;
+}
+
+.contact-icon {
+    margin-right: 1%;
+}
+
+.social-icon {
+    margin: 0 1%;
+    font-size: 2vw;
+    transition: color 0.3s;
+}
+
+.social-icon:hover {
+    color: #e0a800; 
+}
+
+footer p, footer a {
+    margin: 0;
+    padding: 0;
+}
+
+footer h5 {
+    font-weight: bold;
+    margin-top: 1%;
+}
+
+footer p {
+    margin-bottom: 1%;
+}
+
+footer .container:last-child {
+    padding-top: 2%;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+.btn-primary:hover {
+    background-color: #004085;
+}
+
+.video-section {
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+.video-container {
+    position: relative;
+    display: inline-block;
+    width: 100%; 
+}
+
+.video-container .video-poster {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.video-overlay .play-button {
+    font-size: 50px;
+    margin-bottom: 10px;
+    color: white; 
+}
+
+.video-overlay h3 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.video-overlay p {
+    font-size: 16px;
+    margin: 0;
+}
+
+.call-to-action {
+    background-color: #f8f9fa;
+    padding: 40px 0;
+}
+
+.call-to-action .container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.call-to-action h2 {
+    color: #193075;
+    font-size: 5vw;
+    font-weight: bold;
+    line-height: 1;
+    margin-bottom: 2%; 
+}
+
+.call-to-action p {
+    color: #193075;
+    font-size: 3vw;
+    line-height: 1;
+    margin-bottom: 2%; 
+}
+
+.sign-up-btn {
+    background-color: #ffc107; 
+    border-color: #ffc107; 
+    color: #193075; 
+    padding: 1% 2%;
+    font-size: 1.2vw;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, color 0.3s;
+    margin-top: 0px;
+}
+
+.sign-up-btn:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+    color: #ffffff;
+}
+
+.call-to-action img {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+}
+
+/* Modal styling */
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 1rem);
+}
+
+.modal-dialog {
+    max-width: 600px;
+    margin: 1.75rem auto;
+}
+
+.modal-content {
+    min-height: 400px;
+}
+
+/* Login options */
+.modal-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* Space between the options */
+    flex-wrap: wrap; /* Wrap the options on smaller screens */
+}
+
+.login-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 20px;
+    margin: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    flex: 1 1 45%; /* Flex-grow, flex-shrink, flex-basis */
+    max-width: 200px; /* Ensure the options don't get too wide */
+}
+
+.login-option:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.login-option img {
+    width: 80%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.login-option button {
+    margin-top: 10px;
+    font-size: 16px;
+    width: 100%;
+}
+
+.login-or {
+    margin: 0 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
