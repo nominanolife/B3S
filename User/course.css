@@ -1,0 +1,337 @@
+/* General Styles */
+body {
+    background: linear-gradient(135deg, #142a74 0%, #0d1d51 100%); /* Gradient background */
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Navbar Styles */
+.navbar {
+    position: relative;
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure it's above other elements */
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent background for navbar */
+    border-bottom: 1px solid #ddd; /* Optional: border for better visibility */
+    padding: 10px 0; /* Optional: padding for spacing */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for better visibility */
+    transition: top 0.3s; /* Smooth transition for hiding/showing */
+}
+
+
+
+/* Navbar Brand Styles */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand img {
+    height: 50px;
+    margin-right: 10px;
+}
+
+.navbar-brand .brand-name {
+    font-weight: bold;
+    font-size: 24px;
+    color: #142a74; /* Updated text color */
+    margin: 0;
+}
+
+.navbar-brand .sub-title {
+    font-size: 14px;
+    color: #6c757d; /* Updated text color */
+    margin: 0;
+}
+
+/* Navbar Link Styles */
+.navbar-nav .nav-link {
+    font-size: 18px;
+    color: #343a40 !important; /* Updated text color */
+}
+
+.navbar .btn {
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    margin-left: 10px;
+}
+
+/* Button Styles */
+.btn-outline-primary {
+    color: #142A74;
+    border-color: #142A74;
+}
+
+.btn-outline-primary:hover {
+    background-color: #142A74 !important;
+    color: white;
+    border-color: #142A74;
+}
+
+.btn-primary {
+    background-color: #142A74;
+    border-color: #142A74;
+}
+
+.btn-primary:hover {
+    background-color: #0d1d51 !important;
+    border-color: #0d1d51;
+}
+
+/* Navbar Menu Style (hidden by default) */
+.navbar-nav-slide {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100%;
+    background-color: white;
+    box-shadow: -4px 0px 8px rgba(0, 0, 0, 0.2);
+    transform: translateX(100%); /* Default position: hidden */
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+    overflow-y: auto; /* Allows scrolling if content overflows */
+}
+
+/* Navbar Menu Slide Out Effect */
+.navbar-nav-slide.show {
+    transform: translateX(0);
+}
+
+/* Overlay Styles */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 999;
+    display: none; /* Hidden by default */
+}
+
+/* Show Overlay When Navbar is Open */
+.overlay.show {
+    opacity: 1;
+    display: block; /* Show when navbar is open */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 991.98px) {
+    .navbar-nav-slide {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .navbar-collapse {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+/* Course Section Styles */
+h1.text-center {
+    font-size: 36px; /* Adjust font size as needed */
+    color: #ffffff; /* White color for the text */
+    text-align: center; /* Center align the text */
+    margin-bottom: 40px; /* Space below the heading */
+    font-weight: bold; /* Make the text bold */
+}
+
+.course-section {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.course-section h2 {
+    font-size: 32px; /* Larger font size for the heading */
+    color: #142a74; /* Updated color for the heading */
+    text-align: center; /* Center align the text */
+    margin-bottom: 30px; /* Space below the heading */
+    font-weight: bold; /* Make the text bold */
+}
+
+.course-section p {
+    font-size: 1.3rem; /* Larger font size for the paragraph */
+    color: #black; /* Updated color for the text */
+    text-align: justify; /* Justify text alignment */
+    line-height: 1.5; /* Line height for better readability */
+}
+
+.course-img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+/* Flexbox for Image and Text Content */
+.course-content {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Space between image and text */
+}
+
+/* Image Styling */
+.course-img.theoretical {
+    max-width: 50%; /* Adjust size as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+
+/* Text Content Styling */
+.course-info {
+    max-width: 50%; /* Ensure text area does not exceed half width */
+}
+
+.course-info h4 {
+    font-size: 1.2rem; /* Adjust as needed */
+    color: #333; /* Heading color */
+    margin-bottom: 10px;
+}
+
+.course-info p {
+    font-size: 1rem; /* Adjust as needed */
+    color: #666; /* Text color */
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .course-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .course-img.theoretical, .course-info {
+        max-width: 100%;
+    }
+}
+
+/* Specific Styles for Each Image */
+.theoretical {
+    height: 100px; /* Adjust height as needed */
+    object-fit: cover; /* Ensures image covers the container without distortion */
+}
+
+.motorcycle {
+    height: 340px; /* Height for motorcycle image */
+    object-fit: cover;
+}
+
+.sedan {
+    height: 340px; /* Height for sedan image */
+    object-fit: cover;
+}
+
+/* Card Styles */
+/* Practical Driving Courses Heading */
+h2.mb-4 {
+    font-size: 32px; /* Adjust font size as needed */
+    color: #ffffff; /* White color for the heading */
+    margin-bottom: 30px; /* Space below the heading */
+    font-weight: bold; /* Make the text bold */
+    text-align: center; /* Center align the text */
+}
+
+/* Card Styles */
+.card.course-card {
+    border: none;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    background-color: #ffffff; /* Background color of the card */
+}
+
+/* Specific Card Styles for Theoretical */
+.card.theoretical-card {
+    max-width: 600px; /* Adjust width as needed */
+    margin: auto; /* Centers the card horizontally */
+}
+
+.card-img-top {
+    width: 100%;
+    height: 150px; /* Adjust height as needed */
+    object-fit: cover;
+    border-bottom: 1px solid #ddd; /* Border below the image */
+}
+
+.card-body {
+    padding: 15px; /* Adjust padding as needed */
+}
+
+.card-title {
+    font-size: 1.5rem; /* Font size for card titles */
+    color: #142a74;
+    margin-bottom: 10px;
+    font-weight: bold; /* Make the text bold */
+}
+
+.card-text {
+    color: #black; /* Updated color for the card text */
+    font-size: 0.9rem; /* Font size for the card text */
+    text-align: justify; /* Justify text alignment */
+    line-height: 1.5; /* Line height for better readability */
+}
+
+/* Responsive Adjustments for Cards */
+@media (max-width: 767px) {
+    .card-img-top {
+        height: 150px; /* Adjust height for smaller screens */
+    }
+    .card-body {
+        padding: 15px;
+    }
+}
+
+/* Footer Styles */
+footer {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 20px 0;
+    position: relative;
+}
+
+.footer-logo {
+    width: 100px; 
+    margin-bottom: 10px;
+}
+
+.contact-icon {
+    margin-right: 10px;
+}
+
+.social-icon {
+    margin: 0 10px;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.social-icon:hover {
+    color: #e0a800; 
+}
+
+footer p, footer a {
+    margin: 0;
+    padding: 0;
+}
+
+footer h5 {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+footer p {
+    margin-bottom: 10px;
+}
+
+footer .container:last-child {
+    padding-top: 20px;
+}

@@ -1,0 +1,278 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(rgba(254, 254, 254, 0.7), rgba(20, 42, 116, 0.7)), url('assets/b3s.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+/* Navbar Styles */
+.navbar {
+    position: relative;
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure it's above other elements */
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent background for navbar */
+    border-bottom: 1px solid #ddd; /* Optional: border for better visibility */
+    padding: 10px 0; /* Optional: padding for spacing */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for better visibility */
+    transition: top 0.3s; /* Smooth transition for hiding/showing */
+}
+
+
+
+/* Navbar Brand Styles */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand img {
+    height: 50px;
+    margin-right: 10px;
+}
+
+.navbar-brand .brand-name {
+    font-weight: bold;
+    font-size: 24px;
+    color: #142a74; /* Updated text color */
+    margin: 0;
+}
+
+.navbar-brand .sub-title {
+    font-size: 14px;
+    color: #6c757d; /* Updated text color */
+    margin: 0;
+}
+
+/* Navbar Link Styles */
+.navbar-nav .nav-link {
+    font-size: 18px;
+    color: #343a40 !important; /* Updated text color */
+}
+
+.navbar .btn {
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    margin-left: 10px;
+}
+
+/* Button Styles */
+.btn-outline-primary {
+    color: #142A74;
+    border-color: #142A74;
+}
+
+.btn-outline-primary:hover {
+    background-color: #142A74 !important;
+    color: white;
+    border-color: #142A74;
+}
+
+.btn-primary {
+    background-color: #142A74;
+    border-color: #142A74;
+}
+
+.btn-primary:hover {
+    background-color: #0d1d51 !important;
+    border-color: #0d1d51;
+}
+
+/* Navbar Menu Style (hidden by default) */
+.navbar-nav-slide {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100%;
+    background-color: white;
+    box-shadow: -4px 0px 8px rgba(0, 0, 0, 0.2);
+    transform: translateX(100%); /* Default position: hidden */
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+    overflow-y: auto; /* Allows scrolling if content overflows */
+}
+
+/* Navbar Menu Slide Out Effect */
+.navbar-nav-slide.show {
+    transform: translateX(0);
+}
+/* Overlay styles */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 999;
+    display: none; /* Hidden by default */
+}
+
+/* Show overlay when navbar is open */
+.overlay.show {
+    opacity: 1;
+    display: block; /* Show when navbar is open */
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .navbar-nav-slide {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .navbar-collapse {
+        display: flex;
+        flex-direction: column;
+    }
+}
+p {
+    font-size: 20px;
+}
+
+.input-group-text, .btn-outline-secondary {
+    cursor: pointer;
+}
+
+.login-logo {
+    width: 50%;
+    height: auto;
+}
+
+/* Main container styles */
+main {
+    min-height: 100vh;
+}
+
+/* Card styles */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    padding: 2rem;
+    max-width: 700px;
+    width: 100%;
+}
+/* Updated button styles */
+/* Updated button styles */
+.save-btn {
+    background-color: #142A74;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.save-btn:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+
+/* Center the button container */
+.d-flex-center {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;     /* Center vertically (if needed) */
+    width: 100%;
+    margin-top: 2rem;        /* Adjust margin as needed */
+}
+
+/* Logo image styles */
+.login-logo {
+    display: block;
+    margin: 0 auto;
+    width: 200px; /* Adjust as needed */
+}
+
+/* Form styles */
+.login-form {
+    margin-top: 1rem;
+}
+
+
+/* Input styles */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+}
+
+.input-group-text {
+    border-radius: 8px 0 0 8px;
+    background: #f8f9fa;
+    border: 1px solid #ced4da;
+}
+
+.input-group {
+    margin-top: 0.5rem;
+}
+
+/* Password toggle button styles */
+.btn-outline-secondary {
+    border-radius: 0 8px 8px 0;
+}
+
+.btn-outline-secondary i {
+    font-size: 1.5rem;
+}
+
+.login-btn {
+    background-color: #142A74;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+.login-btn:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+
+/* Link styles */
+.text-dark {
+    color: #142a74;
+}
+
+.text-dark:hover {
+    text-decoration: underline;
+}
+
+
+.verification-code-input {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    font-size: 24px;
+    margin: 0 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+/* Custom Radio Button Styles */
+.form-check-input {
+    border: 2px solid #142a74;
+    background-color: #fff;
+    border-radius: 50%;
+    position: relative;
+    width: 1.5em;
+    height: 1.5em;
+    appearance: none;
+}
+
+.form-check-input:checked {
+    background-color: #142a74;
+    border-color: #142a74;
+}
+

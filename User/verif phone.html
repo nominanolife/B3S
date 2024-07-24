@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="top-section">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <img src="assets/logo.png" alt="B3S Logo" height="50">
+                    <div>
+                        <span class="brand-name">B3S</span><br>
+                        <span class="sub-title">Driving School</span>
+                    </div>
+                </a>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <div class="d-flex justify-content-center flex-grow-1">
+                        <ul class="navbar-nav">
+                            <li class="nav-item"><a class="nav-link text-dark" href="#">Home</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" href="#">About</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" href="courses.html">Courses</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" href="#">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="d-flex mt-3 mt-lg-0">
+                        <button class="btn btn-outline-primary me-2" type="button">Register</button>
+                        <button class="btn btn-primary" type="button">Login</button>
+                    </div>
+                </div>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <main class="d-flex align-items-center">
+        <div class="container d-flex justify-content-center">
+            <div class="card login-card">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <img src="assets/phone.png" alt="Verification" class="img-fluid" style="height: 110px;">
+                    </div>
+                    <h3 class="text-center mb-4">Verification</h3>
+                    <p class="text-center mb-4">A verification code has been sent to your phone number.</p>
+                    <div class="d-flex justify-content-center mb-4">
+                        <input type="text" class="verification-code-input" maxlength="1" data-next-input-id="input1" id="input0">
+                        <input type="text" class="verification-code-input" maxlength="1" data-next-input-id="input2" data-prev-input-id="input0" id="input1">
+                        <input type="text" class="verification-code-input" maxlength="1" data-next-input-id="input3" data-prev-input-id="input1" id="input2">
+                        <input type="text" class="verification-code-input" maxlength="1" data-next-input-id="input4" data-prev-input-id="input2" id="input3">
+                        <input type="text" class="verification-code-input" maxlength="1" data-next-input-id="input5" data-prev-input-id="input3" id="input4">
+                        <input type="text" class="verification-code-input" maxlength="1" data-prev-input-id="input4" id="input5">
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-outline-primary login-btn">VERIFY</button>
+                    </div>
+                    <p class="text-center mt-3">Didn't receive a code? <a href="#" class="text-dark">Resend Code</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="verify phone.js"></script>
+</body>
+</html>
