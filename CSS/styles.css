@@ -216,20 +216,8 @@ main {
 }
 
 .welcome-admin {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    text-align: center; 
-}
-
-.login-card {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    background-color: white;
+    text-align: center;
+    width: 100%;
 }
 
 /* Link styles */
