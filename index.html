@@ -4,43 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Driving School</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap">
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
 
-    <nav>
-        <div class="navbar-left">
-            <img src="logo.png" class="b3slogo" alt="B3S Logo">
-            <div class="brand-name">
-                <span class="brand-title">B3S</span>
-                <span class="sub-title">Driving School</span>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="logo.png" alt="B3S Logo" height="50">
+                <div>
+                    <span class="brand-name">B3S</span><br>
+                    <span class="sub-title">Driving School</span>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link text-dark" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark" href="#">About</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark" href="#">Courses</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark" href="#">Contact</a></li>
+                </ul>
             </div>
-        </div>
-        <div class="navbar-center" id="navbarNav">
-            <div class="navbar-nav">
-                <a href="#home">Home</a>
-                <a href="#about">About</a>
-                <a href="#courses">Courses</a>
-                <a href="#contact">Contact</a>
-            </div>
-        </div>
-        <div class="header-right">
             <div class="header-right-content">
-                <button class="register" type="button">Register</button>
-                <button class="login" id="loginButton" type="button">Login</button>
-            </div>    
+                <button class="btn btn-outline-primary me-2" type="button">Register</button>
+                <button class="btn btn-primary" id="loginButton" type="button">Login</button>
+            </div>
         </div>
     </nav>
 
-    <header class="text-center" data-aos="fade-up" id="home">
+    <header class="text-center" data-aos="fade-up">
         <div class="header-container">
             <div class="text-section">
                 <h1>BE SKILLFUL <br> BE SELF-DISCIPLINE <br> BE SAFE</h1>
@@ -67,7 +65,7 @@
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                     <div class="testimonial">
                         <div class="quote-circle yellow-circle">
-                            <img src="quote.png" class="quote-icon" alt="Quote Icon" id="about">
+                            <img src="quote.png" class="quote-icon" alt="Quote Icon">
                         </div>
                         <p>Thank you, B3S Driving School - Manila! Highly recommended, accommodating staff and skilled instructors.</p>
                         <h5>KC de Grano</h5>
@@ -115,7 +113,7 @@
                 </div>
                 <div class="col-md-6 text-left text-white" data-aos="fade-left">
                     <p class="about-text">B3S Driving School is an LTO accredited Driving School that provides effective Driving courses to the aspiring drivers. We make sure to equip our students with the right knowledge and proper skills that every Responsible Driver should have. Beginning with our Theoretical Driving courses that can be availed Online or in Face to Face as well as the Practical Driving Courses. We help them to get acquainted with the basics of driving a motor vehicle and develop driving skills with self discipline and mastery.</p>
-                    <a href="about.html" class="btn btn-primary read-more-btn" id="courses">Read More</a>
+                    <a href="about.html" class="btn btn-primary read-more-btn">Read More</a>
                 </div>
             </div>
         </div>
@@ -172,7 +170,7 @@
         </div>
     </div>
 
-    <section class="call-to-action text-center" data-aos="fade-up" id="contact">
+    <section class="call-to-action text-center" data-aos="fade-up">
         <div class="container">
             <div class="row">
                 <div class="col-md-6 text-left">
@@ -251,8 +249,26 @@
         </div>
     </div>
 </div>
-<script src="script.js"></script>
-</body>
+    
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var loginButton = document.getElementById('loginButton');
+            loginButton.addEventListener('click', function() {
+                $('#loginModal').modal('show');
+            });
+        });
+
+        function redirectToLogin(page) {
+            window.location.href = page;
+        }
+    </script>
+    <script src="script.js"></script>
+
+    </body>
 </html>
 
 
