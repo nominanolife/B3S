@@ -19,12 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
             emailError.textContent = 'Please enter a valid email address.';
             valid = false;
         }
-
-        // Redirect to verif_email.html if valid
-        if (valid) {
-            event.preventDefault(); // Prevent the form from submitting normally
-            window.location.href = 'verif email.html'; // Redirect to the verification page
-        }
     });
 
     // Email validation function

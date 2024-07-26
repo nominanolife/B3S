@@ -1,0 +1,697 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    background-color: #fff;
+    padding: 5px 30px 5px 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    width: 100%;
+    z-index: 1;
+}
+
+.navbar-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
+
+.b3slogo {
+    width: 55px;
+    height: 55px;
+}
+
+.brand-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #2F2E2E;
+}
+
+.brand-title {
+    font-family: Noto Sans; 
+    font-size: 36px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.sub-title {
+    font-family: Noto Sans;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.navbar-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+}
+
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-right: 50px;
+}
+
+.navbar-nav a {
+    margin: 10px;
+    padding: 10px;
+    font-family: Ubuntu;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #2F2E2E;
+}
+
+.navbar-nav a:hover {
+    color: #1442c9;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+}
+
+.header-right-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.register {
+    margin: 10px;
+    padding: 10px;
+    font-family: Ubuntu;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #092A73;
+    border: 1px solid #2F2E2E ;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.5s;
+}
+
+.login {
+    margin: 10px;
+    padding: 10px;
+    font-family: Ubuntu;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+    border: 1px solid #2F2E2E;
+    border-radius: 5px;
+    background-color: #092A73;
+    cursor: pointer;
+}
+
+.register:hover {
+    background-color: #092A73;
+    color: #fff;
+}
+
+header {
+    background: url('b3sdriver.png') no-repeat right bottom; 
+    background-size: contain; 
+    background-color: #193075; 
+    color: #ffffff;
+    padding: 60px 0;
+    overflow: hidden;
+    min-height: 650px; 
+    position: relative;
+}
+
+.header-container {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2; 
+}
+
+.text-section {
+    position: relative;
+    left: -30px;
+    flex: 1;
+    max-width: 80%; 
+    text-align: left;
+    z-index: 2;
+}
+
+.text-section h1 {
+    color: #f6d92b;
+    font-weight: bold;
+    font-size: 67px; 
+    margin-top: 100px;
+    line-height: 1.0;
+    transition: color 0.3s, transform 0.3s, text-shadow 0.3s;
+}
+
+.text-section p {
+    margin-top: 40px;
+    font-size: 20px;
+    transition: color 0.3s, transform 0.3s;
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+.text-section h1:hover {
+    color: #ffeb3b;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+}
+
+.text-section p:hover {
+    color: #ffeb3b;
+    transform: scale(1.05);
+}
+
+#enrollNowBtn {
+    background-color: #ffc107; 
+    border-color: #ffc107; 
+    color: #193075; 
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, color 0.3s, transform 0.3s; 
+    margin-top: 20px; 
+}
+
+#enrollNowBtn:hover {
+    background-color: #e0a800; 
+    border-color: #e0a800;
+    color: #ffffff; 
+    transform: translateY(-2px); 
+}
+
+
+header:hover .image-section {
+    transform: translateX(0); 
+}
+
+
+.text-yellow-white {
+    color: #f6d92b;
+}
+
+.white-section {
+    background-color: #ffffff;
+    height: 10px;
+    width: 100%;
+    position: relative;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+}
+
+.section-header {
+    color: #142a76; 
+    font-size: 60px;
+    font-weight: bold;
+}
+
+.testimonial {
+    flex: 1;
+    margin: 20px;
+    background-color: #ffffff;
+    padding: 50px;
+    border: 4px solid #ddd;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    height: 80%; 
+    max-width: 90%; 
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    transition: transform 0.3s, box-shadow 0.3s; 
+}
+
+.testimonial p {
+    text-align: justify; 
+    margin: 20px 0; 
+    flex-grow: 1;
+}
+
+.testimonial h5 {
+    color: #142a76;
+    font-weight: bold;
+    margin-top: 20px; 
+}
+
+.testimonial:hover {
+    transform: translateY(-10px); 
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+}
+
+.quote-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f6d92b;
+}
+
+.quote-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.card {
+    transition: transform 0.3s, box-shadow 0.3s; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+}
+
+.card-title {
+    color: #142a76;
+    font-weight: bold;
+}
+
+.card-body {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.about-section-header {
+    margin-bottom: 30px; 
+    font-weight: bold; 
+    font-size: 68px;
+}
+
+.about-text {
+    font-size: 20px; 
+    font-weight: normal;
+    text-align: justify; 
+}
+
+.carousel-item img {
+    height: 300px;
+    object-fit: cover; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: #000; 
+    border-radius: 50%; 
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 5%; 
+}
+
+.read-more-btn {
+    background-color: #28a745; 
+    border-color: #28a745; 
+    color: white; 
+}
+
+.read-more-btn:hover {
+    background-color: #ffffff; 
+    border-color: #ffff; 
+}
+
+
+.text-left p {
+    margin-top: 20px; 
+}
+
+.btn-primary {
+    background-color: #004085;
+    border-color: #004085;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.text-blue {
+    font-weight: bold;
+    font-size: 68px; 
+    margin-bottom: 50px;
+}
+
+.image-section {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    z-index: 2;
+}
+
+.car-img {
+    width: 100%;
+    max-width: 600px;
+}
+
+footer {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 20px 0;
+}
+
+.footer-logo {
+    width: 100px; 
+    margin-bottom: 10px;
+}
+
+.contact-icon {
+    margin-right: 10px;
+}
+
+.social-icon {
+    margin: 0 10px;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.social-icon:hover {
+    color: #e0a800; 
+}
+
+footer {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 20px 0;
+    position: relative;
+}
+
+.footer-logo {
+    width: 100px; 
+    margin-bottom: 10px;
+}
+
+.contact-icon {
+    margin-right: 10px;
+}
+
+.social-icon {
+    margin: 0 10px;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.social-icon:hover {
+    color: #e0a800; 
+}
+
+footer p, footer a {
+    margin: 0;
+    padding: 0;
+}
+
+footer h5 {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+footer p {
+    margin-bottom: 10px;
+}
+
+footer .container:last-child {
+    padding-top: 20px;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+.btn-primary:hover {
+    background-color: #004085;
+}
+  
+.video-section {
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+.video-container {
+    position: relative;
+    display: inline-block;
+    width: 100%; 
+}
+
+.video-container .video-poster {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.video-overlay .play-button {
+    font-size: 50px;
+    margin-bottom: 10px;
+    color: white; 
+    }
+
+.video-overlay h3 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.video-overlay p {
+    font-size: 16px;
+    margin: 0;
+}
+
+
+.call-to-action {
+    background-color: #f8f9fa;
+    padding: 40px 0;
+}
+
+.call-to-action .container {
+    display: flex;
+    align-items: center;
+}
+
+.call-to-action h2 {
+    color: #193075;
+    font-size: 55px;
+    font-weight: bold;
+    line-height: 1;
+    margin-bottom: 40px; 
+}
+
+.call-to-action p {
+    color: #193075;
+    font-size: 39px;
+    line-height: 1;
+    margin-bottom: 40px; 
+}
+
+.sign-up-btn {
+    background-color: #ffc107; 
+    border-color: #ffc107; 
+    color: #193075; 
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, color 0.3s;
+    margin-top: 0px;
+}
+
+.sign-up-btn:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+    color: #ffffff;
+}
+
+.call-to-action img {
+    width: 180%;
+    height: auto;
+    margin-top: 150px; 
+}
+
+/* Center the modal content */
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 1rem);
+}
+
+/* Increase the size of the modal */
+.modal-dialog {
+    max-width: 600px;
+    margin: 1.75rem auto;
+}
+
+.modal-content {
+    min-height: 400px;
+}
+
+/* Styling for login options */
+.modal-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* Space between the options */
+    flex-wrap: wrap; /* Wrap the options on smaller screens */
+}
+
+.login-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 20px;
+    margin: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    flex: 1 1 30%; /* Flex-grow, flex-shrink, flex-basis */
+    max-width: 200px; /* Ensure the options don't get too wide */
+}
+
+.login-option:hover {
+    text-decoration: none;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.login-option img {
+    width: 80%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.login-option button {
+    margin-top: 10px;
+    font-size: 16px;
+    width: 100%;
+}
+
+.login-or {
+    margin: 0 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+@media (max-width: 1200px) {
+    .header-container {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .header-container {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px; /* Add padding for spacing */
+    }
+
+    .text-section, .image-section {
+        max-width: 100%;
+    }
+
+    .text-section {
+        margin-bottom: 20px;
+        text-align: left; /* Ensure text remains left-aligned */
+        padding-right: 0; /* Remove right padding */
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 40px 0;
+    }
+
+    .header-container {
+        padding: 10px;
+    }
+
+    .text-section h1 {
+        font-size: 40px; 
+    }
+
+    .text-section p {
+        font-size: 20px; /* Adjust font size to be consistent */
+    }
+
+    #enrollNowBtn {
+        margin-top: 20px; 
+    }
+
+    .car-img {
+        width: 80%;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 600px) {
+    header {
+        padding: 20px 0;
+    }
+
+    .text-section h1 {
+        font-size: 30px; /* Adjust font size for smaller screens */
+    }
+
+    .text-section p {
+        font-size: 18px; 
+        margin-top: 10px; 
+    }
+}

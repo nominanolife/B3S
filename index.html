@@ -5,20 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Driving School</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="landing.css">
+    <link rel="stylesheet" href="CSS/landing.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap">
-    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
 
     <nav>
         <div class="navbar-left">
-            <img src="logo.png" class="b3slogo" alt="B3S Logo">
+            <img src="Assets/logo.png" class="b3slogo" alt="B3S Logo">
             <div class="brand-name">
                 <span class="brand-title">B3S</span>
                 <span class="sub-title">Driving School</span>
@@ -34,8 +30,8 @@
         </div>
         <div class="header-right">
             <div class="header-right-content">
-                <button class="register" type="button">Register</button>
-                <button class="login" id="loginButton" type="button">Login</button>
+                <button class="register" type="button" id="registerButton">Register</button>
+                <button class="login" type="button" id="loginButton">Login</button>
             </div>    
         </div>
     </nav>
@@ -58,7 +54,7 @@
                 <div class="col-md-4" data-aos="fade-up">
                     <div class="testimonial">
                         <div class="quote-circle yellow-circle">
-                            <img src="quote.png" class="quote-icon" alt="Quote Icon">
+                            <img src="Assets/quote.png" class="quote-icon" alt="Quote Icon">
                         </div>
                         <p>Got the DL at last! Thanks to B3S Driving School - Manila for their easy and effective teaching. Highly recommend.</p>
                         <h5>Shafiul Hasan</h5>
@@ -67,7 +63,7 @@
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                     <div class="testimonial">
                         <div class="quote-circle yellow-circle">
-                            <img src="quote.png" class="quote-icon" alt="Quote Icon" id="about">
+                            <img src="Assets/quote.png" class="quote-icon" alt="Quote Icon" id="about">
                         </div>
                         <p>Thank you, B3S Driving School - Manila! Highly recommended, accommodating staff and skilled instructors.</p>
                         <h5>KC de Grano</h5>
@@ -76,7 +72,7 @@
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                     <div class="testimonial">
                         <div class="quote-circle yellow-circle">
-                            <img src="quote.png" class="quote-icon" alt="Quote Icon">
+                            <img src="Assets/quote.png" class="quote-icon" alt="Quote Icon">
                         </div>
                         <p>Most personnel are accommodating, helpful, and considerate. Listens to feedback and gives legit tips to make acquiring licenses hassle-free!</p>
                         <h5>Hans Kristoffer Mariano</h5>
@@ -94,13 +90,13 @@
                     <div id="aboutCarousel" class="carousel slide" data-ride="carousel">
                         <div class="carousel-inner">
                             <div class="carousel-item active">
-                                <img src="b3s team.png" class="d-block w-100" alt="About Image 1">
+                                <img src="Assets/b3s team.png" class="d-block w-100" alt="About Image 1">
                             </div>
                             <div class="carousel-item">
-                                <img src="b3steam.jpg" class="d-block w-100" alt="About Image 2">
+                                <img src="Assets/b3steam.jpg" class="d-block w-100" alt="About Image 2">
                             </div>
                             <div class="carousel-item">
-                                <img src="b3s-team.jpg" class="d-block w-100" alt="About Image 3">
+                                <img src="Assets/b3s-team.jpg" class="d-block w-100" alt="About Image 3">
                             </div>
                         </div>
                         <a class="carousel-control-prev" href="#aboutCarousel" role="button" data-slide="prev">
@@ -127,7 +123,7 @@
             <div class="row">
                 <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
                     <div class="card bg-light mb-3">
-                        <img src="theoreticall.jpg" class="card-img-top" alt="Theoretical Driving Course">
+                        <img src="Assets/theoreticall.jpg" class="card-img-top" alt="Theoretical Driving Course">
                         <div class="card-body">
                             <h5 class="card-title"><b>THEORETICAL DRIVING COURSE</b></h5>
                             <a href="theoretical.html" class="btn btn-primary">Learn More</a>
@@ -136,7 +132,7 @@
                 </div>
                 <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
                     <div class="card bg-light mb-3">
-                        <img src="practical.jpg" class="card-img-top" alt="Practical Driving Course">
+                        <img src="Assets/practical.jpg" class="card-img-top" alt="Practical Driving Course">
                         <div class="card-body">
                             <h5 class="card-title"><b>PRACTICAL DRIVING COURSE</b></h5>
                             <a href="practical.html" class="btn btn-primary">Learn More</a>
@@ -150,7 +146,7 @@
     <section class="video-section" data-aos="fade-up">
         <div class="video-container">
             <video id="posterVideo" class="video-poster" muted autoplay loop playsinline>
-                <source src="B3S-Video.mp4" type="video/mp4"></video>
+                <source src="Assets/B3S-Video.mp4" type="video/mp4"></video>
             <div class="video-overlay" data-toggle="modal" data-target="#videoModal">
                 <div class="play-button">&#9658;</div>
                 <h3>B3S DRIVING SCHOOL</h3>
@@ -164,7 +160,7 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <video id="modalVideo" controls style="width: 100%;">
-                        <source src="B3S-Video.mp4" type="video/mp4">
+                        <source src="Assets/B3S-Video.mp4" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                 </div>
@@ -178,10 +174,10 @@
                 <div class="col-md-6 text-left">
                     <h2 class="action text">Ready to get behind the wheel?</h2>
                     <p>Schedule Your Driving Lessons With Us!</p>
-                    <a href="registration.html" class="btn btn-warning sign-up-btn">SIGN UP TODAY</a>
+                    <a href="reg.html" class="btn btn-warning sign-up-btn">SIGN UP TODAY</a>
                 </div>
                 <div class="col-md-6">
-                    <img src="car.png" alt="B3S Driving School" class="img-fluid">
+                    <img src="Assets/car.png" alt="B3S Driving School" class="img-fluid">
                 </div>
             </div>
         </div>
@@ -191,7 +187,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-4 text-left">
-                    <img src="logo.png" alt="B3S Driving School Logo" class="footer-logo">
+                    <img src="Assets/logo.png" alt="B3S Driving School Logo" class="footer-logo">
                 </div>
                 <div class="col-md-4 text-left">
                     <h5>Contact Info</h5>
@@ -237,20 +233,26 @@
             </div>
             <div class="modal-body text-center">
                 <div class="login-options">
-                    <div class="login-option" onclick="redirectToLogin('student.html')">
-                        <img src="student.png" alt="Student">
+                    <a class="login-option" href="login.html">
+                        <img src="Assets/student.png" alt="Student">
                         <button class="btn btn-primary">Student</button>
-                    </div>
+                    </a>
                     <div class="login-or">or</div>
-                    <div class="login-option" onclick="redirectToLogin('admin.html')">
-                        <img src="admin.png" alt="Admin">
+                    <a class="login-option" href="adminlogin.html">
+                        <img src="Assets/admin.png" alt="Admin">
                         <button class="btn btn-warning">Admin</button>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="script.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="JS/script.js"></script>
+
 </body>
 </html>
