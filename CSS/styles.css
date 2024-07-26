@@ -217,7 +217,23 @@ main {
     font-size: 1.25rem;
     font-weight: bold;
     margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: center; 
+    width: 100%; 
+}
+
+.login-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background-color: white;
+    max-width: 700px; 
+    width: 100%; 
 }
 
 /* Link styles */
