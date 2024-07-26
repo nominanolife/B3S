@@ -126,7 +126,7 @@ nav {
 }
 
 header {
-    background: url('https://github.com/nominanolife/B3S/blob/1fb525c2b8c060b3aa3c8d9fb2f07a1de1f7fad4/Assets/b3sdriver.png') no-repeat right bottom; 
+    background: url('../assets/b3sdriver.png') no-repeat right bottom; 
     background-size: contain; 
     background-color: #193075; 
     color: #ffffff;
