@@ -15,6 +15,7 @@ nav {
     z-index: 1;
 }
 
+
 .navbar-left {
     display: flex;
     flex-direction: row;
@@ -383,31 +384,7 @@ header:hover .image-section {
     max-width: 600px;
 }
 
-footer {
-    background-color: #1a1a1a;
-    color: #ffffff;
-    padding: 20px 0;
-}
-
-.footer-logo {
-    width: 100px; 
-    margin-bottom: 10px;
-}
-
-.contact-icon {
-    margin-right: 10px;
-}
-
-.social-icon {
-    margin: 0 10px;
-    font-size: 20px;
-    transition: color 0.3s;
-}
-
-.social-icon:hover {
-    color: #e0a800; 
-}
-
+/* Footer Styles */
 footer {
     background-color: #1a1a1a;
     color: #ffffff;
@@ -426,7 +403,7 @@ footer {
 
 .social-icon {
     margin: 0 10px;
-    font-size: 20px;
+    font-size: 18px;
     transition: color 0.3s;
 }
 

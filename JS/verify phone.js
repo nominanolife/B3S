@@ -28,9 +28,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to move to the previous input field
     function moveToPrev(event, prevInputId) {
         if (event.key === 'Backspace') {
-            const prevInput = document.getElementById(prevInputId);
-            if (prevInput) {
-                prevInput.focus();
+            if (event.target.value.length === 0 && prevInputId) {
+                const prevInput = document.getElementById(prevInputId);
+                if (prevInput) {
+                    prevInput.focus();
+                }
             }
         }
     }
