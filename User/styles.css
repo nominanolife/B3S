@@ -3,122 +3,82 @@ body {
     margin: 0;
     min-height: 100vh;
     overflow: hidden;
-    background: linear-gradient(rgba(254, 254, 254, 0.7), rgba(20, 42, 116, 0.7)), url('assets/b3s.jpg');
+    background: linear-gradient(#E4EfE9 ,#93A5CF, #6594d3);
     background-size: cover;
     background-position: center;
 }
 
-/* Navbar Styles */
-.navbar {
-    position: relative;
-    top: 0;
-    width: 100%;
-    z-index: 1000; /* Ensure it's above other elements */
-    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent background for navbar */
-    border-bottom: 1px solid #ddd; /* Optional: border for better visibility */
-    padding: 10px 0; /* Optional: padding for spacing */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for better visibility */
-    transition: top 0.3s; /* Smooth transition for hiding/showing */
-}
-
-
-
-/* Navbar Brand Styles */
-.navbar-brand {
+nav {
     display: flex;
-    align-items: center;
-}
-
-.navbar-brand img {
-    height: 50px;
-    margin-right: 10px;
-}
-
-.navbar-brand .brand-name {
-    font-weight: bold;
-    font-size: 24px;
-    color: #142a74; /* Updated text color */
-    margin: 0;
-}
-
-.navbar-brand .sub-title {
-    font-size: 14px;
-    color: #6c757d; /* Updated text color */
-    margin: 0;
-}
-
-/* Navbar Link Styles */
-.navbar-nav .nav-link {
-    font-size: 18px;
-    color: #343a40 !important; /* Updated text color */
-}
-
-.navbar .btn {
-    font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 20px;
-    margin-left: 10px;
-}
-
-/* Button Styles */
-.btn-outline-primary {
-    color: #142A74;
-    border-color: #142A74;
-}
-
-.btn-outline-primary:hover {
-    background-color: #142A74 !important;
-    color: white;
-    border-color: #142A74;
-}
-
-.btn-primary {
-    background-color: #142A74;
-    border-color: #142A74;
-}
-
-.btn-primary:hover {
-    background-color: #0d1d51 !important;
-    border-color: #0d1d51;
-}
-
-/* Navbar Menu Style (hidden by default) */
-.navbar-nav-slide {
+    flex-direction: row;
+    background-color: none;
+    padding: 5px 30px 5px 30px;
     position: fixed;
-    top: 0;
-    right: 0;
-    width: 250px;
-    height: 100%;
-    background-color: white;
-    box-shadow: -4px 0px 8px rgba(0, 0, 0, 0.2);
-    transform: translateX(100%); /* Default position: hidden */
-    transition: transform 0.3s ease-in-out;
-    z-index: 1000;
-    overflow-y: auto; /* Allows scrolling if content overflows */
-}
-
-/* Navbar Menu Slide Out Effect */
-.navbar-nav-slide.show {
-    transform: translateX(0);
-}
-/* Overlay styles */
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-    z-index: 999;
-    display: none; /* Hidden by default */
+    z-index: 1;
 }
 
-/* Show overlay when navbar is open */
-.overlay.show {
-    opacity: 1;
-    display: block; /* Show when navbar is open */
+.navbar-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
+
+.navbar-left:hover {
+    text-decoration: none;
+}
+
+.b3slogo {
+    width: 55px;
+    height: 55px;
+}
+
+.brand-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #2F2E2E;
+}
+
+.brand-title {
+    font-family: Noto Sans; 
+    font-size: 36px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.sub-title {
+    font-family: Noto Sans;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.navbar-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+}
+
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-right: 50px;
+}
+
+.navbar-nav a {
+    margin: 10px;
+    padding: 10px;
+    font-family: Ubuntu;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #2F2E2E;
 }
 
 /* Responsive adjustments */
@@ -136,7 +96,7 @@ body {
     }
 }
 p {
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .input-group-text, .btn-outline-secondary {
@@ -200,6 +160,11 @@ main {
     margin-top: 1rem;
 }
 
+.form-label {
+    font-family: Noto Sans;
+    font-size: 14px;
+    font-weight: bold;
+}
 
 /* Input styles */
 .form-control {
@@ -229,6 +194,8 @@ main {
 }
 
 .login-btn {
+    font-family: Noto Sans;
+    font-weight: bold;
     background-color: #142A74;
     color: #fff;
     border: none;
@@ -250,6 +217,12 @@ main {
     text-decoration: underline;
 }
 
+form p {
+    font-family: Inter;
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 1rem;
+}
 
 .verification-code-input {
     width: 50px;
