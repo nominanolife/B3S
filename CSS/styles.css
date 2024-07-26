@@ -213,6 +213,12 @@ main {
     color: white !important;
 }
 
+.welcome-admin {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
 /* Link styles */
 .text-dark {
     color: #142a74;
