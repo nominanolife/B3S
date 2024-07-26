@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="top-section">
+        <nav>
+            <a href="#" class="navbar-left" >
+                <img src="assets/logo.png" class="b3slogo" alt="B3S Logo">
+                <div class="brand-name">
+                    <span class="brand-title">B3S</span>
+                    <span class="sub-title">Driving School</span>
+                </div>
+            </a>
+        </nav>
+    </div>
+    <main class="d-flex align-items-center">
+        <div class="container d-flex justify-content-center">
+            <div class="card login-card d-flex flex-row">
+                <div class="card-body">
+                    <img src="assets/logo.png" alt="Logo" class="login-logo"><br>
+                    <form id="loginForm" class="login-form">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="Email" required>
+                            <div id="emailError" class="text-danger mt-2"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" placeholder="Password" required>
+                                <button class="btn btn-outline-primary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye-slash"></i>
+                                </button>
+                            </div>
+                            <div id="passwordError" class="text-danger mt-2"></div>
+                            <p class="mt-2"><a href="#" id="forgotPasswordLink" class="text-dark">Forgot Password?</a></p>
+                        </div>                        
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-outline-primary login-btn">LOG IN</button>
+                        </div>
+                        <p class="text-center mt-3">Don't have an account yet? <a href="#" id="registerLink" class="text-dark">Register Now!</a></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="login.js"></script>
+</body>
+</html>

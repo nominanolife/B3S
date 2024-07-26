@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Information</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <main class="d-flex align-items-center">
+        <div class="container d-flex justify-content-center">
+            <div class="card login-card">
+                <div class="card-body">
+                    <img src="assets/logo.png" alt="Logo" class="login-logo"><br>
+                    <form>
+                        <h3 class="text-center mb-4">Personal Information</h3>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first" placeholder="Enter your first name" required>
+                                <div class="invalid-feedback">Please enter your first name.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="middle" class="form-label">Middle Name</label>
+                                <input type="text" class="form-control" id="middle" placeholder="Enter your middle name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last" placeholder="Enter your last name" required>
+                                <div class="invalid-feedback">Please enter your last name.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="suffix" class="form-label">Suffix</label>
+                                <input type="text" class="form-control" id="suffix" placeholder="Enter your suffix (e.g., Jr., Sr.)">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="birthday" class="form-label">Birthday</label>
+                                <input type="date" class="form-control" id="birthday" required>
+                                <div class="invalid-feedback">Please enter your birthday.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="age" class="form-label">Age</label>
+                                <input type="number" class="form-control" id="age" readonly>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="address" placeholder="Enter your address" required>
+                                <div class="invalid-feedback">Please enter your address.</div>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="status" class="form-label">Civil Status</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="status" id="single" value="Single" required>
+                                        <label class="form-check-label" for="single">Single</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="status" id="married" value="Married" required>
+                                        <label class="form-check-label" for="married">Married</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="status" id="widowed" value="Widowed" required>
+                                        <label class="form-check-label" for="widowed">Widowed</label>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback">Please select your civil status.</div>
+                            </div>
+                            <div class="d-flex-center">
+                                <button type="button" class="btn save-btn">SAVE</button>
+                            </div>                             
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="personal info.js"></script>
+</body>
+</html>
