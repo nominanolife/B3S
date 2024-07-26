@@ -127,7 +127,7 @@ nav {
 }
 
 header {
-    background: url('b3sdriver.png') no-repeat right bottom; 
+    background: url('../assets/b3sdriver.png') no-repeat right bottom; 
     background-size: contain; 
     background-color: #193075; 
     color: #ffffff;
