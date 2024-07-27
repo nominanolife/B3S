@@ -34,16 +34,34 @@
                     </div>
                     <p class="text-center mt-3">Didn't receive a code? <a href="#" class="text-dark" id="resendCode">Resend Code</a></p>
                     <p id="resendCountdown" class="text-center mt-3"></p>
-                    <p class="text-center mt-3" id="message"></p>
                     <div id="recaptcha-container" class="mb-4"></div>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- Modal for prompts -->
+    <div class="modal fade" id="promptModal" tabindex="-1" aria-labelledby="promptModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="promptModalLabel">Notification</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalMessage">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="JS/verify phone.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
@@ -88,7 +106,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const confirmationResultData = localStorage.getItem('confirmationResult');
             if (!confirmationResultData) {
-                document.getElementById('message').textContent = 'No confirmation result found. Please try sending the code again.';
+                showModal('No confirmation result found. Please try sending the code again.');
                 return;
             }
     
@@ -97,12 +115,12 @@
                 confirmationResult = JSON.parse(confirmationResultData);
             } catch (error) {
                 console.error('Error parsing confirmation result', error);
-                document.getElementById('message').textContent = 'Error parsing confirmation result. Please try again.';
+                showModal('Error parsing confirmation result. Please try again.');
                 return;
             }
     
             if (!confirmationResult.verificationId) {
-                document.getElementById('message').textContent = 'Invalid confirmation result. Please try again.';
+                showModal('Invalid confirmation result. Please try again.');
                 return;
             }
     
@@ -117,7 +135,7 @@
                 try {
                     const result = await signInWithCredential(auth, credential);
                     const user = result.user;
-                    document.getElementById('message').textContent = 'Phone Number Verified Successfully!';
+                    showModal('Phone Number Verified Successfully!');
     
                     // Save phone number to Firestore
                     const initialUid = localStorage.getItem('initialUid');
@@ -129,18 +147,18 @@
                         window.location.href = 'personalinfo.html';
                     } else {
                         console.error("Initial UID or email not found in localStorage");
-                        document.getElementById('message').textContent = 'Error retrieving user information. Please try again.';
+                        showModal('Error retrieving user information. Please try again.');
                     }
                 } catch (error) {
                     console.error("Error during signInWithCredential", error);
-                    document.getElementById('message').textContent = 'Error Verifying Code. Please try again.';
+                    showModal('Error Verifying Code. Please try again.');
                 }
             });
     
             document.getElementById('resendCode').addEventListener('click', () => {
                 const phoneNumber = localStorage.getItem('phoneNumber');
                 if (!/^\+[1-9]\d{1,14}$/.test(phoneNumber)) {
-                    document.getElementById('message').textContent = 'Invalid Phone Number Format. Please try again.';
+                    showModal('Invalid Phone Number Format. Please try again.');
                     return;
                 }
     
@@ -154,14 +172,14 @@
                 signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
                     .then((newConfirmationResult) => {
                         localStorage.setItem('confirmationResult', JSON.stringify(newConfirmationResult));
-                        document.getElementById('message').textContent = 'Verification Code Sent Successfully.';
+                        showModal('Verification Code Sent Successfully.');
                         startResendCooldown();
                     }).catch((error) => {
                         console.error("Error during signInWithPhoneNumber", error);
                         if (error.code === 'auth/too-many-requests') {
-                            document.getElementById('message').textContent = 'Too many requests. Please try again later.';
+                            showModal('Too many requests. Please try again later.');
                         } else {
-                            document.getElementById('message').textContent = 'Error sending verification code. Please try again.';
+                            showModal('Error sending verification code. Please try again.');
                         }
                     });
             });
@@ -171,6 +189,11 @@
                 startResendCooldown();
             }
         });
+    
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            $('#promptModal').modal('show');
+        }
     </script>
 </body>
 </html>
