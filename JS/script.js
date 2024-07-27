@@ -37,3 +37,5 @@ $('#videoModal').on('hidden.bs.modal', function () {
     video.pause();
     video.currentTime = 0;
 });
+
+

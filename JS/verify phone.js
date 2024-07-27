@@ -1,20 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Function to handle the verification process
-    function handleVerification() {
-        // Show a notification when the button is clicked
-        alert('You have been verified successfully!');
-        window.location.href = 'personal info.html';
-    }
-
-    // Get the verify button and attach a click event listener
-    const verifyButton = document.querySelector('.login-btn');
-    if (verifyButton) {
-        verifyButton.addEventListener('click', function () {
-            // Call the handleVerification function when the button is clicked
-            handleVerification();
-        });
-    }
-
     // Function to move to the next input field
     function moveToNext(currentInput, nextInputId) {
         if (currentInput.value.length === currentInput.maxLength) {
