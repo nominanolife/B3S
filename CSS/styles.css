@@ -161,6 +161,12 @@ main {
     text-align: left;
 }
 
+span {
+    font-family: Inter;
+    font-size: 20px;
+    font-weight: bold;
+}
+
 .form-label {
     font-family: Noto Sans;
     font-size: 14px;
@@ -217,10 +223,6 @@ main {
 
 /* Link styles */
 .text-dark {
-    color: #142a74;
-}
-
-.text-dark:hover {
     text-decoration: underline;
 }
 
