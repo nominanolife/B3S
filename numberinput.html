@@ -24,8 +24,13 @@
                     <p class="text-center mb-4">Enter your number for sending of OTP.</p>
                     <form id="phoneForm">
                         <div class="form-group">
-                            <input type="tel" id="phoneNumber" class="form-control mb-4" placeholder="Phone Number" name="phoneNumber" required>
-                        </div>
+                            <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">+63</span>
+                                </div>
+                                <input type="tel" id="phoneNumber" class="form-control" placeholder="Phone Number" name="phoneNumber" required>
+                            </div>
+                        </div>                        
                         <div class="d-flex justify-content-center">
                             <button type="submit" class="btn btn-primary login-btn" id="sendCodeButton">SEND OTP</button>
                             <p class="text-center mt-3" id="message"></p> 
@@ -72,15 +77,16 @@
                 window.recaptchaWidgetId = widgetId;
             });
 
-            document.getElementById('sendCodeButton').addEventListener('click', () => {
+            document.getElementById('sendCodeButton').addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent form from submitting normally
                 const sendCodeButton = document.getElementById('sendCodeButton');
                 const message = document.getElementById('message');
-                const phoneNumber = document.getElementById('phoneNumber').value;
+                const phoneNumber = '+63' + document.getElementById('phoneNumber').value;
                 const appVerifier = recaptchaVerifier;
 
                 sendCodeButton.disabled = true; // Disable the button to prevent multiple requests
 
-                if (!/^\+[1-9]\d{1,14}$/.test(phoneNumber)) {
+                if (!/^9\d{9}$/.test(phoneNumber.slice(3))) { // Adjusted regex to account for +63 prefix
                     message.textContent = 'Invalid phone number format. Please enter a valid phone number.';
                     sendCodeButton.disabled = false; // Re-enable the button
                     return;
@@ -107,6 +113,15 @@
                 setTimeout(() => {
                     sendCodeButton.disabled = false;
                 }, 60000);
+            });
+
+            // Add input event listener to phone number field
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            phoneNumberInput.addEventListener('input', () => {
+                let value = phoneNumberInput.value;
+                if (value.startsWith('0')) {
+                    phoneNumberInput.value = value.slice(1);
+                }
             });
         });
     </script>
