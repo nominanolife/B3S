@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
+    <link rel="stylesheet" href="CSS/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap">
+    <link rel="icon" href="Assets/logo.png" type="image/x-icon">
+</head>
+<body>
+    <main class="d-flex align-items-center">
+        <div class="container d-flex justify-content-center">
+            <div class="card login-card">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <img src="assets/phone.png" alt="Verification" class="img-fluid" style="height: 110px;">
+                    </div>
+                    <h3 class="text-center mb-4">Verification</h3>
+                    <p class="text-center mb-4">A verification code has been sent to your phone number.</p>
+                    <div class="d-flex justify-content-center mb-4">
+                        <input type="text" class="verification-code-input" maxlength="1" data-next-input-id="input1" id="input0">
+                        <input type="text" class="verification-code-input" maxlength="1" data-next-input-id="input2" data-prev-input-id="input0" id="input1">
+                        <input type="text" class="verification-code-input" maxlength="1" data-next-input-id="input3" data-prev-input-id="input1" id="input2">
+                        <input type="text" class="verification-code-input" maxlength="1" data-next-input-id="input4" data-prev-input-id="input2" id="input3">
+                        <input type="text" class="verification-code-input" maxlength="1" data-next-input-id="input5" data-prev-input-id="input3" id="input4">
+                        <input type="text" class="verification-code-input" maxlength="1" data-prev-input-id="input4" id="input5">
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-outline-primary login-btn" id="verifyButton">VERIFY</button>
+                    </div>
+                    <p class="text-center mt-3">Didn't receive a code? <a href="#" class="text-dark" id="resendCode">Resend Code</a></p>
+                    <p id="resendCountdown" class="text-center mt-3"></p>
+                    <div id="recaptcha-container" class="mb-4"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for prompts -->
+    <div class="modal fade" id="promptModal" tabindex="-1" aria-labelledby="promptModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="promptModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body" id="modalMessage">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="JS/verify phone.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+            authDomain: "authentication-d6496.firebaseapp.com",
+            databaseURL: "https://authentication-d6496-default-rtdb.asia-southeast1.firebasedatabase.app", // Keep this URL if still using Realtime DB elsewhere
+            projectId: "authentication-d6496",
+            storageBucket: "authentication-d6496.appspot.com",
+            messagingSenderId: "195867894399",
+            appId: "1:195867894399:web:596fb109d308aea8b6154a"
+        };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const firestore = getFirestore(app);
+    
+        let resendTimeout;
+    
+        function startResendCooldown() {
+            const countdownElement = document.getElementById('resendCountdown');
+            let timeLeft = 30; // 30 seconds cooldown
+    
+            document.getElementById('resendCode').disabled = true;
+            countdownElement.textContent = `You can resend the code in ${timeLeft} seconds.`;
+    
+            resendTimeout = setInterval(() => {
+                timeLeft--;
+                countdownElement.textContent = `You can resend the code in ${timeLeft} seconds.`;
+                if (timeLeft <= 0) {
+                    clearInterval(resendTimeout);
+                    countdownElement.textContent = '';
+                    document.getElementById('resendCode').disabled = false;
+                }
+            }, 1000);
+        }
+    
+        document.addEventListener('DOMContentLoaded', () => {
+            const confirmationResultData = localStorage.getItem('confirmationResult');
+            if (!confirmationResultData) {
+                showModal('No confirmation result found. Please try sending the code again.');
+                return;
+            }
+    
+            let confirmationResult;
+            try {
+                confirmationResult = JSON.parse(confirmationResultData);
+            } catch (error) {
+                console.error('Error parsing confirmation result', error);
+                showModal('Error parsing confirmation result. Please try again.');
+                return;
+            }
+    
+            if (!confirmationResult.verificationId) {
+                showModal('Invalid confirmation result. Please try again.');
+                return;
+            }
+    
+            const verificationId = confirmationResult.verificationId;
+    
+            document.getElementById('verifyButton').addEventListener('click', async () => {
+                const code = Array.from(document.querySelectorAll('.verification-code-input'))
+                    .map(input => input.value)
+                    .join('');
+    
+                const credential = PhoneAuthProvider.credential(verificationId, code);
+                try {
+                    const result = await signInWithCredential(auth, credential);
+                    const user = result.user;
+                    showModal('Phone Number Verified Successfully!');
+    
+                    // Save phone number to Firestore
+                    const initialUid = localStorage.getItem('initialUid');
+                    if (initialUid) {
+                        await setDoc(doc(firestore, 'applicants', initialUid), {
+                            phoneNumber: user.phoneNumber
+                        }, { merge: true }); // Merge to ensure other fields are not overwritten
+                        console.log('Phone number stored successfully');
+                        window.location.href = 'personalinfo.html';
+                    } else {
+                        console.error("Initial UID or email not found in localStorage");
+                        showModal('Error retrieving user information. Please try again.');
+                    }
+                } catch (error) {
+                    console.error("Error during signInWithCredential", error);
+                    showModal('Error Verifying Code. Please try again.');
+                }
+            });
+    
+            document.getElementById('resendCode').addEventListener('click', () => {
+                const phoneNumber = localStorage.getItem('phoneNumber');
+                if (!/^\+[1-9]\d{1,14}$/.test(phoneNumber)) {
+                    showModal('Invalid Phone Number Format. Please try again.');
+                    return;
+                }
+    
+                const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                        // Do nothing, invisible reCAPTCHA will automatically trigger sendCode
+                    }
+                });
+    
+                signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
+                    .then((newConfirmationResult) => {
+                        localStorage.setItem('confirmationResult', JSON.stringify(newConfirmationResult));
+                        showModal('Verification Code Sent Successfully.');
+                        startResendCooldown();
+                    }).catch((error) => {
+                        console.error("Error during signInWithPhoneNumber", error);
+                        if (error.code === 'auth/too-many-requests') {
+                            showModal('Too many requests. Please try again later.');
+                        } else {
+                            showModal('Error sending verification code. Please try again.');
+                        }
+                    });
+            });
+    
+            // Start cooldown timer on page load if resend cooldown is in progress
+            if (document.getElementById('resendCode').disabled) {
+                startResendCooldown();
+            }
+        });
+    
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            $('#promptModal').modal('show');
+        }
+    </script>
+</body>
+</html>

@@ -79,6 +79,11 @@ nav {
     color: #1442c9;
 }
 
+.navbar-nav a.active {
+    color: #1442c9;
+}
+
+
 .header-right {
     display: flex;
     flex-direction: row;
