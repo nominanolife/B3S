@@ -49,17 +49,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
         return isValid;
     }
-
-    // Event listener to handle save button click
-    if (saveButton) {
-        saveButton.addEventListener('click', function () {
-            if (validateForm()) {
-                // Redirect to personal info page
-                window.location.href = 'login.html'; // Redirect to another page on success
-                alert('Your personal information has been saved successfully!');
-            } else {
-                alert('Please fill out all required fields correctly.');
-            }
-        });
-    }
 });

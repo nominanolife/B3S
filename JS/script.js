@@ -37,3 +37,31 @@ $('#videoModal').on('hidden.bs.modal', function () {
     video.pause();
     video.currentTime = 0;
 });
+
+// Function to highlight active nav link
+document.addEventListener('DOMContentLoaded', function() {
+    const sections = document.querySelectorAll('#home, #about, #courses, #contact');
+    const navLinks = document.querySelectorAll('.navbar-nav a');
+
+    window.addEventListener('scroll', function() {
+        let current = '';
+
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (pageYOffset >= sectionTop - sectionHeight / 2) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(a => {
+            a.classList.remove('active');
+            if (a.getAttribute('href') === '#' + current) {
+                a.classList.add('active');
+            }
+        });
+    });
+});
+
+
+
