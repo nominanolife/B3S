@@ -1,0 +1,262 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    background-color: #fff;
+    padding: 5px 30px 5px 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: fixed; /* This ensures the navbar is fixed */
+    top: 0; /* This places the navbar at the top */    
+    width: 100%;
+    z-index: 1;
+}
+
+.navbar-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
+
+.b3slogo {
+    width: 55px;
+    height: 55px;
+}
+
+.brand-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #2F2E2E;
+}
+
+.brand-title {
+    font-family: Noto Sans; 
+    font-size: 36px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.sub-title {
+    font-family: Noto Sans;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.navbar-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+}
+
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-right: 50px;
+}
+
+.navbar-nav a {
+    margin: 10px;
+    padding: 10px;
+    font-family: Ubuntu;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #2F2E2E;
+}
+
+.navbar-nav a:hover {
+    color: #142974;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+}
+
+.header-right-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.register {
+    margin: 10px;
+    padding: 10px;
+    font-family: Ubuntu;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #092A73;
+    border: 1px solid #2F2E2E;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.5s;
+}
+
+.login {
+    margin: 10px;
+    padding: 10px;
+    font-family: Ubuntu;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+    border: 1px solid #2F2E2E;
+    border-radius: 5px;
+    background-color: #092A73;
+    cursor: pointer;
+}
+
+.register:hover {
+    background-color: #092A73;
+    color: #fff;
+}
+
+header {
+    background-color: #193075; 
+    color: #ffffff;
+    padding: 60px 0;
+    overflow: hidden;
+    min-height: 650px; 
+    position: relative;
+}
+
+.header-container {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2; 
+}
+
+.statistics-section {
+    background-color: #142974; /* Match the blue color */
+    padding: 50px 0;
+}
+
+.statistics-section .card {
+    border: none; /* Remove card border */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add slight shadow */
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.statistics-section .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.statistics-section .card i {
+    color: #142974; /* Match the icon color to the blue theme */
+}
+
+.about-us h2 {
+    color: #142974; /* Match the about us title color */
+}
+
+.about-us .container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.about-us .container img {
+    width: 60%; 
+    height: auto;
+    border-radius: 10px; 
+}
+
+.about-us .about-text {
+    background-color: white; /* White background for the about section */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slight shadow */
+    width: 100%; /* Adjust as necessary to fit the desired size */
+    margin-left: 5%; /* Adjust as necessary for spacing */
+}
+
+.strong-team .container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.strong-team .team-text {
+    width: 50%; 
+    margin-right: 5%; 
+}
+
+.strong-team .carousel {
+    width: 45%; 
+    height: auto;
+}
+
+.strong-team .carousel-inner img {
+    width: 100%;
+    height: 300px; /* Adjust the height as necessary */
+    object-fit: cover;
+    border-radius: 10px; 
+}
+
+/* Footer Styles */
+footer {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 20px 0;
+    position: relative;
+}
+
+.footer-logo {
+    width: 100px; 
+    margin-bottom: 10px;
+}
+
+.contact-icon {
+    margin-right: 10px;
+}
+
+.social-icon {
+    margin: 0 10px;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.social-icon:hover {
+    color: #e0a800; 
+}
+
+footer p, footer a {
+    margin: 0;
+    padding: 0;
+}
+
+footer h5 {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+footer p {
+    margin-bottom: 10px;
+}
+
+footer .container:last-child {
+    padding-top: 20px;
+}
