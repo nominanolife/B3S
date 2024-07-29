@@ -292,3 +292,25 @@ form p {
 .login-form {
     position: relative;
 }
+
+.return-icon {
+    position: absolute;
+    top: 20px; /* Adjust this value as needed */
+    left: 20px;
+    z-index: 10;
+}
+
+.return-icon a {
+    font-size: 24px;
+    color: #142a74;
+    text-decoration: none;
+}
+
+.return-icon a:hover {
+    color: #0d1d51;
+}
+
+/* Ensure the card body is positioned relative to contain the return icon */
+.card-body {
+    position: relative;
+}
