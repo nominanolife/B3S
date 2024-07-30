@@ -15,21 +15,13 @@
 <body>
 
     <nav>
-        <div class="navbar-left">
+        <a href="index.html" class="navbar-left">
             <img src="Assets/logo.png" class="b3slogo" alt="B3S Logo">
             <div class="brand-name">
                 <span class="brand-title">B3S</span>
                 <span class="sub-title">Driving School</span>
             </div>
-        </div>
-        <div class="navbar-center" id="navbarNav">
-            <div class="navbar-nav">
-                <a href="#home">Home</a>
-                <a href="#about">About</a>
-                <a href="#courses">Courses</a>
-                <a href="#contact">Contact</a>
-            </div>
-        </div>
+        </a>
         <div class="header-right">
             <div class="header-right-content">
                 <button class="register" type="button" id="registerButton">Register</button>
@@ -155,10 +147,10 @@
                 </div>
                 <div class="col-md-4 text-left">
                     <h5>Social Icons</h5>
-                    <a href="#" class="text-white social-icon"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="text-white social-icon"><i class="fab fa-facebook-messenger"></i></a>
-                    <a href="#" class="text-white social-icon"><i class="fa fa-envelope"></i></a>
-                    <p><a href="#" class="text-white">Data Protection Policy</a></p>
+                    <a href="https://www.facebook.com/b3smanila" class="text-white social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://m.me/b3smanila" class="text-white social-icon"><i class="fab fa-facebook-messenger"></i></a>
+                    <a href="mailto:b3sdrivingmanila@gmail.com" class="text-white social-icon"><i class="fa fa-envelope"></i></a>
+                    <p><a href="https://privacy.gov.ph/data-privacy-act/" class="text-white">Data Protection Policy</a></p>
                 </div>
             </div>
         </div>
@@ -171,8 +163,36 @@
         </div>
     </footer>
 
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Logged in as:</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="login-options">
+                        <a class="login-option" href="login.html">
+                            <img src="Assets/student.png" alt="Student">
+                            <button class="btn btn-primary">Student</button>
+                        </a>
+                        <div class="login-or">or</div>
+                        <a class="login-option" href="adminlogin.html">
+                            <img src="Assets/admin.png" alt="Admin">
+                            <button class="btn btn-warning">Admin</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="JS/about.js"></script>
 </body>
 </html>

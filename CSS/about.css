@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: Noto Sans;
     margin: 0;
     padding: 0;
 }
@@ -21,6 +21,10 @@ nav {
     flex-direction: row;
     align-items: center;
     cursor: pointer;
+}
+
+.navbar-left:hover {
+    text-decoration: none;
 }
 
 .b3slogo {
@@ -126,6 +130,77 @@ nav {
     color: #fff;
 }
 
+/* Center the modal content */
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 1rem);
+}
+
+/* Increase the size of the modal */
+.modal-dialog {
+    max-width: 600px;
+    margin: 1.75rem auto;
+}
+
+.modal-content {
+    min-height: 400px;
+}
+
+/* Styling for login options */
+.modal-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* Space between the options */
+    flex-wrap: wrap; /* Wrap the options on smaller screens */
+}
+
+.login-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 20px;
+    margin: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    flex: 1 1 30%; /* Flex-grow, flex-shrink, flex-basis */
+    max-width: 200px; /* Ensure the options don't get too wide */
+}
+
+.login-option:hover {
+    text-decoration: none;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.login-option img {
+    width: 80%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.login-option button {
+    margin-top: 10px;
+    font-size: 16px;
+    width: 100%;
+}
+
+.login-or {
+    margin: 0 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
 header {
     background-color: #193075; 
     color: #ffffff;
@@ -205,7 +280,7 @@ header {
 }
 
 .strong-team .carousel {
-    width: 45%; 
+    width: 45%;
     height: auto;
 }
 
