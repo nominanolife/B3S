@@ -1,0 +1,262 @@
+/* General styles */
+body {
+    font-family: 'Ubuntu', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    background-color: #fff;
+    padding: 5px 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    width: 100%;
+    z-index: 1;
+    height: 90px; /* Navbar height */
+    top: 0;
+    left: 0;
+}
+
+.navbar-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
+
+.b3slogo {
+    width: 55px;
+    height: 55px;
+    margin-left: 10px; /* Adjust the margin as needed */
+}
+
+.brand-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #2F2E2E;
+}
+
+.brand-title {
+    font-family: Noto Sans; 
+    font-size: 36px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.sub-title {
+    font-family: Noto Sans;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    background-color: #142a74 !important;
+    padding-top: 90px;
+    position: fixed;
+    transition: width 0.3s;
+    overflow: hidden;
+    top: 90px; /* Align with the bottom of the navbar */
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    display: block;
+    padding: 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar ul li a:hover {
+    background-color: #fff;
+    color: #142a74;
+}
+
+.sidebar.active {
+    width: 0;
+}
+
+.content {
+    padding: 20px;
+    margin-left: 200px;
+    margin-top: 100px; /* Space for fixed navbar */
+    width: calc(100% - 200px); /* Adjust for sidebar width */
+    transition: margin-left 0.3s;
+}
+
+.content.fullwidth {
+    margin-left: 0;
+    width: 100%;
+}
+
+.appointment-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.calendar {
+    width: 50%;
+}
+
+.time-slot .form-check-input {
+    margin-left: -20px; /* Adjust this value as needed */
+}
+
+.time-slot label {
+    display: block;
+    margin: 5px 0;
+    padding-left: 30px; /* Ensures label text is aligned correctly with the radio button */
+    position: relative;
+}
+
+.time-slot label::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px; /* Width of the radio button */
+    height: 20px; /* Height of the radio button */
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-group-append {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.input-group-append .calendar-icon {
+    border: 1px solid #ced4da;
+    border-left: none;
+    border-radius: 0;
+    background-color: #142a74;
+    color: #fff;
+    cursor: pointer;
+}
+
+.input-group-append .calendar-icon i {
+    color: #fff;
+}
+
+.input-group input {
+    border-radius: 0;
+}
+
+.input-group input:focus {
+    box-shadow: none;
+    border-color: #142a74;
+}
+
+.time-slot input[type="radio"] {
+    accent-color: #142a74; /* Sets the color of radio buttons */
+}
+
+.time-slot label {
+    display: block;
+    margin: 5px 0;
+}
+
+.input-group-append .calendar-icon {
+    border: 1px solid #ced4da;
+    border-left: none;
+    border-radius: 0;
+    background-color: #142a74;
+    color: #fff;
+    cursor: pointer;
+}
+
+.input-group-append .calendar-icon i {
+    color: #fff;
+}
+
+.form-check-input:checked ~ .form-check-label {
+    color: #142a74;
+}
+
+/* Responsive styles */
+@media (max-width: 992px) { /* Large tablets and below */
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding-top: 0;
+        top: 0;
+    }
+    
+    .content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) { /* Tablets and below */
+    .sidebar ul li {
+        margin: 10px 0;
+    }
+
+    .sidebar ul li a {
+        font-size: 16px;
+    }
+
+    .brand-title {
+        font-size: 30px;
+    }
+
+    .sub-title {
+        font-size: 10px;
+    }
+
+    .appointment-container {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media (max-width: 576px) { /* Mobile phones */
+    .b3slogo {
+        width: 45px;
+        height: 45px;
+    }
+
+    .brand-title {
+        font-size: 24px;
+    }
+
+    .sub-title {
+        font-size: 8px;
+    }
+
+    .appointment-container {
+        margin-top: 10px;
+    }
+
+    .calendar {
+        width: 100%;
+    }
+}
