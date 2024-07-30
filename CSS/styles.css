@@ -1,5 +1,5 @@
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: Noto Sans;
     margin: 0;
     min-height: 100vh;
     overflow: hidden;
@@ -213,6 +213,7 @@ span {
     border: none;
     border-radius: 50px;
     padding: 10px 20px;
+    margin-top: 20px;
     transition: background-color 0.3s ease;
 }
 
@@ -295,4 +296,73 @@ form p {
 /* Ensure the form is positioned relative to contain the back icon */
 .login-form {
     position: relative;
+}
+
+.return-icon {
+    position: absolute;
+    top: 20px; /* Adjust this value as needed */
+    left: 20px;
+    z-index: 10;
+}
+
+.return-icon a {
+    font-size: 24px;
+    color: #142a74;
+    text-decoration: none;
+}
+
+.return-icon a:hover {
+    color: #0d1d51;
+}
+
+/* Ensure the card body is positioned relative to contain the return icon */
+.card-body {
+    position: relative;
+}
+
+/* Error message styles */
+h5 {
+    font-family: Noto Sans;
+    font-size: 16px;
+    font-weight: bold;
+    color: #dc3545;
+}
+
+#modalMessage {
+    font-family: Inter;
+    font-size: 12px;
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.btn-secondary {
+    background-color: #142A74;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+}
+
+.btn-secondary:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+
+/* Password strength meter styles */
+.requirement {
+    display: flex;
+    align-items: center;
+}
+.requirement i {
+    margin-right: 10px;
+}
+.requirement p {
+    font-family: Noto Sans;
+    font-size: 12px;
+}
+.requirement.valid i {
+    color: green;
+}
+.requirement.invalid i {
+    color: red;
 }
