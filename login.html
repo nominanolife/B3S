@@ -59,46 +59,49 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
     <script src="JS/login.js"></script>
+    <script src="JS/login.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-        import { getDatabase, ref, set, update } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+        import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
     
-        const firebaseConfig = {
-          apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
-          authDomain: "authentication-d6496.firebaseapp.com",
-          databaseURL: "https://authentication-d6496-default-rtdb.asia-southeast1.firebasedatabase.app",
-          projectId: "authentication-d6496",
-          storageBucket: "authentication-d6496.appspot.com",
-          messagingSenderId: "195867894399",
-          appId: "1:195867894399:web:596fb109d308aea8b6154a"
-        };
+        document.addEventListener('DOMContentLoaded', () => {
+            const firebaseConfig = {
+              apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+              authDomain: "authentication-d6496.firebaseapp.com",
+              projectId: "authentication-d6496",
+              storageBucket: "authentication-d6496.appspot.com",
+              messagingSenderId: "195867894399",
+              appId: "1:195867894399:web:596fb109d308aea8b6154a"
+            };
     
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const auth = getAuth();
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            const auth = getAuth();
     
-        document.getElementById('signIn').addEventListener('click', async (event) => {
-            event.preventDefault(); // Prevent the default form submission
+            document.getElementById('signIn').addEventListener('click', async (event) => {
+                event.preventDefault(); // Prevent the default form submission
     
-            var email = document.getElementById('email').value;
-            var password = document.getElementById('password').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
     
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                
-                const dt = new Date();
-                await update(ref(database, 'applicants/' + user.uid), {
-                    last_login: dt
-                });
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    
+                    const dt = new Date();
+                    const userRef = doc(db, 'applicants', user.uid);
+                    await updateDoc(userRef, {
+                        last_login: dt
+                    });
     
-                alert('Logged In Successfully');
-            } catch (error) {
-                const errorMessage = error.message;
-                alert(errorMessage);
-            }
+                    alert('Logged In Successfully');
+                } catch (error) {
+                    const errorMessage = error.message;
+                    alert(errorMessage);
+                }
+            });
         });
     </script>
 </body>

@@ -70,7 +70,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, query, collection, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
         document.addEventListener('DOMContentLoaded', () => {
             const firebaseConfig = {
@@ -136,7 +136,7 @@
             registerForm.addEventListener('submit', async (event) => {
                 event.preventDefault(); // Prevent the default form submission
 
-                const email = document.getElementById('email').value;
+                const email = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value;
 
                 // Validate Email
@@ -173,12 +173,15 @@
                         role: 'applicant'
                     });
 
+                    // Clear the form fields
+                    registerForm.reset();
+
                     alert('Account Created');
                     
                     // Redirect to phone verification page
                     window.location.replace('numberinput.html');
                 } catch (error) {
-                    alert(error.message);
+                    alert('Error Creating Account: ' + error.message);
                 }
             });
 
@@ -188,9 +191,9 @@
             }
 
             async function checkEmailExists(email) {
-                const querySnapshot = await getDocs(collection(firestore, 'applicants'));
-                const users = querySnapshot.docs.map(doc => doc.data());
-                return users.some(user => user.email === email);
+                const userQuery = query(collection(firestore, 'applicants'), where('email', '==', email));
+                const querySnapshot = await getDocs(userQuery);
+                return !querySnapshot.empty;
             }
 
             function validatePassword(password) {

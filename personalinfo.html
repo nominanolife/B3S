@@ -158,6 +158,13 @@
                                 }, { merge: true });
 
                                 alert('Personal Information Saved Successfully!');
+
+                                // Clear localStorage after saving data
+                                localStorage.removeItem('initialUid');
+                                localStorage.removeItem('phoneNumber');
+                                localStorage.removeItem('confirmationResult');
+                                localStorage.setItem('codeSentTime', Date.now());
+
                                 window.location.href = 'login.html';  // Navigate to login page
                             } catch (error) {
                                 alert('Failed to Save Personal Information: ' + error.message);

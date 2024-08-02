@@ -366,3 +366,8 @@ h5 {
 .requirement.invalid i {
     color: red;
 }
+.disabled-link {
+    pointer-events: none; /* Prevents clicks */
+    color: #ccc; /* Grey out text */
+    text-decoration: none; /* Remove underline */
+}
