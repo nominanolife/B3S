@@ -43,7 +43,7 @@
         </div>
         <div class="main-content">
             <div class="header">
-                <h2>Dashboard</h2>
+                <h2>Courses</h2>
                 <div class="search-container">
                     <i class="bi bi-search"></i>
                     <input type="text" class="search" placeholder="Search">
@@ -54,7 +54,10 @@
                     <button class="add-package" type="button" id="addButton">Add Package</button>
                     <button class="delete-package" type="button" id="deleteButton">Delete Package</button>
                 </div>
-            </div>
+                <div class="package-list" id="packageList">
+                    
+                </div>
+            </div>            
         </div>
 
         <div class="modal" id="packageModal">
@@ -65,13 +68,13 @@
                     </div>
                     <form class="modal-body">
                         <div class="input-body">
-                            <input type="text" class="package-name" placeholder="Package Name">
-                            <input type="text" class="package-price" placeholder="Price">
-                            <input type="text" class="package-description" placeholder="Description">
+                            <input type="text" class="package-name" placeholder="Package Name" required>
+                            <input type="text" class="package-price" placeholder="Price" required>
+                            <input type="text" class="package-description" placeholder="Description" required>
                         </div>
                         <div class="modal-footer">
-                            <button class="close-modal" type="button">Create</button>
-                            <button class="save-package" type="button">Cancel</button>
+                            <button class="save-package" type="submit">Create</button>
+                            <button class="close-modal" type="button">Cancel</button>
                         </div>
                     </form>
                 </div>
