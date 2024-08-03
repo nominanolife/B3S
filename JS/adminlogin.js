@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     var adminData = doc.data();
                     if (adminData.name === name && adminData.password === password) {
                         alert("Login Successful");
-                        // Redirect to admin dashboard or other actions
+                        // Redirect to admin dashboard
+                        window.location.href = "admindashboard.html";
                     } else {
                         alert("Invalid credentials");
                     }
