@@ -1,5 +1,5 @@
 body {
-    font-family: Noto Sans;
+    font-family: Poppins;
     margin: 0;
     min-height: 100vh;
     overflow: hidden;
@@ -42,7 +42,7 @@ nav {
 }
 
 .brand-title {
-    font-family: Noto Sans; 
+    font-family: Poppins; 
     font-size: 36px;
     font-weight: bold;
     margin: 0;
@@ -50,7 +50,7 @@ nav {
 }
 
 .sub-title {
-    font-family: Noto Sans;
+    font-family: Poppins;
     font-size: 12px;
     font-weight: bold;
     margin: 0;
@@ -74,7 +74,7 @@ nav {
 .navbar-nav a {
     margin: 10px;
     padding: 10px;
-    font-family: Ubuntu;
+    font-family: Poppins;
     font-size: 14px;
     font-weight: bold;
     text-decoration: none;
@@ -162,13 +162,13 @@ main {
 }
 
 span {
-    font-family: Inter;
+    font-family: Poppins;
     font-size: 20px;
     font-weight: bold;
 }
 
 .form-label {
-    font-family: Noto Sans;
+    font-family: Poppins;
     font-size: 14px;
     font-weight: bold;
     text-align: left;
@@ -206,7 +206,7 @@ span {
 }
 
 .login-btn {
-    font-family: Noto Sans;
+    font-family: Poppins;
     font-weight: bold;
     background-color: #142A74;
     color: #fff;
@@ -228,7 +228,7 @@ span {
 }
 
 form p {
-    font-family: Inter;
+    font-family: Poppins;
     font-size: 14px;
     font-weight: 400;
     margin-top: 1rem;
@@ -322,14 +322,14 @@ form p {
 
 /* Error message styles */
 h5 {
-    font-family: Noto Sans;
+    font-family: Poppins;
     font-size: 16px;
     font-weight: bold;
     color: #dc3545;
 }
 
 #modalMessage {
-    font-family: Inter;
+    font-family: Poppins;
     font-size: 12px;
     font-weight: bold;
     color: #dc3545;
@@ -357,7 +357,7 @@ h5 {
     margin-right: 10px;
 }
 .requirement p {
-    font-family: Noto Sans;
+    font-family: Poppins;
     font-size: 12px;
 }
 .requirement.valid i {
