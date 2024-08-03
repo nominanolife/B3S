@@ -107,6 +107,7 @@
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     const initialUid = localStorage.getItem('initialUid');
+                    const email = localStorage.getItem('email');
                     if (initialUid) {
                         const docRef = doc(firestore, 'applicants', initialUid);
                         const docSnap = await getDoc(docRef);
@@ -145,6 +146,8 @@
 
                             try {
                                 await setDoc(docRef, {
+                                    email: email, // Save the email
+                                    role: 'applicant', // Save the role as 'applicant'
                                     personalInfo: {
                                         first: first,
                                         middle: middle,
@@ -161,9 +164,10 @@
 
                                 // Clear localStorage after saving data
                                 localStorage.removeItem('initialUid');
+                                localStorage.removeItem('email');
                                 localStorage.removeItem('phoneNumber');
                                 localStorage.removeItem('confirmationResult');
-                                localStorage.setItem('codeSentTime', Date.now());
+                                localStorage.removeItem('codeSentTime', Date.now());
 
                                 window.location.href = 'login.html';  // Navigate to login page
                             } catch (error) {

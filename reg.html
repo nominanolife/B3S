@@ -71,7 +71,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
         import { getFirestore, doc, setDoc, query, collection, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-
+    
         document.addEventListener('DOMContentLoaded', () => {
             const firebaseConfig = {
                 apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
@@ -81,18 +81,18 @@
                 messagingSenderId: "195867894399",
                 appId: "1:195867894399:web:596fb109d308aea8b6154a"
             };
-
+    
             // Initialize Firebase
             const app = initializeApp(firebaseConfig);
             const firestore = getFirestore(app);
             const auth = getAuth();
-
+    
             const registerForm = document.getElementById('registerForm');
             const passwordInput = document.getElementById('password');
             const minLengthRequirement = document.getElementById('minLength');
             const lettersRequirement = document.getElementById('letters');
             const numbersSymbolsRequirement = document.getElementById('numbersSymbols');
-
+    
             passwordInput.addEventListener('input', () => {
                 const password = passwordInput.value;
                 // Validate Password Length
@@ -108,7 +108,7 @@
                 // Validate Password Characters
                 const hasLowerCase = /[a-z]/.test(password);
                 const hasUpperCase = /[A-Z]/.test(password);
-                
+    
                 if (hasLowerCase && hasUpperCase) {
                     lettersRequirement.classList.remove('invalid');
                     lettersRequirement.classList.add('valid');
@@ -121,7 +121,7 @@
                 // Validate Password Numbers and Symbols
                 const hasNumbers = /\d/.test(password);
                 const hasSymbols = /[@$!%*?&]/.test(password);
-
+    
                 if (hasNumbers && hasSymbols) {
                     numbersSymbolsRequirement.classList.remove('invalid');
                     numbersSymbolsRequirement.classList.add('valid');
@@ -132,77 +132,71 @@
                     numbersSymbolsRequirement.querySelector('i').className = 'fas fa-times';
                 }
             });
-
+    
             registerForm.addEventListener('submit', async (event) => {
                 event.preventDefault(); // Prevent the default form submission
-
+    
                 const email = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value;
-
+    
                 // Validate Email
                 if (!validateEmail(email)) {
                     alert('Please Enter a Valid Email Address.');
                     return;
                 }
-
+    
                 // Check for duplicate email
                 const emailExists = await checkEmailExists(email);
                 if (emailExists) {
                     alert('This Email is Already Registered.');
                     return;
                 }
-
+    
                 // Validate Password
                 const passwordValidationResult = validatePassword(password);
                 if (!passwordValidationResult.isValid) {
                     alert(passwordValidationResult.message);
                     return;
                 }
-
+    
                 try {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
-
-                    // Save the initial UID in localStorage
+    
+                    // Save the initial UID and email in localStorage
                     localStorage.setItem('initialUid', user.uid);
-
-                    // Save user data to the Firestore
-                    await setDoc(doc(firestore, 'applicants', user.uid), {
-                        email: email,
-                        last_login: new Date().toISOString(),
-                        role: 'applicant'
-                    });
-
+                    localStorage.setItem('email', email);
+    
                     // Clear the form fields
                     registerForm.reset();
-
+    
                     alert('Account Created');
-                    
+    
                     // Redirect to phone verification page
                     window.location.replace('numberinput.html');
                 } catch (error) {
                     alert('Error Creating Account: ' + error.message);
                 }
             });
-
+    
             function validateEmail(email) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 return emailRegex.test(email);
             }
-
+    
             async function checkEmailExists(email) {
                 const userQuery = query(collection(firestore, 'applicants'), where('email', '==', email));
                 const querySnapshot = await getDocs(userQuery);
                 return !querySnapshot.empty;
             }
-
+    
             function validatePassword(password) {
                 const minLength = 8;
                 const hasUpperCase = /[A-Z]/.test(password);
                 const hasLowerCase = /[a-z]/.test(password);
                 const hasNumber = /\d/.test(password);
                 const hasSpecialChar = /[@$!%*?&]/.test(password);
-
+    
                 if (password.length < minLength) {
                     return { isValid: false, message: `Password must be at least ${minLength} characters long.` };
                 }
@@ -221,6 +215,6 @@
                 return { isValid: true, message: '' };
             }
         });
-    </script>
+    </script>    
 </body>
 </html>
