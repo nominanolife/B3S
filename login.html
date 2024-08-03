@@ -95,7 +95,7 @@
                         last_login: dt
                     });
     
-                    alert('Logged In Successfully');
+                    window.location.href = 'userdashboard.html';
                 } catch (error) {
                     const errorMessage = error.message;
                     alert(errorMessage);
