@@ -371,3 +371,21 @@ h2 {
     background: none;
     text-decoration: underline;
 }
+
+.student-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+    background-color: #f9f9f9;
+}
+
+.student-item h3 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.student-item p {
+    margin: 5px 0;
+    font-size: 1em;
+}

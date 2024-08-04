@@ -23,6 +23,7 @@ const tilesPerPage = 1;
 const packageContainer = document.querySelector('.package-container');
 let packages = [];
 let userEnrolledPackage = null; // To store the user's enrolled package
+let userPackagePrice = null; // To store the user's enrolled package price
 
 function renderPackages(packages) {
   packageContainer.innerHTML = '';
@@ -37,7 +38,7 @@ function renderPackages(packages) {
             <h3>${pkg.description}</h3>
           </div>
           <div class="package-footer">
-            <button class="enroll-now-button" type="button" data-package-id="${pkg.id}" data-package-name="${pkg.name}">Enroll Now</button>
+            <button class="enroll-now-button" type="button" data-package-id="${pkg.id}" data-package-name="${pkg.name}" data-package-price="${pkg.price}">Enroll Now</button>
           </div>
         </form>
       </div>`;
@@ -100,6 +101,7 @@ document.addEventListener('click', async (e) => {
   if (e.target && e.target.classList.contains('enroll-now-button')) {
     const packageId = e.target.dataset.packageId;
     const packageName = e.target.dataset.packageName;
+    const packagePrice = e.target.dataset.packagePrice;
     const user = auth.currentUser;
 
     if (user) {
@@ -112,6 +114,7 @@ document.addEventListener('click', async (e) => {
         $('#confirmModal').modal('show');
         document.getElementById('confirmEnrollButton').dataset.packageId = packageId;
         document.getElementById('confirmEnrollButton').dataset.packageName = packageName;
+        document.getElementById('confirmEnrollButton').dataset.packagePrice = packagePrice;
       }
     } else {
       console.error("No user is currently signed in.");
@@ -123,6 +126,7 @@ document.addEventListener('click', async (e) => {
 document.getElementById('confirmEnrollButton').addEventListener('click', async () => {
   const packageId = document.getElementById('confirmEnrollButton').dataset.packageId;
   const packageName = document.getElementById('confirmEnrollButton').dataset.packageName;
+  const packagePrice = document.getElementById('confirmEnrollButton').dataset.packagePrice;
   const user = auth.currentUser;
 
   if (user) {
@@ -130,10 +134,12 @@ document.getElementById('confirmEnrollButton').addEventListener('click', async (
     try {
       await updateDoc(doc(db, "applicants", userId), {
         role: "student",
-        enrolledPackage: packageName // Store the package name
+        enrolledPackage: packageName, // Store the package name
+        packagePrice: packagePrice // Store the package price
       });
       document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
       userEnrolledPackage = packageName;
+      userPackagePrice = packagePrice;
       $('#confirmModal').modal('hide');
       $('#successToast').toast('show');
       setTimeout(() => {
@@ -154,6 +160,7 @@ onAuthStateChanged(auth, async (user) => {
       if (docSnap.exists()) {
         const userData = docSnap.data();
         userEnrolledPackage = userData.enrolledPackage || null;
+        userPackagePrice = userData.packagePrice || null;
         if (userEnrolledPackage) {
           document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
         }
