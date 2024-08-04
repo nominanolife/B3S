@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B3S Driving School - Manila</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="CSS/userprofile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap">
+    <link rel="icon" href="Assets/logo.png" type="image/x-icon">
+</head>
+<body>
+    <div class="whole-page">
+        <div class="sidebar">
+            <div class="sidebar-content">
+                <div class="logo">
+                    <img src="Assets/logo.png" class="b3slogo" alt="B3S Logo">
+                    <div class="brand-name">
+                        <span class="brand-title">B3S</span>
+                        <span class="sub-title">Driving School</span>
+                    </div>
+                </div>
+                <div class="sidebar-dashboard">
+                    <a href="userdashboard.html"><i class="bi bi-columns-gap"></i>Dashboard</a>
+                </div>
+                <div class="sidebar-menu">
+                    <a href="usercourses.html"><i class="bi bi-mortarboard"></i>Courses</a>
+                    <a href="userappointment.html"><i class="bi bi-calendar2-week"></i>Appointment</a>
+                    <a href="usermodule.html"><i class="bi bi-book"></i>Modules</a>
+                    <a href="uservideolearning.html"><i class="bi bi-collection-play-fill"></i>Video Learning</a>
+                    <a href="userquiz.html"><i class="bi bi-journals"></i>Quiz</a>
+                </div>
+                <div class="sidebar-account">
+                    <button class="profile" type="button" id="profileBtn"><i class="bi bi-person-circle"></i>Profile</button>
+                    <button class="logout" type="button"><i class="bi bi-box-arrow-left"></i>Logout</button>
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h2>Profile</h2>
+            </div>
+            <div class="page-content">
+                <div class="profile-container">
+                    <div class="container-header">
+                        <img class="profile-pic" src="Assets/default-profile.png" alt="profile picture">
+                    </div>
+                    <div class="container-body">
+                        <div class="top-info">
+                            <span class="name"></span>
+                            <span class="email"></span>
+                            <button class="edit" type="button" data-toggle="modal" data-target="#editProfileModal">Edit Profile<i class="bi bi-pencil-square"></i></button>
+                        </div>
+                        <div class="bottom-info">
+                            <div class="three-info">
+                                <div class="info-block">
+                                    <span class="label">Birthdate</span>
+                                    <span class="input-label1"></span>
+                                </div>
+                                <div class="info-block">
+                                    <span class="label">Age</span>
+                                    <span class="input-label1"></span>
+                                </div> 
+                                <div class="info-block"> 
+                                    <span class="label">Status</span>
+                                    <span class="input-label1"></span>
+                                </div>
+                            </div>
+                            <div class="two-info">
+                                <div class="info-block">
+                                    <span class="label">Contact Number</span>
+                                    <span class="input-label2"></span>
+                                </div>
+                                <div class="info-block">
+                                    <span class="label">Address</span>
+                                    <span class="input-label2"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="editProfileForm">
+                        <div class="profile-pic-container">
+                            <img id="profilePicPreview" src="Assets/default-profile.png" alt="profile picture">
+                            <i class="fas fa-camera" id="uploadIcon"></i>
+                            <input type="file" id="editProfilePic" accept="image/*" style="display: none;">
+                        </div>
+                        <div class="inputs">
+                            <div class="form-group">
+                                <label for="editFirstName">First Name</label>
+                                <input type="text" class="form-control" id="editName">
+                            </div>
+                            <div class="form-group">
+                                <label for="editMiddleName">Middle Name</label>
+                                <input type="text" class="form-control" id="editName">
+                            </div>
+                            <div class="form-group">
+                                <label for="editLastName">Last Name</label>
+                                <input type="text" class="form-control" id="editName">
+                            </div>
+                            <div class="form-group">
+                                <label for="editLastName">Suffix</label>
+                                <input type="text" class="form-control" id="editName">
+                            </div>
+                        </div>
+                        <div class="inputs">
+                            <div class="form-group">
+                                <label for="editBirthdate">Birthdate</label>
+                                <input type="date" class="form-control" id="editBirthdate">
+                            </div>
+                            <div class="form-group">
+                                <label for="editAge">Age</label>
+                                <input type="number" class="form-control" id="editAge">
+                            </div>
+                        </div>
+                        <div class="inputs">
+                            <div class="form-group">
+                                <label for="editStatus">Status</label>
+                                <select class="form-control" id="editStatus">
+                                    <option value="single">Single</option>
+                                    <option value="married">Married</option>
+                                    <option value="widowed">Widowed</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editContactNumber">Contact Number</label>
+                                <input type="text" class="form-control" id="editContactNumber">
+                            </div>
+                        </div>
+                        <div class="inputs">
+                            <div class="form-group">
+                                <label for="editAddress">Address</label>
+                                <input type="text" class="form-control" id="editAddress">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="saveProfileChanges">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confirmLogoutBtn">Logout</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="module" src="JS/userprofile.js"></script>
+    <script type="module" src="JS/common.js"></script>
+</body>
+</html>

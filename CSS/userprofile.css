@@ -1,0 +1,482 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.whole-page {
+    display: flex;
+    flex-direction: row;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    height: 100vh;
+    padding: 30px 30px;
+    background-color: #ffffff;
+    border-right: 1px solid #D9D9D9;
+}
+
+.sidebar-content {
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.b3slogo {
+    width: 55px;
+    height: 55px;
+}
+
+.brand-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #2F2E2E;
+}
+
+.brand-title {
+    font-family: Poppins; 
+    font-size: 36px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.sub-title {
+    font-family: Poppins;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.sidebar-dashboard {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    padding: 20px 0;
+}
+
+.sidebar-dashboard a {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #2F2E2E;
+    padding: 20px 30px;
+}
+
+.sidebar-dashboard a:hover {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.sidebar-dashboard::after {
+    content: "";
+    display: block;
+    margin-top: 20px;
+    border-bottom: 1px solid #D9D9D9;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-menu a {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    text-decoration: none;
+    color: #2F2E2E;
+    margin-top: 20px;
+    padding: 20px 30px;
+}
+
+.sidebar-menu a:hover {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.sidebar-menu::after {
+    content: "";
+    display: block;
+    margin-top: 20px;
+    border-bottom: 1px solid #D9D9D9;
+}
+
+.sidebar-dashboard i, .sidebar-menu i, .sidebar-account i {
+    margin-right: 10px;
+}
+
+.top-info i {
+    margin-left: 10px;
+}
+
+.sidebar-account {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar a.active, .sidebar button.active {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.profile, .logout {
+    border: none;
+    background: none;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    text-decoration: none;
+    text-align: left;
+    margin-top: 20px;
+    padding: 20px 30px;
+}
+
+.profile:hover, .logout:hover {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    width: calc(100% - 300px);
+    height: calc(100vh - 120px);
+    margin-left: 300px;
+    margin-top: 120px;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    display: flex;
+    flex-direction: row;
+    width: calc(100% - 300px);
+    padding: 40px 30px;
+    background-color: #ffffff;
+    justify-content: center;
+    z-index: 1000;
+}
+
+h3 {
+    font-family: Poppins;
+    font-size: 22px;
+    font-weight: bold;
+    color: #2F2E2E;
+}
+
+h2 {
+    font-family: Poppins;
+    font-size: 24px;
+    font-weight: normal;
+    color: #2F2E2E;
+}
+
+.page-content {
+    display: flex;
+    padding: 30px 30px;
+    background-color: #f5f5f5;
+    height: 100%;
+}
+
+.profile-container {
+    border: 1px solid #142A74;
+    border-radius: 20px;
+    background-color: #ffffff;
+    width: 100%;
+}
+
+.container-header {
+    display: flex;
+    flex-direction: column;
+    background-image: linear-gradient(to right, #142A74, #8597D4);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    height: 180px;
+}
+
+.profile-pic{
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    margin: 0 auto;
+    margin-top: 10px;
+}
+
+.profile-pic {
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #dfe4ea;
+}
+
+.container-body {
+    padding: 20px;
+}
+
+.top-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 130px;
+}
+
+.name {
+    font-family: Poppins;
+    font-size: 32px;
+    font-weight: bold;
+    color: #2F2E2E;
+}
+
+.email {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #2f2e2ea2;
+    margin-top: 10px;
+}
+
+.edit {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #ffffff;
+    margin-top: 20px;
+    padding: 10px 30px;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    background-color: #142A74;
+}
+
+.edit:hover {
+    background-color: #142a74ec;
+}
+
+.bottom-info {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.three-info{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.two-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.label {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #2F2E2E;
+}
+
+.info-block {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+}
+
+/* Ensure placeholders have consistent styling */
+.info-block span.input-label1{
+    display: inline-block;
+    min-width: 475px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    color: #2F2E2E;
+    margin-top: 10px;
+}
+
+.info-block span.input-label2 {
+    display: inline-block;
+    min-width: 720px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    color: #2F2E2E;
+    margin-top: 10px;
+}
+
+/* Specific styling for spans with no text to keep the design */
+.info-block span.input-label1:empty::before,
+.info-block span.input-label2:empty::before {
+    content: 'N/A'; /* Placeholder text */
+    color: #2f2e2eb6;
+}
+
+/* Optional: Adjust margin or alignment to match design */
+.three-info .info-block,
+.two-info .info-block {
+    margin-bottom: 10px; /* Adjust spacing as needed */
+}
+
+
+.disabled-link {
+    pointer-events: none;
+    color: gray;
+    text-decoration: none;  /* Remove underline */
+    cursor: default;  /* Change cursor to default */
+}
+
+#editProfileModal .modal-dialog {
+    top: 25%;
+    left: 55%;
+    transform: translate(-50%, -20%);
+    margin: 0;
+    max-width: 70%;
+}
+
+#editProfileModal .modal-content {
+    border-radius: 20px;
+    padding: 20px;
+    height: 800px;
+}
+
+#editProfileModal .modal-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+#editProfileModal .inputs {
+    display: flex;
+    flex-direction: row;
+}
+
+#editProfileModal .form-group {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    width: 100%;
+}
+
+#editProfileModal .form-group label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #142A74;
+}
+
+#editProfileModal .form-group input, #editProfileModal .form-group select {
+    font-size: 16px;
+    padding: 10px 20px;
+    height: 50px; 
+    border-radius: 10px;
+}
+
+#profilePicPreview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: block;
+    margin: 20px auto;
+}
+
+#profilePicPreview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #dfe4ea;
+}
+
+#uploadIcon {
+    position: absolute;
+    top: 170px;
+    left: 660px;
+    color: #ffffff;
+    background-color: #2f3542;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#uploadIcon:hover {
+    background-color: #57606f;
+}
+
+.modal-header, .modal-body, .modal-footer {
+    border: none;
+}
+
+.modal-dialog {
+    top: 30%;
+    left: 5%;
+    border-radius: 20px;
+}
+
+.modal-content {
+    justify-content: space-evenly;
+    font-family: Poppins;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.modal-title {
+    font-weight: bold;
+    color: #142A74;
+}
+
+.modal-body {
+    font-size: 14px;
+}
+
+.close {
+    font-size: 24px;
+    color: #142A74;
+}
+
+.btn-primary {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+}
+
+.btn-primary:hover {
+    background-color: #142a74ec;
+}
+
+.btn-secondary {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #B60505;
+    border-radius: 30px;
+    padding: 10px 30px;
+}
+
+.btn-secondary:hover {
+    background-color: #b60505ec;
+}

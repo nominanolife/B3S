@@ -20,7 +20,7 @@
                         <img src="assets/phone.png" alt="Phone" class="img-fluid" style="height: 110px;">
                     </div>
                     <h3 class="text-center mb-4">Verification</h3>
-                    <p class="text-center mb-4">Enter your number for sending of OTP.</p>
+                    <p class="text-center mb-4">Enter your number to receive an OTP.</p>
                     <form id="phoneForm">
                         <div class="form-group">
                             <div class="input-group mb-4">
@@ -41,10 +41,25 @@
         </div>
     </main>
 
+    <!-- Modal for prompts -->
+    <div class="modal fade" id="promptModal" >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="promptModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body" id="modalMessage">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-    <script src="JS/number input.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
@@ -65,85 +80,82 @@
         const db = getFirestore(app);
 
         document.addEventListener('DOMContentLoaded', () => {
-    const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-        'callback': () => sendCode() // Trigger sendCode function
-    });
-
-    recaptchaVerifier.render().then((widgetId) => {
-        window.recaptchaWidgetId = widgetId;
-    });
-
-    document.getElementById('sendCodeButton').addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent default form submission
-
-        const sendCodeButton = document.getElementById('sendCodeButton');
-        const message = document.getElementById('message');
-        const phoneNumberInput = document.getElementById('phoneNumber');
-        let phoneNumber = '+63' + phoneNumberInput.value;
-
-        // Validate phone number format
-        if (!/^9\d{9}$/.test(phoneNumber.slice(3))) {
-            message.textContent = 'Invalid phone number format. Please enter a valid phone number.';
-            message.classList.add('error-message'); // Add error message class
-            sendCodeButton.disabled = false;
-            // Remove error message after 5 seconds
-            setTimeout(() => {
-                message.textContent = '';
-                message.classList.remove('error-message'); // Remove error class
-            }, 5000);
-            return;
-        }
-
-        sendCodeButton.disabled = true; // Disable the button
-
-        signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
-            .then(async (confirmationResult) => {
-                window.confirmationResult = confirmationResult;
-                localStorage.setItem('confirmationResult', JSON.stringify(confirmationResult));
-                localStorage.setItem('phoneNumber', phoneNumber);
-                localStorage.setItem('codeSentTime', Date.now());
-                message.textContent = 'Verification Code Sent Successfully.';
-                message.classList.remove('error-message'); // Remove error class if successful
-                message.classList.add('success-message'); // Add success message class
-                // Remove success message after 5 seconds
-                setTimeout(() => {
-                    message.textContent = '';
-                    message.classList.remove('success-message'); // Remove success class
-                }, 5000);
-                window.location.href = 'verifphone.html';
-            })
-            .catch((error) => {
-                console.error("Error during signInWithPhoneNumber", error);
-                if (error.code === 'auth/too-many-requests') {
-                    message.textContent = 'Too many requests. Please try again later.';
-                } else {
-                    message.textContent = 'Error sending verification code. Please try again.';
-                }
-                message.classList.add('error-message'); // Add error message class
-                // Remove error message after 5 seconds
-                setTimeout(() => {
-                    message.textContent = '';
-                    message.classList.remove('error-message'); // Remove error class
-                }, 5000);
-                sendCodeButton.disabled = false; // Re-enable button
+            const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                'size': 'invisible',
+                'callback': () => sendCode() // Trigger sendCode function
             });
 
-        // Re-enable the button after 1 minute
-        setTimeout(() => {
-            sendCodeButton.disabled = false;
-        }, 60000);
-    });
+            recaptchaVerifier.render().then((widgetId) => {
+                window.recaptchaWidgetId = widgetId;
+            });
 
-    // Add input event listener to phone number field
-    document.getElementById('phoneNumber').addEventListener('input', () => {
-        let value = phoneNumberInput.value;
-        if (value.startsWith('0')) {
-            phoneNumberInput.value = value.slice(1);
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            let debounceTimer;
+
+            // Debounce function to remove leading zero after 1 second
+            const debounce = (func, delay) => {
+                return function(...args) {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => func.apply(this, args), delay);
+                };
+            };
+
+            // Function to handle input changes
+            const handleInputChange = () => {
+                let value = phoneNumberInput.value;
+                if (value.startsWith('0')) {
+                    phoneNumberInput.value = value.slice(1);
+                }
+            };
+
+            // Add input event listener with debounce
+            phoneNumberInput.addEventListener('input', debounce(handleInputChange, 1000));
+
+            document.getElementById('phoneForm').addEventListener('submit', (event) => {
+                event.preventDefault(); // Prevent default form submission
+
+                const sendCodeButton = document.getElementById('sendCodeButton');
+                const message = document.getElementById('message');
+                const phoneNumber = '+63' + phoneNumberInput.value.trim();
+
+                // Validate phone number format
+                if (!/^9\d{9}$/.test(phoneNumber.slice(3))) {
+                    showModal('Invalid phone number format. Please enter a valid phone number.');
+                    sendCodeButton.disabled = false;
+                    return;
+                }
+
+                sendCodeButton.disabled = true;
+
+                signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
+                    .then(async (confirmationResult) => {
+                        window.confirmationResult = confirmationResult;
+                        localStorage.setItem('confirmationResult', JSON.stringify(confirmationResult));
+                        localStorage.setItem('phoneNumber', phoneNumber);
+                        localStorage.setItem('codeSentTime', Date.now());
+                        showModal('Verification Code Sent Successfully.');
+                        window.location.href = 'verifphone.html';
+                    })
+                    .catch((error) => {
+                        console.error("Error during signInWithPhoneNumber", error);
+                        if (error.code === 'auth/too-many-requests') {
+                            showModal('Too many requests. Please try again later.');
+                        } else {
+                            showModal('Error sending verification code. Please try again.');
+                        }
+                        sendCodeButton.disabled = false;
+                    });
+
+                setTimeout(() => {
+                    sendCodeButton.disabled = false;
+                }, 60000);
+            });
+        });
+
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            $('#promptModal').modal('show');
         }
-    });
-});
-
     </script>
 </body>
 </html>
