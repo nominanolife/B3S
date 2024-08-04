@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (doc.exists) {
                     var adminData = doc.data();
                     if (adminData.name === name && adminData.password === password) {
-                        alert("Login Successful");
                         // Redirect to admin dashboard
                         window.location.href = "admindashboard.html";
                     } else {
@@ -40,4 +39,27 @@ document.addEventListener('DOMContentLoaded', function() {
             alert("Please fill in both fields");
         }
     });
+
+    // Function to set up password toggle
+    function setupPasswordToggle(toggleId, passwordId) {
+        const togglePassword = document.getElementById(toggleId);
+        if (togglePassword) {
+            togglePassword.addEventListener('click', function () {
+                const passwordInput = document.getElementById(passwordId);
+                const icon = this.querySelector('i');
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                }
+            });
+        }
+    }
+
+    // Call the function with the appropriate IDs
+    setupPasswordToggle('togglePassword', 'password');
 });
