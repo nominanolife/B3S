@@ -116,6 +116,7 @@
                                 <input type="number" id="slots" class="form-control" min="1" placeholder="Number of slots">
                             </div>
                             <button class="btn-add">Add</button>
+                            <button class="btn-clear">Clear</button>
                         </div>
                     </div>
                 </div>
@@ -123,15 +124,8 @@
             <div class="available-slots">
                 <div class="available-slots-header">
                     <h2>Available Slots</h2>
-                    <div class="kebab-menu">
-                        <button class="dropdown-toggle" type="button" data-toggle="dropdown">
-                            <i class="bi bi-three-dots"></i>
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">See All</a>
-                            <a class="dropdown-item" href="#">Delete</a>
-                        </div>
-                    </div>
+                    <td>
+                    </td>                    
                 </div>
                 <div class="available-slots-body">
                     <table class="table">
@@ -141,6 +135,7 @@
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Slots</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="slots-table-body">
