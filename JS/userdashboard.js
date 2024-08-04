@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const linksToDisable = [
             'usermodule.html',
             'uservideolearning.html',
-            'userquiz.html'
+            'userquiz.html',
+            'userappointment.html'
         ];
 
         linksToDisable.forEach(link => {

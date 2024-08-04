@@ -27,6 +27,11 @@ document.addEventListener("DOMContentLoaded", async function() {
     const packageNameInput = document.querySelector(".package-name");
     const packagePriceInput = document.querySelector(".package-price");
     const packageDescriptionInput = document.querySelector(".package-description");
+    const deleteConfirmModal = document.getElementById("deleteConfirmModal");
+    const confirmDeleteButton = document.querySelector(".confirm-delete");
+    const cancelDeleteButton = document.querySelector(".cancel-delete");
+
+    let packageElementToDelete = null;
 
     // Show modal when "Add Package" button is clicked
     addButton.addEventListener("click", function() {
@@ -38,6 +43,12 @@ document.addEventListener("DOMContentLoaded", async function() {
         packageModal.style.display = "none";
     });
 
+    // Hide delete confirmation modal when "Cancel" button is clicked
+    cancelDeleteButton.addEventListener("click", function() {
+        deleteConfirmModal.style.display = "none";
+        packageElementToDelete = null;
+    });
+
     // Function to add package to Firestore
     async function addPackageToFirestore(packageName, packagePrice, packageDescription) {
         try {
@@ -47,8 +58,31 @@ document.addEventListener("DOMContentLoaded", async function() {
                 description: packageDescription
             });
             addPackageToDOM(docRef.id, packageName, packagePrice, packageDescription);
+
+            // Show success toast notification
+            Toastify({
+                text: "Package added successfully!",
+                duration: 3000,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                backgroundColor: "green",
+                stopOnFocus: true // Prevents dismissing of toast on hover
+            }).showToast();
+
         } catch (e) {
             console.error("Error adding document: ", e);
+
+            // Show error toast notification
+            Toastify({
+                text: "Failed to add package. Please try again.",
+                duration: 3000,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                backgroundColor: "red",
+                stopOnFocus: true // Prevents dismissing of toast on hover
+            }).showToast();
         }
     }
 
@@ -69,15 +103,55 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         // Attach delete event to the delete button
         const deleteButton = packageElement.querySelector(".delete-button");
-        deleteButton.addEventListener("click", async function() {
-            const confirmed = confirm("Are you sure you want to delete this package?");
-            if (confirmed) {
-                const packageId = packageElement.getAttribute("data-id");
-                await deleteDoc(doc(db, "packages", packageId));
-                packageList.removeChild(packageElement);
-            }
+        deleteButton.addEventListener("click", function() {
+            packageElementToDelete = packageElement;
+            deleteConfirmModal.style.display = "block";
         });
     }
+
+    // Function to delete package from Firestore
+    async function deletePackageFromFirestore(packageId) {
+        try {
+            await deleteDoc(doc(db, "packages", packageId));
+            if (packageElementToDelete) {
+                packageList.removeChild(packageElementToDelete);
+            }
+
+            // Show success toast notification
+            Toastify({
+                text: "Package deleted successfully!",
+                duration: 3000,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                backgroundColor: "green",
+                stopOnFocus: true // Prevents dismissing of toast on hover
+            }).showToast();
+        } catch (e) {
+            console.error("Error deleting document: ", e);
+
+            // Show error toast notification
+            Toastify({
+                text: "Failed to delete package. Please try again.",
+                duration: 3000,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                backgroundColor: "red",
+                stopOnFocus: true // Prevents dismissing of toast on hover
+            }).showToast();
+        }
+    }
+
+    // Confirm delete button click event
+    confirmDeleteButton.addEventListener("click", function() {
+        if (packageElementToDelete) {
+            const packageId = packageElementToDelete.getAttribute("data-id");
+            deletePackageFromFirestore(packageId);
+            deleteConfirmModal.style.display = "none";
+            packageElementToDelete = null;
+        }
+    });
 
     // Function to load packages from Firestore and add them to the DOM
     async function loadPackages() {
