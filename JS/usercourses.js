@@ -41,7 +41,7 @@ function renderPackages(packages) {
           </div>
         </form>
       </div>`;
-    packageContainer.insertAdjacentHTML('beforeend', packageHtml);
+    packageContainer.insertAdjacentHTML('beforebegin', packageHtml);
   });
   showTiles(currentIndex);
 }
@@ -108,10 +108,23 @@ document.addEventListener('click', async (e) => {
       if (userEnrolledPackage) {
         $('#enrollmentToast').toast('show');
       } else {
-        // Show the confirmation modal
-        $('#confirmModal').modal('show');
-        document.getElementById('confirmEnrollButton').dataset.packageId = packageId;
-        document.getElementById('confirmEnrollButton').dataset.packageName = packageName;
+        const confirmEnroll = confirm("Enroll in this course?");
+        if (confirmEnroll) {
+          try {
+            await updateDoc(doc(db, "applicants", userId), {
+              role: "student",
+              enrolledPackage: packageName // Store the package name
+            });
+            document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
+            userEnrolledPackage = packageName;
+            $('#successToast').toast('show'); // Show success toast
+            setTimeout(() => {
+              window.location.href = "userappointment.html";
+            }, 1000); // Redirect after 1 second to let toast show
+          } catch (error) {
+            console.error("Error updating user role: ", error);
+          }
+        }
       }
     } else {
       console.error("No user is currently signed in.");
@@ -119,31 +132,6 @@ document.addEventListener('click', async (e) => {
   }
 });
 
-// Handle enrollment confirmation
-document.getElementById('confirmEnrollButton').addEventListener('click', async () => {
-  const packageId = document.getElementById('confirmEnrollButton').dataset.packageId;
-  const packageName = document.getElementById('confirmEnrollButton').dataset.packageName;
-  const user = auth.currentUser;
-
-  if (user) {
-    const userId = user.uid;
-    try {
-      await updateDoc(doc(db, "applicants", userId), {
-        role: "student",
-        enrolledPackage: packageName // Store the package name
-      });
-      document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
-      userEnrolledPackage = packageName;
-      $('#confirmModal').modal('hide');
-      $('#successToast').toast('show');
-      setTimeout(() => {
-        window.location.href = "userappointment.html";
-      }, 1500);
-    } catch (error) {
-      console.error("Error updating user role: ", error);
-    }
-  }
-});
 
 // Check enrollment status on page load
 onAuthStateChanged(auth, async (user) => {

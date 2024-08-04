@@ -198,3 +198,61 @@ h2 {
     text-decoration: none;  /* Remove underline */
     cursor: default;  /* Change cursor to default */
 }
+
+.modal-header, .modal-body, .modal-footer {
+    border: none;
+}
+
+.modal-dialog {
+    top: 30%;
+    left: 5%;
+    border-radius: 20px;
+}
+
+.modal-content {
+    justify-content: space-evenly;
+    font-family: Poppins;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.modal-title {
+    font-weight: bold;
+    color: #142A74;
+}
+
+.modal-body {
+    font-size: 14px;
+}
+
+.close {
+    font-size: 24px;
+    color: #142A74;
+}
+
+.btn-primary {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+}
+
+.btn-primary:hover {
+    background-color: #142a74ec;
+}
+
+.btn-secondary {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #B60505;
+    border-radius: 30px;
+    padding: 10px 30px;
+}
+
+.btn-secondary:hover {
+    background-color: #b60505ec;
+}

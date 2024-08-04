@@ -37,20 +37,22 @@ function disableLinks() {
 }
 
 // Function to set up logout functionality
-function setupLogout() {
-    const logoutButton = document.querySelector('.logout');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', function() {
-            console.log('Logout button clicked');
-            signOut(auth).then(() => {
-                console.log('User signed out.');
-                window.location.href = 'index.html'; // Redirect to login page or home page
-            }).catch((error) => {
-                console.error('Sign out error:', error);
-            });
+const logoutButton = document.querySelector('.logout');
+    const confirmLogoutButton = document.getElementById('confirmLogoutBtn');
+
+    logoutButton.addEventListener('click', function() {
+        $('#logoutModal').modal('show');
+    });
+
+    confirmLogoutButton.addEventListener('click', function() {
+        console.log('Logout confirmed');
+        signOut(auth).then(() => {
+            console.log('User signed out.');
+            window.location.href = 'login.html';
+        }).catch((error) => {
+            console.error('Sign out error:', error);
         });
-    }
-}
+    });
 
 // Check user role and disable links if needed
 function checkUserRole() {
