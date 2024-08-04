@@ -121,6 +121,10 @@ body {
     margin-right: 10px;
 }
 
+.top-info i {
+    margin-left: 10px;
+}
+
 .sidebar-account {
     display: flex;
     flex-direction: column;
@@ -187,16 +191,236 @@ h2 {
 }
 
 .page-content {
+    display: flex;
     padding: 30px 30px;
     background-color: #f5f5f5;
     height: 100%;
 }
+
+.profile-container {
+    border: 1px solid #142A74;
+    border-radius: 20px;
+    background-color: #ffffff;
+    width: 100%;
+}
+
+.container-header {
+    display: flex;
+    flex-direction: column;
+    background-image: linear-gradient(to right, #142A74, #8597D4);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    height: 180px;
+}
+
+.profile-pic{
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    margin: 0 auto;
+    margin-top: 10px;
+}
+
+.profile-pic {
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #dfe4ea;
+}
+
+.container-body {
+    padding: 20px;
+}
+
+.top-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 130px;
+}
+
+.name {
+    font-family: Poppins;
+    font-size: 32px;
+    font-weight: bold;
+    color: #2F2E2E;
+}
+
+.email {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #2f2e2ea2;
+    margin-top: 10px;
+}
+
+.edit {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #ffffff;
+    margin-top: 20px;
+    padding: 10px 30px;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    background-color: #142A74;
+}
+
+.edit:hover {
+    background-color: #142a74ec;
+}
+
+.bottom-info {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.three-info{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.two-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.label {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #2F2E2E;
+}
+
+.info-block {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+}
+
+/* Ensure placeholders have consistent styling */
+.info-block span.input-label1{
+    display: inline-block;
+    min-width: 475px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    color: #2F2E2E;
+    margin-top: 10px;
+}
+
+.info-block span.input-label2 {
+    display: inline-block;
+    min-width: 720px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    color: #2F2E2E;
+    margin-top: 10px;
+}
+
+/* Specific styling for spans with no text to keep the design */
+.info-block span.input-label1:empty::before,
+.info-block span.input-label2:empty::before {
+    content: 'N/A'; /* Placeholder text */
+    color: #2f2e2eb6;
+}
+
+/* Optional: Adjust margin or alignment to match design */
+.three-info .info-block,
+.two-info .info-block {
+    margin-bottom: 10px; /* Adjust spacing as needed */
+}
+
 
 .disabled-link {
     pointer-events: none;
     color: gray;
     text-decoration: none;  /* Remove underline */
     cursor: default;  /* Change cursor to default */
+}
+
+#editProfileModal .modal-dialog {
+    top: 25%;
+    left: 55%;
+    transform: translate(-50%, -20%);
+    margin: 0;
+    max-width: 70%;
+}
+
+#editProfileModal .modal-content {
+    border-radius: 20px;
+    padding: 20px;
+    height: 800px;
+}
+
+#editProfileModal .modal-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+#editProfileModal .inputs {
+    display: flex;
+    flex-direction: row;
+}
+
+#editProfileModal .form-group {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    width: 100%;
+}
+
+#editProfileModal .form-group label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #142A74;
+}
+
+#editProfileModal .form-group input, #editProfileModal .form-group select {
+    font-size: 16px;
+    padding: 10px 20px;
+    height: 50px; 
+    border-radius: 10px;
+}
+
+#profilePicPreview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: block;
+    margin: 20px auto;
+}
+
+#profilePicPreview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #dfe4ea;
+}
+
+#uploadIcon {
+    position: absolute;
+    top: 170px;
+    left: 660px;
+    color: #ffffff;
+    background-color: #2f3542;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#uploadIcon:hover {
+    background-color: #57606f;
 }
 
 .modal-header, .modal-body, .modal-footer {

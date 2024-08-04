@@ -36,20 +36,29 @@ function disableLinks() {
     });
 }
 
-// Function to set up logout functionality
-function setupLogout() {
+// Function to set up logout and profile functionality
+function setupButtons() {
+    const profileButton = document.getElementById('profileBtn');
     const logoutButton = document.querySelector('.logout');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', function() {
-            console.log('Logout button clicked');
-            signOut(auth).then(() => {
-                console.log('User signed out.');
-                window.location.href = 'index.html'; // Redirect to login page or home page
-            }).catch((error) => {
-                console.error('Sign out error:', error);
-            });
+    const confirmLogoutButton = document.getElementById('confirmLogoutBtn');
+
+    profileButton.addEventListener('click', function() {
+        window.location.href = 'userprofile.html';
+    });
+
+    logoutButton.addEventListener('click', function() {
+        $('#logoutModal').modal('show');
+    });
+
+    confirmLogoutButton.addEventListener('click', function() {
+        console.log('Logout confirmed');
+        signOut(auth).then(() => {
+            console.log('User signed out.');
+            window.location.href = 'login.html';
+        }).catch((error) => {
+            console.error('Sign out error:', error);
         });
-    }
+    });
 }
 
 // Check user role and disable links if needed
@@ -80,6 +89,21 @@ function checkUserRole() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    setupLogout();
+    setupButtons();  // Call the function to set up logout and profile button functionality
+    checkUserRole();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const profileButton = document.getElementById('profileBtn');
+
+    if (currentPath.includes('userprofile.html')) {
+        profileButton.classList.add('active');
+    } else {
+        profileButton.classList.remove('active');
+    }
+
+    // Existing setup for logout button and role check
+    setupButtons();
     checkUserRole();
 });

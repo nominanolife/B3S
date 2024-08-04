@@ -34,7 +34,7 @@
                     <a href="userquiz.html"><i class="bi bi-journals"></i>Quiz</a>
                 </div>
                 <div class="sidebar-account">
-                    <button class="profile" type="button"><i class="bi bi-person-circle"></i>Profile</button>
+                    <button class="profile" type="button" id="profileBtn"><i class="bi bi-person-circle"></i>Profile</button>
                     <button class="logout" type="button"><i class="bi bi-box-arrow-left"></i>Logout</button>
                 </div>
             </div>
@@ -48,6 +48,29 @@
             </div>  
         </div>
     </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confirmLogoutBtn">Logout</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="module" src="JS/userdashboard.js"></script>
+    <script type="module" src="JS/common.js"></script>
 </body>
 </html>

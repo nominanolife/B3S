@@ -335,6 +335,25 @@ h5 {
     color: #dc3545;
 }
 
+/* Ensure error messages are styled clearly */
+#error-message {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #dc3545; /* Red color for errors */
+    margin-top: 1rem;
+}
+
+/* Style for successful messages */
+.success-message {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #28a745; /* Green color for success */
+    margin-top: 1rem;
+}
+
+
 .btn-secondary {
     background-color: #142A74;
     color: #fff;

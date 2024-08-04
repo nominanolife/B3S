@@ -65,14 +65,4 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error("No user is currently signed in.");
         }
     });
-
-    document.querySelector('.logout').addEventListener('click', function() {
-        console.log('Logout button clicked');
-        signOut(auth).then(() => {
-            console.log('User signed out.');
-            window.location.href = 'index.html';
-        }).catch((error) => {
-            console.error('Sign out error:', error);
-        });
-    });
 });
