@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap">
     <link rel="icon" href="Assets/logo.png" type="image/x-icon">
 </head>
@@ -58,25 +59,25 @@
                             <div class="three-info">
                                 <div class="info-block">
                                     <span class="label">Birthdate</span>
-                                    <span class="input-label1"></span>
+                                    <span id="birthdate" class="input-label1"></span>
                                 </div>
                                 <div class="info-block">
                                     <span class="label">Age</span>
-                                    <span class="input-label1"></span>
+                                    <span id="age" class="input-label1"></span>
                                 </div> 
                                 <div class="info-block"> 
                                     <span class="label">Status</span>
-                                    <span class="input-label1"></span>
+                                    <span id="status" class="input-label1"></span>
                                 </div>
                             </div>
                             <div class="two-info">
                                 <div class="info-block">
                                     <span class="label">Contact Number</span>
-                                    <span class="input-label2"></span>
+                                    <span id="contactNumber" class="input-label2"></span>
                                 </div>
                                 <div class="info-block">
                                     <span class="label">Address</span>
-                                    <span class="input-label2"></span>
+                                    <span id="address" class="input-label2"></span>
                                 </div>
                             </div>
                         </div>
@@ -97,25 +98,25 @@
                     <form id="editProfileForm">
                         <div class="profile-pic-container">
                             <img id="profilePicPreview" src="Assets/default-profile.png" alt="profile picture">
-                            <i class="fas fa-camera" id="uploadIcon"></i>
+                            <i class="fas fa-camera" id="uploadIcon" style="cursor: pointer;"></i>
                             <input type="file" id="editProfilePic" accept="image/*" style="display: none;">
                         </div>
                         <div class="inputs">
                             <div class="form-group">
                                 <label for="editFirstName">First Name</label>
-                                <input type="text" class="form-control" id="editName">
+                                <input type="text" class="form-control" id="editFirstName">
                             </div>
                             <div class="form-group">
                                 <label for="editMiddleName">Middle Name</label>
-                                <input type="text" class="form-control" id="editName">
+                                <input type="text" class="form-control" id="editMiddleName">
                             </div>
                             <div class="form-group">
                                 <label for="editLastName">Last Name</label>
-                                <input type="text" class="form-control" id="editName">
+                                <input type="text" class="form-control" id="editLastName">
                             </div>
                             <div class="form-group">
-                                <label for="editLastName">Suffix</label>
-                                <input type="text" class="form-control" id="editName">
+                                <label for="editSuffix">Suffix</label>
+                                <input type="text" class="form-control" id="editSuffix">
                             </div>
                         </div>
                         <div class="inputs">
@@ -132,9 +133,9 @@
                             <div class="form-group">
                                 <label for="editStatus">Status</label>
                                 <select class="form-control" id="editStatus">
-                                    <option value="single">Single</option>
-                                    <option value="married">Married</option>
-                                    <option value="widowed">Widowed</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Widowed">Widowed</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -158,7 +159,6 @@
         </div>
     </div>
 
-
     <!-- Logout Confirmation Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -180,7 +180,14 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script type="module" src="JS/userprofile.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <!-- Include Firebase compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-storage-compat.js"></script>
+    <!-- Include your userprofile.js script -->
+    <script src="JS/userprofile.js"></script>
     <script type="module" src="JS/common.js"></script>
 </body>
 </html>
