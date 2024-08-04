@@ -6,6 +6,7 @@ const dateInput = document.getElementById("date");
 const timeInput = document.getElementById("time");
 const slotsInput = document.getElementById("slots");
 const addButton = document.querySelector(".btn-add");
+const clearButton = document.querySelector(".btn-clear");
 const slotsTableBody = document.getElementById("slots-table-body");
 
 const months = [
@@ -42,18 +43,11 @@ function renderCalendar() {
 
   for (let i = 1; i <= endDate; i++) {
     let className = "";
-    if (availableSlots[`${year}-${month + 1}-${i}`]) {
-      className =
-        availableSlots[`${year}-${month + 1}-${i}`].slots === 0
-          ? ' class="full"'
-          : ' class="available"';
+    const slotKey = `${year}-${month + 1}-${i}`;
+    if (availableSlots[slotKey]) {
+      className = availableSlots[slotKey].slots === 0 ? ' class="full"' : ' class="available"';
     } else {
-      className =
-        i === date.getDate() &&
-        month === new Date().getMonth() &&
-        year === new Date().getFullYear()
-          ? ' class="today"'
-          : "";
+      className = i === date.getDate() && month === new Date().getMonth() && year === new Date().getFullYear() ? ' class="today"' : "";
     }
     datesHtml += `<li${className}>${i}</li>`;
   }
@@ -80,13 +74,16 @@ navs.forEach((nav) => {
       month = btnId === "next" ? month + 1 : month - 1;
     }
 
-    date = new Date(year, month, new Date().getDate());
-    year = date.getFullYear();
-    month = date.getMonth();
-
     renderCalendar();
   });
 });
+
+function formatTime(timeStr) {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 || 12;
+  return `${formattedHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+}
 
 function addSlotToTable(course, date, time, slots) {
   const row = document.createElement("tr");
@@ -95,7 +92,12 @@ function addSlotToTable(course, date, time, slots) {
 }
 
 function addSlot() {
-  const selectedCourse = document.querySelector('input[name="course"]:checked').value;
+  console.log("addSlot function triggered"); // Debugging log
+  const selectedCourse = document.querySelector('input[name="course"]:checked');
+  if (!selectedCourse) {
+    alert("Please select a course.");
+    return;
+  }
   const selectedDate = dateInput.value;
   const selectedTime = timeInput.value;
   const selectedSlots = parseInt(slotsInput.value);
@@ -113,16 +115,30 @@ function addSlot() {
   const slotKey = `${selectedDate}`;
 
   availableSlots[slotKey] = {
-    course: selectedCourse,
+    course: selectedCourse.value,
     date: selectedDate,
     time: selectedTime,
     slots: selectedSlots,
   };
 
-  addSlotToTable(selectedCourse, selectedDate, selectedTime, selectedSlots);
+  addSlotToTable(selectedCourse.value, selectedDate, formatTime(selectedTime), selectedSlots);
+}
+
+function clearFields() {
+  console.log("clearFields function triggered"); // Debugging log
+  // Clear the radio button selection
+  courseRadios.forEach(radio => {
+    radio.checked = false;
+  });
+
+  // Clear the date, time, and slots input fields
+  dateInput.value = "";
+  timeInput.value = "";
+  slotsInput.value = "";
 }
 
 addButton.addEventListener("click", addSlot);
+clearButton.addEventListener("click", clearFields);
 
 function updateCalendarDate() {
   const selectedDate = dateInput.value;
@@ -140,37 +156,37 @@ function updateCalendarDate() {
 dateInput.addEventListener("change", updateCalendarDate);
 
 renderCalendar();
+function addSlotToTable(course, date, time, slots) {
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${course}</td>
+    <td>${date}</td>
+    <td>${formatTime(time)}</td>
+    <td>${slots}</td>
+    <td>
+      <button class="btn-delete">Delete</button>
+    </td>`;
+  slotsTableBody.appendChild(row);
+}
 
-document.addEventListener('DOMContentLoaded', function () {
-    const prevButton = document.getElementById('prev');
-    const nextButton = document.getElementById('next');
-    const calendarHeader = document.querySelector('.calendar header h3');
-    
-    // Function to update calendar
-    function updateCalendar(monthOffset) {
-        const today = new Date();
-        today.setMonth(today.getMonth() + monthOffset);
-        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        
-        calendarHeader.textContent = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        
-        const datesList = document.querySelector('.calendar .dates');
-        datesList.innerHTML = '';
+function handleTableAction(event) {
+  if (event.target.classList.contains("btn-delete")) {
+    // Delete logic here
+    const row = event.target.closest("tr");
+    row.remove();
+  }
+}
 
-        // Fill in dates
-        for (let i = 0; i < startOfMonth.getDay(); i++) {
-            datesList.innerHTML += '<li></li>';
-        }
-        for (let i = 1; i <= endOfMonth.getDate(); i++) {
-            datesList.innerHTML += `<li>${i}</li>`;
-        }
-    }
-
-    // Initial calendar load
-    updateCalendar(0);
-
-    // Event listeners for navigation buttons
-    prevButton.addEventListener('click', () => updateCalendar(-1));
-    nextButton.addEventListener('click', () => updateCalendar(1));
-});
+document.addEventListener("click", handleTableAction);
+function addSlotToTable(course, date, time, slots) {
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${course}</td>
+    <td>${date}</td>
+    <td>${formatTime(time)}</td>
+    <td>${slots}</td>
+    <td>
+      <button class="btn-delete"><i class="fas fa-trash"></i></button>
+    </td>`;
+  slotsTableBody.appendChild(row);
+}
