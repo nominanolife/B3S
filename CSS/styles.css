@@ -344,6 +344,31 @@ h5 {
     margin-top: 1rem;
 }
 
+.modal-header, .modal-body, .modal-footer {
+    border: none;
+}
+
+.modal-dialog {
+    top: 30%;
+    border-radius: 20px;
+}
+
+.modal-content {
+    justify-content: space-evenly;
+    font-family: Poppins;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.modal-title {
+    font-weight: bold;
+    color: #142A74;
+}
+
+.modal-body {
+    font-size: 14px;
+}
+
 /* Style for successful messages */
 .success-message {
     font-family: Poppins;
