@@ -1,4 +1,3 @@
-// Import Firebase libraries
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
@@ -29,9 +28,28 @@ document.addEventListener("DOMContentLoaded", async function() {
     const packageDescriptionInput = document.querySelector(".package-description");
     const deleteConfirmModal = document.getElementById("deleteConfirmModal");
     const confirmDeleteButton = document.querySelector(".confirm-delete");
-    const cancelDeleteButton = document.querySelector(".cancel-delete");
+    const cancelDeleteModalButton = document.querySelector(".cancel-delete-modal");
 
     let packageElementToDelete = null;
+
+    // Create and style cancel button
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = "Cancel";
+    cancelButton.className = "cancel-button";
+    cancelButton.style.display = "none"; // Initially hidden
+    cancelButton.style.backgroundColor = "#7B1719"; 
+    cancelButton.style.color = "#ffffff"; 
+    cancelButton.style.border = "none";
+    cancelButton.style.borderRadius = "10px";
+    cancelButton.style.padding = "10px 20px";
+    cancelButton.style.cursor = "pointer";
+    cancelButton.style.fontFamily = "Poppins";
+    cancelButton.style.fontSize = "14px";
+    cancelButton.style.fontWeight = "bold";
+
+    // Add the cancel button to the buttons container
+    const buttonsContainer = document.querySelector('.buttons');
+    buttonsContainer.appendChild(cancelButton);
 
     // Show modal when "Add Package" button is clicked
     addButton.addEventListener("click", function() {
@@ -44,9 +62,52 @@ document.addEventListener("DOMContentLoaded", async function() {
     });
 
     // Hide delete confirmation modal when "Cancel" button is clicked
-    cancelDeleteButton.addEventListener("click", function() {
+    cancelDeleteModalButton.addEventListener("click", function() {
         deleteConfirmModal.style.display = "none";
         packageElementToDelete = null;
+    });
+
+    // Cancel button functionality
+    cancelButton.addEventListener("click", function() {
+        // Hide cancel button
+        cancelButton.style.display = "none";
+
+        // Show the Add and Delete buttons again
+        addButton.style.display = "inline";
+        deleteButton.style.display = "inline";
+
+        // Hide delete button animations
+        const deleteButtons = document.querySelectorAll(".delete-button");
+        deleteButtons.forEach(button => {
+            button.style.display = "none"; // Hide delete button
+            button.classList.remove("wiggle"); // Remove wiggle animation
+        });
+    });
+
+    // Show delete buttons when "Delete Package" button is clicked
+    deleteButton.addEventListener("click", function() {
+        // Hide Add and Delete buttons
+        addButton.style.display = "none";
+        deleteButton.style.display = "none";
+
+        // Show the Cancel button
+        cancelButton.style.display = "inline";
+
+        const deleteButtons = document.querySelectorAll(".delete-button");
+        deleteButtons.forEach(button => {
+            button.style.display = "inline"; // Show the delete button
+            button.classList.add("wiggle"); // Add wiggle animation
+        });
+    });
+
+    // Confirm delete button click event
+    confirmDeleteButton.addEventListener("click", async function() {
+        if (packageElementToDelete) {
+            const packageId = packageElementToDelete.getAttribute("data-id");
+            await deletePackageFromFirestore(packageId);
+            deleteConfirmModal.style.display = "none";
+            packageElementToDelete = null;
+        }
     });
 
     // Function to add package to Firestore
@@ -64,10 +125,10 @@ document.addEventListener("DOMContentLoaded", async function() {
                 text: "Package added successfully!",
                 duration: 3000,
                 close: true,
-                gravity: "top", // `top` or `bottom`
-                position: "right", // `left`, `center` or `right`
+                gravity: "top",
+                position: "right",
                 backgroundColor: "green",
-                stopOnFocus: true // Prevents dismissing of toast on hover
+                stopOnFocus: true
             }).showToast();
 
         } catch (e) {
@@ -78,10 +139,10 @@ document.addEventListener("DOMContentLoaded", async function() {
                 text: "Failed to add package. Please try again.",
                 duration: 3000,
                 close: true,
-                gravity: "top", // `top` or `bottom`
-                position: "right", // `left`, `center` or `right`
+                gravity: "top",
+                position: "right",
                 backgroundColor: "red",
-                stopOnFocus: true // Prevents dismissing of toast on hover
+                stopOnFocus: true
             }).showToast();
         }
     }
@@ -122,10 +183,10 @@ document.addEventListener("DOMContentLoaded", async function() {
                 text: "Package deleted successfully!",
                 duration: 3000,
                 close: true,
-                gravity: "top", // `top` or `bottom`
-                position: "right", // `left`, `center` or `right`
+                gravity: "top",
+                position: "right",
                 backgroundColor: "green",
-                stopOnFocus: true // Prevents dismissing of toast on hover
+                stopOnFocus: true
             }).showToast();
         } catch (e) {
             console.error("Error deleting document: ", e);
@@ -135,23 +196,13 @@ document.addEventListener("DOMContentLoaded", async function() {
                 text: "Failed to delete package. Please try again.",
                 duration: 3000,
                 close: true,
-                gravity: "top", // `top` or `bottom`
-                position: "right", // `left`, `center` or `right`
+                gravity: "top",
+                position: "right",
                 backgroundColor: "red",
-                stopOnFocus: true // Prevents dismissing of toast on hover
+                stopOnFocus: true
             }).showToast();
         }
     }
-
-    // Confirm delete button click event
-    confirmDeleteButton.addEventListener("click", function() {
-        if (packageElementToDelete) {
-            const packageId = packageElementToDelete.getAttribute("data-id");
-            deletePackageFromFirestore(packageId);
-            deleteConfirmModal.style.display = "none";
-            packageElementToDelete = null;
-        }
-    });
 
     // Function to load packages from Firestore and add them to the DOM
     async function loadPackages() {
@@ -188,14 +239,5 @@ document.addEventListener("DOMContentLoaded", async function() {
         } else {
             alert("Please fill out all fields.");
         }
-    });
-
-    // Show delete buttons when "Delete Package" button is clicked
-    deleteButton.addEventListener("click", function() {
-        const deleteButtons = document.querySelectorAll(".delete-button");
-        deleteButtons.forEach(button => {
-            button.style.display = "inline"; // Show the delete button
-            button.classList.add("wiggle"); // Add wiggle animation
-        });
     });
 });
