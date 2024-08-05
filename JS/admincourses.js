@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -30,7 +30,16 @@ document.addEventListener("DOMContentLoaded", async function() {
     const confirmDeleteButton = document.querySelector(".confirm-delete");
     const cancelDeleteModalButton = document.querySelector(".cancel-delete-modal");
 
+    // Get elements for the edit modal
+    const editPackageModal = document.getElementById("editPackageModal");
+    const closeEditModal = document.querySelector(".close-edit-modal");
+    const updatePackage = document.querySelector(".update-package");
+    const editPackageNameInput = document.querySelector(".edit-package-name");
+    const editPackagePriceInput = document.querySelector(".edit-package-price");
+    const editPackageDescriptionInput = document.querySelector(".edit-package-description");
+
     let packageElementToDelete = null;
+    let packageIdToEdit = null;
 
     // Create and style cancel button
     const cancelButton = document.createElement('button');
@@ -67,6 +76,11 @@ document.addEventListener("DOMContentLoaded", async function() {
         packageElementToDelete = null;
     });
 
+    // Hide edit modal when "Close" button is clicked
+    closeEditModal.addEventListener("click", function() {
+        editPackageModal.style.display = "none";
+    });
+
     // Cancel button functionality
     cancelButton.addEventListener("click", function() {
         // Hide cancel button
@@ -100,6 +114,61 @@ document.addEventListener("DOMContentLoaded", async function() {
         });
     });
 
+    // Function to show delete mode
+    function activateDeleteMode() {
+        // Hide Add and Delete buttons
+        addButton.style.display = "none";
+        deleteButton.style.display = "none";
+
+        // Show the Cancel button
+        cancelButton.style.display = "inline";
+
+        const deleteButtons = document.querySelectorAll(".delete-button");
+        deleteButtons.forEach(button => {
+            button.style.display = "inline"; // Show the delete button
+            button.classList.add("wiggle"); // Add wiggle animation
+        });
+
+        // Hide edit buttons
+        const editButtons = document.querySelectorAll(".edit-button");
+        editButtons.forEach(button => {
+            button.classList.add("hide-edit-button"); // Hide edit button
+        });
+    }
+
+    // Function to cancel delete mode
+    function cancelDeleteMode() {
+        // Hide cancel button
+        cancelButton.style.display = "none";
+
+        // Show Add and Delete buttons
+        addButton.style.display = "inline";
+        deleteButton.style.display = "inline";
+
+        // Hide delete button animations
+        const deleteButtons = document.querySelectorAll(".delete-button");
+        deleteButtons.forEach(button => {
+            button.style.display = "none"; // Hide delete button
+            button.classList.remove("wiggle"); // Remove wiggle animation
+        });
+
+        // Show edit buttons
+        const editButtons = document.querySelectorAll(".edit-button");
+        editButtons.forEach(button => {
+            button.classList.remove("hide-edit-button"); // Show edit button
+        });
+    }
+
+    // Show delete buttons when "Delete Package" button is clicked
+    deleteButton.addEventListener("click", function() {
+        activateDeleteMode();
+    });
+
+    // Cancel button functionality
+    cancelButton.addEventListener("click", function() {
+        cancelDeleteMode();
+    });
+
     // Confirm delete button click event
     confirmDeleteButton.addEventListener("click", async function() {
         if (packageElementToDelete) {
@@ -107,6 +176,32 @@ document.addEventListener("DOMContentLoaded", async function() {
             await deletePackageFromFirestore(packageId);
             deleteConfirmModal.style.display = "none";
             packageElementToDelete = null;
+
+            // Cancel delete mode after successful deletion
+            cancelDeleteMode();
+        }
+    });
+
+
+    // Confirm delete button click event
+    confirmDeleteButton.addEventListener("click", async function() {
+        if (packageElementToDelete) {
+            const packageId = packageElementToDelete.getAttribute("data-id");
+            await deletePackageFromFirestore(packageId);
+            deleteConfirmModal.style.display = "none";
+            packageElementToDelete = null;
+
+            // Cancel delete mode after successful deletion
+            cancelButton.style.display = "none"; // Hide cancel button
+            addButton.style.display = "inline"; // Show add button
+            deleteButton.style.display = "inline"; // Show delete button
+
+            // Hide delete button animations
+            const deleteButtons = document.querySelectorAll(".delete-button");
+            deleteButtons.forEach(button => {
+                button.style.display = "none"; // Hide delete button
+                button.classList.remove("wiggle"); // Remove wiggle animation
+            });
         }
     });
 
@@ -156,6 +251,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             <h2>${packageName}</h2>
             <span>Tuition Fee: &#8369;${packagePrice}</span>
             <h4>${packageDescription}</h4>
+            <button class="edit-button"><i class="bi bi-three-dots-vertical"></i></button>
             <button class="delete-button">&times;</button>
         `;
 
@@ -167,6 +263,12 @@ document.addEventListener("DOMContentLoaded", async function() {
         deleteButton.addEventListener("click", function() {
             packageElementToDelete = packageElement;
             deleteConfirmModal.style.display = "block";
+        });
+
+        // Attach edit event to the edit button
+        const editButton = packageElement.querySelector(".edit-button");
+        editButton.addEventListener("click", function() {
+            showEditModal(packageElement);
         });
     }
 
@@ -204,18 +306,115 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     }
 
-    // Function to load packages from Firestore and add them to the DOM
-    async function loadPackages() {
-        const querySnapshot = await getDocs(collection(db, "packages"));
-        querySnapshot.forEach((doc) => {
-            addPackageToDOM(doc.id, doc.data().name, doc.data().price, doc.data().description);
-        });
+    // Function to update package in Firestore
+    async function updatePackageInFirestore(packageId, packageName, packagePrice, packageDescription) {
+        try {
+            const packageRef = doc(db, "packages", packageId);
+            await updateDoc(packageRef, {
+                name: packageName,
+                price: packagePrice,
+                description: packageDescription
+            });
+
+            // Show success toast notification
+            Toastify({
+                text: "Package updated successfully!",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "green",
+                stopOnFocus: true
+            }).showToast();
+        } catch (e) {
+            console.error("Error updating document: ", e);
+
+            // Show error toast notification
+            Toastify({
+                text: "Failed to update package. Please try again.",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "red",
+                stopOnFocus: true
+            }).showToast();
+        }
     }
 
-    // Load packages when the page loads
-    await loadPackages();
+    // Function to show edit modal and populate fields
+    function showEditModal(packageElement) {
+        packageIdToEdit = packageElement.getAttribute("data-id");
+        const name = packageElement.querySelector("h2").textContent;
+        const priceText = packageElement.querySelector("span").textContent;
+        
+        // Extract only the numeric part from the price text
+        const price = priceText.replace(/[^0-9.]/g, ''); // Keep only digits and dot
+        
+        const description = packageElement.querySelector("h4").textContent;
 
-    // Save package button click event
+        // Populate the edit modal with current package details
+        editPackageNameInput.value = name;
+        editPackagePriceInput.value = price;
+        editPackageDescriptionInput.value = description;
+
+        // Show the edit modal
+        editPackageModal.style.display = "block";
+    }
+
+
+    // Update package details
+    updatePackage.addEventListener("click", async function(event) {
+        event.preventDefault(); // Prevent form submission
+
+        // Get updated package details from inputs
+        const packageName = editPackageNameInput.value;
+        const packagePrice = editPackagePriceInput.value;
+        const packageDescription = editPackageDescriptionInput.value;
+
+        // Check if all fields are filled
+        if (packageName && packagePrice && packageDescription) {
+            if (packageIdToEdit) {
+                // Update the package in Firestore
+                await updatePackageInFirestore(packageIdToEdit, packageName, packagePrice, packageDescription);
+                
+                // Update the package in the DOM with "Tuition Fee:" label and currency symbol
+                const packageElement = document.querySelector(`.package-text[data-id="${packageIdToEdit}"]`);
+                packageElement.querySelector("h2").textContent = packageName;
+                packageElement.querySelector("span").innerHTML = `Tuition Fee: &#8369;${packagePrice}`;
+                packageElement.querySelector("h4").textContent = packageDescription;
+
+                // Hide the edit modal
+                editPackageModal.style.display = "none";
+
+                // Clear the input fields
+                editPackageNameInput.value = '';
+                editPackagePriceInput.value = '';
+                editPackageDescriptionInput.value = '';
+            }
+        } else {
+            alert("Please fill out all fields.");
+        }
+    });
+
+
+    // Load existing packages from Firestore and add to DOM
+    async function loadPackages() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "packages"));
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                addPackageToDOM(doc.id, data.name, data.price, data.description);
+            });
+        } catch (e) {
+            console.error("Error loading packages: ", e);
+        }
+    }
+
+    // Load packages on page load
+    loadPackages();
+
+    // Save new package
     savePackage.addEventListener("click", function(event) {
         event.preventDefault(); // Prevent form submission
 
@@ -226,7 +425,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         // Check if all fields are filled
         if (packageName && packagePrice && packageDescription) {
-            // Add the package to Firestore and DOM
+            // Add the package to Firestore
             addPackageToFirestore(packageName, packagePrice, packageDescription);
 
             // Hide the modal

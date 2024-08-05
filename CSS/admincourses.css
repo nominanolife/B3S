@@ -284,8 +284,6 @@ h2 {
     background-color: #c9302c;
 }
 
-
-
 .package-list {
     display: flex;
     flex-wrap: wrap;
@@ -316,6 +314,22 @@ h2 {
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
 }
+
+.edit-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #2F2E2E;
+    cursor: pointer;
+}
+
+.hide-edit-button {
+    display: none;
+}
+
 
 .wiggle {
     animation: wiggle 0.3s ease-in-out infinite;
@@ -403,6 +417,58 @@ h2 {
     font-size: 14px;
 }
 
+#editPackageModal .modal-content {
+    padding: 20px;
+    border-radius: 20px;
+}
+
+#editPackageModal .modal-header {
+    border-bottom: none;
+    background: #f8f9fa;
+}
+
+#editPackageModal .modal-body {
+    padding: 10px;
+}
+
+#editPackageModal .modal-footer {
+    border-top: none;
+}
+
+.edit-package-name, .edit-package-price, .edit-package-description {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+
+.update-package {
+    background-color: #142A74;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.update-package:hover {
+    background-color: #1B3286;
+}
+
+.close-edit-modal {
+    background-color: #7B1719;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.close-edit-modal:hover {
+    background-color: #c9302c;
+}
+
 .input-body {
     display: flex;
     flex-direction: column;
@@ -481,3 +547,6 @@ h2 {
 .close-modal:hover {
     background-color: #c9302c;
 }
+
+
+
