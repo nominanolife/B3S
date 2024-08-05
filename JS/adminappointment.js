@@ -1,6 +1,5 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -209,7 +208,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         updateTable();
         renderCalendar();
     };
-    
+
     const updateTable = () => {
         const tableBody = document.getElementById("slots-table-body");
         tableBody.innerHTML = "";
@@ -217,7 +216,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             addTableRow(app);
         });
     };
-    
+
     const renderCalendar = () => {
         const firstDay = new Date(currentYear, currentMonth, 1);
         const lastDay = new Date(currentYear, currentMonth + 1, 0);
@@ -226,21 +225,21 @@ document.addEventListener("DOMContentLoaded", async function() {
         const prevLastDay = new Date(currentYear, currentMonth, 0);
         const prevLastDayDate = prevLastDay.getDate();
         const nextDays = 7 - lastDayIndex - 1;
-    
+
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         month.innerHTML = `${months[currentMonth]} ${currentYear}`;
-    
+
         let days = "";
-    
+
         // Previous month's days
         for (let x = firstDay.getDay(); x > 0; x--) {
             days += `<div class="day prev">${prevLastDayDate - x + 1}</div>`;
         }
-    
+
         // Current month's days
         for (let i = 1; i <= lastDayDate; i++) {
             const fullDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-    
+
             let dayClass = "day";
             if (
                 i === new Date().getDate() &&
@@ -249,27 +248,27 @@ document.addEventListener("DOMContentLoaded", async function() {
             ) {
                 dayClass += " today";
             }
-    
+
             days += `<div class="${dayClass}" data-date="${fullDate}">${i}</div>`;
         }
-    
+
         // Next month's days
         for (let j = 1; j <= nextDays; j++) {
             days += `<div class="day next">${j}</div>`;
         }
-    
+
         const daysContainer = document.getElementById('calendar-days');
         daysContainer.innerHTML = days;
         updateCalendarColors();
     };
-    
+
     const updateCalendarColors = () => {
         const dayElements = document.querySelectorAll("#calendar-days .day");
         dayElements.forEach(dayElement => {
             const fullDate = dayElement.dataset.date;
             const appointmentsOnThisDate = appointments.filter(app => app.date === fullDate);
             const totalSlots = appointmentsOnThisDate.reduce((sum, app) => sum + app.slots, 0);
-    
+
             if (appointmentsOnThisDate.length > 0) {
                 if (totalSlots > 0) {
                     dayElement.style.backgroundColor = "green"; // Set background color to green
@@ -279,7 +278,15 @@ document.addEventListener("DOMContentLoaded", async function() {
             }
         });
     };
-    
+
+    // Initialize Firestore real-time listener
+    const appointmentsRef = collection(db, "appointments");
+    onSnapshot(appointmentsRef, async (snapshot) => {
+        appointments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        updateTable();
+        renderCalendar();
+    });
+
     // Initialize the calendar and fetch appointments on load
     await fetchAppointments();
     renderCalendar();
