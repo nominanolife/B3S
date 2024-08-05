@@ -44,7 +44,8 @@ async function getUserData() {
                 age: personalInfo.age || '',
                 status: personalInfo.status || 'Single',
                 contactNumber: userData.phoneNumber || '',
-                address: personalInfo.address || ''
+                address: personalInfo.address || '',
+                profilePicUrl: personalInfo.profilePicUrl || ''
             };
 
             // Pre-fill edit profile modal with existing data

@@ -29,7 +29,7 @@ function renderPackages(packages) {
   packages.forEach(pkg => {
     const packageHtml = `
       <div class="package-tiles">
-        <button class="info" type="button" id="infoButton"><i class="bi bi-info-circle"></i></button>
+        <i class="info bi bi-info-circle" data-toggle="modal" data-target="#infoModal"></i>
         <form class="package-body">
           <div class="package-text">
             <h2>${pkg.name}</h2>
@@ -40,7 +40,8 @@ function renderPackages(packages) {
             <button class="enroll-now-button" type="button" data-package-id="${pkg.id}" data-package-name="${pkg.name}">Enroll Now</button>
           </div>
         </form>
-      </div>`;
+      </div>
+            `;
     packageContainer.insertAdjacentHTML('beforebegin', packageHtml);
   });
   showTiles(currentIndex);
@@ -82,13 +83,6 @@ async function fetchPackages() {
 }
 
 fetchPackages();
-
-// Handle info button click
-document.addEventListener('click', (e) => {
-  if (e.target && e.target.classList.contains('info')) {
-    $('#infoModal').modal('show');
-  }
-});
 
 // Handle close button click
 document.querySelector('.modal .close').addEventListener('click', () => {

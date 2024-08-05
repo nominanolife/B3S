@@ -288,6 +288,7 @@ h2 {
     border: none;
     background: none;
     color: #142A74;
+    cursor: pointer;
 }
 
 .package-body {
