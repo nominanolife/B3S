@@ -1,212 +1,310 @@
-document.addEventListener("DOMContentLoaded", function() {
-  const form = document.querySelector(".upper-container");
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-  // Prevent form submission
-  form.addEventListener("submit", function(event) {
-      event.preventDefault();
-  });
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+    authDomain: "authentication-d6496.firebaseapp.com",
+    projectId: "authentication-d6496",
+    storageBucket: "authentication-d6496.appspot.com",
+    messagingSenderId: "195867894399",
+    appId: "1:195867894399:web:596fb109d308aea8b6154a"
+};
 
-  // Add button click event listener
-  document.getElementById("btn-add").addEventListener("click", function() {
-      const course = document.querySelector('input[name="course"]:checked');
-      const date = document.getElementById("datepicker").value;
-      const timeStart = document.getElementById("time-start").value;
-      const timeEnd = document.getElementById("time-end").value;
-      const slots = document.getElementById("slots").value;
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-      if (!course || !date || !timeStart || !timeEnd || !slots) {
-          alert("Please fill out all fields.");
-          return;
-      }
+document.addEventListener("DOMContentLoaded", async function() {
+    const form = document.querySelector(".upper-container");
+    let selectedAppointmentId = null;
 
-      const formattedTimeStart = formatTimeToAMPM(timeStart);
-      const formattedTimeEnd = formatTimeToAMPM(timeEnd);
-      
-      const row = document.createElement("tr");
-      row.innerHTML = `
-          <td>${course.value}</td>
-          <td>${date}</td>
-          <td>${formattedTimeStart}</td>
-          <td>${formattedTimeEnd}</td>
-          <td>${slots}</td>
-          <td>
-              <button class="btn-edit">Edit</button>
-              <button class="btn-delete">Delete</button>
-          </td>
-      `;
-      document.getElementById("slots-table-body").appendChild(row);
+    // Initialize Bootstrap Modal for delete confirmation
+    const deleteModalElement = document.getElementById("deleteModal");
+    const deleteModal = new bootstrap.Modal(deleteModalElement);
+    let rowToDelete = null;
 
-      // Clear form fields after adding
-      clearForm();
-  });
+    // Prevent form submission
+    form.addEventListener("submit", function(event) {
+        event.preventDefault();
+    });
 
-  // Clear button click event listener
-  document.getElementById("btn-clear").addEventListener("click", function() {
-      clearForm();
-  });
+    // Add button click event listener for adding an appointment
+    document.getElementById("btn-add").addEventListener("click", async function() {
+        await saveAppointment();
+    });
 
-  function clearForm() {
-      const checkedRadio = document.querySelector('input[name="course"]:checked');
-      if (checkedRadio) {
-          checkedRadio.checked = false;
-      }
-      document.getElementById("datepicker").value = "";
-      document.getElementById("time-start").value = "";
-      document.getElementById("time-end").value = "";
-      document.getElementById("slots").value = "";
-  }
+    // Update button click event listener for updating an appointment
+    document.getElementById("btn-update").addEventListener("click", async function() {
+        await saveAppointment();
+    });
 
-  // Event delegation for edit and delete buttons
-  document.getElementById("slots-table-body").addEventListener("click", function(event) {
-      if (event.target.classList.contains("btn-edit")) {
-          // Handle edit functionality
-          const row = event.target.closest("tr");
-          // Populate the form with existing data
-          const cells = row.getElementsByTagName("td");
-          document.querySelector(`input[name="course"][value="${cells[0].textContent}"]`).checked = true;
-          document.getElementById("datepicker").value = cells[1].textContent;
-          
-          // Convert time from AM/PM to 24-hour format for the input
-          const [timeStartString, timeEndString] = [cells[2].textContent, cells[3].textContent];
-          const timeStrings = [timeStartString, timeEndString];
-          const timeIDs = ["time-start", "time-end"];
-          
-          timeStrings.forEach((timeString, index) => {
-              const [time, period] = timeString.split(" ");
-              let [hour, minute] = time.split(":");
-              hour = parseInt(hour, 10);
-              if (period === "PM" && hour < 12) hour += 12;
-              if (period === "AM" && hour === 12) hour = 0;
-              document.getElementById(timeIDs[index]).value = `${String(hour).padStart(2, "0")}:${minute}`;
-          });
-          
-          document.getElementById("slots").value = cells[4].textContent;
-          // Remove the row for editing
-          row.remove();
-      } else if (event.target.classList.contains("btn-delete")) {
-          // Handle delete functionality
-          const row = event.target.closest("tr");
-          // Set the row to delete in global variable
-          rowToDelete = row;
-          // Show the modal
-          deleteModal.show();
-      }
-  });
+    async function saveAppointment() {
+        const course = document.querySelector('input[name="course"]:checked');
+        const date = document.getElementById("datepicker").value;
+        const timeStart = document.getElementById("time-start").value;
+        const timeEnd = document.getElementById("time-end").value;
+        const slots = document.getElementById("slots").value;
 
-  // Function to format time to AM/PM
-  function formatTimeToAMPM(time) {
-      let [hour, minute] = time.split(":");
-      hour = parseInt(hour, 10);
-      const period = hour >= 12 ? "PM" : "AM";
-      if (hour > 12) hour -= 12;
-      if (hour === 0) hour = 12;
-      return `${String(hour).padStart(2, "0")}:${minute} ${period}`;
-  }
+        if (!course || !date || !timeStart || !timeEnd || !slots) {
+            alert("Please Fill Out All Fields Correctly.");
+            return;
+        }
 
-  // Calendar functionality
-  const daysContainer = document.querySelector(".days");
-  const nextBtn = document.querySelector(".next");
-  const prevBtn = document.querySelector(".prev");
-  const todayBtn = document.querySelector(".today");
-  const month = document.querySelector(".month");
+        if (selectedAppointmentId) {
+            // Update the existing document
+            try {
+                await updateDoc(doc(db, "appointments", selectedAppointmentId), {
+                    course: course.value,
+                    date: date,
+                    timeStart: timeStart,
+                    timeEnd: timeEnd,
+                    slots: parseInt(slots)
+                });
+                alert("Appointment Updated Successfully!");
+                selectedAppointmentId = null; // Clear the selected ID after update
+                document.getElementById("btn-add").style.display = "block";
+                document.getElementById("btn-update").style.display = "none";
+            } catch (e) {
+                console.error("Error Updating Appointment: ", e);
+            }
+        } else {
+            // Add a new document
+            try {
+                await addDoc(collection(db, "appointments"), {
+                    course: course.value,
+                    date: date,
+                    timeStart: timeStart,
+                    timeEnd: timeEnd,
+                    slots: parseInt(slots)
+                });
+                alert("Appointment Added Successfully!");
+            } catch (e) {
+                console.error("Error Adding Appointment: ", e);
+            }
+        }
 
-  const months = [
-      "January", "February", "March", "April", "May", "June", "July",
-      "August", "September", "October", "November", "December"
-  ];
+        // Re-fetch appointments and re-render the table and calendar
+        await fetchAppointments();
+        renderCalendar();
+        clearForm();
+    }
 
-  const date = new Date();
-  let currentMonth = date.getMonth();
-  let currentYear = date.getFullYear();
+    // Clear button click event listener
+    document.getElementById("btn-clear").addEventListener("click", clearForm);
 
-  const renderCalendar = () => {
-      date.setDate(1);
-      const firstDay = new Date(currentYear, currentMonth, 1);
-      const lastDay = new Date(currentYear, currentMonth + 1, 0);
-      const lastDayIndex = lastDay.getDay();
-      const lastDayDate = lastDay.getDate();
-      const prevLastDay = new Date(currentYear, currentMonth, 0);
-      const prevLastDayDate = prevLastDay.getDate();
-      const nextDays = 7 - lastDayIndex - 1;
+    function clearForm() {
+        const checkedCourse = document.querySelector('input[name="course"]:checked');
+        if (checkedCourse) {
+            checkedCourse.checked = false;
+        }
+        document.getElementById("datepicker").value = "";
+        document.getElementById("time-start").value = "";
+        document.getElementById("time-end").value = "";
+        document.getElementById("slots").value = "";
+        selectedAppointmentId = null;
+        document.getElementById("btn-add").style.display = "block";
+        document.getElementById("btn-update").style.display = "none";
+    }
 
-      month.innerHTML = `${months[currentMonth]} ${currentYear}`;
+    // Add a new row to the table
+    function addTableRow(appointment) {
+        const { id, course, date, timeStart, timeEnd, slots } = appointment;
+        const formattedTimeStart = formatTimeToAMPM(timeStart);
+        const formattedTimeEnd = formatTimeToAMPM(timeEnd);
 
-      let days = "";
+        const row = document.createElement("tr");
+        row.setAttribute("data-id", id);
+        row.innerHTML = `
+            <td>${course}</td>
+            <td>${date}</td>
+            <td>${formattedTimeStart}</td>
+            <td>${formattedTimeEnd}</td>
+            <td>${slots}</td>
+            <td>
+                <button class="btn-edit">Edit</button>
+                <button class="btn-delete">Delete</button>
+            </td>
+        `;
+        document.getElementById("slots-table-body").appendChild(row);
+    }
 
-      for (let x = firstDay.getDay(); x > 0; x--) {
-          days += `<div class="day prev">${prevLastDayDate - x + 1}</div>`;
-      }
+    // Event delegation for edit and delete buttons
+    document.getElementById("slots-table-body").addEventListener("click", async function(event) {
+        if (event.target.classList.contains("btn-edit")) {
+            // Handle edit functionality
+            const row = event.target.closest("tr");
+            const id = row.getAttribute("data-id");
+            populateFormForEdit(id);
+        } else if (event.target.classList.contains("btn-delete")) {
+            // Handle delete functionality
+            const row = event.target.closest("tr");
+            rowToDelete = row;
+            deleteModal.show();
+        }
+    });
 
-      for (let i = 1; i <= lastDayDate; i++) {
-          if (
-              i === new Date().getDate() &&
-              currentMonth === new Date().getMonth() &&
-              currentYear === new Date().getFullYear()
-          ) {
-              days += `<div class="day today">${i}</div>`;
-          } else {
-              days += `<div class="day">${i}</div>`;
-          }
-      }
+    async function populateFormForEdit(id) {
+        const docRef = doc(db, "appointments", id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.querySelector(`input[name="course"][value="${data.course}"]`).checked = true;
+            document.getElementById("datepicker").value = data.date;
+            document.getElementById("time-start").value = data.timeStart;
+            document.getElementById("time-end").value = data.timeEnd;
+            document.getElementById("slots").value = data.slots;
 
-      for (let j = 1; j <= nextDays; j++) {
-          days += `<div class="day next">${j}</div>`;
-      }
+            document.getElementById("btn-add").style.display = "none";
+            document.getElementById("btn-update").style.display = "block";
+            selectedAppointmentId = id;
+        } else {
+            console.error("No such document!");
+        }
+    }
 
-      daysContainer.innerHTML = days;
-      hideTodayBtn();
-  };
+    document.getElementById("confirmDeleteBtn").addEventListener("click", async function() {
+        if (rowToDelete) {
+            const id = rowToDelete.getAttribute("data-id");
 
-  nextBtn.addEventListener("click", () => {
-      currentMonth++;
-      if (currentMonth > 11) {
-          currentMonth = 0;
-          currentYear++;
-      }
-      renderCalendar();
-  });
+            // Delete the document in Firestore
+            await deleteDoc(doc(db, "appointments", id));
+            rowToDelete.remove();
 
-  prevBtn.addEventListener("click", () => {
-      currentMonth--;
-      if (currentMonth < 0) {
-          currentMonth = 11;
-          currentYear--;
-      }
-      renderCalendar();
-  });
+            // Re-fetch appointments and re-render the calendar
+            await fetchAppointments();
+            renderCalendar();
 
-  todayBtn.addEventListener("click", () => {
-      currentMonth = date.getMonth();
-      currentYear = date.getFullYear();
-      renderCalendar();
-  });
+            deleteModal.hide();
+            rowToDelete = null;
+        }
+    });
 
-  function hideTodayBtn() {
-      if (
-          currentMonth === new Date().getMonth() &&
-          currentYear === new Date().getFullYear()
-      ) {
-          todayBtn.style.display = "none";
-      } else {
-          todayBtn.style.display = "flex";
-      }
-  }
+    // Function to format time to AM/PM
+    function formatTimeToAMPM(time) {
+        let [hour, minute] = time.split(":");
+        hour = parseInt(hour, 10);
+        const period = hour >= 12 ? "PM" : "AM";
+        if (hour > 12) hour -= 12;
+        if (hour === 0) hour = 12;
+        return `${String(hour).padStart(2, "0")}:${minute} ${period}`;
+    }
 
-  renderCalendar();
+    // Calendar functionality
+    const nextBtn = document.querySelector(".next");
+    const prevBtn = document.querySelector(".prev");
+    const todayBtn = document.querySelector(".today");
+    const month = document.querySelector(".month");
+
+    const date = new Date();
+    let currentMonth = date.getMonth();
+    let currentYear = date.getFullYear();
+
+    let appointments = [];
+
+    const fetchAppointments = async () => {
+        const querySnapshot = await getDocs(collection(db, "appointments"));
+        appointments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        updateTable();
+        renderCalendar();
+    };
+    
+    const updateTable = () => {
+        const tableBody = document.getElementById("slots-table-body");
+        tableBody.innerHTML = "";
+        appointments.forEach(app => {
+            addTableRow(app);
+        });
+    };
+    
+    const renderCalendar = () => {
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const lastDayIndex = lastDay.getDay();
+        const lastDayDate = lastDay.getDate();
+        const prevLastDay = new Date(currentYear, currentMonth, 0);
+        const prevLastDayDate = prevLastDay.getDate();
+        const nextDays = 7 - lastDayIndex - 1;
+    
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        month.innerHTML = `${months[currentMonth]} ${currentYear}`;
+    
+        let days = "";
+    
+        // Previous month's days
+        for (let x = firstDay.getDay(); x > 0; x--) {
+            days += `<div class="day prev">${prevLastDayDate - x + 1}</div>`;
+        }
+    
+        // Current month's days
+        for (let i = 1; i <= lastDayDate; i++) {
+            const fullDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+    
+            let dayClass = "day";
+            if (
+                i === new Date().getDate() &&
+                currentMonth === new Date().getMonth() &&
+                currentYear === new Date().getFullYear()
+            ) {
+                dayClass += " today";
+            }
+    
+            days += `<div class="${dayClass}" data-date="${fullDate}">${i}</div>`;
+        }
+    
+        // Next month's days
+        for (let j = 1; j <= nextDays; j++) {
+            days += `<div class="day next">${j}</div>`;
+        }
+    
+        const daysContainer = document.getElementById('calendar-days');
+        daysContainer.innerHTML = days;
+        updateCalendarColors();
+    };
+    
+    const updateCalendarColors = () => {
+        const dayElements = document.querySelectorAll("#calendar-days .day");
+        dayElements.forEach(dayElement => {
+            const fullDate = dayElement.dataset.date;
+            const appointmentsOnThisDate = appointments.filter(app => app.date === fullDate);
+            const totalSlots = appointmentsOnThisDate.reduce((sum, app) => sum + app.slots, 0);
+    
+            if (appointmentsOnThisDate.length > 0) {
+                if (totalSlots > 0) {
+                    dayElement.style.backgroundColor = "green"; // Set background color to green
+                } else {
+                    dayElement.style.backgroundColor = "red"; // Set background color to red
+                }
+            }
+        });
+    };
+    
+    // Initialize the calendar and fetch appointments on load
+    await fetchAppointments();
+    renderCalendar();
+
+    nextBtn.addEventListener("click", () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar();
+    });
+
+    prevBtn.addEventListener("click", () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar();
+    });
+
+    todayBtn.addEventListener("click", () => {
+        currentMonth = date.getMonth();
+        currentYear = date.getFullYear();
+        renderCalendar();
+    });
 });
-
-// Initialize Bootstrap Modal
-const deleteModalElement = document.getElementById("deleteModal");
-const deleteModal = new bootstrap.Modal(deleteModalElement);
-let rowToDelete = null;
-
-// Confirm delete
-document.getElementById("confirmDeleteBtn").addEventListener("click", function() {
-  if (rowToDelete) {
-    rowToDelete.remove();
-    deleteModal.hide();
-    rowToDelete = null;
-  }
-});
-
-
