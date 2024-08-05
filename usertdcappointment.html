@@ -50,13 +50,72 @@
                         <h3>TDC Appointment</h3>
                     </div>
                     <div class="my-sched">
-                        <button class="my-sched-btn" type="button">My Schedule</button>
+                        <button class="my-sched-btn" id="mySchedBtn" type="button">My Schedule</button>
                     </div>
                 </div>
+                <div class="upper-container">
+                    <div class="left-container">
+                        <h3>Date</h3>
+                        <div class="calendar">
+                            <div class="header-cal">
+                                <div class="month">July 2021</div>
+                                <div class="btns">
+                                    <div class="btn today">
+                                        <i class="fas fa-calendar-day"></i>
+                                    </div>
+                                    <div class="btn prev">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </div>
+                                    <div class="btn next">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="weekdays">
+                                <div class="day">Sun</div>
+                                <div class="day">Mon</div>
+                                <div class="day">Tue</div>
+                                <div class="day">Wed</div>
+                                <div class="day">Thu</div>
+                                <div class="day">Fri</div>
+                                <div class="day">Sat</div>
+                            </div>
+                            <div class="days">
+                                <!-- render days with js -->
+                            </div>
+                            <div class="calendar-container">
+                                <div class="calendar-legend">
+                                    <div class="legend-item">
+                                        <div class="legend-color available"></div>
+                                        <span>Available</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color full"></div>
+                                        <span>Full</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
+                    </div>   
+                    <div class="right-container">
+                        <div class="time-section">
+                            <div class="time-header">
+                                <h2>Time</h2>
+                            </div>
+                            <div class="time-body">
+                                <p>Please Select a Date</p>
+                            </div>     
+                            <div class="book-button-container">
+                                <button class="btn-book">Book</button>
+                            </div>                        
+                        </div>
+                    </div>
+                </div>
+           
             </div>
         </div>
     </div>
-
+    
     <!-- Logout Confirmation Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
