@@ -375,7 +375,7 @@ h2 {
 }
 
 /* General button styles */
-.btn-add, .btn-clear {
+.btn-add, .btn-clear  {
     font-family: Poppins;
     font-size: 14px;
     font-weight: bold;
@@ -406,7 +406,7 @@ h2 {
     font-size: 14px;
     font-weight: bold;
     color: #ffffff; /* Text color */
-    background-color: #142a74; /* Button background color */
+    background-color: #142a74; /* Button background color */    
     border: none; /* Remove default border */
     border-radius: 5px; /* Rounded corners */
     padding: 5px 10px; /* Adjust padding for size */
@@ -680,4 +680,30 @@ body {
 
 .close:hover {
     color: #c9302c;
+}
+
+#btn-update{
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff; /* Text color */
+    background-color: #142a74; /* Button background color */
+    border: none; /* Remove default border */
+    border-radius: 10px; /* Rounded corners */
+    padding: 10px 20px; /* Adjust padding for size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transitions for hover effects */
+    margin: 5px; /* Space between buttons */
+}
+
+/* Hover effect for buttons */
+#btn-update:hover {
+    background-color: #0e1d4d; /* Darker background color on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+/* Focus effect for buttons */
+#btn-update:focus {
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Subtle shadow on focus */
 }

@@ -20,10 +20,13 @@ document.addEventListener("DOMContentLoaded", async function() {
     const form = document.querySelector(".upper-container");
     let selectedAppointmentId = null;
 
-    // Initialize Bootstrap Modal for delete confirmation
+    // Initialize Bootstrap Modals
     const deleteModalElement = document.getElementById("deleteModal");
     const deleteModal = new bootstrap.Modal(deleteModalElement);
     let rowToDelete = null;
+
+    const successModalElement = document.getElementById("successModal");
+    const successModal = new bootstrap.Modal(successModalElement);
 
     // Prevent form submission
     form.addEventListener("submit", function(event) {
@@ -48,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const slots = document.getElementById("slots").value;
 
         if (!course || !date || !timeStart || !timeEnd || !slots) {
-            alert("Please Fill Out All Fields Correctly.");
+            showSuccessModal("Please Fill Out All Fields Correctly.");
             return;
         }
 
@@ -62,7 +65,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                     timeEnd: timeEnd,
                     slots: parseInt(slots)
                 });
-                alert("Appointment Updated Successfully!");
+                showSuccessModal("Appointment Updated Successfully!");
                 selectedAppointmentId = null; // Clear the selected ID after update
                 document.getElementById("btn-add").style.display = "block";
                 document.getElementById("btn-update").style.display = "none";
@@ -79,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                     timeEnd: timeEnd,
                     slots: parseInt(slots)
                 });
-                alert("Appointment Added Successfully!");
+                showSuccessModal("Appointment Added Successfully!");
             } catch (e) {
                 console.error("Error Adding Appointment: ", e);
             }
@@ -113,7 +116,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const { id, course, date, timeStart, timeEnd, slots } = appointment;
         const formattedTimeStart = formatTimeToAMPM(timeStart);
         const formattedTimeEnd = formatTimeToAMPM(timeEnd);
-
+    
         const row = document.createElement("tr");
         row.setAttribute("data-id", id);
         row.innerHTML = `
@@ -123,8 +126,8 @@ document.addEventListener("DOMContentLoaded", async function() {
             <td>${formattedTimeEnd}</td>
             <td>${slots}</td>
             <td>
-                <button class="btn-edit">Edit</button>
-                <button class="btn-delete">Delete</button>
+                <button class="btn-edit btn btn-warning">Edit</button>
+                <button class="btn-delete btn btn-danger">Delete</button>
             </td>
         `;
         document.getElementById("slots-table-body").appendChild(row);
@@ -144,43 +147,43 @@ document.addEventListener("DOMContentLoaded", async function() {
             deleteModal.show();
         }
     });
+// Populate form for editing an existing appointment
+async function populateFormForEdit(id) {
+    const docRef = doc(db, "appointments", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.querySelector(`input[name="course"][value="${data.course}"]`).checked = true;
+        document.getElementById("datepicker").value = data.date;
+        document.getElementById("time-start").value = data.timeStart;
+        document.getElementById("time-end").value = data.timeEnd;
+        document.getElementById("slots").value = data.slots;
 
-    async function populateFormForEdit(id) {
-        const docRef = doc(db, "appointments", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            document.querySelector(`input[name="course"][value="${data.course}"]`).checked = true;
-            document.getElementById("datepicker").value = data.date;
-            document.getElementById("time-start").value = data.timeStart;
-            document.getElementById("time-end").value = data.timeEnd;
-            document.getElementById("slots").value = data.slots;
-
-            document.getElementById("btn-add").style.display = "none";
-            document.getElementById("btn-update").style.display = "block";
-            selectedAppointmentId = id;
-        } else {
-            console.error("No such document!");
-        }
+        document.getElementById("btn-add").style.display = "none";
+        document.getElementById("btn-update").style.display = "block";
+        selectedAppointmentId = id;
+    } else {
+        console.error("No such document!");
     }
+}
 
-    document.getElementById("confirmDeleteBtn").addEventListener("click", async function() {
-        if (rowToDelete) {
-            const id = rowToDelete.getAttribute("data-id");
+// Confirm delete button in the delete modal
+document.getElementById("confirmDeleteBtn").addEventListener("click", async function() {
+    if (rowToDelete) {
+        const id = rowToDelete.getAttribute("data-id");
 
-            // Delete the document in Firestore
-            await deleteDoc(doc(db, "appointments", id));
-            rowToDelete.remove();
+        // Delete the document in Firestore
+        await deleteDoc(doc(db, "appointments", id));
+        rowToDelete.remove();
 
-            // Re-fetch appointments and re-render the calendar
-            await fetchAppointments();
-            renderCalendar();
+        // Re-fetch appointments and re-render the calendar
+        await fetchAppointments();
+        renderCalendar();
 
-            deleteModal.hide();
-            rowToDelete = null;
-        }
-    });
-
+        deleteModal.hide();
+        rowToDelete = null;
+    }
+});
     // Function to format time to AM/PM
     function formatTimeToAMPM(time) {
         let [hour, minute] = time.split(":");
@@ -307,4 +310,16 @@ document.addEventListener("DOMContentLoaded", async function() {
         currentYear = date.getFullYear();
         renderCalendar();
     });
+
+    function showSuccessModal(message) {
+        const modalBody = successModalElement.querySelector(".modal-body");
+        modalBody.textContent = message;
+        successModal.show();
+        
+        // Hide the modal when "OK" button is clicked
+        const okButton = successModalElement.querySelector(".btn-primary");
+        okButton.addEventListener("click", function() {
+            successModal.hide();
+        }, { once: true }); // Ensures event listener is only added once
+    }
 });
