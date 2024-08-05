@@ -56,7 +56,9 @@
                     <button class="delete-package" type="button" id="deleteButton">Delete Package</button>
                     <button class="cancel-delete" type="button" id="cancelButton" style="display: none;">Cancel</button>
                 </div>
-                <div class="package-list" id="packageList"></div>
+                <div class="package-list" id="packageList">
+                    
+                </div>
             </div>            
         </div>
 
@@ -80,6 +82,27 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal" id="editPackageModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Edit Package</h4>
+                    </div>
+                    <form class="modal-body">
+                        <div class="input-body">
+                            <input type="text" class="edit-package-name" placeholder="Package Name" required>
+                            <input type="text" class="edit-package-price" placeholder="Price" required>
+                            <input type="text" class="edit-package-description" placeholder="Description" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="update-package" type="submit">Update</button>
+                            <button class="close-edit-modal" type="button">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>        
     </div>
 
     <div class="modal" id="deleteConfirmModal">

@@ -36,13 +36,14 @@ function renderStudents(students) {
   students.forEach(student => {
     const personalInfo = student.personalInfo || {}; // Ensure personalInfo exists
     const studentHtml = `
-      <div class="student-item">
-        <h3>${personalInfo.first || ''} ${personalInfo.last || ''}</h3>
-        <p>Email: ${student.email}</p>
-        <p>Phone Number: ${student.phoneNumber || ''}</p>
-        <p>Enrolled Package: ${student.enrolledPackage}</p>
-        <p>Package Price: &#8369;${student.packagePrice}</p>
-      </div>`;
+      <tr class="table-row">
+        <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
+        <td class="table-row-content">${student.email}</td>
+        <td class="table-row-content">${student.phoneNumber || ''}</td>
+        <td class="table-row-content">${student.enrolledPackage}</td>
+        <td class="table-row-content">&#8369; ${student.packagePrice}</td>
+      </tr>
+      `;
     studentList.insertAdjacentHTML('beforeend', studentHtml);
   });
 }

@@ -80,7 +80,7 @@
                                 <div class="day">Fri</div>
                                 <div class="day">Sat</div>
                             </div>
-                            <div class="days">
+                            <div class="days" id="calendar-days">
                                 <!-- render days with js -->
                             </div>
                             <div class="calendar-container">
@@ -99,19 +99,16 @@
                     </div>   
                     <div class="right-container">
                         <div class="time-section">
-                            <div class="time-header">
-                                <h2>Time</h2>
-                            </div>
-                            <div class="time-body">
-                                <p>Please Select a Date</p>
-                            </div>     
-                            <div class="book-button-container">
-                                <button class="btn-book">Book</button>
-                            </div>                        
+                          <div class="time-header">
+                            <h2>Time</h2>
+                          </div>
+                          <div class="time-body"></div>
+                          <div class="book-button-container">
+                            <button id="btn-book" class="btn-book" style="display: none;">Book</button>
+                          </div>
                         </div>
-                    </div>
+                      </div>
                 </div>
-           
             </div>
         </div>
     </div>
@@ -137,7 +134,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="JS/userpdcappointment.js"></script>
+    <script type="module" src="JS/userpdcappointment.js"></script>
     <script type="module" src="JS/common.js"></script>
 </body>
 </html>
