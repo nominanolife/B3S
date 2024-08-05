@@ -51,8 +51,51 @@
             </div>
             <div class="page-content">
                 <div class="left-container">
-                    <h1>Calendar</h1>
-                </div>                
+                    <h1>Calendar</h1> 
+                    <div class="calendar">
+                      <div class="header-cal">
+                        <div class="month">July 2021</div>
+                        <div class="btns">
+                          <!-- today -->
+                          <div class="btn today">
+                            <i class="fas fa-calendar-day"></i>
+                          </div>
+                          <!-- previous month -->
+                          <div class="btn prev">
+                            <i class="fas fa-chevron-left"></i>
+                          </div>
+                          <!-- next month -->
+                          <div class="btn next">
+                            <i class="fas fa-chevron-right"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="weekdays">
+                        <div class="day">Sun</div>
+                        <div class="day">Mon</div>
+                        <div class="day">Tue</div>
+                        <div class="day">Wed</div>
+                        <div class="day">Thu</div>
+                        <div class="day">Fri</div>
+                        <div class="day">Sat</div>
+                      </div>
+                      <div class="days">
+                        <!-- render days with js -->
+                      </div>
+                      <div class="calendar-container">
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <div class="legend-color available"></div>
+                                <span>Available</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color full"></div>
+                                <span>Full</span>
+                            </div>
+                        </div>
+                    </div>
+                  </div>  
+                </div>           
                 <div class="right-container">
                     <div class="course-section">
                         <div class="course-header">
