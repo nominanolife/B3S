@@ -390,3 +390,153 @@ h2 {
 .btn-delete:hover {
     background-color: #c0392b; /* Darker red on hover */
 }
+@import url(https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
+:root {
+  --primary-color: #142a74;
+  --text-color: #1d1d1d;
+  --bg-color: #f1f1fb;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+body {
+  background: #ffffff;
+}
+.container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.calendar {
+  width: 100%;
+  max-width: 600px;
+  background: var(--bg-color);
+  padding: 30px 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow for depth */
+}
+.calendar .header-cal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #ccc;
+}
+.calendar .header-cal .month {
+  display: flex;
+  align-items: center;
+  font-size: 25px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+.calendar .header-cal .btns {
+  display: flex;
+  gap: 10px;
+}
+.calendar .header-cal .btns .btn {
+  width: 50px;
+  height: 40px;
+  background: var(--primary-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.calendar .header-cal .btns .btn:hover {
+  background: #142a74;
+  transform: scale(1.05);
+}
+.calendar .weekdays {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.calendar .weekdays .day {
+  width: calc(100% / 7 - 10px);
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+.calendar .days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.calendar .days .day {
+  width: calc(100% / 7 - 10px);
+  height: 50px;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-color);
+  transition: all 0.3s;
+  user-select: none;
+}
+.calendar .days .day:not(.next):not(.prev):hover {
+  color: #fff;
+  background: var(--primary-color);
+  transform: scale(1.05);
+}
+.calendar .days .day.next,
+.calendar .days .day.prev {
+  color: #ccc;
+}
+.calendar .days .day.today {
+  color: #fff;
+  background: var(--primary-color);
+}
+.calendar-container {
+    width: 100%;
+    max-width: 600px;
+    background: var(--bg-color);
+    padding: 30px 20px;
+    border-radius: 10px;
+}
+
+.calendar-legend {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ccc;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.available {
+    background-color: #28a745; /* Green color for available */
+}
+
+.full {
+    background-color: #e74c3c; /* Red color for full */
+}
+
+.legend-item span {
+    font-size: 16px;
+    color: var(--text-color);
+}
+
