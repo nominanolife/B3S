@@ -24,10 +24,10 @@
                     </div>
                 </div>
                 <div class="sidebar-dashboard">
-                    <a href="admindashboard.html" class="active"><i class="bi bi-columns-gap"></i>Dashboard</a>
+                    <a href="admindashboard.html"><i class="bi bi-columns-gap"></i>Dashboard</a>
                 </div>
                 <div class="sidebar-menu">
-                    <a href="adminappointment.html"><i class="bi bi-calendar2-week"></i>Appointment</a>
+                    <a href="adminappointment.html" class="active"><i class="bi bi-calendar2-week"></i>Appointment</a>
                     <a href=""><i class="bi bi-file-earmark-text"></i>Sales Report</a>
                     <a href="admincourses.html"><i class="bi bi-mortarboard"></i>Courses</a>
                 </div>
@@ -50,106 +50,111 @@
                 </div>
             </div>
             <div class="page-content">
-                <div class="left-container">
-                    <h1>Calendar</h1> 
-                    <div class="calendar">
-                      <div class="header-cal">
-                        <div class="month">July 2021</div>
-                        <div class="btns">
-                          <!-- today -->
-                          <div class="btn today">
-                            <i class="fas fa-calendar-day"></i>
-                          </div>
-                          <!-- previous month -->
-                          <div class="btn prev">
-                            <i class="fas fa-chevron-left"></i>
-                          </div>
-                          <!-- next month -->
-                          <div class="btn next">
-                            <i class="fas fa-chevron-right"></i>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="weekdays">
-                        <div class="day">Sun</div>
-                        <div class="day">Mon</div>
-                        <div class="day">Tue</div>
-                        <div class="day">Wed</div>
-                        <div class="day">Thu</div>
-                        <div class="day">Fri</div>
-                        <div class="day">Sat</div>
-                      </div>
-                      <div class="days">
-                        <!-- render days with js -->
-                      </div>
-                      <div class="calendar-container">
-                        <div class="calendar-legend">
-                            <div class="legend-item">
-                                <div class="legend-color available"></div>
-                                <span>Available</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color full"></div>
-                                <span>Full</span>
-                            </div>
-                        </div>
-                    </div>
-                  </div>  
-                </div>           
-                <div class="right-container">
-                    <div class="course-section">
-                        <div class="course-header">
-                            <h2>Course</h2>
-                        </div>
-                        <div class="course-body">
-                            <label><input type="radio" name="course" value="TDC"> Theoretical Driving Course</label>
-                            <label><input type="radio" name="course" value="PDC"> Practical Driving Course</label>
-                        </div>                        
-                    </div>
-                    <div class="slots-section">
-                        <div class="slots-header">
-                            <h2>Slots</h2>
-                        </div>
-                        <div class="slots-body">
-                            <div class="form-group">
-                                <label for="date">Date</label>
-                                <div class="date-container">
-                                    <input type="text" id="datepicker" class="form-control" placeholder="Select a date">
-                                    <i class="bi bi-calendar"></i>
+                <form class="upper-container">
+                    <div class="left-container">
+                        <h1>Calendar</h1> 
+                        <div class="calendar">
+                            <div class="header-cal">
+                                <div class="month">July 2021</div>
+                                <div class="btns">
+                                    <!-- today -->
+                                    <div class="btn today">
+                                        <i class="fas fa-calendar-day"></i>
+                                    </div>
+                                    <!-- previous month -->
+                                    <div class="btn prev">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </div>
+                                    <!-- next month -->
+                                    <div class="btn next">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </div>
                                 </div>
-                            </div>                            
-                            <div class="form-group">
-                                <label for="time">Time</label>
-                                <input type="time" id="time" class="form-control">
                             </div>
-                            <div class="form-group">
-                                <label for="slots">Slots</label>
-                                <input type="number" id="slots" class="form-control" min="1" placeholder="Number of slots">
+                            <div class="weekdays">
+                                <div class="day">Sun</div>
+                                <div class="day">Mon</div>
+                                <div class="day">Tue</div>
+                                <div class="day">Wed</div>
+                                <div class="day">Thu</div>
+                                <div class="day">Fri</div>
+                                <div class="day">Sat</div>
                             </div>
-                            <button class="btn-add" id="btn-add">Add</button>
-                            <button class="btn-clear" id="btn-clear">Clear</button>
+                            <div class="days">
+                                <!-- render days with js -->
+                            </div>
+                            <div class="calendar-container">
+                                <div class="calendar-legend">
+                                    <div class="legend-item">
+                                        <div class="legend-color available"></div>
+                                        <span>Available</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color full"></div>
+                                        <span>Full</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
+                    </div>    
+
+                    <div class="right-container">
+                        <div class="course-section">
+                            <div class="course-header">
+                                <h2>Course</h2>
+                            </div>
+                            <div class="course-body">
+                                <label><input type="radio" name="course" value="TDC"> Theoretical Driving Course</label>
+                                <label><input type="radio" name="course" value="PDC"> Practical Driving Course</label>
+                            </div>                        
+                        </div>
+                        <div class="slots-section">
+                            <div class="slots-header">
+                                <h2>Slots</h2>
+                            </div>
+                            <div class="slots-body">
+                                <div class="form-group">
+                                    <label for="date">Date</label>
+                                    <div class="date-container">
+                                        <input type="text" id="datepicker" class="form-control" placeholder="Select a date">
+                                        <i class="bi bi-calendar"></i>
+                                    </div>
+                                </div>                            
+                                <div class="form-group">
+                                    <label for="time">Time</label>
+                                    <input type="time" id="time" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="slots">Slots</label>
+                                    <input type="number" id="slots" class="form-control" min="1" placeholder="Number of slots">
+                                </div>
+                                <button class="btn-add" id="btn-add">Add</button>
+                                <button class="btn-clear" id="btn-clear">Clear</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="available-slots">
-                    <div class="available-slots-header">
-                        <h2>Available Slots</h2>
-                    </div>
-                    <div class="available-slots-body">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Course</th>
-                                    <th>Date</th>
-                                    <th>Time</th>
-                                    <th>Slots</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="slots-table-body">
-                                <!-- Rows will be dynamically added here -->
-                            </tbody>
-                        </table>
+                </form>
+                <div class="lower-container">
+                    <div class="available-slots">
+                        <div class="available-slots-header">
+                            <h2>Available Slots</h2>
+                        </div>
+                        <div class="available-slots-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Slots</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="slots-table-body">
+                                    <!-- Rows will be dynamically added here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
