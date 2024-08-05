@@ -265,6 +265,10 @@ h2 {
     margin-right: 10px;
 }
 
+.add-package:hover {
+    background-color: #142A74;
+}
+
 .delete-package {
     background-color: #7B1719;
     color: #ffffff;
@@ -275,6 +279,12 @@ h2 {
     border: none;
     border-radius: 10px;
 }
+
+.delete-package:hover {
+    background-color: #c9302c;
+}
+
+
 
 .package-list {
     display: flex;
@@ -409,13 +419,13 @@ h2 {
 
 /* Style for the confirm-delete button */
 .confirm-delete {
-    background-color: #d9534f; 
+    background-color: #7B1719; 
     color: white; 
     border: none;
     border-radius: 5px;
     padding: 10px 20px;
     cursor: pointer;
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins;
     font-size: 14px;
     transition: background-color 0.3s ease;
 }
@@ -426,35 +436,48 @@ h2 {
 
 /* Style for the cancel-delete-modal button */
 .cancel-delete-modal {
-    background-color: #142A74; 
+    background-color: #1B3286; 
     color: white; 
     border: none;   
     border-radius: 5px;
     padding: 10px 20px;
     cursor: pointer;
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins;
     font-size: 14px;
     transition: background-color 0.3s ease;
 }
 
 .cancel-delete-modal:hover {
-    background-color: #252641; 
+    background-color: #142A74; 
 }
-
 
 .modal-footer {
     display: flex;
-    justify-content: space-between; 
-    padding: 10px; 
+    margin-top: 20px; 
 }
-
 
 .save-package {
     background-color: #1B3286;
     color: #ffffff;
+    font-size: 14px;
+    border-radius: 10px;
+    border: none;
+    padding: 10px 20px;
+}
+
+.save-package:hover {
+    background-color: #142A74;
 }
 
 .close-modal {
     background-color: #7B1719;
     color: #ffffff;
+    font-size: 14px;
+    border-radius: 10px;
+    border: none;
+    padding: 10px 20px;
+}
+
+.close-modal:hover {
+    background-color: #c9302c;
 }
