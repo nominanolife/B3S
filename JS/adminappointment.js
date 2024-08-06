@@ -48,12 +48,30 @@ document.addEventListener("DOMContentLoaded", async function() {
         const timeStart = document.getElementById("time-start").value;
         const timeEnd = document.getElementById("time-end").value;
         const slots = document.getElementById("slots").value;
-
+    
         if (!course || !date || !timeStart || !timeEnd || !slots) {
             showSuccessModal("Please Fill Out All Fields Correctly.");
             return;
         }
-
+    
+        // Validate the date
+        const today = new Date();
+        const selectedDate = new Date(date);
+    
+        if (selectedDate.toString() === "Invalid Date") {
+            showSuccessModal("Please enter a valid date.");
+            return;
+        }
+    
+        if (selectedDate < today.setHours(0, 0, 0, 0)) {
+            showSuccessModal("The selected date cannot be in the past.");
+            return;
+        }
+    
+        if (selectedDate.toDateString() === today.toDateString()) {
+            // Allow today's date
+        }
+    
         if (selectedAppointmentId) {
             // Update the existing document
             try {
@@ -86,7 +104,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                 console.error("Error Adding Appointment: ", e);
             }
         }
-
+    
         // Re-fetch appointments and re-render the table and calendar
         await fetchAppointments();
         renderCalendar();
@@ -167,22 +185,25 @@ async function populateFormForEdit(id) {
 }
 
 // Confirm delete button in the delete modal
-document.getElementById("confirmDeleteBtn").addEventListener("click", async function() {
-    if (rowToDelete) {
-        const id = rowToDelete.getAttribute("data-id");
+    document.getElementById("confirmDeleteBtn").addEventListener("click", async function() {
+        if (rowToDelete) {
+            const id = rowToDelete.getAttribute("data-id");
 
-        // Delete the document in Firestore
-        await deleteDoc(doc(db, "appointments", id));
-        rowToDelete.remove();
+            // Delete the document in Firestore
+            await deleteDoc(doc(db, "appointments", id));
+            rowToDelete.remove();
 
-        // Re-fetch appointments and re-render the calendar
-        await fetchAppointments();
-        renderCalendar();
+            // Re-fetch appointments and re-render the calendar
+            await fetchAppointments();
+            renderCalendar();
 
-        deleteModal.hide();
-        rowToDelete = null;
-    }
-});
+            // Show success modal
+            showSuccessModal("Appointment Deleted Successfully!");
+
+            deleteModal.hide();
+            rowToDelete = null;
+        }
+    });
     // Function to format time to AM/PM
     function formatTimeToAMPM(time) {
         let [hour, minute] = time.split(":");
