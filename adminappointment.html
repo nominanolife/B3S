@@ -99,8 +99,11 @@
                                 <h2>Course</h2>
                             </div>
                             <div class="course-body">
-                                <label><input type="radio" name="course" value="TDC"> Theoretical Driving Course</label>
-                                <label><input type="radio" name="course" value="PDC"> Practical Driving Course</label>
+                                <b><label>Theoretical Driving Course</label></b>
+                                <label><input type="radio" name="course" value="TDC"> Seminar</label>
+                                <b><label> Practical Driving Course</label></b>
+                                <label><input type="radio" name="course" value="PDC-4Wheels"> 4-Wheels</label>
+                                <label><input type="radio" name="course" value="PDC-Motors"> Motorcycle</label>
                             </div>                        
                         </div>
                         <div class="slots-section">
@@ -194,23 +197,23 @@
         </div>
     </div>
 
-        <!-- Logout Confirmation Modal -->
-        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to logout?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary btn-logout" id="confirmLogoutBtn">Logout</button>
-                        <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
-                    </div>
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-logout" id="confirmLogoutBtn">Logout</button>
+                    <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
+    </div>
 
     <!-- jQuery, Popper.js, and Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
