@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -306,16 +307,39 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     }
 
-    // Function to update package in Firestore
     async function updatePackageInFirestore(packageId, packageName, packagePrice, packageDescription) {
+        const batch = writeBatch(db);
         try {
+            // Update the package document
             const packageRef = doc(db, "packages", packageId);
-            await updateDoc(packageRef, {
+            batch.update(packageRef, {
                 name: packageName,
                 price: packagePrice,
                 description: packageDescription
             });
-
+    
+            // Fetch all applicants
+            const applicantsSnapshot = await getDocs(collection(db, "applicants"));
+    
+            // Update enrolled package information for relevant applicants
+            let updatedCount = 0;
+            for (const applicantDoc of applicantsSnapshot.docs) {
+                const applicantData = applicantDoc.data();
+    
+                if (applicantData.packageName) {
+                    const applicantRef = doc(db, "applicants", applicantDoc.id);
+    
+                    batch.update(applicantRef, {
+                        enrolledPackage: packageName,
+                        packagePrice: packagePrice
+                    });
+                    updatedCount++;
+                }
+            }
+    
+            await batch.commit();
+            console.log(`Updated ${updatedCount} applicants.`);
+    
             // Show success toast notification
             Toastify({
                 text: "Package updated successfully!",
@@ -328,7 +352,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             }).showToast();
         } catch (e) {
             console.error("Error updating document: ", e);
-
+    
             // Show error toast notification
             Toastify({
                 text: "Failed to update package. Please try again.",
@@ -341,6 +365,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             }).showToast();
         }
     }
+    
 
     // Function to show edit modal and populate fields
     function showEditModal(packageElement) {

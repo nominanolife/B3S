@@ -98,16 +98,18 @@ document.addEventListener('click', async (e) => {
 
     if (user) {
       const userId = user.uid;
+      const selectedPackage = packages.find(pkg => pkg.id === packageId);
 
       if (userEnrolledPackage) {
         $('#enrollmentToast').toast('show');
       } else {
         const confirmEnroll = confirm("Enroll in this course?");
-        if (confirmEnroll) {
+        if (confirmEnroll && selectedPackage) {
           try {
             await updateDoc(doc(db, "applicants", userId), {
               role: "student",
-              enrolledPackage: packageName // Store the package name
+              packageName: packageName, // Store the package name
+              packagePrice: selectedPackage.price // Store the package price
             });
             document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
             userEnrolledPackage = packageName;
@@ -116,8 +118,18 @@ document.addEventListener('click', async (e) => {
               window.location.href = "userappointment.html";
             }, 1000); // Redirect after 1 second to let toast show
           } catch (error) {
-            console.error("Error updating user role: ", error);
+            Toastify({
+              text: "Failed to enroll. Please try again.",
+              duration: 3000,
+              close: true,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "red",
+              stopOnFocus: true
+            }).showToast();
           }
+        } else {
+          console.error("Package not found or enrollment not confirmed.");
         }
       }
     } else {
@@ -125,7 +137,6 @@ document.addEventListener('click', async (e) => {
     }
   }
 });
-
 
 // Check enrollment status on page load
 onAuthStateChanged(auth, async (user) => {

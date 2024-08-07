@@ -252,7 +252,6 @@ async function populateFormForEdit(id) {
     
         for (const doc of querySnapshot.docs) {
             const appointment = { id: doc.id, ...doc.data() };
-            console.log(appointment); // Add this line to check the fetched data
             addTableRow(appointment);
         }
     }
@@ -261,7 +260,6 @@ async function populateFormForEdit(id) {
     async function updateTable() {
         for (const appointment of appointments) {
             appointment.bookingCount = await fetchBookingsCountForAppointment(appointment.id);
-            addOrUpdateTableRow(appointment);
         }
     }
 
