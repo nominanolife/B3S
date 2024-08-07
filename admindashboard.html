@@ -28,13 +28,13 @@
                 </div>
                 <div class="sidebar-menu">
                     <a href="adminappointment.html"><i class="bi bi-calendar2-week"></i>Appointment</a>
-                    <a href=""><i class="bi bi-file-earmark-text"></i>Sales Report</a>
+                    <a href="adminsales.html"><i class="bi bi-file-earmark-text"></i>Sales Report</a>
                     <a href="admincourses.html"><i class="bi bi-mortarboard"></i>Courses</a>
                 </div>
                 <div class="sidebar-learning">
-                    <a href=""><i class="bi bi-collection-play-fill"></i>Video Learning</a>
-                    <a href=""><i class="bi bi-book"></i>Modules</a>
-                    <a href=""><i class="bi bi-journals"></i>Quiz</a>
+                    <a href="adminvideolearning.html"><i class="bi bi-collection-play-fill"></i>Video Learning</a>
+                    <a href="adminmodules.html"><i class="bi bi-book"></i>Modules</a>
+                    <a href="adminquiz.html"><i class="bi bi-journals"></i>Quiz</a>
                 </div>
                 <div class="sidebar-account">
                     <button class="logout" type="button"><i class="bi bi-box-arrow-left"></i>Logout</button>
@@ -44,10 +44,6 @@
         <div class="main-content">
             <div class="header">
                 <h2>Dashboard</h2>
-                <div class="search-container">
-                    <i class="bi bi-search"></i>
-                    <input type="text" class="search" placeholder="Search">
-                </div>
             </div>
             <div class="page-content">
                 <h2>Welcome Back, <b>Admin</b></h2>
@@ -90,6 +86,26 @@
         </div>
     </div>
 
+        <!-- Logout Confirmation Modal -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to logout?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="confirmLogoutBtn">Logout</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+
     <script src="JS/admindashboard.js"></script>
+    <script src="JS/admincommon.js"></script>
 </body>
 </html>
