@@ -26,6 +26,7 @@ async function fetchStudents() {
   } catch (error) {
     console.error("Error fetching students: ", error);
   }
+  
 }
 
 // Render students in the HTML
