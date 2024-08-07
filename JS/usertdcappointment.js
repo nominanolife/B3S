@@ -26,10 +26,6 @@ const monthElement = document.querySelector(".month");
 const timeBody = document.querySelector(".time-body");
 const bookButton = document.getElementById('btn-book');
 
-// Modal elements
-const modal = document.getElementById('notificationModal');
-const modalMessage = document.getElementById('modalMessage');
-const closeModal = document.querySelector('#notificationModal .close');
 
 // Check if booking button exists
 if (!bookButton) {
@@ -164,75 +160,70 @@ function showAppointmentDetails(appointment, date) {
   updateTimeSection(date);
 }
 
+// Function to show notification modal
+function showNotification(message) {
+  const modalBody = document.getElementById('notificationModalBody');
+  modalBody.textContent = message;
+  $('#notificationModal').modal('show');
+}
+
 // Handle booking
 async function handleBooking() {
   const selectedSlot = document.querySelector('input[name="time-slot"]:checked');
   if (!selectedSlot) {
-    alert('Please select a time slot.');
-    return;
+      showNotification('Please select a time slot.');
+      return;
   }
 
   const timeSlot = selectedSlot.value;
   const appointmentDate = selectedSlot.dataset.date;
   const appointment = appointments.find(app => app.date === appointmentDate && app.course === 'TDC');
   if (!appointment) {
-    alert('No appointment found for the selected date.');
-    return;
+      showNotification('No appointment found for the selected date.');
+      return;
   }
 
   const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
   if (bookedSlots >= appointment.slots) {
-    alert('This appointment is already fully booked.');
-    return;
+      showNotification('This appointment is already fully booked.');
+      return;
   }
 
   if (!currentUserUid) {
-    alert('You must be logged in to book an appointment.');
-    return;
+      showNotification('You must be logged in to book an appointment.');
+      return;
   }
 
   const userHasBooked = appointment.bookings && appointment.bookings.some(booking => booking.userId === currentUserUid);
   if (userHasBooked) {
-    alert('You have already booked a slot for this appointment.');
-    return;
+      showNotification('You have already booked a slot for this appointment.');
+      return;
   }
 
   try {
-    const appointmentRef = doc(db, "appointments", appointment.id);
-    await updateDoc(appointmentRef, {
-      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid }]
-    });
+      const appointmentRef = doc(db, "appointments", appointment.id);
+      await updateDoc(appointmentRef, {
+          bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid }]
+      });
 
-    const totalSlots = appointment.slots;
-    const updatedBookings = [...(appointment.bookings || []), { timeSlot, userId: currentUserUid }];
-    if (updatedBookings.length >= totalSlots) {
-      await updateDoc(appointmentRef, { status: 'full' });
-      const appointmentElement = document.querySelector(`[data-date="${appointment.date}"]`);
-      if (appointmentElement) {
-        appointmentElement.style.backgroundColor = "red";
+      const totalSlots = appointment.slots;
+      const updatedBookings = [...(appointment.bookings || []), { timeSlot, userId: currentUserUid }];
+      if (updatedBookings.length >= totalSlots) {
+          await updateDoc(appointmentRef, { status: 'full' });
+          const appointmentElement = document.querySelector(`[data-date="${appointment.date}"]`);
+          if (appointmentElement) {
+              appointmentElement.style.backgroundColor = "red";
+          }
       }
-    }
 
-    await fetchAppointments();
-    renderCalendar(currentMonth, currentYear);
-    alert('Booking successful!');
+      await fetchAppointments();
+      renderCalendar(currentMonth, currentYear);
+      showNotification('Booking successful!');
   } catch (error) {
-    console.error("Error updating booking:", error);
-    alert('Failed to book appointment. Please try again later.');
+      console.error("Error updating booking:", error);
+      showNotification('Failed to book appointment. Please try again later.');
   }
 }
-
-// Modal handling
-function showModal(message) {
-  modalMessage.textContent = message;
-  modal.style.display = 'block';
-}
-
-function hideModal() {
-  modal.style.display = 'none';
-}
-
-closeModal.addEventListener('click', hideModal);
 
 // Event Listeners
 nextBtn.addEventListener("click", () => {
@@ -269,8 +260,4 @@ onAuthStateChanged(auth, (user) => {
 
 fetchAppointments().then(() => {
   renderCalendar(currentMonth, currentYear);
-});
-
-document.getElementById('mySchedBtn').addEventListener('click', function() {
-  window.location.href = 'usersched.html';
 });
