@@ -26,7 +26,6 @@ async function fetchStudents() {
   } catch (error) {
     console.error("Error fetching students: ", error);
   }
-  
 }
 
 // Render students in the HTML
@@ -56,4 +55,9 @@ onAuthStateChanged(auth, (user) => {
   } else {
     console.error("No user is currently signed in.");
   }
+});
+
+// Fetch students on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+  fetchStudents();
 });
