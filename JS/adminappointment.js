@@ -128,12 +128,20 @@ document.addEventListener("DOMContentLoaded", async function() {
         document.getElementById("btn-update").style.display = "none";
     }
 
+    // Fetch the count of bookings for an appointment
+    const fetchBookingsCountForAppointment = async (appointmentId) => {
+        const bookingsRef = collection(db, "appointments", appointmentId, "bookings");
+        const querySnapshot = await getDocs(bookingsRef);
+        return querySnapshot.docs.length;
+    };
+
     // Add a new row to the table
     function addTableRow(appointment) {
-        const { id, course, date, timeStart, timeEnd, slots } = appointment;
+        const { id, course, date, timeStart, timeEnd, slots, bookings } = appointment;
         const formattedTimeStart = formatTimeToAMPM(timeStart);
         const formattedTimeEnd = formatTimeToAMPM(timeEnd);
-    
+        const availableSlots = slots - (bookings ? bookings.length : 0);
+
         const row = document.createElement("tr");
         row.setAttribute("data-id", id);
         row.innerHTML = `
@@ -141,7 +149,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             <td>${date}</td>
             <td>${formattedTimeStart}</td>
             <td>${formattedTimeEnd}</td>
-            <td>${slots}</td>
+            <td>${availableSlots}</td>
             <td>
                 <button class="btn-edit btn btn-warning">Edit</button>
                 <button class="btn-delete btn btn-danger">Delete</button>
@@ -149,6 +157,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         `;
         document.getElementById("slots-table-body").appendChild(row);
     }
+
 
     // Event delegation for edit and delete buttons
     document.getElementById("slots-table-body").addEventListener("click", async function(event) {
@@ -204,9 +213,18 @@ async function populateFormForEdit(id) {
             rowToDelete = null;
         }
     });
-    // Function to format time to AM/PM
     function formatTimeToAMPM(time) {
+        if (typeof time !== 'string') {
+            console.error('Invalid time format:', time);
+            return 'Invalid time';
+        }
+    
         let [hour, minute] = time.split(":");
+        if (!hour || !minute) {
+            console.error('Invalid time format:', time);
+            return 'Invalid time';
+        }
+    
         hour = parseInt(hour, 10);
         const period = hour >= 12 ? "PM" : "AM";
         if (hour > 12) hour -= 12;
@@ -226,20 +244,26 @@ async function populateFormForEdit(id) {
 
     let appointments = [];
 
-    const fetchAppointments = async () => {
-        const querySnapshot = await getDocs(collection(db, "appointments"));
-        appointments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        updateTable();
-        renderCalendar();
-    };
-
-    const updateTable = () => {
+    async function fetchAppointments() {
+        const q = query(collection(db, "appointments"));
+        const querySnapshot = await getDocs(q);
         const tableBody = document.getElementById("slots-table-body");
         tableBody.innerHTML = "";
-        appointments.forEach(app => {
-            addTableRow(app);
-        });
-    };
+    
+        for (const doc of querySnapshot.docs) {
+            const appointment = { id: doc.id, ...doc.data() };
+            console.log(appointment); // Add this line to check the fetched data
+            addTableRow(appointment);
+        }
+    }
+
+    // Update the table with real-time changes
+    async function updateTable() {
+        for (const appointment of appointments) {
+            appointment.bookingCount = await fetchBookingsCountForAppointment(appointment.id);
+            addOrUpdateTableRow(appointment);
+        }
+    }
 
     const renderCalendar = () => {
         const firstDay = new Date(currentYear, currentMonth, 1);
@@ -249,21 +273,21 @@ async function populateFormForEdit(id) {
         const prevLastDay = new Date(currentYear, currentMonth, 0);
         const prevLastDayDate = prevLastDay.getDate();
         const nextDays = 7 - lastDayIndex - 1;
-
+    
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         month.innerHTML = `${months[currentMonth]} ${currentYear}`;
-
+    
         let days = "";
-
+    
         // Previous month's days
         for (let x = firstDay.getDay(); x > 0; x--) {
             days += `<div class="day prev">${prevLastDayDate - x + 1}</div>`;
         }
-
+    
         // Current month's days
         for (let i = 1; i <= lastDayDate; i++) {
             const fullDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-
+    
             let dayClass = "day";
             if (
                 i === new Date().getDate() &&
@@ -272,42 +296,52 @@ async function populateFormForEdit(id) {
             ) {
                 dayClass += " today";
             }
-
+    
             days += `<div class="${dayClass}" data-date="${fullDate}">${i}</div>`;
         }
-
+    
         // Next month's days
         for (let j = 1; j <= nextDays; j++) {
             days += `<div class="day next">${j}</div>`;
         }
-
+    
         const daysContainer = document.getElementById('calendar-days');
         daysContainer.innerHTML = days;
         updateCalendarColors();
     };
-
+    
     const updateCalendarColors = () => {
         const dayElements = document.querySelectorAll("#calendar-days .day");
         dayElements.forEach(dayElement => {
             const fullDate = dayElement.dataset.date;
             const appointmentsOnThisDate = appointments.filter(app => app.date === fullDate);
-            const totalSlots = appointmentsOnThisDate.reduce((sum, app) => sum + app.slots, 0);
-
+    
+            let totalSlots = 0;
+            let totalBookings = 0;
+    
+            appointmentsOnThisDate.forEach(app => {
+                totalSlots += app.slots;
+                totalBookings += app.bookings ? app.bookings.length : 0;
+            });
+    
+            const availableSlots = totalSlots - totalBookings;
+    
             if (appointmentsOnThisDate.length > 0) {
-                if (totalSlots > 0) {
+                if (availableSlots > 0) {
                     dayElement.style.backgroundColor = "green"; // Set background color to green
                 } else {
                     dayElement.style.backgroundColor = "red"; // Set background color to red
                 }
             }
         });
-    };
+    };  
 
+    
     // Initialize Firestore real-time listener
     const appointmentsRef = collection(db, "appointments");
     onSnapshot(appointmentsRef, async (snapshot) => {
-        appointments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        updateTable();
+        appointments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Update global appointments array
+        await updateTable(); // Fetch bookings count and update table
         renderCalendar();
     });
 

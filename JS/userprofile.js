@@ -96,6 +96,30 @@ async function saveProfileChanges() {
 
         const profilePicFile = document.getElementById('editProfilePic').files[0];
 
+        // Validate birthdate
+        if (!birthdate) {
+            Toastify({
+                text: "Please fill in the birthdate.",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#ff9800",
+            }).showToast();
+            return;
+        }
+
+        const birthDateObj = new Date(birthdate);
+        if (isNaN(birthDateObj.getTime())) {
+            Toastify({
+                text: "Invalid birthdate. Please enter a valid date.",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#ff9800",
+            }).showToast();
+            return;
+        }
+
         // Check if any field has changed
         if (
             firstName === originalData.firstName &&

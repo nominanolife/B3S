@@ -187,7 +187,6 @@ async function handleBooking() {
     return;
   }
 
-  console.log('Found Appointment:', appointment);
 
   const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
   if (bookedSlots >= appointment.slots) {
