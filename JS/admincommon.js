@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutModal.hide();
 
             // Redirect to login page or another page after logout
-            window.location.href = '/login'; // Replace with your actual login page URL
+            window.location.href = '/adminlogin.html'; // Replace with your actual login page URL
         });
     }
 });

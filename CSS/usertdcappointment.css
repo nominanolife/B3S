@@ -192,7 +192,6 @@ h2 {
     flex-direction: column;
     padding: 30px 30px;
     background-color: #f5f5f5;
-    height: 100%;
 }
 
 .page-content-header {
@@ -200,6 +199,7 @@ h2 {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
 }
 
 .page-content-title {
@@ -233,9 +233,11 @@ h2 {
     border-radius: 10px;
     padding: 10px 20px;
 }
+
 .my-sched-btn:hover{
     background-color: #0c1a3f; 
 }
+
 .modal-header, .modal-body, .modal-footer {
     border: none;
 }
@@ -324,7 +326,7 @@ body {
   width: 100%;
   max-width: 800px; /* Increased width */
   background: var(--bg-color);
-  padding: 40px 30px; /* Increased padding */
+  padding: 20px 20px; /* Increased padding */
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow for depth */
 }
@@ -461,119 +463,63 @@ body {
   color: var(--text-color);
 }
 
-/* Additional styles for the rest of the page */
-
-.whole-page {
-  display: flex;
-  flex-direction: row;
-}
-
 .upper-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-between; /* Ensures space is distributed between containers */
-    gap: 20px; /* Adds space between the containers */
-    margin-bottom: 20px; /* Optional: space below the containers */
+    justify-content: space-evenly; /* Ensures space is distributed between containers */
+    align-items: center;
 }
 
 
 .right-container {
-    position: relative; /* Make it a reference for absolute positioning */
     display: flex;
     flex-direction: column; /* Stack items vertically */
-    justify-content: flex-start; /* Default behavior: stack items from top to bottom */
-    flex: 1; /* Takes up available space */
-    max-width: 100%; /* Ensures it doesn't exceed its container's width */
-    margin-left: 20px; /* Adds space between the calendar and the time section */
+    justify-content: space-between;
+    align-items: center;
+    width: 40%;
+    height: 60%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds shadow effect */
     border-radius: 10px; /* Optional: Adds rounded corners to the shadow effect */
     background-color: #ffffff; /* Ensures the container has a white background */
-    margin-top: 20px;
 }
 
-.left-container {
-    flex: 1; /* Takes up available space */
-    max-width: 100%; /* Ensures it doesn't exceed its container's width */
-}
-
-.time-section {
+.time-header {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
     width: 100%;
-    max-width: 400px;
-    height: auto;
-    margin: 0 auto;
-    margin-bottom: 40px;
+    padding: 10px 20px;
+    background-color: #142a74;
+    border-radius: 10px 10px 0 0;
+}
+
+.time-header h2 {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 600;
 }
 
 .time-body {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    text-align: center;
+    font-size: large;
 }
-.time-header {
-    text-align: center;
-    margin-bottom: 20px;
-    margin-top: 50px;
-}
+
 .book-button-container {
-    position: absolute; /* Position absolutely within the right-container */
-    bottom: 20px; /* Distance from the bottom of the container */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Adjust to precisely center the button */
-    width: 100%; /* Takes the full width of the right-container */
-    text-align: center; /* Centers the button within the container */
+    padding: 30px;
 }
 
 .btn-book {
-    font-family: Poppins;
-    font-size: 20px;
-    font-weight: bold;
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
     color: #ffffff;
-    background-color: #142A74; /* Button color */
+    background-color: #142a74;
     border: none;
-    border-radius: 10px;
+    border-radius: 5px;
     padding: 10px 20px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s;
 }
 
 .btn-book:hover {
-    background-color: #0c1a3f; /* Darker shade on hover */
+    background-color: #0c1a3f;
 }
-
-.modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1; 
-    left: 0;
-    top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgb(0,0,0); 
-    background-color: rgba(0,0,0,0.4); 
-  }
-  
-  .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; 
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; 
-  }
-  
-  .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-  }
-  
-  .close:hover,
-  .close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-  }
