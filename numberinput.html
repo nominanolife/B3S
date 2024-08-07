@@ -133,7 +133,6 @@
                         localStorage.setItem('confirmationResult', JSON.stringify(confirmationResult));
                         localStorage.setItem('phoneNumber', phoneNumber);
                         localStorage.setItem('codeSentTime', Date.now());
-                        showModal('Verification Code Sent Successfully.');
                         window.location.href = 'verifphone.html';
                     })
                     .catch((error) => {
@@ -151,11 +150,6 @@
                 }, 60000);
             });
         });
-
-        function showModal(message) {
-            document.getElementById('modalMessage').textContent = message;
-            $('#promptModal').modal('show');
-        }
     </script>
 </body>
 </html>

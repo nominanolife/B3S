@@ -201,14 +201,11 @@
                         await setDoc(doc(firestore, 'applicants', initialUid), {
                             phoneNumber: user.phoneNumber
                         }, { merge: true });
-                        console.log('Phone number stored successfully');
                         window.location.href = 'personalinfo.html';
                     } else {
-                        console.error("Initial UID or email not found in localStorage");
                         showModal('Error retrieving user information. Please try again.');
                     }
                 } catch (error) {
-                    console.error("Error during signInWithCredential", error);
                     showModal('Error Verifying Code. Please try again.');
                 }
             });
@@ -233,12 +230,6 @@
                 });
             }
         });
-    
-        function showModal(message) {
-            document.getElementById('modalMessage').textContent = message;
-            $('#promptModal').modal('show');
-        }
     </script>
-       
 </body>
 </html>
