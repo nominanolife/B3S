@@ -523,4 +523,36 @@ h2 {
 }
 
 
+/* Cancel Button */
+.btn-cancel {
+    font-family: Poppins, sans-serif;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #1B3286; 
+    border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
 
+.btn-cancel:hover {
+    background-color: #142A74; 
+}
+
+/* Logout Button */
+.btn-logout {
+    font-family: Poppins, sans-serif;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #B60505;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-logout:hover {
+    background-color: #c9302c; 
+}

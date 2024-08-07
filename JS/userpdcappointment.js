@@ -265,3 +265,7 @@ onAuthStateChanged(auth, (user) => {
 fetchAppointments().then(() => {
   renderCalendar(currentMonth, currentYear);
 });
+
+document.getElementById('mySchedBtn').addEventListener('click', function() {
+  window.location.href = 'usersched.html';
+});

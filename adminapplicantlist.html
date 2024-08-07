@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B3S Driving School - Manila</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="CSS/adminapplicantlist.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
@@ -37,7 +37,7 @@
                     <a href="adminquiz.html"><i class="bi bi-journals"></i>Quiz</a>
                 </div>
                 <div class="sidebar-account">
-                    <button class="logout" type="button"><i class="bi bi-box-arrow-left"></i>Logout</button>
+                    <button class="logout" type="button" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="bi bi-box-arrow-left"></i>Logout</button>
                 </div>
             </div>
         </div>
@@ -83,7 +83,7 @@
                                 </tr>
                             </thead>
                             <tbody class="applicant-list">
-                                
+                                <!-- Applicant list items will be added here -->
                             </tbody>
                         </table>
                     </div>
@@ -92,28 +92,30 @@
         </div>
     </div>
 
-        <!-- Logout Confirmation Modal -->
-        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to logout?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="confirmLogoutBtn">Logout</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    </div>
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confirmLogoutBtn">Logout</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
-        </div>    
+        </div>
+    </div>    
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-firestore-compat.js"></script>
-    <!-- Custom Script -->
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Scripts -->
     <script src="JS/adminapplicantlist.js"></script>
     <script src="JS/admincommon.js"></script>
 </body>
