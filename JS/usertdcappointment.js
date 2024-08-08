@@ -77,7 +77,7 @@ function renderCalendar(month, year) {
     const dayDiv = document.createElement("div");
     dayDiv.classList.add("day");
     const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-    const appointment = appointments.find(app => app.date === fullDate);
+    const appointment = appointments.find(app => app.date === fullDate && app.course === 'TDC');
 
     if (appointment) {
       const totalSlots = appointment.slots;

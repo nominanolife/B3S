@@ -1,5 +1,5 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
+import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
 
 // Your web app's Firebase configuration
@@ -13,22 +13,45 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+let app;
+if (!getApps().length) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApps()[0];
+}
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Fetch students from Firestore
-async function fetchStudents() {
+// Fetch appointments and associated students
+async function fetchAppointments() {
   try {
-    const querySnapshot = await getDocs(collection(db, "applicants"));
-    const students = querySnapshot.docs.map(doc => doc.data()).filter(student => student.role === "student");
+    const querySnapshot = await getDocs(collection(db, "appointments"));
+    const appointments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const studentsMap = new Map();
+
+    for (const appointment of appointments) {
+      for (const booking of appointment.bookings) {
+        const studentDocRef = doc(db, "applicants", booking.userId);
+        const studentDoc = await getDoc(studentDocRef);
+        if (studentDoc.exists()) {
+          const studentData = studentDoc.data();
+          if (!studentsMap.has(booking.userId)) {
+            studentData.bookings = [];
+            studentsMap.set(booking.userId, studentData);
+          }
+          const student = studentsMap.get(booking.userId);
+          student.bookings.push({ ...booking, appointmentId: appointment.id });
+        }
+      }
+    }
+
+    const students = Array.from(studentsMap.values()).filter(student => student.role === "student");
     renderStudents(students);
   } catch (error) {
-    console.error("Error fetching students: ", error);
+    console.error("Error fetching appointments: ", error);
   }
 }
 
-// Render students in the HTML
 function renderStudents(students) {
   const studentList = document.getElementById('student-list');
   studentList.innerHTML = '';
@@ -42,16 +65,67 @@ function renderStudents(students) {
         <td class="table-row-content">${student.phoneNumber || ''}</td>
         <td class="table-row-content">${student.enrolledPackage}</td>
         <td class="table-row-content">&#8369; ${student.packagePrice}</td>
+        ${(student.bookings || []).map(booking => `
+          <td class="table-row-content">
+            <select class="status-dropdown" data-appointment-id="${booking.appointmentId}" data-booking-id="${booking.userId}" data-column="TDC">
+              <option value="Not yet Started" ${booking.TDC === 'Not yet Started' ? 'selected' : ''}>Not yet Started</option>
+              <option value="Completed" ${booking.TDC === 'Completed' ? 'selected' : ''}>Completed</option>
+            </select>
+          </td>
+          <td class="table-row-content">
+            <select class="status-dropdown" data-appointment-id="${booking.appointmentId}" data-booking-id="${booking.userId}" data-column="PDC">
+              <option value="Not yet Started" ${booking.PDC === 'Not yet Started' ? 'selected' : ''}>Not yet Started</option>
+              <option value="Completed" ${booking.PDC === 'Completed' ? 'selected' : ''}>Completed</option>
+            </select>
+          </td>
+        `).join('')}
       </tr>
-      `;
+    `;
     studentList.insertAdjacentHTML('beforeend', studentHtml);
   });
+
+  // Add event listeners to status dropdowns
+  document.querySelectorAll('.status-dropdown').forEach(dropdown => {
+    dropdown.addEventListener('change', (event) => {
+      const appointmentId = event.target.dataset.appointmentId;
+      const bookingId = event.target.dataset.bookingId;
+      const column = event.target.dataset.column;
+      const newStatus = event.target.value;
+      handleStatusChange(appointmentId, bookingId, column, newStatus);
+    });
+  });
+}
+
+// Handle status change
+async function handleStatusChange(appointmentId, bookingId, column, newStatus) {
+  try {
+    const appointmentDocRef = doc(db, "appointments", appointmentId);
+    const appointmentDoc = await getDoc(appointmentDocRef);
+    if (!appointmentDoc.exists()) {
+      console.error("No such document!");
+      return;
+    }
+
+    const appointmentData = appointmentDoc.data();
+    const bookings = appointmentData.bookings.map(booking => {
+      if (booking.userId === bookingId) {
+        return { ...booking, [column]: newStatus };
+      }
+      return booking;
+    });
+
+    await updateDoc(appointmentDocRef, { bookings });
+    console.log("Status updated successfully");
+    fetchAppointments(); // Refresh the UI to reflect the updated status
+  } catch (error) {
+    console.error("Error updating status: ", error);
+  }
 }
 
 // Check user authentication and fetch students on page load
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    fetchStudents();
+    fetchAppointments();
   } else {
     console.error("No user is currently signed in.");
   }
@@ -59,5 +133,5 @@ onAuthStateChanged(auth, (user) => {
 
 // Fetch students on DOM load
 document.addEventListener('DOMContentLoaded', () => {
-  fetchStudents();
+  fetchAppointments();
 });
