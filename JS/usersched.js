@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -18,13 +18,25 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 // DOM Elements
-const appointmentsTableBody = document.querySelector('tbody');
+const appointmentsTableBody = document.querySelector('#appointmentsTableBody');
 
-// Helper function to parse date and time
+// Helper function to parse date and time and convert to 12-hour format
 function parseDateTime(dateStr, timeStr) {
     const [year, month, day] = dateStr.split('-');
     const [hours, minutes] = timeStr.split(':');
-    return new Date(year, month - 1, day, hours, minutes);
+    const date = new Date(year, month - 1, day, hours, minutes);
+
+    // Convert to 12-hour format
+    let hour = date.getHours();
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12;
+    hour = hour ? hour : 12; // the hour '0' should be '12'
+    const minutesStr = date.getMinutes().toString().padStart(2, '0');
+
+    return {
+        date: `${year}-${month}-${day}`,
+        time: `${hour}:${minutesStr} ${ampm}`
+    };
 }
 
 // Fetch user appointments
@@ -53,14 +65,31 @@ async function fetchUserAppointments(userId) {
                 courseCell.innerText = appointment.course;
                 row.appendChild(courseCell);
 
-                const dateTimeCell = document.createElement('td');
-                dateTimeCell.innerText = `${appointment.date} ${appointment.timeStart} - ${appointment.timeEnd}`;
-                row.appendChild(dateTimeCell);
+                // Parse and format the start and end times
+                const { date } = parseDateTime(appointment.date, appointment.timeStart);
+                const startTime = parseDateTime(appointment.date, appointment.timeStart).time;
+                const endTime = parseDateTime(appointment.date, appointment.timeEnd).time;
+                
+                const dateCell = document.createElement('td');
+                dateCell.innerText = date;
+                row.appendChild(dateCell);
+
+                const startTimeCell = document.createElement('td');
+                startTimeCell.innerText = startTime;
+                row.appendChild(startTimeCell);
+
+                const endTimeCell = document.createElement('td');
+                endTimeCell.innerText = endTime;
+                row.appendChild(endTimeCell);
+
+                const progressCell = document.createElement('td');
+                progressCell.innerText = booking.TDC || booking.PDC || 'Not yet Started'; // Display booking status
+                row.appendChild(progressCell);
 
                 const statusCell = document.createElement('td');
-                statusCell.innerText = booking.TDC || booking.PDC || 'Not yet Started'; // Display booking status
+                statusCell.innerText = booking.reschedule || booking.cancelled || booking.status || ''; // Default to 'Pending' if no status is set
                 row.appendChild(statusCell);
-
+             
                 const actionCell = document.createElement('td');
 
                 const appointmentStartDate = parseDateTime(appointment.date, appointment.timeStart);
@@ -102,54 +131,27 @@ async function fetchUserAppointments(userId) {
     }
 }
 
-// Listen for auth state changes
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        fetchUserAppointments(user.uid);
-    } else {
-        console.log("User not logged in");
-    }
-});
-
-// Fetch and display updated student data after status change
-async function fetchUpdatedStudentData(userId) {
+// Handle appointment cancellation
+async function handleCancel(appointmentId, userId) {
     try {
-        const studentDocRef = doc(db, "applicants", userId);
-        const studentDoc = await getDoc(studentDocRef);
-        if (studentDoc.exists()) {
-            const studentData = studentDoc.data();
-            renderStudentData(studentData);
-        } else {
-            console.error("No such student document!");
+        const appointmentRef = doc(db, "appointments", appointmentId);
+        await updateDoc(appointmentRef, {
+            bookings: arrayRemove({ userId })
+        });
+        // Refresh the appointments table
+        const user = auth.currentUser;
+        if (user) {
+            await fetchUserAppointments(user.uid);
         }
     } catch (error) {
-        console.error("Error fetching student data: ", error);
+        console.error("Error canceling appointment:", error);
     }
 }
 
-// Render updated student data
-function renderStudentData(student) {
-    const personalInfo = student.personalInfo || {};
-    const studentContainer = document.getElementById('student-container');
-    studentContainer.innerHTML = `
-        <p>Name: ${personalInfo.first || ''} ${personalInfo.last || ''}</p>
-        <p>Email: ${student.email}</p>
-        <p>Phone: ${student.phoneNumber || ''}</p>
-        <p>Package: ${student.enrolledPackage}</p>
-        <p>Price: &#8369; ${student.packagePrice}</p>
-        ${(student.bookings || []).map(booking => `
-            <p>Course: ${booking.course}</p>
-            <p>Date & Time: ${booking.date} ${booking.timeStart} - ${booking.timeEnd}</p>
-            <p>Status: ${booking.TDC || booking.PDC || 'Not yet Started'}</p>
-        `).join('')}
-    `;
-}
-
-// Ensure updated student data is displayed
-onAuthStateChanged(auth, (user) => {
+// Get user ID from Firebase Auth
+onAuthStateChanged(auth, async (user) => {
     if (user) {
-        fetchUpdatedStudentData(user.uid);
-    } else {
-        console.log("User not logged in");
+        const userId = user.uid;
+        await fetchUserAppointments(userId);
     }
 });
