@@ -106,6 +106,13 @@ function renderCalendar(month, year) {
   }
 }
 
+function convertTo12HourFormat(time24) {
+  const [hour, minute] = time24.split(':').map(Number);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`;
+}
+
 // Update available time slots
 function updateTimeSection(date) {
   const selectedAppointments = appointments.filter(app => app.date === date && app.course === 'PDC-4Wheels');
@@ -132,7 +139,7 @@ function updateTimeSection(date) {
 
     const label = document.createElement('label');
     label.htmlFor = radioInput.id;
-    label.textContent = `${timeStart} - ${timeEnd} (${availableSlots} slots left) ${userHasBooked ? "(Already booked)" : ""}`;
+    label.textContent = `${convertTo12HourFormat(timeStart)} - ${convertTo12HourFormat(timeEnd)} (${availableSlots} slots left) ${userHasBooked ? "(Already booked)" : ""}`;
     timeBody.appendChild(radioInput);
     timeBody.appendChild(label);
     timeBody.appendChild(document.createElement('br'));
@@ -148,6 +155,7 @@ function updateTimeSection(date) {
 
   bookButton.style.display = userHasBooked ? 'none' : 'block';
 }
+
 
 // Show appointment details
 function showAppointmentDetails(appointment, date) {
