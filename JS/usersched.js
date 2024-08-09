@@ -53,7 +53,7 @@ function showNotificationModal(message) {
 }
 
 // Helper function to show confirmation modal
-function showConfirmationModal(action, callback) {
+function showConfirmationModal(action, callback, redirectUrl) {
     const modal = document.querySelector('#confirmationModal');
     if (modal) {
         const modalMessage = modal.querySelector('.modal-body');
@@ -61,9 +61,12 @@ function showConfirmationModal(action, callback) {
         const modalInstance = new bootstrap.Modal(modal);
 
         const confirmButton = modal.querySelector('#confirmButton');
-        confirmButton.onclick = () => {
-            callback();
-            modalInstance.hide();
+        confirmButton.onclick = async () => {
+            await callback(); // Execute the callback
+            modalInstance.hide(); // Hide the modal
+            if (redirectUrl) {
+                window.location.href = redirectUrl; // Redirect after confirming the action
+            }
         };
 
         modalInstance.show();
@@ -113,10 +116,6 @@ async function fetchUserAppointments(userId) {
                     endTimeCell.innerText = endTime;
                     row.appendChild(endTimeCell);
 
-                    const progressCell = document.createElement('td');
-                    progressCell.innerText = booking.TDC || booking.PDC || 'Not yet Started'; // Display booking status
-                    row.appendChild(progressCell);
-
                     const statusCell = document.createElement('td');
                     statusCell.innerText = booking.status || ''; // Default to 'Pending' if no status is set
                     row.appendChild(statusCell);
@@ -133,9 +132,8 @@ async function fetchUserAppointments(userId) {
                     const isDisabled = isAppointmentDay || booking.status === 'Cancelled';
 
                     // Determine button states
-                    actionCell.innerHTML = `<button class="btn btn-warning reschedule-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Reschedule</button>`;
-                    actionCell.innerHTML += `<button class="btn btn-danger cancel-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Cancel</button>`;
-
+                    actionCell.innerHTML = `<button class="btn btn-danger cancel-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Cancel</button>`;
+                    actionCell.innerHTML += `<button class="btn btn-warning reschedule-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Reschedule</button>`;
 
                     row.appendChild(actionCell);
                     appointmentsTableBody.appendChild(row);
@@ -143,8 +141,8 @@ async function fetchUserAppointments(userId) {
             }
         });
 
-        // Add event listeners for Cancel and Reschedule buttons
-        document.querySelectorAll('.cancel-btn, .reschedule-btn').forEach(button => {
+         // Add event listeners for Cancel and Reschedule buttons
+         document.querySelectorAll('.cancel-btn, .reschedule-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const appointmentId = e.target.getAttribute('data-appointment-id');
                 const booking = JSON.parse(e.target.getAttribute('data-booking'));

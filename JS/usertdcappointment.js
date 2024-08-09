@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -25,12 +25,6 @@ const todayBtn = document.querySelector(".today");
 const monthElement = document.querySelector(".month");
 const timeBody = document.querySelector(".time-body");
 const bookButton = document.getElementById('btn-book');
-
-
-// Check if booking button exists
-if (!bookButton) {
-  console.error('The booking button with id "btn-book" was not found.');
-}
 
 // Month names
 const months = [
@@ -66,6 +60,8 @@ function renderCalendar(month, year) {
   monthElement.innerText = `${months[month]} ${year}`;
   const prevMonthLastDay = new Date(year, month, 0).getDate();
 
+  const today = new Date();
+
   for (let i = firstDay - 1; i >= 0; i--) {
     const prevMonthDay = document.createElement("div");
     prevMonthDay.classList.add("day", "prev");
@@ -83,16 +79,20 @@ function renderCalendar(month, year) {
       const totalSlots = appointment.slots;
       const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
 
-      if (appointment.course === 'TDC') {
-        dayDiv.style.backgroundColor = bookedSlots >= totalSlots ? "red" : "green";
-      } else {
-        dayDiv.style.backgroundColor = bookedSlots >= totalSlots ? "red" : "";
-      }
+      dayDiv.style.backgroundColor = bookedSlots >= totalSlots ? "red" : "green";
 
-      dayDiv.addEventListener('click', () => showAppointmentDetails(appointment, fullDate));
+      const appointmentDate = new Date(fullDate);
+      if (appointmentDate.toDateString() === today.toDateString()) {
+        // Disable the tile if it's the day of the appointment
+        dayDiv.style.pointerEvents = 'none'; // Disable click events
+        dayDiv.style.opacity = '0.5'; // Dim the tile to indicate it's disabled
+        dayDiv.title = 'Booking not allowed on the day of the appointment';
+      } else {
+        dayDiv.addEventListener('click', () => showAppointmentDetails(fullDate));
+      }
     }
 
-    if (i === date.getDate() && month === date.getMonth() && year === date.getFullYear()) {
+    if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
       dayDiv.classList.add("today");
     }
 
@@ -112,60 +112,79 @@ function renderCalendar(month, year) {
   }
 }
 
-// Helper function to convert 24-hour time to 12-hour format
+async function updateTimeSection(date) {
+  const selectedAppointments = appointments.filter(app => app.date === date && app.course === 'TDC');
+  timeBody.innerHTML = '';
+
+  if (selectedAppointments.length === 0) {
+    timeBody.innerHTML = '<p>No available slots for this date.</p>';
+    bookButton.style.display = 'none';
+    return;
+  }
+
+  let userHasBooked = false;
+
+  selectedAppointments.forEach(appointment => {
+    const { timeStart, timeEnd, slots, bookings } = appointment;
+    const availableSlots = slots - (bookings ? bookings.length : 0);
+    const currentDate = new Date();
+    const appointmentDateObj = new Date(date);
+
+    // Check if the user has previously booked and canceled or rescheduled this slot
+    const userBooking = bookings ? bookings.find(booking => 
+      booking.userId === currentUserUid && 
+      booking.timeSlot === `${timeStart} - ${timeEnd}` && 
+      (booking.status === 'Cancelled' || booking.status === 'Rescheduled')) : null;
+
+    if (userBooking) {
+      if (availableSlots > 0 && appointmentDateObj > currentDate) {
+        // Allow rebooking if slots are available and the appointment date is in the future
+        userHasBooked = false; // Reset so the user can rebook
+      } else {
+        userHasBooked = true;
+      }
+    } else {
+      userHasBooked = bookings && bookings.some(booking => booking.userId === currentUserUid);
+    }
+
+    const radioInput = document.createElement('input');
+    radioInput.type = 'radio';
+    radioInput.name = 'time-slot';
+    radioInput.value = `${timeStart} - ${timeEnd}`;
+    radioInput.id = `${timeStart}-${timeEnd}`;
+    radioInput.dataset.date = date;
+    radioInput.dataset.appointmentId = appointment.id;
+
+    const label = document.createElement('label');
+    label.htmlFor = radioInput.id;
+    label.textContent = `${convertTo12Hour(timeStart)} - ${convertTo12Hour(timeEnd)} (${availableSlots} slots left)`;
+    timeBody.appendChild(radioInput);
+    timeBody.appendChild(label);
+    timeBody.appendChild(document.createElement('br'));
+
+    // Add click event listener for radio buttons
+    radioInput.addEventListener('click', () => {
+      if (userHasBooked) {
+        showNotification('You have already booked this slot.');
+        radioInput.checked = false; // Uncheck the radio button
+      }
+    });
+  });
+
+  bookButton.style.display = userHasBooked ? 'none' : 'block';
+}
+
+// Show appointment details and time slots when a date is clicked
+function showAppointmentDetails(date) {  
+  updateTimeSection(date);
+}
+
+// Function to convert 24-hour time to 12-hour format
 function convertTo12Hour(time24) {
   const [hour, minute] = time24.split(':').map(Number);
   const period = hour >= 12 ? 'PM' : 'AM';
   const hour12 = hour % 12 || 12;
   return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`;
-}
-
-// Update available time slots
-function updateTimeSection(date) {
-const selectedAppointments = appointments.filter(app => app.date === date && app.course === 'TDC');
-timeBody.innerHTML = '';
-
-if (selectedAppointments.length === 0) {
-  timeBody.innerHTML = '<p>No available slots for this date.</p>';
-  bookButton.style.display = 'none';
-  return;
-}
-
-let userHasBooked = false;
-selectedAppointments.forEach(appointment => {
-  const { timeStart, timeEnd, slots, bookings } = appointment;
-  const availableSlots = slots - (bookings ? bookings.length : 0);
-  userHasBooked = bookings && bookings.some(booking => booking.userId === currentUserUid);
-
-  const radioInput = document.createElement('input');
-  radioInput.type = 'radio';
-  radioInput.name = 'time-slot';
-  radioInput.value = `${timeStart} - ${timeEnd}`;
-  radioInput.id = `${timeStart}-${timeEnd}`;
-  radioInput.dataset.date = date;
-
-  const label = document.createElement('label');
-  label.htmlFor = radioInput.id;
-  label.textContent = `${convertTo12Hour(timeStart)} - ${convertTo12Hour(timeEnd)} (${availableSlots} slots left)`;
-  timeBody.appendChild(radioInput);
-  timeBody.appendChild(label);
-  timeBody.appendChild(document.createElement('br'));
-
-  // Add click event listener for radio buttons
-  radioInput.addEventListener('click', () => {
-    if (userHasBooked) {
-      showModal('You have already have booked a slot');
-      radioInput.checked = false; // Uncheck the radio button
-    }
-  });
-});
-
-bookButton.style.display = userHasBooked ? 'none' : 'block';
-}
-
-// Show appointment details
-function showAppointmentDetails(appointment, date) {
-  updateTimeSection(date);
 }
 
 // Function to show notification modal
@@ -175,61 +194,65 @@ function showNotification(message) {
   $('#notificationModal').modal('show');
 }
 
-// Handle booking
 async function handleBooking() {
   const selectedSlot = document.querySelector('input[name="time-slot"]:checked');
   if (!selectedSlot) {
-      showNotification('Please select a time slot.');
-      return;
+    showNotification('Please select a time slot.');
+    return;
   }
 
   const timeSlot = selectedSlot.value;
   const appointmentDate = selectedSlot.dataset.date;
-  const appointment = appointments.find(app => app.date === appointmentDate && app.course === 'TDC');
+  const appointmentId = selectedSlot.dataset.appointmentId;
+  const appointment = appointments.find(app => app.id === appointmentId);
+
   if (!appointment) {
-      showNotification('No appointment found for the selected date.');
-      return;
+    showNotification('No appointment found for the selected date.');
+    return;
   }
 
   const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
   if (bookedSlots >= appointment.slots) {
-      showNotification('This appointment is already fully booked.');
-      return;
+    showNotification('This appointment is already fully booked.');
+    return;
   }
 
   if (!currentUserUid) {
-      showNotification('You must be logged in to book an appointment.');
-      return;
+    showNotification('You must be logged in to book an appointment.');
+    return;
   }
 
-  const userHasBooked = appointment.bookings && appointment.bookings.some(booking => booking.userId === currentUserUid);
-  if (userHasBooked) {
-      showNotification('You have already booked a slot for this appointment.');
-      return;
+  // Allow rebooking regardless of previous cancellations or rescheduling
+  const today = new Date();
+  const appointmentDateObj = new Date(appointmentDate);
+
+  if (appointmentDateObj < today) {
+    showNotification('You cannot book an appointment for a past date.');
+    return;
   }
 
   try {
-      const appointmentRef = doc(db, "appointments", appointment.id);
-      await updateDoc(appointmentRef, {
-          bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid }]
-      });
+    const appointmentRef = doc(db, "appointments", appointment.id);
+    await updateDoc(appointmentRef, {
+      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked" }]
+    });
 
-      const totalSlots = appointment.slots;
-      const updatedBookings = [...(appointment.bookings || []), { timeSlot, userId: currentUserUid }];
-      if (updatedBookings.length >= totalSlots) {
-          await updateDoc(appointmentRef, { status: 'full' });
-          const appointmentElement = document.querySelector(`[data-date="${appointment.date}"]`);
-          if (appointmentElement) {
-              appointmentElement.style.backgroundColor = "red";
-          }
+    const totalSlots = appointment.slots;
+    const updatedBookings = [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked" }];
+    if (updatedBookings.length >= totalSlots) {
+      await updateDoc(appointmentRef, { status: 'full' });
+      const appointmentElement = document.querySelector(`[data-date="${appointment.date}"]`);
+      if (appointmentElement) {
+        appointmentElement.style.backgroundColor = "red";
       }
+    }
 
-      await fetchAppointments();
-      renderCalendar(currentMonth, currentYear);
-      showNotification('Booking successful!');
+    await fetchAppointments();
+    renderCalendar(currentMonth, currentYear);
+    showNotification('Booking successful!');
   } catch (error) {
-      console.error("Error updating booking:", error);
-      showNotification('Failed to book appointment. Please try again later.');
+    console.error("Error updating booking:", error);
+    showNotification('Failed to book appointment. Please try again later.');
   }
 }
 
