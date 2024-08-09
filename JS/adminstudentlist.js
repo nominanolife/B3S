@@ -33,6 +33,11 @@ async function fetchAppointments() {
           const bookings = Array.isArray(appointment.bookings) ? appointment.bookings : [];
 
           for (const booking of bookings) {
+              // Filter out bookings that are "Cancelled" or "Rescheduled"
+              if (booking.status === "Cancelled" || booking.status === "Rescheduled") {
+                  continue;
+              }
+
               const studentDocRef = doc(db, "applicants", booking.userId);
               const studentDoc = await getDoc(studentDocRef);
               if (studentDoc.exists()) {

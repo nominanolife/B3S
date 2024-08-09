@@ -146,7 +146,7 @@ selectedAppointments.forEach(appointment => {
 
   const label = document.createElement('label');
   label.htmlFor = radioInput.id;
-  label.textContent = `${convertTo12Hour(timeStart)} - ${convertTo12Hour(timeEnd)} (${availableSlots} slots left) ${userHasBooked ? "(Already booked)" : ""}`;
+  label.textContent = `${convertTo12Hour(timeStart)} - ${convertTo12Hour(timeEnd)} (${availableSlots} slots left)`;
   timeBody.appendChild(radioInput);
   timeBody.appendChild(label);
   timeBody.appendChild(document.createElement('br'));
