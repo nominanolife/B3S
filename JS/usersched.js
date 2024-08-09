@@ -141,8 +141,8 @@ async function fetchUserAppointments(userId) {
             }
         });
 
-         // Add event listeners for Cancel and Reschedule buttons
-         document.querySelectorAll('.cancel-btn, .reschedule-btn').forEach(button => {
+        // Add event listeners for Cancel and Reschedule buttons
+        document.querySelectorAll('.cancel-btn, .reschedule-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const appointmentId = e.target.getAttribute('data-appointment-id');
                 const booking = JSON.parse(e.target.getAttribute('data-booking'));
@@ -198,13 +198,17 @@ async function fetchUserAppointments(userId) {
 
                                     showNotificationModal(`${action} successful.`);
                                     fetchUserAppointments(userId); // Refresh the appointments list
+
+                                    // Ensure the redirection happens after the UI is updated
+                                    setTimeout(() => {
+                                        window.location.href = 'userappointment.html';
+                            }, 100); // Add a slight delay to ensure UI updates
                                 } catch (error) {
                                     console.error("Error updating booking:", error);
                                     showNotificationModal("An error occurred. Please try again.");
                                     // Optionally re-enable the buttons in case of error
-                                    e.target.disabled = false;
-                                    if (siblingButton) {
-                                        siblingButton.disabled = false;
+                                    if (row) {
+                                        row.querySelectorAll('button').forEach(btn => btn.disabled = false);
                                     }
                                 }
                             }
