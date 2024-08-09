@@ -72,20 +72,43 @@ function renderStudents(students) {
         <td class="table-row-content">${student.phoneNumber || ''}</td>
         <td class="table-row-content">${student.enrolledPackage}</td>
         <td class="table-row-content">&#8369; ${student.packagePrice}</td>
-        ${(student.bookings || []).map(booking => `
-          <td class="table-row-content">
-            <select class="status-dropdown" data-appointment-id="${booking.appointmentId}" data-booking-id="${booking.userId}" data-column="TDC">
-              <option value="Not yet Started" ${booking.TDC === 'Not yet Started' ? 'selected' : ''}>Not yet Started</option>
-              <option value="Completed" ${booking.TDC === 'Completed' ? 'selected' : ''}>Completed</option>
-            </select>
-          </td>
-          <td class="table-row-content">
-            <select class="status-dropdown" data-appointment-id="${booking.appointmentId}" data-booking-id="${booking.userId}" data-column="PDC">
-              <option value="Not yet Started" ${booking.PDC === 'Not yet Started' ? 'selected' : ''}>Not yet Started</option>
-              <option value="Completed" ${booking.PDC === 'Completed' ? 'selected' : ''}>Completed</option>
-            </select>
-          </td>
-        `).join('')}
+        ${(student.bookings || []).map(booking => {
+          let tdcDropdown = '';
+          let pdc4WheelsDropdown = '';
+          let pdcMotorsDropdown = '';
+
+          if (booking.TDC) {
+            tdcDropdown = `
+              <td class="table-row-content">
+                <select class="status-dropdown" data-appointment-id="${booking.appointmentId}" data-booking-id="${booking.userId}" data-column="TDC">
+                  <option value="Not yet Started" ${booking.TDC === 'Not yet Started' ? 'selected' : ''}>Not yet Started</option>
+                  <option value="Completed" ${booking.TDC === 'Completed' ? 'selected' : ''}>Completed</option>
+                </select>
+              </td>`;
+          }
+
+          if (booking['PDC-4Wheels']) {
+            pdc4WheelsDropdown = `
+              <td class="table-row-content">
+                <select class="status-dropdown" data-appointment-id="${booking.appointmentId}" data-booking-id="${booking.userId}" data-column="PDC-4Wheels">
+                  <option value="Not yet Started" ${booking['PDC-4Wheels'] === 'Not yet Started' ? 'selected' : ''}>Not yet Started</option>
+                  <option value="Completed" ${booking['PDC-4Wheels'] === 'Completed' ? 'selected' : ''}>Completed</option>
+                </select>
+              </td>`;
+          }
+
+          if (booking['PDC-Motors']) {
+            pdcMotorsDropdown = `
+              <td class="table-row-content">
+                <select class="status-dropdown" data-appointment-id="${booking.appointmentId}" data-booking-id="${booking.userId}" data-column="PDC-Motors">
+                  <option value="Not yet Started" ${booking['PDC-Motors'] === 'Not yet Started' ? 'selected' : ''}>Not yet Started</option>
+                  <option value="Completed" ${booking['PDC-Motors'] === 'Completed' ? 'selected' : ''}>Completed</option>
+                </select>
+              </td>`;
+          }
+
+          return `${tdcDropdown}${pdc4WheelsDropdown}${pdcMotorsDropdown}`;
+        }).join('')}
       </tr>
     `;
     studentList.insertAdjacentHTML('beforeend', studentHtml);

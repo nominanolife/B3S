@@ -250,8 +250,12 @@ async function populateFormForEdit(id) {
         const tableBody = document.getElementById("slots-table-body");
         tableBody.innerHTML = "";
     
-        for (const doc of querySnapshot.docs) {
-            const appointment = { id: doc.id, ...doc.data() };
+        // Extract and sort appointments by date
+        const appointments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        appointments.sort((a, b) => new Date(a.date) - new Date(b.date));  // Sort by closest date
+    
+        // Add sorted appointments to the table
+        for (const appointment of appointments) {
             addTableRow(appointment);
         }
     }
