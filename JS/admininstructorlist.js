@@ -24,7 +24,6 @@ const saveInstructorBtn = document.querySelector('.save-instructor');
 const closeModalButton = document.querySelector('.close-modal');
 const instructorNameInput = document.querySelector('.instructor-name');
 const instructorCourseInput = document.querySelector('.instructor-course');
-const courseFilter = document.getElementById('courseFilter');
 
 let instructors = []; // Store all instructors data
 
@@ -131,15 +130,6 @@ function searchInstructors(event) {
   renderInstructors(filteredInstructors);
 }
 
-// Filter instructors by course
-function filterInstructors(event) {
-  const course = event.target.value;
-  const filteredInstructors = course
-    ? instructors.filter(instructor => instructor.course === course)
-    : instructors;
-  renderInstructors(filteredInstructors);
-}
-
 // Event Listeners
 addInstructorButton.addEventListener('click', () => {
   instructorModal.show();
@@ -158,7 +148,6 @@ instructorList.addEventListener('click', function (event) {
     deleteInstructor(event);
   }
 });
-courseFilter.addEventListener('change', filterInstructors);
 
 // Handle sidebar button active state
 document.addEventListener('DOMContentLoaded', function () {
