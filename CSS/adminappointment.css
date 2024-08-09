@@ -628,10 +628,11 @@ body {
 
 /* Confirm delete button */
 .btn-danger {
-    background-color: #7B1719; 
+    background-color: #B60505; 
     color: white; 
     border: none;
     border-radius: 5px;
+    padding: 10px 20px;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
@@ -639,12 +640,24 @@ body {
 }
 
 .btn-danger:hover {
-    background-color: #c9302c; 
+    background-color: #b60505ec; 
+}
+
+.btn-warning {
+    background-color: #142A74; 
+    color: white; 
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
 }
 
 /* Cancel button */
 .btn-secondary {
-    background-color: #1B3286; 
+    background-color: #142A74; 
     color: white; 
     border: none;   
     border-radius: 5px;
@@ -656,19 +669,19 @@ body {
 }
 
 .btn-secondary:hover {
-    background-color: #142A74; 
+    background-color: #142a74ec; 
 }
 
 /* Close button */
 .close {
-    color: #7B1719;
+    color: #B60505;
     font-size: 1.5rem;
     opacity: 1;
     border: none;
 }
 
 .close:hover {
-    color: #c9302c;
+    color: #b60505ec;
 }
 
 #btn-update{

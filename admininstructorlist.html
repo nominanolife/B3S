@@ -51,10 +51,13 @@
                     <div class="dashboard-bttns">
                         <a href="adminapplicantlist.html" class="button-right">Applicant List</a>
                         <a href="adminstudentlist.html" class="button-right">Student List</a>
-                        <a href="admininstructorlist.html" class="button-right">Instructor List</a>
+                        <a href="admininstructorlist.html" class="button-right active">Instructor List</a>
                     </div>
                 </div>
                 <div class="page-body">
+                    <div class="buttons">
+                        <button type="button" class="add-instructor">Add Instructors</button>
+                    </div>
                     <div class="upcomming-container">
                         <div class="title-header">
                             <h2>Instructor List</h2>
@@ -62,12 +65,48 @@
                                 <i class="bi bi-search"></i>
                                 <input type="text" class="search" placeholder="Search">
                             </div>
+                            <div class="filter-container">
+                                <select class="form-control course-filter" id="courseFilter">
+                                    <option value="">All</option>
+                                    <option value="TDC">TDC</option>
+                                    <option value="PDC">PDC</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="content" id="">
-
-                        </div>
+                        <table class="table">
+                            <thead class="table-headers">
+                                <tr class="table-headers-title">
+                                    <th>NAME</th>
+                                    <th>COURSE</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody class="instructor-list">
+                                
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="instructorModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Add Instructor</h4>
+                </div>
+                <form class="modal-body">
+                    <div class="input-body">
+                        <input type="text" class="instructor-name" placeholder="Instructor Name" required>
+                        <input type="text" class="instructor-course" placeholder="Course" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="save-instructor" type="submit">Save</button>
+                        <button class="close-modal" type="button">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

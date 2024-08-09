@@ -133,8 +133,9 @@ async function fetchUserAppointments(userId) {
                     const isDisabled = isAppointmentDay || booking.status === 'Cancelled';
 
                     // Determine button states
-                    actionCell.innerHTML = `<button class="btn btn-danger cancel-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Cancel</button>`;
-                    actionCell.innerHTML += `<button class="btn btn-warning reschedule-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Reschedule</button>`;
+                    actionCell.innerHTML = `<button class="btn btn-warning reschedule-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Reschedule</button>`;
+                    actionCell.innerHTML += `<button class="btn btn-danger cancel-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Cancel</button>`;
+
 
                     row.appendChild(actionCell);
                     appointmentsTableBody.appendChild(row);
