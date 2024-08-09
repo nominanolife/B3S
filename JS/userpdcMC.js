@@ -26,7 +26,6 @@ const monthElement = document.querySelector(".month");
 const timeBody = document.querySelector(".time-body");
 const bookButton = document.getElementById('btn-book');
 
-
 // Check if booking button exists
 if (!bookButton) {
   console.error('The booking button with id "btn-book" was not found.');
@@ -44,6 +43,14 @@ let currentMonth = date.getMonth();
 let currentYear = date.getFullYear();
 let appointments = [];
 let currentUserUid = null;
+
+// Helper function to convert 24-hour time to 12-hour format
+function convertTo12HourFormat(time24) {
+  const [hour, minute] = time24.split(':').map(Number);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`;
+}
 
 // Fetch appointments from Firestore
 async function fetchAppointments() {
@@ -138,7 +145,7 @@ function updateTimeSection(date) {
 
     const label = document.createElement('label');
     label.htmlFor = radioInput.id;
-    label.textContent = `${timeStart} - ${timeEnd} (${availableSlots} slots left) ${userHasBooked ? "(Already booked)" : ""}`;
+    label.textContent = `${convertTo12HourFormat(timeStart)} - ${convertTo12HourFormat(timeEnd)} (${availableSlots} slots left) ${userHasBooked ? "(Already booked)" : ""}`;
     timeBody.appendChild(radioInput);
     timeBody.appendChild(label);
     timeBody.appendChild(document.createElement('br'));

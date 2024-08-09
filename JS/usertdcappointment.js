@@ -112,47 +112,55 @@ function renderCalendar(month, year) {
   }
 }
 
+// Helper function to convert 24-hour time to 12-hour format
+function convertTo12Hour(time24) {
+  const [hour, minute] = time24.split(':').map(Number);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`;
+}
+
 // Update available time slots
 function updateTimeSection(date) {
-  const selectedAppointments = appointments.filter(app => app.date === date && app.course === 'TDC');
-  timeBody.innerHTML = '';
+const selectedAppointments = appointments.filter(app => app.date === date && app.course === 'TDC');
+timeBody.innerHTML = '';
 
-  if (selectedAppointments.length === 0) {
-    timeBody.innerHTML = '<p>No available slots for this date.</p>';
-    bookButton.style.display = 'none';
-    return;
-  }
+if (selectedAppointments.length === 0) {
+  timeBody.innerHTML = '<p>No available slots for this date.</p>';
+  bookButton.style.display = 'none';
+  return;
+}
 
-  let userHasBooked = false;
-  selectedAppointments.forEach(appointment => {
-    const { timeStart, timeEnd, slots, bookings } = appointment;
-    const availableSlots = slots - (bookings ? bookings.length : 0);
-    userHasBooked = bookings && bookings.some(booking => booking.userId === currentUserUid);
+let userHasBooked = false;
+selectedAppointments.forEach(appointment => {
+  const { timeStart, timeEnd, slots, bookings } = appointment;
+  const availableSlots = slots - (bookings ? bookings.length : 0);
+  userHasBooked = bookings && bookings.some(booking => booking.userId === currentUserUid);
 
-    const radioInput = document.createElement('input');
-    radioInput.type = 'radio';
-    radioInput.name = 'time-slot';
-    radioInput.value = `${timeStart} - ${timeEnd}`;
-    radioInput.id = `${timeStart}-${timeEnd}`;
-    radioInput.dataset.date = date;
+  const radioInput = document.createElement('input');
+  radioInput.type = 'radio';
+  radioInput.name = 'time-slot';
+  radioInput.value = `${timeStart} - ${timeEnd}`;
+  radioInput.id = `${timeStart}-${timeEnd}`;
+  radioInput.dataset.date = date;
 
-    const label = document.createElement('label');
-    label.htmlFor = radioInput.id;
-    label.textContent = `${timeStart} - ${timeEnd} (${availableSlots} slots left)`;
-    timeBody.appendChild(radioInput);
-    timeBody.appendChild(label);
-    timeBody.appendChild(document.createElement('br'));
+  const label = document.createElement('label');
+  label.htmlFor = radioInput.id;
+  label.textContent = `${convertTo12Hour(timeStart)} - ${convertTo12Hour(timeEnd)} (${availableSlots} slots left) ${userHasBooked ? "(Already booked)" : ""}`;
+  timeBody.appendChild(radioInput);
+  timeBody.appendChild(label);
+  timeBody.appendChild(document.createElement('br'));
 
-    // Add click event listener for radio buttons
-    radioInput.addEventListener('click', () => {
-      if (userHasBooked) {
-        showModal('You have already have booked a slot');
-        radioInput.checked = false; // Uncheck the radio button
-      }
-    });
+  // Add click event listener for radio buttons
+  radioInput.addEventListener('click', () => {
+    if (userHasBooked) {
+      showModal('You have already have booked a slot');
+      radioInput.checked = false; // Uncheck the radio button
+    }
   });
+});
 
-  bookButton.style.display = userHasBooked ? 'none' : 'block';
+bookButton.style.display = userHasBooked ? 'none' : 'block';
 }
 
 // Show appointment details
