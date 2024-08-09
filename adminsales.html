@@ -43,31 +43,57 @@
         </div>
         <div class="main-content">
             <div class="header">
-                <h2>Sales</h2>
+                <h2>Sales Report</h2>
             </div>
             <div class="page-content">
-                <!-- Add your dashboard content here -->
+                <div class="page-content-header">
+                    <h2>B3S Driving School - Manila</h2>
+                    <h2>Sales Report</h2>
+                    <h2>For the Month of </h2>
+                </div>
+                <div class="page-body">
+                    <div class="sales-container">
+                        <table class="table">
+                            <thead class="table-headers">
+                                <tr class="table-headers-title">
+                                    <th>STUDENT NUMBER</th>
+                                    <th>NAME</th>
+                                    <th>PACKAGE</th>
+                                    <th>AMOUNT</th>
+                                </tr>
+                            </thead>
+                            <tbody class="sales-list">
+                                
+                            </tbody>
+                            <tfoot class="total-amount-sales">
+                                <tr class="total">
+                                    <td colspan="3" class="total-label">Total:</td>
+                                </tr>
+                            </tfoot>                            
+                        </table>
+                    </div>
+                </div>    
             </div>
         </div>
     </div>
 
-        <!-- Logout Confirmation Modal -->
-        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to logout?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary btn-logout" id="confirmLogoutBtn">Logout</button>
-                        <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
-                    </div>
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-logout" id="confirmLogoutBtn">Logout</button>
+                    <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
+    </div>
     
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
