@@ -138,7 +138,7 @@ function updateTimeSection(date) {
 
     const label = document.createElement('label');
     label.htmlFor = radioInput.id;
-    label.textContent = `${timeStart} - ${timeEnd} (${availableSlots} slots left) ${userHasBooked ? "(Already booked)" : ""}`;
+    label.textContent = `${timeStart} - ${timeEnd} (${availableSlots} slots left)`;
     timeBody.appendChild(radioInput);
     timeBody.appendChild(label);
     timeBody.appendChild(document.createElement('br'));

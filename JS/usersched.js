@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -39,7 +39,39 @@ function parseDateTime(dateStr, timeStr) {
     };
 }
 
-// Fetch user appointments
+// Helper function to show notification modal
+function showNotificationModal(message) {
+    const modal = document.querySelector('#notificationModal');
+    if (modal) {
+        const modalMessage = modal.querySelector('.modal-body');
+        modalMessage.innerText = message;
+        const modalInstance = new bootstrap.Modal(modal);
+        modalInstance.show();
+    } else {
+        console.error('Notification modal not found');
+    }
+}
+
+// Helper function to show confirmation modal
+function showConfirmationModal(action, callback) {
+    const modal = document.querySelector('#confirmationModal');
+    if (modal) {
+        const modalMessage = modal.querySelector('.modal-body');
+        modalMessage.innerText = `Are you sure you want to ${action.toLowerCase()} this booking?`;
+        const modalInstance = new bootstrap.Modal(modal);
+
+        const confirmButton = modal.querySelector('#confirmButton');
+        confirmButton.onclick = () => {
+            callback();
+            modalInstance.hide();
+        };
+
+        modalInstance.show();
+    } else {
+        console.error('Confirmation modal not found');
+    }
+}
+
 async function fetchUserAppointments(userId) {
     try {
         const appointmentsRef = collection(db, "appointments");
@@ -55,103 +87,147 @@ async function fetchUserAppointments(userId) {
         querySnapshot.forEach((doc) => {
             const appointment = doc.data();
 
-            // Filter bookings for the logged-in user
-            const userBookings = appointment.bookings.filter(booking => booking.userId === userId);
+            if (Array.isArray(appointment.bookings)) {
+                const userBookings = appointment.bookings.filter(booking => booking.userId === userId);
 
-            userBookings.forEach(booking => {
-                const row = document.createElement('tr');
+                userBookings.forEach(booking => {
+                    const row = document.createElement('tr');
 
-                const courseCell = document.createElement('td');
-                courseCell.innerText = appointment.course;
-                row.appendChild(courseCell);
+                    const courseCell = document.createElement('td');
+                    courseCell.innerText = appointment.course;
+                    row.appendChild(courseCell);
 
-                // Parse and format the start and end times
-                const { date } = parseDateTime(appointment.date, appointment.timeStart);
-                const startTime = parseDateTime(appointment.date, appointment.timeStart).time;
-                const endTime = parseDateTime(appointment.date, appointment.timeEnd).time;
-                
-                const dateCell = document.createElement('td');
-                dateCell.innerText = date;
-                row.appendChild(dateCell);
+                    const { date } = parseDateTime(appointment.date, appointment.timeStart);
+                    const startTime = parseDateTime(appointment.date, appointment.timeStart).time;
+                    const endTime = parseDateTime(appointment.date, appointment.timeEnd).time;
 
-                const startTimeCell = document.createElement('td');
-                startTimeCell.innerText = startTime;
-                row.appendChild(startTimeCell);
+                    const dateCell = document.createElement('td');
+                    dateCell.innerText = date;
+                    row.appendChild(dateCell);
 
-                const endTimeCell = document.createElement('td');
-                endTimeCell.innerText = endTime;
-                row.appendChild(endTimeCell);
+                    const startTimeCell = document.createElement('td');
+                    startTimeCell.innerText = startTime;
+                    row.appendChild(startTimeCell);
 
-                const progressCell = document.createElement('td');
-                progressCell.innerText = booking.TDC || booking.PDC || 'Not yet Started'; // Display booking status
-                row.appendChild(progressCell);
+                    const endTimeCell = document.createElement('td');
+                    endTimeCell.innerText = endTime;
+                    row.appendChild(endTimeCell);
 
-                const statusCell = document.createElement('td');
-                statusCell.innerText = booking.reschedule || booking.cancelled || booking.status || ''; // Default to 'Pending' if no status is set
-                row.appendChild(statusCell);
-             
-                const actionCell = document.createElement('td');
+                    const progressCell = document.createElement('td');
+                    progressCell.innerText = booking.TDC || booking.PDC || 'Not yet Started'; // Display booking status
+                    row.appendChild(progressCell);
 
-                const appointmentStartDate = parseDateTime(appointment.date, appointment.timeStart);
-                const currentDate = new Date();
-                const oneDayBefore = new Date(appointmentStartDate);
-                oneDayBefore.setDate(oneDayBefore.getDate() - 1);
+                    const statusCell = document.createElement('td');
+                    statusCell.innerText = booking.status || ''; // Default to 'Pending' if no status is set
+                    row.appendChild(statusCell);
 
-                if (currentDate >= oneDayBefore) {
-                    actionCell.innerHTML = `<button class="btn btn-danger" disabled>Cancel</button>`;
-                    actionCell.innerHTML += `<button class="btn btn-warning" disabled>Reschedule</button>`;
-                } else {
-                    actionCell.innerHTML = `<button class="btn btn-danger cancel-btn" data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}'>Cancel</button>`;
-                    actionCell.innerHTML += `<button class="btn btn-warning reschedule-btn" data-appointment-id="${doc.id}" data-booking-id="${booking.userId}">Reschedule</button>`;
-                }
+                    const actionCell = document.createElement('td');
 
-                row.appendChild(actionCell);
-                appointmentsTableBody.appendChild(row);
-            });
+                    const appointmentStartDate = new Date(appointment.date + 'T' + appointment.timeStart);
+                    const currentDate = new Date();
+                    const oneDayBefore = new Date(appointmentStartDate);
+                    oneDayBefore.setDate(oneDayBefore.getDate() - 1);
+
+                    const isDayBefore = currentDate >= oneDayBefore;
+                    const isAppointmentDay = currentDate.toDateString() === appointmentStartDate.toDateString();
+                    const isDisabled = isAppointmentDay || booking.status === 'Cancelled';
+
+                    // Determine button states
+                    actionCell.innerHTML = `<button class="btn btn-danger cancel-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Cancel</button>`;
+                    actionCell.innerHTML += `<button class="btn btn-warning reschedule-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Reschedule</button>`;
+
+                    row.appendChild(actionCell);
+                    appointmentsTableBody.appendChild(row);
+                });
+            }
         });
 
-        document.querySelectorAll('.cancel-btn').forEach(button => {
+        // Add event listeners for Cancel and Reschedule buttons
+        document.querySelectorAll('.cancel-btn, .reschedule-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const appointmentId = e.target.getAttribute('data-appointment-id');
                 const booking = JSON.parse(e.target.getAttribute('data-booking'));
-                try {
-                    const appointmentRef = doc(db, "appointments", appointmentId);
-                    await updateDoc(appointmentRef, {
-                        bookings: arrayRemove(booking)
-                    });
-                    fetchUserAppointments(userId); // Refresh the UI to reflect the updated status
-                } catch (error) {
-                    console.error("Error canceling booking:", error);
-                }
+                const appointment = JSON.parse(e.target.getAttribute('data-appointment'));
+
+                const action = e.target.classList.contains('cancel-btn') ? 'Cancel' : 'Reschedule';
+
+                // Get the userId from auth
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        const userId = user.uid;
+
+                        showConfirmationModal(action, async () => {
+                            const appointmentStartDate = new Date(appointment.date + 'T' + appointment.timeStart);
+                            const currentDate = new Date();
+                            const oneDayBefore = new Date(appointmentStartDate);
+                            oneDayBefore.setDate(oneDayBefore.getDate() - 1);
+
+                            if (currentDate >= oneDayBefore) {
+                                showNotificationModal("You cannot cancel or reschedule 1 day before the appointment.");
+                            } else {
+                                // Disable the clicked button immediately
+                                e.target.disabled = true;
+
+                                // Disable the sibling button immediately
+                                const siblingButton = e.target.classList.contains('cancel-btn') ?
+                                    e.target.nextElementSibling : e.target.previousElementSibling;
+                                if (siblingButton) {
+                                    siblingButton.disabled = true;
+                                }
+
+                                try {
+                                    const appointmentRef = doc(db, "appointments", appointmentId);
+
+                                    // Update the status and increment slots based on the action
+                                    const updatedBookings = appointment.bookings.map(b => {
+                                        if (b.userId === booking.userId) {
+                                            if (action === 'Cancel') {
+                                                return { ...b, status: 'Cancelled' };
+                                            } else if (action === 'Reschedule') {
+                                                return { ...b, status: 'Rescheduled' };
+                                            }
+                                        }
+                                        return b;
+                                    });
+
+                                    const updatedSlots = appointment.slots + 1; // Increment slots
+
+                                    await updateDoc(appointmentRef, {
+                                        bookings: updatedBookings,
+                                        slots: updatedSlots
+                                    });
+
+                                    showNotificationModal(`${action} successful.`);
+                                    fetchUserAppointments(userId); // Refresh the appointments list
+                                } catch (error) {
+                                    console.error("Error updating booking:", error);
+                                    showNotificationModal("An error occurred. Please try again.");
+                                    // Optionally re-enable the buttons in case of error
+                                    e.target.disabled = false;
+                                    if (siblingButton) {
+                                        siblingButton.disabled = false;
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        console.log("User is not signed in");
+                    }
+                });
             });
         });
 
     } catch (error) {
-        console.error("Error fetching user appointments:", error);
+        console.error("Error fetching appointments:", error);
     }
 }
 
-// Handle appointment cancellation
-async function handleCancel(appointmentId, userId) {
-    try {
-        const appointmentRef = doc(db, "appointments", appointmentId);
-        await updateDoc(appointmentRef, {
-            bookings: arrayRemove({ userId })
-        });
-        // Refresh the appointments table
-        const user = auth.currentUser;
-        if (user) {
-            await fetchUserAppointments(user.uid);
-        }
-    } catch (error) {
-        console.error("Error canceling appointment:", error);
-    }
-}
-
-// Get user ID from Firebase Auth
+// Check if user is authenticated
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         const userId = user.uid;
         await fetchUserAppointments(userId);
+    } else {
+        console.log("User is not signed in");
     }
 });

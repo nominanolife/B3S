@@ -22,33 +22,35 @@ if (!getApps().length) {
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Fetch appointments and associated students
 async function fetchAppointments() {
   try {
-    const querySnapshot = await getDocs(collection(db, "appointments"));
-    const appointments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    const studentsMap = new Map();
+      const querySnapshot = await getDocs(collection(db, "appointments"));
+      const appointments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const studentsMap = new Map();
 
-    for (const appointment of appointments) {
-      for (const booking of appointment.bookings) {
-        const studentDocRef = doc(db, "applicants", booking.userId);
-        const studentDoc = await getDoc(studentDocRef);
-        if (studentDoc.exists()) {
-          const studentData = studentDoc.data();
-          if (!studentsMap.has(booking.userId)) {
-            studentData.bookings = [];
-            studentsMap.set(booking.userId, studentData);
+      for (const appointment of appointments) {
+          // Ensure that `bookings` is an array, or set it to an empty array if not present
+          const bookings = Array.isArray(appointment.bookings) ? appointment.bookings : [];
+
+          for (const booking of bookings) {
+              const studentDocRef = doc(db, "applicants", booking.userId);
+              const studentDoc = await getDoc(studentDocRef);
+              if (studentDoc.exists()) {
+                  const studentData = studentDoc.data();
+                  if (!studentsMap.has(booking.userId)) {
+                      studentData.bookings = [];
+                      studentsMap.set(booking.userId, studentData);
+                  }
+                  const student = studentsMap.get(booking.userId);
+                  student.bookings.push({ ...booking, appointmentId: appointment.id });
+              }
           }
-          const student = studentsMap.get(booking.userId);
-          student.bookings.push({ ...booking, appointmentId: appointment.id });
-        }
       }
-    }
 
-    const students = Array.from(studentsMap.values()).filter(student => student.role === "student");
-    renderStudents(students);
+      const students = Array.from(studentsMap.values()).filter(student => student.role === "student");
+      renderStudents(students);
   } catch (error) {
-    console.error("Error fetching appointments: ", error);
+      console.error("Error fetching appointments: ", error);
   }
 }
 
