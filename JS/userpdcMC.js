@@ -250,6 +250,12 @@ async function handleBooking() {
     await fetchAppointments();
     renderCalendar(currentMonth, currentYear);
     showNotification('Booking successful!');
+
+    // Redirect to usersched.html after a short delay
+    setTimeout(() => {
+      window.location.href = 'usersched.html';
+    }, 1000); // 1 seconds delay before redirection
+    
   } catch (error) {
     console.error("Error updating booking:", error);
     showNotification('Failed to book appointment. Please try again later.');
