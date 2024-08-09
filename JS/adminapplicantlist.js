@@ -42,17 +42,38 @@ async function fetchApplicants() {
     }
 }
 
+// Function to filter applicants based on search input
+function searchApplicants() {
+    const searchInput = document.querySelector('.search').value.toLowerCase();
+    const rows = document.querySelectorAll('.table-row');
+
+    rows.forEach(row => {
+        const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+        const email = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        const phone = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+
+        if (name.includes(searchInput) || email.includes(searchInput) || phone.includes(searchInput)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const buttons = document.querySelectorAll('.button-right');
-    
+    const searchInput = document.querySelector('.search');
+
     buttons.forEach(button => {
         button.addEventListener('click', function() {
             buttons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
         });
     });
-});
 
+    // Attach event listener to search input
+    searchInput.addEventListener('input', searchApplicants);
+});
 
 // Call the function to fetch and display applicants
 fetchApplicants();

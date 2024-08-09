@@ -80,7 +80,7 @@ async function fetchUserAppointments(userId) {
         const appointmentsRef = collection(db, "appointments");
         const querySnapshot = await getDocs(appointmentsRef);
 
-        appointmentsTableBody.innerHTML = "";
+        let appointmentsData = [];
 
         if (querySnapshot.empty) {
             console.log("No matching documents.");
@@ -92,53 +92,80 @@ async function fetchUserAppointments(userId) {
 
             if (Array.isArray(appointment.bookings)) {
                 const userBookings = appointment.bookings.filter(booking => booking.userId === userId);
-
                 userBookings.forEach(booking => {
-                    const row = document.createElement('tr');
-
-                    const courseCell = document.createElement('td');
-                    courseCell.innerText = appointment.course;
-                    row.appendChild(courseCell);
-
-                    const { date } = parseDateTime(appointment.date, appointment.timeStart);
-                    const startTime = parseDateTime(appointment.date, appointment.timeStart).time;
-                    const endTime = parseDateTime(appointment.date, appointment.timeEnd).time;
-
-                    const dateCell = document.createElement('td');
-                    dateCell.innerText = date;
-                    row.appendChild(dateCell);
-
-                    const startTimeCell = document.createElement('td');
-                    startTimeCell.innerText = startTime;
-                    row.appendChild(startTimeCell);
-
-                    const endTimeCell = document.createElement('td');
-                    endTimeCell.innerText = endTime;
-                    row.appendChild(endTimeCell);
-
-                    const statusCell = document.createElement('td');
-                    statusCell.innerText = booking.status || ''; // Default to 'Pending' if no status is set
-                    row.appendChild(statusCell);
-
-                    const actionCell = document.createElement('td');
-
-                    const appointmentStartDate = new Date(appointment.date + 'T' + appointment.timeStart);
-                    const currentDate = new Date();
-                    const oneDayBefore = new Date(appointmentStartDate);
-                    oneDayBefore.setDate(oneDayBefore.getDate() - 1);
-
-                    const isDayBefore = currentDate >= oneDayBefore;
-                    const isAppointmentDay = currentDate.toDateString() === appointmentStartDate.toDateString();
-                    const isDisabled = isAppointmentDay || booking.status === 'Cancelled';
-
-                    // Determine button states
-                    actionCell.innerHTML = `<button class="btn btn-danger cancel-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Cancel</button>`;
-                    actionCell.innerHTML += `<button class="btn btn-warning reschedule-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${doc.id}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Reschedule</button>`;
-
-                    row.appendChild(actionCell);
-                    appointmentsTableBody.appendChild(row);
+                    appointmentsData.push({ appointment, booking, docId: doc.id });
                 });
             }
+        });
+
+        // Sort appointments: existing ones first (not "Cancelled" or "Rescheduled")
+        appointmentsData.sort((a, b) => {
+            const statusOrder = { "Booked": 1, "Pending": 2, "Rescheduled": 3, "Cancelled": 4 };
+            return statusOrder[a.booking.status || "Pending"] - statusOrder[b.booking.status || "Pending"];
+        });
+
+        // Clear the table body before rendering
+        appointmentsTableBody.innerHTML = "";
+
+        appointmentsData.forEach(({ appointment, booking, docId }) => {
+            const row = document.createElement('tr');
+
+            const courseCell = document.createElement('td');
+            courseCell.innerText = appointment.course;
+            row.appendChild(courseCell);
+
+            const { date } = parseDateTime(appointment.date, appointment.timeStart);
+            const startTime = parseDateTime(appointment.date, appointment.timeStart).time;
+            const endTime = parseDateTime(appointment.date, appointment.timeEnd).time;
+
+            const dateCell = document.createElement('td');
+            dateCell.innerText = date;
+            row.appendChild(dateCell);
+
+            const startTimeCell = document.createElement('td');
+            startTimeCell.innerText = startTime;
+            row.appendChild(startTimeCell);
+
+            const endTimeCell = document.createElement('td');
+            endTimeCell.innerText = endTime;
+            row.appendChild(endTimeCell);
+
+            const statusCell = document.createElement('td');
+            statusCell.innerText = booking.status || 'Pending'; // Default to 'Pending' if no status is set
+
+            // Apply color based on status
+            if (booking.status === 'Booked') {
+                statusCell.style.color = '#28a745'; // Green (Bootstrap's success color)
+            } else if (booking.status === 'Cancelled') {
+                statusCell.style.color = '#dc3545'; // Red (Bootstrap's danger color)
+            } else if (booking.status === 'Rescheduled') {
+                statusCell.style.color = '#ffc107'; // Yellow (Bootstrap's warning color)
+            } else {
+                statusCell.style.color = '#6c757d'; // Grey (Bootstrap's secondary color for Pending)
+            }
+
+            row.appendChild(statusCell);
+
+            const actionCell = document.createElement('td');
+
+            // Hide buttons if the status is "Cancelled" or "Rescheduled"
+            if (booking.status !== 'Cancelled' && booking.status !== 'Rescheduled') {
+                const appointmentStartDate = new Date(appointment.date + 'T' + appointment.timeStart);
+                const currentDate = new Date();
+                const oneDayBefore = new Date(appointmentStartDate);
+                oneDayBefore.setDate(oneDayBefore.getDate() - 1);
+
+                const isDayBefore = currentDate >= oneDayBefore;
+                const isAppointmentDay = currentDate.toDateString() === appointmentStartDate.toDateString();
+                const isDisabled = isAppointmentDay || booking.status === 'Cancelled';
+
+                // Determine button states
+                actionCell.innerHTML = `<button class="btn btn-warning reschedule-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${docId}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Reschedule</button>`;
+                actionCell.innerHTML += `<button class="btn btn-danger cancel-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${docId}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Cancel</button>`;
+            }
+
+            row.appendChild(actionCell);
+            appointmentsTableBody.appendChild(row);
         });
 
         // Add event listeners for Cancel and Reschedule buttons
@@ -197,12 +224,10 @@ async function fetchUserAppointments(userId) {
                                     });
 
                                     showNotificationModal(`${action} successful.`);
-                                    fetchUserAppointments(userId); // Refresh the appointments list
-
-                                    // Ensure the redirection happens after the UI is updated
                                     setTimeout(() => {
                                         window.location.href = 'userappointment.html';
-                            }, 100); // Add a slight delay to ensure UI updates
+                                    }, 1000); // Redirect after showing the success notification
+
                                 } catch (error) {
                                     console.error("Error updating booking:", error);
                                     showNotificationModal("An error occurred. Please try again.");
@@ -224,6 +249,7 @@ async function fetchUserAppointments(userId) {
         console.error("Error fetching appointments:", error);
     }
 }
+
 
 // Check if user is authenticated
 onAuthStateChanged(auth, async (user) => {
