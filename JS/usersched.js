@@ -199,7 +199,6 @@ async function fetchUserAppointments(userId) {
 
                                     showNotificationModal(`${action} successful.`);
                                     fetchUserAppointments(userId); // Refresh the appointments list
-                                    window.location.href = "userappointment.html"; // Redirect to userappointment.html
                                 } catch (error) {
                                     console.error("Error updating booking:", error);
                                     showNotificationModal("An error occurred. Please try again.");
