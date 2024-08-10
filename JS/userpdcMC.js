@@ -194,7 +194,89 @@ function showNotification(message) {
   $('#notificationModal').modal('show');
 }
 
+async function handleBooking() {
+  const selectedSlot = document.querySelector('input[name="time-slot"]:checked');
+  if (!selectedSlot) {
+    showNotification('Please select a time slot.');
+    return;
+  }
 
+  const timeSlot = selectedSlot.value;
+  const appointmentDate = selectedSlot.dataset.date;
+  const appointmentId = selectedSlot.dataset.appointmentId;
+  const appointment = appointments.find(app => app.id === appointmentId);
+
+  if (!appointment) {
+    showNotification('No appointment found for the selected date.');
+    return;
+  }
+
+  if (!currentUserUid) {
+    showNotification('You must be logged in to book an appointment.');
+    return;
+  }
+
+  const currentDate = new Date();
+  const appointmentDateObj = new Date(appointmentDate);
+
+  // Prevent booking if it's within one day before the appointment date or on the day of the appointment
+  if (appointmentDateObj <= currentDate.setDate(currentDate.getDate() + 1)) {
+    showNotification('Booking is not allowed within one day before the appointment or on the day of the appointment.');
+    return;
+  }
+
+  // Check if the user has any existing bookings that are not canceled or rescheduled, excluding completed appointments
+  const userExistingBookings = appointments.filter(app => 
+    app.bookings && app.bookings.some(booking => 
+      booking.userId === currentUserUid && 
+      booking.status !== 'Cancelled' && 
+      booking.status !== 'Rescheduled' && 
+      booking.progress !== 'Completed' // Check the progress within the booking
+    )
+  );
+
+  if (userExistingBookings.length > 0) {
+    showNotification('You already have an ongoing appointment. Please cancel or reschedule it before booking a new one.');
+    return;
+  }
+
+  const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
+  if (bookedSlots >= appointment.slots) {
+    showNotification('This appointment is already fully booked.');
+    return;
+  }
+
+  // Proceed with booking
+  try {
+    const appointmentRef = doc(db, "appointments", appointment.id);
+    await updateDoc(appointmentRef, {
+      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "In Progress" }] // Assuming 'In Progress' for a new booking
+    });
+
+    const totalSlots = appointment.slots;
+    const updatedBookings = [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "In Progress" }];
+    if (updatedBookings.length >= totalSlots) {
+      await updateDoc(appointmentRef, { status: 'full' });
+      const appointmentElement = document.querySelector(`[data-date="${appointment.date}"]`);
+      if (appointmentElement) {
+        appointmentElement.style.backgroundColor = "red";
+      }
+    }
+
+    await fetchAppointments();
+    renderCalendar(currentMonth, currentYear);
+    showNotification('Booking successful!');
+
+    // Redirect to usersched.html after a short delay
+    setTimeout(() => {
+      window.location.href = 'usersched.html';
+    }, 1000); // 1 second delay before redirection
+
+  } catch (error) {
+    console.error("Error updating booking:", error);
+    showNotification('Failed to book appointment. Please try again later.');
+  }
+}
 
 // Event Listeners
 nextBtn.addEventListener("click", () => {
