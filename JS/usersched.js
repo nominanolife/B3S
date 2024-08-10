@@ -109,30 +109,34 @@ async function fetchUserAppointments(userId) {
 
         appointmentsData.forEach(({ appointment, booking, docId }) => {
             const row = document.createElement('tr');
-
+        
             const courseCell = document.createElement('td');
             courseCell.innerText = appointment.course;
             row.appendChild(courseCell);
-
+        
             const { date } = parseDateTime(appointment.date, appointment.timeStart);
             const startTime = parseDateTime(appointment.date, appointment.timeStart).time;
             const endTime = parseDateTime(appointment.date, appointment.timeEnd).time;
-
+        
             const dateCell = document.createElement('td');
             dateCell.innerText = date;
             row.appendChild(dateCell);
-
+        
             const startTimeCell = document.createElement('td');
             startTimeCell.innerText = startTime;
             row.appendChild(startTimeCell);
-
+        
             const endTimeCell = document.createElement('td');
             endTimeCell.innerText = endTime;
             row.appendChild(endTimeCell);
-
+        
+            const progressCell = document.createElement('td');
+            progressCell.innerText = booking.progress || 'Not started'; // Ensure 'Not started' is displayed if no progress is set
+            row.appendChild(progressCell);
+        
             const statusCell = document.createElement('td');
             statusCell.innerText = booking.status || 'Pending'; // Default to 'Pending' if no status is set
-
+        
             // Apply color based on status
             if (booking.status === 'Booked') {
                 statusCell.style.color = '#28a745'; // Green (Bootstrap's success color)
@@ -143,27 +147,31 @@ async function fetchUserAppointments(userId) {
             } else {
                 statusCell.style.color = '#6c757d'; // Grey (Bootstrap's secondary color for Pending)
             }
-
+        
             row.appendChild(statusCell);
-
+        
             const actionCell = document.createElement('td');
-
-            // Hide buttons if the status is "Cancelled" or "Rescheduled"
-            if (booking.status !== 'Cancelled' && booking.status !== 'Rescheduled') {
+        
+            // Disable buttons if progress is "Completed" or the status is "Cancelled" or "Rescheduled"
+            const isDisabled = booking.progress === 'Completed' || booking.status === 'Cancelled' || booking.status === 'Rescheduled';
+        
+            if (!isDisabled) {
                 const appointmentStartDate = new Date(appointment.date + 'T' + appointment.timeStart);
                 const currentDate = new Date();
                 const oneDayBefore = new Date(appointmentStartDate);
                 oneDayBefore.setDate(oneDayBefore.getDate() - 1);
-
+        
                 const isDayBefore = currentDate >= oneDayBefore;
                 const isAppointmentDay = currentDate.toDateString() === appointmentStartDate.toDateString();
-                const isDisabled = isAppointmentDay || booking.status === 'Cancelled';
-
+        
                 // Determine button states
-                actionCell.innerHTML = `<button class="btn btn-warning reschedule-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${docId}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Reschedule</button>`;
-                actionCell.innerHTML += `<button class="btn btn-danger cancel-btn" ${isDisabled ? 'disabled' : ''} data-appointment-id="${docId}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Cancel</button>`;
+                actionCell.innerHTML = `<button class="btn btn-warning reschedule-btn" ${isDayBefore || isAppointmentDay ? 'disabled' : ''} data-appointment-id="${docId}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Reschedule</button>`;
+                actionCell.innerHTML += `<button class="btn btn-danger cancel-btn" ${isDayBefore || isAppointmentDay ? 'disabled' : ''} data-appointment-id="${docId}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Cancel</button>`;
+            } else {
+                actionCell.innerHTML = `<button class="btn btn-warning reschedule-btn" disabled>Reschedule</button>`;
+                actionCell.innerHTML += `<button class="btn btn-danger cancel-btn" disabled>Cancel</button>`;
             }
-
+        
             row.appendChild(actionCell);
             appointmentsTableBody.appendChild(row);
         });

@@ -194,73 +194,7 @@ function showNotification(message) {
   $('#notificationModal').modal('show');
 }
 
-async function handleBooking() {
-  const selectedSlot = document.querySelector('input[name="time-slot"]:checked');
-  if (!selectedSlot) {
-    showNotification('Please select a time slot.');
-    return;
-  }
 
-  const timeSlot = selectedSlot.value;
-  const appointmentDate = selectedSlot.dataset.date;
-  const appointmentId = selectedSlot.dataset.appointmentId;
-  const appointment = appointments.find(app => app.id === appointmentId);
-
-  if (!appointment) {
-    showNotification('No appointment found for the selected date.');
-    return;
-  }
-
-  const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
-  if (bookedSlots >= appointment.slots) {
-    showNotification('This appointment is already fully booked.');
-    return;
-  }
-
-  if (!currentUserUid) {
-    showNotification('You must be logged in to book an appointment.');
-    return;
-  }
-
-  // Allow rebooking regardless of previous cancellations or rescheduling
-  const today = new Date();
-  const appointmentDateObj = new Date(appointmentDate);
-
-  if (appointmentDateObj < today) {
-    showNotification('You cannot book an appointment for a past date.');
-    return;
-  }
-
-  try {
-    const appointmentRef = doc(db, "appointments", appointment.id);
-    await updateDoc(appointmentRef, {
-      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked" }]
-    });
-
-    const totalSlots = appointment.slots;
-    const updatedBookings = [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked" }];
-    if (updatedBookings.length >= totalSlots) {
-      await updateDoc(appointmentRef, { status: 'full' });
-      const appointmentElement = document.querySelector(`[data-date="${appointment.date}"]`);
-      if (appointmentElement) {
-        appointmentElement.style.backgroundColor = "red";
-      }
-    }
-
-    await fetchAppointments();
-    renderCalendar(currentMonth, currentYear);
-    showNotification('Booking successful!');
-
-    // Redirect to usersched.html after a short delay
-    setTimeout(() => {
-      window.location.href = 'usersched.html';
-    }, 1000); // 1 seconds delay before redirection
-
-  } catch (error) {
-    console.error("Error updating booking:", error);
-    showNotification('Failed to book appointment. Please try again later.');
-  }
-}
 
 
 // Event Listeners

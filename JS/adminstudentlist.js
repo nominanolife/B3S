@@ -35,6 +35,8 @@ async function fetchAppointments() {
 
       for (const appointment of appointments) {
           const bookings = Array.isArray(appointment.bookings) ? appointment.bookings : [];
+          
+          console.log("Processing appointment with course:", appointment.course);
 
           for (const booking of bookings) {
               if (booking.status === "Cancelled" || booking.status === "Rescheduled") {
@@ -52,7 +54,8 @@ async function fetchAppointments() {
                           studentsMap.set(booking.userId, studentData);
                       }
                       const student = studentsMap.get(booking.userId);
-                      student.bookings.push({ ...booking, appointmentId: appointment.id });
+                      // Include course information from appointment level
+                      student.bookings.push({ ...booking, appointmentId: appointment.id, course: appointment.course });
                   }
               }
           }
@@ -78,48 +81,119 @@ function renderStudents() {
 
   paginatedStudents.forEach(student => {
     const personalInfo = student.personalInfo || {}; // Ensure personalInfo exists
+    const activeBookings = {
+      TDC: null,
+      "PDC-4Wheels": null,
+      "PDC-Motors": null
+    };
+
+    (student.bookings || []).forEach(booking => {
+      if (booking.status === "Booked") {
+        if (booking.course === "TDC") {
+          activeBookings.TDC = {
+            appointmentId: booking.appointmentId,
+            userId: booking.userId,
+            progress: booking.progress // Add progress to activeBookings
+          };
+        }
+        if (booking.course === "PDC-4Wheels") {
+          activeBookings["PDC-4Wheels"] = {
+            appointmentId: booking.appointmentId,
+            userId: booking.userId,
+            progress: booking.progress // Add progress to activeBookings
+          };
+        }
+        if (booking.course === "PDC-Motors") {
+          activeBookings["PDC-Motors"] = {
+            appointmentId: booking.appointmentId,
+            userId: booking.userId,
+            progress: booking.progress // Add progress to activeBookings
+          };
+        }
+      }
+    });
+
     const studentHtml = `
       <tr class="table-row">
         <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
         <td class="table-row-content">${student.email}</td>
         <td class="table-row-content">${student.phoneNumber || ''}</td>
         <td class="table-row-content">${student.enrolledPackage}</td>
-        <td class="table-row-content">&#8369; ${student.packagePrice}</td>
-        ${(student.bookings || []).map(booking => `
+        <td class="table-row-content">&#8369; ${student.packagePrice || ''}</td>
+        ${activeBookings.TDC ? `
           <td class="table-row-content">
             <label class="status-label">
-              <input type="checkbox" class="status-toggle" data-appointment-id="${booking.appointmentId}" data-booking-id="${booking.userId}" data-column="TDC" ${booking.TDC === 'Completed' ? 'checked' : ''}>
+              <input type="checkbox" class="status-toggle" 
+                     data-booking-id="${activeBookings.TDC.appointmentId}" 
+                     data-user-id="${activeBookings.TDC.userId}" 
+                     data-column="TDC"
+                     ${activeBookings.TDC.progress === "Completed" ? "checked" : ""}>
               Completed
             </label>
           </td>
+        ` : '<td class="table-row-content"></td>'}
+        ${activeBookings["PDC-4Wheels"] ? `
           <td class="table-row-content">
             <label class="status-label">
-              <input type="checkbox" class="status-toggle" data-appointment-id="${booking.appointmentId}" data-booking-id="${booking.userId}" data-column="PDC-4Wheels" ${booking['PDC-4Wheels'] === 'Completed' ? 'checked' : ''}>
+              <input type="checkbox" class="status-toggle" 
+                     data-booking-id="${activeBookings["PDC-4Wheels"].appointmentId}" 
+                     data-user-id="${activeBookings["PDC-4Wheels"].userId}" 
+                     data-column="PDC-4Wheels"
+                     ${activeBookings["PDC-4Wheels"].progress === "Completed" ? "checked" : ""}>
               Completed
             </label>
           </td>
+        ` : '<td class="table-row-content"></td>'}
+        ${activeBookings["PDC-Motors"] ? `
           <td class="table-row-content">
             <label class="status-label">
-              <input type="checkbox" class="status-toggle" data-appointment-id="${booking.appointmentId}" data-booking-id="${booking.userId}" data-column="PDC-Motors" ${booking['PDC-Motors'] === 'Completed' ? 'checked' : ''}>
+              <input type="checkbox" class="status-toggle" 
+                     data-booking-id="${activeBookings["PDC-Motors"].appointmentId}" 
+                     data-user-id="${activeBookings["PDC-Motors"].userId}" 
+                     data-column="PDC-Motors"
+                     ${activeBookings["PDC-Motors"].progress === "Completed" ? "checked" : ""}>
               Completed
             </label>
           </td>
-        `).join('')}
+        ` : '<td class="table-row-content"></td>'}
       </tr>
     `;
     studentList.insertAdjacentHTML('beforeend', studentHtml);
   });
 
-  // Add event listeners to status toggles
   document.querySelectorAll('.status-toggle').forEach(toggle => {
-    toggle.addEventListener('change', (event) => {
-      const appointmentId = event.target.dataset.appointmentId;
-      const bookingId = event.target.dataset.bookingId;
-      const column = event.target.dataset.column;
-      const newStatus = event.target.checked ? 'Completed' : 'Not yet Started';
-      handleStatusChange(appointmentId, bookingId, column, newStatus);
+    toggle.addEventListener('change', async (event) => {
+        const appointmentId = event.target.dataset.bookingId;
+        const userId = event.target.dataset.userId;
+        const newStatus = event.target.checked ? 'Completed' : 'Not yet Started';
+
+        try {
+            const docRef = doc(db, "appointments", appointmentId);
+            const docSnapshot = await getDoc(docRef);
+
+            if (docSnapshot.exists()) {
+                const appointmentData = docSnapshot.data();
+
+                if (Array.isArray(appointmentData.bookings)) {
+                    const updatedBookings = appointmentData.bookings.map(booking => {
+                        if (booking.userId === userId && booking.status === "Booked") {
+                            return { ...booking, progress: newStatus };
+                        }
+                        return booking;
+                    });
+
+                    await updateDoc(docRef, { bookings: updatedBookings });
+                } else {
+                    console.error("No bookings array found in document:", appointmentId);
+                }
+            } else {
+                console.error("No document found with ID:", appointmentId);
+            }
+        } catch (error) {
+            console.error("Error updating progress:", error);
+        }
     });
-  });
+});
 }
 
 function updatePaginationControls() {
@@ -166,30 +240,50 @@ function updatePaginationControls() {
   paginationControls.appendChild(nextButton);
 }
 
-async function handleStatusChange(appointmentId, bookingId, column, newStatus) {
+async function handleStatusChange(bookingId, course, newStatus) {
   try {
-    const appointmentDocRef = doc(db, "appointments", appointmentId);
-    const appointmentDoc = await getDoc(appointmentDocRef);
-    if (!appointmentDoc.exists()) {
-      console.error("No such document!");
-      return;
-    }
+      const querySnapshot = await getDocs(collection(db, "appointments"));
+      let appointmentDocRef = null;
+      let updatedBookings = null;
 
-    const appointmentData = appointmentDoc.data();
-    const bookings = appointmentData.bookings.map(booking => {
-      if (booking.userId === bookingId) {
-        return { ...booking, [column]: newStatus };
+      querySnapshot.forEach(doc => {
+          const appointmentData = doc.data();
+          console.log("Checking appointment data:", appointmentData);
+
+          // Find the booking with the matching appointment ID and course
+          const matchingBooking = appointmentData.bookings.find(booking => {
+              console.log("Checking booking:", booking);
+              return booking.appointmentId === bookingId && booking.course === course && booking.status === "Booked";
+          });
+
+          if (matchingBooking) {
+              console.log("Matching booking found:", matchingBooking);
+              appointmentDocRef = doc.ref;
+
+              // Update the specific booking
+              updatedBookings = appointmentData.bookings.map(booking => {
+                  if (booking === matchingBooking) {
+                      console.log("Updating booking with new status:", newStatus);
+                      return { ...booking, progress: newStatus };
+                  }
+                  return booking;
+              });
+
+              console.log("Updated bookings array: ", updatedBookings);
+          }
+      });
+
+      if (appointmentDocRef && updatedBookings) {
+          // Update the document in Firestore with the modified bookings array
+          await updateDoc(appointmentDocRef, { bookings: updatedBookings });
+          console.log("Progress updated successfully");
+      } else {
+          console.error(`No matching appointment found for booking ID: ${bookingId} and course: ${course}`);
       }
-      return booking;
-    });
-
-    await updateDoc(appointmentDocRef, { bookings });
-    console.log("Status updated successfully");
   } catch (error) {
-    console.error("Error updating status: ", error);
+      console.error("Error updating progress: ", error);
   }
 }
-
 // Check user authentication and fetch students on page load
 onAuthStateChanged(auth, (user) => {
   if (user) {
