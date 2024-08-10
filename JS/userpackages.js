@@ -89,7 +89,6 @@ document.querySelector('.modal .close').addEventListener('click', () => {
   $('#infoModal').modal('hide');
 });
 
-// Handle enroll button click
 document.addEventListener('click', async (e) => {
   if (e.target && e.target.classList.contains('enroll-now-button')) {
     const packageId = e.target.dataset.packageId;
@@ -101,7 +100,7 @@ document.addEventListener('click', async (e) => {
       const selectedPackage = packages.find(pkg => pkg.id === packageId);
 
       if (userEnrolledPackage) {
-        $('#enrollmentToast').toast('show');
+        showEnrollmentModal("You are currently enrolled in this package. Please consult the admin to change your enrolled package.", "error");
       } else {
         const confirmEnroll = confirm("Enroll in this course?");
         if (confirmEnroll && selectedPackage) {
@@ -113,20 +112,9 @@ document.addEventListener('click', async (e) => {
             });
             document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
             userEnrolledPackage = packageName;
-            $('#successToast').toast('show'); // Show success toast
-            setTimeout(() => {
-              window.location.href = "userappointment.html";
-            }, 1000); // Redirect after 1 second to let toast show
+            showEnrollmentModal("Enrollment successful!", "success");
           } catch (error) {
-            Toastify({
-              text: "Failed to enroll. Please try again.",
-              duration: 3000,
-              close: true,
-              gravity: "top",
-              position: "right",
-              backgroundColor: "red",
-              stopOnFocus: true
-            }).showToast();
+            showEnrollmentModal("Failed to enroll. Please try again.", "error");
           }
         } else {
           console.error("Package not found or enrollment not confirmed.");
@@ -137,6 +125,28 @@ document.addEventListener('click', async (e) => {
     }
   }
 });
+
+// Function to show enrollment modal with a custom message
+function showEnrollmentModal(message, type) {
+  const modalBody = document.getElementById("enrollmentModalBody");
+  modalBody.textContent = message;
+
+  if (type === "success") {
+    modalBody.style.color = "green";
+  } else if (type === "error") {
+    modalBody.style.color = "red";
+  }
+
+  // Show the modal
+  $('#enrollmentModal').modal('show');
+
+  // Redirect to userappointment.html after the modal is closed if enrollment is successful
+  if (type === "success") {
+    $('#enrollmentModal').on('hidden.bs.modal', function () {
+      window.location.href = "userappointment.html";
+    });
+  }
+}
 
 // Check enrollment status on page load
 onAuthStateChanged(auth, async (user) => {

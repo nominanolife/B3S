@@ -76,6 +76,23 @@ function calculateAge(birthdate) {
     return age;
 }
 
+// Function to show notification modal with a custom message
+function showNotificationModal(message, type) {
+    const modalBody = document.getElementById("notificationModalBody");
+    modalBody.textContent = message;
+
+    // Change the color of the text based on the type
+    if (type === "success") {
+        modalBody.style.color = "green";
+    } else if (type === "error") {
+        modalBody.style.color = "red";
+    } else if (type === "warning") {
+        modalBody.style.color = "orange";
+    }
+
+    $('#notificationModal').modal('show');
+}
+
 // Function to save profile changes with validation
 async function saveProfileChanges() {
     const user = auth.currentUser;
@@ -98,25 +115,13 @@ async function saveProfileChanges() {
 
         // Validate birthdate
         if (!birthdate) {
-            Toastify({
-                text: "Please fill in the birthdate.",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "#ff9800",
-            }).showToast();
+            showNotificationModal("Please fill in the birthdate.", "warning");
             return;
         }
 
         const birthDateObj = new Date(birthdate);
         if (isNaN(birthDateObj.getTime())) {
-            Toastify({
-                text: "Invalid birthdate. Please enter a valid date.",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "#ff9800",
-            }).showToast();
+            showNotificationModal("Invalid birthdate. Please enter a valid date.", "warning");
             return;
         }
 
@@ -134,13 +139,7 @@ async function saveProfileChanges() {
             !profilePicFile
         ) {
             // Show validation message
-            Toastify({
-                text: "Please edit at least one field before saving.",
-                duration: 3000, // 3 seconds
-                gravity: "top", // Position of the toast
-                position: "right", // Position of the toast
-                backgroundColor: "#ff9800", // Warning color
-            }).showToast();
+            showNotificationModal("Please edit at least one field before saving.", "warning");
             return; // Exit the function
         }
 
@@ -174,27 +173,16 @@ async function saveProfileChanges() {
             $('#editProfileModal').modal('hide');
             getUserData();
 
-            // Show success toast notification
-            Toastify({
-                text: "Profile Updated Successfully!",
-                duration: 3000, // 3 seconds
-                gravity: "top", // Position of the toast
-                position: "right", // Position of the toast
-                backgroundColor: "#4CAF50", // Success color
-            }).showToast();
+            // Show success notification modal
+            showNotificationModal("Profile Updated Successfully!", "success");
 
         } catch (error) {
-            // Show error toast notification
-            Toastify({
-                text: `Error updating profile: ${error.message}`,
-                duration: 3000, // 3 seconds
-                gravity: "top", // Position of the toast
-                position: "center", // Position of the toast
-                backgroundColor: "#f44336", // Error color
-            }).showToast();
+            // Show error notification modal
+            showNotificationModal(`Error updating profile: ${error.message}`, "error");
         }
     }
 }
+
 
 // Function to reset the edit profile form to the existing data
 function resetEditProfileForm() {

@@ -25,6 +25,7 @@ const closeModalButton = document.querySelector('.close-modal');
 const instructorNameInput = document.querySelector('.instructor-name');
 const instructorCourseInput = document.querySelector('.instructor-course');
 const paginationControls = document.querySelector('.pagination-controls');
+let instructorIdToDelete = null; // Store the ID of the instructor to delete
 
 let instructors = []; // Store all instructors data
 let currentPage = 1; // Tracks the current page
@@ -52,9 +53,53 @@ function renderInstructors() {
     row.innerHTML = `
       <td>${instructor.name}</td>
       <td>${instructor.course}</td>
-      <td class="table-row-content"><i class="bi bi-three-dots"></i></td>
+      <td class="table-row-content">
+        <div class="dropdown">
+          <button class="three-dots-button" type="button"><i class="bi bi-three-dots"></i></button>
+          <div class="dropdown-content">
+            <button class="dropdown-item" data-id="${instructor.id}">Edit</button>
+            <button class="dropdown-item" data-id="${instructor.id}">Delete</button>
+          </div>
+        </div>
+      </td>
     `;
     instructorList.appendChild(row);
+  });
+
+  handleDropdowns();
+}
+
+// Handle dropdown functionality
+function handleDropdowns() {
+  document.querySelectorAll('.three-dots-button').forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.stopPropagation(); // Prevent event from bubbling up
+
+      const dropdown = this.nextElementSibling;
+      const isDropdownOpen = dropdown.classList.contains('show');
+
+      closeAllDropdowns(); // Close any other open dropdowns
+
+      // Toggle the clicked dropdown
+      if (!isDropdownOpen) {
+        dropdown.classList.add('show');
+      } else {
+        dropdown.classList.remove('show');
+      }
+    });
+  });
+
+  function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+      dropdown.classList.remove('show');
+    });
+  }
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', function(event) {
+    if (!event.target.closest('.dropdown')) {
+      closeAllDropdowns();
+    }
   });
 }
 
@@ -152,16 +197,30 @@ async function editInstructor(event) {
   }
 }
 
-// Delete instructor
-async function deleteInstructor(event) {
-  const id = event.target.dataset.id;
-  try {
-    await deleteDoc(doc(db, 'instructors', id));
-    fetchInstructors(); // Refresh the list
-  } catch (error) {
-    console.error('Error deleting instructor:', error);
-  }
+// Store the delete confirmation modal instance
+const deleteConfirmationModalElement = document.getElementById('deleteConfirmationModal');
+const deleteConfirmationModal = new bootstrap.Modal(deleteConfirmationModalElement);
+
+// Handle Delete button click in the dropdown
+function deleteInstructor(event) {
+    instructorIdToDelete = event.target.dataset.id; // Capture the ID of the instructor to delete
+    deleteConfirmationModal.show(); // Show the delete confirmation modal
 }
+
+// Confirm deletion of the instructor
+document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+    if (instructorIdToDelete) {
+        try {
+            await deleteDoc(doc(db, 'instructors', instructorIdToDelete));
+            fetchInstructors(); // Refresh the list after deletion
+            deleteConfirmationModal.hide(); // Hide the modal after successful deletion
+            instructorIdToDelete = null; // Reset the variable
+        } catch (error) {
+            console.error('Error deleting instructor:', error);
+        }
+    }
+});
+
 
 // Search instructors by name
 function searchInstructors(event) {
@@ -185,18 +244,19 @@ function renderFilteredInstructors(filteredInstructors) {
       <td>${instructor.course}</td>
       <td>
         <div class="dropdown">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="bi bi-three-dots-vertical"></i>
-          </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item edit-instructor" href="#" data-id="${instructor.id}">Edit</a>
-            <a class="dropdown-item delete-instructor" href="#" data-id="${instructor.id}">Delete</a>
+          <button class="three-dots-button"><i class="bi bi-three-dots"></i></button>
+          <div class="dropdown-content">
+            <button class="dropdown-item" data-id="${instructor.id}">Edit</button>
+            <button class="dropdown-item" data-id="${instructor.id}">Delete</button>
+            <button class="dropdown-item">Cancel</button>
           </div>
         </div>
       </td>
     `;
     instructorList.appendChild(row);
   });
+
+  handleDropdowns(); // Re-apply dropdown functionality
 }
 
 // Event Listeners
@@ -210,11 +270,12 @@ addInstructorButton.addEventListener('click', () => {
 closeModalButton.addEventListener('click', () => instructorModal.hide());
 searchInput.addEventListener('input', searchInstructors);
 instructorList.addEventListener('click', function (event) {
-  if (event.target.classList.contains('edit-instructor')) {
-    editInstructor(event);
-  }
-  if (event.target.classList.contains('delete-instructor')) {
-    deleteInstructor(event);
+  if (event.target.classList.contains('dropdown-item')) {
+    if (event.target.textContent.includes('Edit')) {
+      editInstructor(event);
+    } else if (event.target.textContent.includes('Delete')) {
+      deleteInstructor(event); // Trigger the delete modal
+    }
   }
 });
 
@@ -228,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function () {
       this.classList.add('active');
     });
   });
-});
 
-// Initial fetch
-fetchInstructors();
+  // Fetch and display instructors on page load
+  fetchInstructors();
+});

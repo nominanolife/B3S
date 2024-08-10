@@ -40,13 +40,19 @@ function parseDateTime(dateStr, timeStr) {
 }
 
 // Helper function to show notification modal
-function showNotificationModal(message) {
+function showNotificationModal(message, redirectUrl = null) {
     const modal = document.querySelector('#notificationModal');
     if (modal) {
         const modalMessage = modal.querySelector('.modal-body');
         modalMessage.innerText = message;
         const modalInstance = new bootstrap.Modal(modal);
         modalInstance.show();
+
+        if (redirectUrl) {
+            modal.addEventListener('hidden.bs.modal', () => {
+                window.location.href = 'userappointment.html';
+            });
+        }
     } else {
         console.error('Notification modal not found');
     }
@@ -65,7 +71,7 @@ function showConfirmationModal(action, callback, redirectUrl) {
             await callback(); // Execute the callback
             modalInstance.hide(); // Hide the modal
             if (redirectUrl) {
-                window.location.href = redirectUrl; // Redirect after confirming the action
+                showNotificationModal(`${action} successful.`, redirectUrl);
             }
         };
 
@@ -168,13 +174,13 @@ async function fetchUserAppointments(userId) {
                 actionCell.innerHTML = `<button class="btn btn-warning reschedule-btn" ${isDayBefore || isAppointmentDay ? 'disabled' : ''} data-appointment-id="${docId}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Reschedule</button>`;
                 actionCell.innerHTML += `<button class="btn btn-danger cancel-btn" ${isDayBefore || isAppointmentDay ? 'disabled' : ''} data-appointment-id="${docId}" data-booking='${JSON.stringify(booking)}' data-appointment='${JSON.stringify(appointment)}'>Cancel</button>`;
             } else {
-                actionCell.innerHTML = `<button class="btn btn-warning reschedule-btn" disabled>Reschedule</button>`;
-                actionCell.innerHTML += `<button class="btn btn-danger cancel-btn" disabled>Cancel</button>`;
+                actionCell.innerHTML = `<button class="btn btn-warning reschedule-btn" disabled style="display:none;">Reschedule</button>`;
+                actionCell.innerHTML += `<button class="btn btn-danger cancel-btn" disabled style="display:none;">Cancel</button>`;
             }
         
             row.appendChild(actionCell);
             appointmentsTableBody.appendChild(row);
-        });
+        });        
 
         // Add event listeners for Cancel and Reschedule buttons
         document.querySelectorAll('.cancel-btn, .reschedule-btn').forEach(button => {
@@ -231,10 +237,7 @@ async function fetchUserAppointments(userId) {
                                         slots: updatedSlots
                                     });
 
-                                    showNotificationModal(`${action} successful.`);
-                                    setTimeout(() => {
-                                        window.location.href = 'userappointment.html';
-                                    }, 1000); // Redirect after showing the success notification
+                                    showNotificationModal(`${action} successful.`, 'userappointment.html');
 
                                 } catch (error) {
                                     console.error("Error updating booking:", error);
@@ -257,7 +260,6 @@ async function fetchUserAppointments(userId) {
         console.error("Error fetching appointments:", error);
     }
 }
-
 
 // Check if user is authenticated
 onAuthStateChanged(auth, async (user) => {

@@ -192,6 +192,13 @@ function showNotification(message) {
   const modalBody = document.getElementById('notificationModalBody');
   modalBody.textContent = message;
   $('#notificationModal').modal('show');
+
+  // Redirect to usersched.html after the notification modal closes, if the message indicates success
+  if (message.includes('Booking successful')) {
+    $('#notificationModal').on('hidden.bs.modal', function () {
+      window.location.href = 'usersched.html';
+    });
+  }
 }
 
 async function handleBooking() {
@@ -266,11 +273,6 @@ async function handleBooking() {
     await fetchAppointments();
     renderCalendar(currentMonth, currentYear);
     showNotification('Booking successful!');
-
-    // Redirect to usersched.html after a short delay
-    setTimeout(() => {
-      window.location.href = 'usersched.html';
-    }, 1000); // 1 second delay before redirection
 
   } catch (error) {
     console.error("Error updating booking:", error);

@@ -520,6 +520,21 @@ h2 {
     background-color: #c9302c;
 }
 
+.btn-primary {
+    font-family: Poppins, sans-serif;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #1B3286; 
+    border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #142A74; 
+}
 
 /* Cancel Button */
 .btn-cancel {

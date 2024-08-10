@@ -216,30 +216,14 @@ document.addEventListener("DOMContentLoaded", async function() {
             });
             addPackageToDOM(docRef.id, packageName, packagePrice, packageDescription);
 
-            // Show success toast notification
-            Toastify({
-                text: "Package added successfully!",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "green",
-                stopOnFocus: true
-            }).showToast();
+            // Show success notification modal
+            showNotificationModal("Package added successfully!", "success");
 
         } catch (e) {
             console.error("Error adding document: ", e);
 
-            // Show error toast notification
-            Toastify({
-                text: "Failed to add package. Please try again.",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "red",
-                stopOnFocus: true
-            }).showToast();
+            // Show error notification modal
+            showNotificationModal("Failed to add package. Please try again.", "error");
         }
     }
 
@@ -281,29 +265,13 @@ document.addEventListener("DOMContentLoaded", async function() {
                 packageList.removeChild(packageElementToDelete);
             }
 
-            // Show success toast notification
-            Toastify({
-                text: "Package deleted successfully!",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "green",
-                stopOnFocus: true
-            }).showToast();
+            // Show success notification modal
+            showNotificationModal("Package deleted successfully!", "success");
         } catch (e) {
             console.error("Error deleting document: ", e);
 
-            // Show error toast notification
-            Toastify({
-                text: "Failed to delete package. Please try again.",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "red",
-                stopOnFocus: true
-            }).showToast();
+            // Show error notification modal
+            showNotificationModal("Failed to delete package. Please try again.", "error");
         }
     }
 
@@ -317,18 +285,18 @@ document.addEventListener("DOMContentLoaded", async function() {
                 price: packagePrice,
                 description: packageDescription
             });
-    
+        
             // Fetch all applicants
             const applicantsSnapshot = await getDocs(collection(db, "applicants"));
-    
+        
             // Update enrolled package information for relevant applicants
             let updatedCount = 0;
             for (const applicantDoc of applicantsSnapshot.docs) {
                 const applicantData = applicantDoc.data();
-    
+        
                 if (applicantData.packageName) {
                     const applicantRef = doc(db, "applicants", applicantDoc.id);
-    
+        
                     batch.update(applicantRef, {
                         enrolledPackage: packageName,
                         packagePrice: packagePrice
@@ -336,34 +304,33 @@ document.addEventListener("DOMContentLoaded", async function() {
                     updatedCount++;
                 }
             }
-    
+        
             await batch.commit();
             console.log(`Updated ${updatedCount} applicants.`);
-    
-            // Show success toast notification
-            Toastify({
-                text: "Package updated successfully!",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "green",
-                stopOnFocus: true
-            }).showToast();
+        
+            // Show success notification modal
+            showNotificationModal("Package updated successfully!", "success");
         } catch (e) {
             console.error("Error updating document: ", e);
-    
-            // Show error toast notification
-            Toastify({
-                text: "Failed to update package. Please try again.",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "red",
-                stopOnFocus: true
-            }).showToast();
+        
+            // Show error notification modal
+            showNotificationModal("Failed to update package. Please try again.", "error");
         }
+    }
+
+    function showNotificationModal(message, type) {
+        const notificationModal = document.getElementById("notificationModal");
+        const notificationModalBody = document.getElementById("notificationModalBody");
+        
+        notificationModalBody.textContent = message;
+        
+        if (type === "success") {
+            notificationModalBody.style.color = "green";
+        } else if (type === "error") {
+            notificationModalBody.style.color = "red";
+        }
+    
+        $(notificationModal).modal('show');
     }
     
 

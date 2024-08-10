@@ -327,6 +327,44 @@ h2 {
     vertical-align: middle;
 }
 
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    border: 1px solid #D9D9D9;
+    border-radius: 10px;
+    z-index: 1;
+    min-width: 120px;
+}
+
+.dropdown-content button {
+    color: black;
+    padding: 8px 12px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content button:hover {
+    background-color: #f1f1f1;
+    border-radius: 10px;
+}
+
+.show {
+    display: block;
+}
+
+.table-row button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
 .table-row i {
     font-size: 24px;
     color: #2F2E2E;
