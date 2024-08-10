@@ -24,38 +24,80 @@ const saveInstructorBtn = document.querySelector('.save-instructor');
 const closeModalButton = document.querySelector('.close-modal');
 const instructorNameInput = document.querySelector('.instructor-name');
 const instructorCourseInput = document.querySelector('.instructor-course');
+const paginationControls = document.querySelector('.pagination-controls');
 
 let instructors = []; // Store all instructors data
+let currentPage = 1; // Tracks the current page
+const itemsPerPage = 10; // Number of items per page
+let totalPages = 1; // Total number of pages
 
 // Fetch and display instructors
 async function fetchInstructors() {
   const querySnapshot = await getDocs(collection(db, 'instructors'));
   instructors = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  renderInstructors(instructors);
+  totalPages = Math.ceil(instructors.length / itemsPerPage);
+  renderInstructors(); // Render the first page
+  updatePaginationControls(); // Update pagination controls
 }
 
 // Render instructors in the table
-function renderInstructors(instructors) {
+function renderInstructors() {
   instructorList.innerHTML = '';
-  instructors.forEach(instructor => {
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const paginatedInstructors = instructors.slice(start, end);
+
+  paginatedInstructors.forEach(instructor => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${instructor.name}</td>
       <td>${instructor.course}</td>
-      <td>
-        <div class="dropdown">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="bi bi-three-dots-vertical"></i>
-          </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item edit-instructor" href="#" data-id="${instructor.id}">Edit</a>
-            <a class="dropdown-item delete-instructor" href="#" data-id="${instructor.id}">Delete</a>
-          </div>
-        </div>
-      </td>
+      <td class="table-row-content"><i class="bi bi-three-dots"></i></td>
     `;
     instructorList.appendChild(row);
   });
+}
+
+// Update pagination controls
+function updatePaginationControls() {
+  paginationControls.innerHTML = '';
+
+  // Previous button
+  const prevButton = document.createElement('i');
+  prevButton.className = 'bi bi-caret-left';
+  if (currentPage === 1) {
+    prevButton.classList.add('disabled');
+  }
+  prevButton.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderInstructors();
+      updatePaginationControls();
+    }
+  });
+
+  // Next button
+  const nextButton = document.createElement('i');
+  nextButton.className = 'bi bi-caret-right';
+  if (currentPage === totalPages) {
+    nextButton.classList.add('disabled');
+  }
+  nextButton.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderInstructors();
+      updatePaginationControls();
+    }
+  });
+
+  // Page number display
+  const pageNumberDisplay = document.createElement('span');
+  pageNumberDisplay.className = 'page-number';
+  pageNumberDisplay.textContent = `Page ${currentPage} of ${totalPages}`;
+
+  paginationControls.appendChild(prevButton);
+  paginationControls.appendChild(pageNumberDisplay);
+  paginationControls.appendChild(nextButton);
 }
 
 // Add instructor
@@ -127,7 +169,34 @@ function searchInstructors(event) {
   const filteredInstructors = instructors.filter(instructor =>
     instructor.name.toLowerCase().startsWith(query)
   );
-  renderInstructors(filteredInstructors);
+  renderFilteredInstructors(filteredInstructors);
+}
+
+function renderFilteredInstructors(filteredInstructors) {
+  instructorList.innerHTML = '';
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const paginatedInstructors = filteredInstructors.slice(start, end);
+
+  paginatedInstructors.forEach(instructor => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${instructor.name}</td>
+      <td>${instructor.course}</td>
+      <td>
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-three-dots-vertical"></i>
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item edit-instructor" href="#" data-id="${instructor.id}">Edit</a>
+            <a class="dropdown-item delete-instructor" href="#" data-id="${instructor.id}">Delete</a>
+          </div>
+        </div>
+      </td>
+    `;
+    instructorList.appendChild(row);
+  });
 }
 
 // Event Listeners

@@ -133,34 +133,51 @@ function updatePaginationControls(type) {
     const totalPages = type === 'upcoming' ? totalPagesUpcoming : totalPagesCancelled;
 
     paginationControls.innerHTML = '';
+    paginationControls.classList.add('pagination-controls');
 
-    const prevButton = document.createElement('button');
-    prevButton.innerHTML = '&#9664;'; // Left arrow
-    prevButton.disabled = currentPage === 1;
+    // Create the previous button
+    const prevButton = document.createElement('i');
+    prevButton.className = 'bi bi-caret-left';
+    if (currentPage === 1) {
+        prevButton.classList.add('disabled');
+    }
     prevButton.addEventListener('click', () => {
-        if (type === 'upcoming') {
-            currentPageUpcoming--;
-        } else {
-            currentPageCancelled--;
+        if (currentPage > 1) {
+            if (type === 'upcoming') {
+                currentPageUpcoming--;
+            } else {
+                currentPageCancelled--;
+            }
+            displayBookings(type);
+            updatePaginationControls(type);
         }
-        displayBookings(type);
-        updatePaginationControls(type);
     });
 
-    const nextButton = document.createElement('button');
-    nextButton.innerHTML = '&#9654;'; // Right arrow
-    nextButton.disabled = currentPage === totalPages;
+    // Create the next button
+    const nextButton = document.createElement('i');
+    nextButton.className = 'bi bi-caret-right';
+    if (currentPage === totalPages) {
+        nextButton.classList.add('disabled');
+    }
     nextButton.addEventListener('click', () => {
-        if (type === 'upcoming') {
-            currentPageUpcoming++;
-        } else {
-            currentPageCancelled++;
+        if (currentPage < totalPages) {
+            if (type === 'upcoming') {
+                currentPageUpcoming++;
+            } else {
+                currentPageCancelled++;
+            }
+            displayBookings(type);
+            updatePaginationControls(type);
         }
-        displayBookings(type);
-        updatePaginationControls(type);
     });
+
+    // Create the page number display
+    const pageNumberDisplay = document.createElement('span');
+    pageNumberDisplay.className = 'page-number';
+    pageNumberDisplay.textContent = `Page ${currentPage} of ${totalPages}`;
 
     paginationControls.appendChild(prevButton);
+    paginationControls.appendChild(pageNumberDisplay);
     paginationControls.appendChild(nextButton);
 }
 
