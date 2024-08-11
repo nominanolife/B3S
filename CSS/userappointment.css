@@ -310,3 +310,7 @@ h2 {
     background-color: #b60505ec;
 }
 
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
