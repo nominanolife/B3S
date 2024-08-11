@@ -28,6 +28,7 @@ const paginationControls = document.querySelector('.pagination-controls');
 let instructorIdToDelete = null; // Store the ID of the instructor to delete
 
 let instructors = []; // Store all instructors data
+let filteredInstructors = []; // Store filtered instructors data
 let currentPage = 1; // Tracks the current page
 const itemsPerPage = 10; // Number of items per page
 let totalPages = 1; // Total number of pages
@@ -36,7 +37,8 @@ let totalPages = 1; // Total number of pages
 async function fetchInstructors() {
   const querySnapshot = await getDocs(collection(db, 'instructors'));
   instructors = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  totalPages = Math.ceil(instructors.length / itemsPerPage);
+  filteredInstructors = instructors; // Initialize with all instructors
+  totalPages = Math.ceil(filteredInstructors.length / itemsPerPage);
   renderInstructors(); // Render the first page
   updatePaginationControls(); // Update pagination controls
 }
@@ -46,7 +48,7 @@ function renderInstructors() {
   instructorList.innerHTML = '';
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
-  const paginatedInstructors = instructors.slice(start, end);
+  const paginatedInstructors = filteredInstructors.slice(start, end);
 
   paginatedInstructors.forEach(instructor => {
     const row = document.createElement('tr');
@@ -221,42 +223,16 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', async func
     }
 });
 
-
 // Search instructors by name
 function searchInstructors(event) {
   const query = event.target.value.toLowerCase();
-  const filteredInstructors = instructors.filter(instructor =>
+  filteredInstructors = instructors.filter(instructor =>
     instructor.name.toLowerCase().startsWith(query)
   );
-  renderFilteredInstructors(filteredInstructors);
-}
-
-function renderFilteredInstructors(filteredInstructors) {
-  instructorList.innerHTML = '';
-  const start = (currentPage - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  const paginatedInstructors = filteredInstructors.slice(start, end);
-
-  paginatedInstructors.forEach(instructor => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${instructor.name}</td>
-      <td>${instructor.course}</td>
-      <td>
-        <div class="dropdown">
-          <button class="three-dots-button"><i class="bi bi-three-dots"></i></button>
-          <div class="dropdown-content">
-            <button class="dropdown-item" data-id="${instructor.id}">Edit</button>
-            <button class="dropdown-item" data-id="${instructor.id}">Delete</button>
-            <button class="dropdown-item">Cancel</button>
-          </div>
-        </div>
-      </td>
-    `;
-    instructorList.appendChild(row);
-  });
-
-  handleDropdowns(); // Re-apply dropdown functionality
+  currentPage = 1; // Reset to first page after search
+  totalPages = Math.ceil(filteredInstructors.length / itemsPerPage);
+  renderInstructors();
+  updatePaginationControls();
 }
 
 // Event Listeners

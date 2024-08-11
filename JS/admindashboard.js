@@ -107,11 +107,15 @@ async function fetchBookings() {
     updatePaginationControls('cancelled');
 }
 
+// Global variables to hold filtered bookings
+let filteredBookingsUpcoming = [];
+let filteredBookingsCancelled = [];
+
 // Display the bookings for the current page
-function displayBookings(type) {
+function displayBookings(type, isFiltered = false) {
     const list = type === 'upcoming' ? document.querySelector('.upcoming-list') : document.querySelector('.cancelled-list');
     const currentPage = type === 'upcoming' ? currentPageUpcoming : currentPageCancelled;
-    const allBookings = type === 'upcoming' ? allBookingsUpcoming : allBookingsCancelled;
+    const allBookings = isFiltered ? (type === 'upcoming' ? filteredBookingsUpcoming : filteredBookingsCancelled) : (type === 'upcoming' ? allBookingsUpcoming : allBookingsCancelled);
 
     list.innerHTML = '';
 
@@ -188,16 +192,18 @@ function searchBookings() {
     searchInput.forEach(input => {
         input.addEventListener('input', () => {
             const searchTerm = input.value.toLowerCase();
-            const rows = input.closest('.title-header').nextElementSibling.querySelectorAll('tbody tr');
 
-            rows.forEach(row => {
-                const name = row.querySelector('td:first-child').textContent.toLowerCase();
-                if (name.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+            // Filter the entire dataset based on the search term
+            filteredBookingsUpcoming = allBookingsUpcoming.filter(rowHtml => rowHtml.toLowerCase().includes(searchTerm));
+            filteredBookingsCancelled = allBookingsCancelled.filter(rowHtml => rowHtml.toLowerCase().includes(searchTerm));
+
+            // Reset pagination and display the filtered results
+            currentPageUpcoming = 1;
+            currentPageCancelled = 1;
+            displayBookings('upcoming', true);
+            displayBookings('cancelled', true);
+            updatePaginationControls('upcoming');
+            updatePaginationControls('cancelled');
         });
     });
 }
@@ -209,16 +215,24 @@ function filterByCourse() {
     courseFilters.forEach(filter => {
         filter.addEventListener('change', () => {
             const selectedCourse = filter.value;
-            const rows = filter.closest('.title-header').nextElementSibling.querySelectorAll('tbody tr');
 
-            rows.forEach(row => {
-                const course = row.querySelector('td:nth-child(2)').textContent;
-                if (selectedCourse === '' || course === selectedCourse) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+            // Filter the entire dataset based on the selected course
+            filteredBookingsUpcoming = allBookingsUpcoming.filter(rowHtml => {
+                const course = rowHtml.split('<td>')[2].split('</td>')[0]; // Extract course from the rowHtml
+                return selectedCourse === '' || course === selectedCourse;
             });
+            filteredBookingsCancelled = allBookingsCancelled.filter(rowHtml => {
+                const course = rowHtml.split('<td>')[2].split('</td>')[0]; // Extract course from the rowHtml
+                return selectedCourse === '' || course === selectedCourse;
+            });
+
+            // Reset pagination and display the filtered results
+            currentPageUpcoming = 1;
+            currentPageCancelled = 1;
+            displayBookings('upcoming', true);
+            displayBookings('cancelled', true);
+            updatePaginationControls('upcoming');
+            updatePaginationControls('cancelled');
         });
     });
 }
