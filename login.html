@@ -13,7 +13,7 @@
 <body>
     <div class="top-section">
         <nav>
-            <a href="index.html" class="navbar-left" >
+            <a href="index.html" class="navbar-left">
                 <img src="assets/logo.png" class="b3slogo" alt="B3S Logo">
                 <div class="brand-name">
                     <span class="brand-title">B3S</span>
@@ -54,6 +54,23 @@
         </div>
     </main>
 
+    <!-- Notification Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body" id="notificationMessage">
+                    <!-- Notification message will be set dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
@@ -65,12 +82,12 @@
     
         document.addEventListener('DOMContentLoaded', () => {
             const firebaseConfig = {
-              apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
-              authDomain: "authentication-d6496.firebaseapp.com",
-              projectId: "authentication-d6496",
-              storageBucket: "authentication-d6496.appspot.com",
-              messagingSenderId: "195867894399",
-              appId: "1:195867894399:web:596fb109d308aea8b6154a"
+                apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+                authDomain: "authentication-d6496.firebaseapp.com",
+                projectId: "authentication-d6496",
+                storageBucket: "authentication-d6496.appspot.com",
+                messagingSenderId: "195867894399",
+                appId: "1:195867894399:web:596fb109d308aea8b6154a"
             };
     
             // Initialize Firebase
@@ -97,7 +114,11 @@
                     window.location.href = 'userdashboard.html';
                 } catch (error) {
                     const errorMessage = error.message;
-                    alert(errorMessage);
+                    
+                    // Show error modal notification
+                    document.getElementById('notificationMessage').textContent = errorMessage;
+                    const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+                    notificationModal.show();
                 }
             });
         });

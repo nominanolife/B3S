@@ -329,7 +329,6 @@ h2 {
     color: white;
 }
 
-
 /* Set background color for section bodies */
 .course-body, .slots-body, .available-slots-body {
     background-color: white;
@@ -339,6 +338,36 @@ h2 {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow for depth */
 }
 
+.table td {
+    vertical-align: middle;;
+}
+
+/* Center the text in the "Action" header */
+.table th:last-child {
+    text-align: center;
+}
+
+/* Center the content (buttons) in the "Action" column cells */
+.table td:last-child {
+    text-align: center;
+}
+
+/* Style the action buttons to ensure they are properly centered */
+.table td:last-child .btn-edit,
+.table td:last-child .btn-delete {
+    display: inline-block;
+    margin: 0 5px; /* Optional: Space between the buttons */
+    text-align: center;
+}
+
+.table th:nth-child(5) {
+    text-align: center;
+}
+
+/* Center the content in the "Slots" column */
+.table td:nth-child(5) {
+    text-align: center;
+}
 
 /* Media query for smaller screens */
 @media (max-width: 768px) {

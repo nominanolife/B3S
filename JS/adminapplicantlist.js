@@ -37,28 +37,6 @@ async function fetchApplicants() {
     }
 }
 
-function handleDropdowns() {
-    document.querySelectorAll('.three-dots-button').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent event from bubbling up
-            closeAllDropdowns(); // Close any other open dropdowns
-            const dropdown = this.nextElementSibling;
-            dropdown.classList.toggle('show');
-        });
-    });
-
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function() {
-        closeAllDropdowns();
-    });
-
-    function closeAllDropdowns() {
-        document.querySelectorAll('.dropdown-content').forEach(dropdown => {
-            dropdown.classList.remove('show');
-        });
-    }
-}
-
 // Function to render applicants based on the current page
 function renderApplicants() {
     const contentElement = document.querySelector('.applicant-list');
@@ -79,56 +57,13 @@ function renderApplicants() {
                 <td class="table-row-content">${applicant.email}</td>
                 <td class="table-row-content">${applicant.phoneNumber}</td>
                 <td class="table-row-content">
-                    <div class="dropdown">
-                        <button class="three-dots-button" type="button"><i class="bi bi-three-dots"></i></button>
-                        <div class="dropdown-content">
-                            <button class="dropdown-item">Edit</button>
-                            <button class="dropdown-item">Send SMS</button>
-                        </div>
-                    </div>
+                    <button class="dropdown-item">Send SMS</button>
                 </td>
             </tr>
         `;
         contentElement.insertAdjacentHTML('beforeend', rowHtml);
     });
-
-    handleDropdowns();
 }
-
-// Function to handle action dropdown
-function handleDropdowns() {
-    document.querySelectorAll('.three-dots-button').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent event from bubbling up
-
-            const dropdown = this.nextElementSibling;
-            const isDropdownOpen = dropdown.classList.contains('show');
-
-            closeAllDropdowns(); // Close any other open dropdowns
-
-            // Toggle the clicked dropdown
-            if (!isDropdownOpen) {
-                dropdown.classList.add('show');
-            } else {
-                dropdown.classList.remove('show');
-            }
-        });
-    });
-
-    function closeAllDropdowns() {
-        document.querySelectorAll('.dropdown-content').forEach(dropdown => {
-            dropdown.classList.remove('show');
-        });
-    }
-
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.dropdown')) {
-            closeAllDropdowns();
-        }
-    });
-}
-
 
 // Function to update pagination controls
 function updatePaginationControls() {
