@@ -61,175 +61,192 @@
         </div>
     </div>
 
+    <div id="customModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); padding:20px; background-color:white; border:1px solid #ccc; z-index:1000;">
+    <div id="customModalMessage"></div>
+    <button onclick="closeModal()">Close</button>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="JS/verify phone.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-    
-        const firebaseConfig = {
-            apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
-            authDomain: "authentication-d6496.firebaseapp.com",
-            databaseURL: "https://authentication-d6496-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "authentication-d6496",
-            storageBucket: "authentication-d6496.appspot.com",
-            messagingSenderId: "195867894399",
-            appId: "1:195867894399:web:596fb109d308aea8b6154a"
-        };
-    
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const firestore = getFirestore(app);
-    
-        let resendTimeout;
-    
-        function startResendCooldown(initialTimeLeft = 60) {
-        const resendCodeLink = document.getElementById('resendCode');
-        const countdownElement = document.getElementById('resendCountdown');
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+            import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+            import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+        
+            const firebaseConfig = {
+                apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+                authDomain: "authentication-d6496.firebaseapp.com",
+                databaseURL: "https://authentication-d6496-default-rtdb.asia-southeast1.firebasedatabase.app",
+                projectId: "authentication-d6496",
+                storageBucket: "authentication-d6496.appspot.com",
+                messagingSenderId: "195867894399",
+                appId: "1:195867894399:web:596fb109d308aea8b6154a"
+            };
+        
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const firestore = getFirestore(app);
+        
+            let resendTimeout;
+        
+            function startResendCooldown(initialTimeLeft = 60) {
+            const resendCodeLink = document.getElementById('resendCode');
+            const countdownElement = document.getElementById('resendCountdown');
 
-        resendCodeLink.style.display = 'none'; // Hide the Resend Code link
-        countdownElement.style.display = 'block'; // Show the countdown element
+            resendCodeLink.style.display = 'none'; // Hide the Resend Code link
+            countdownElement.style.display = 'block'; // Show the countdown element
 
-        let timeLeft = initialTimeLeft;
-        countdownElement.textContent = `You can resend the code in ${timeLeft} seconds.`;
-
-        // Clear any existing interval before starting a new one
-        if (resendTimeout) {
-            clearInterval(resendTimeout);
-        }
-
-        resendTimeout = setInterval(() => {
-            timeLeft--;
+            let timeLeft = initialTimeLeft;
             countdownElement.textContent = `You can resend the code in ${timeLeft} seconds.`;
-            if (timeLeft <= 0) {
+
+            // Clear any existing interval before starting a new one
+            if (resendTimeout) {
                 clearInterval(resendTimeout);
-                resendCodeLink.style.display = 'block'; // Show the Resend Code link
-                countdownElement.style.display = 'none'; // Hide the countdown element
-                resendCodeLink.addEventListener('click', resendCode);
             }
-        }, 1000);
-        }
-    
-        function resendCode(event) {
-            event.preventDefault(); // Prevent default link behavior
-    
-            const phoneNumber = localStorage.getItem('phoneNumber');
-            if (!/^\+[1-9]\d{1,14}$/.test(phoneNumber)) {
-                showModal('Invalid Phone Number Format. Please try again.');
-                return;
-            }
-    
-            const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                'size': 'invisible',
-                'callback': (response) => {
-                    // Do nothing, invisible reCAPTCHA will automatically trigger sendCode
-                }
-            });
-    
-            signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
-                .then((newConfirmationResult) => {
-                    localStorage.setItem('confirmationResult', JSON.stringify(newConfirmationResult));
-                    localStorage.setItem('codeSentTime', Date.now());
-                    showModal('Verification Code Sent Successfully.');
-                    startResendCooldown();
-                }).catch((error) => {
-                    console.error("Error during signInWithPhoneNumber", error);
-                    if (error.code === 'auth/too-many-requests') {
-                        showModal('Too many requests. Please try again later.');
-                    } else {
-                        showModal('Error sending verification code. Please try again.');
-                    }
-                });
-        }
-    
-        window.addEventListener('load', () => {
-            const confirmationResultData = localStorage.getItem('confirmationResult');
-            if (!confirmationResultData) {
-                showModal('No confirmation result found. Please try sending the code again.');
-                return;
-            }
-    
-            let confirmationResult;
-            try {
-                confirmationResult = JSON.parse(confirmationResultData);
-            } catch (error) {
-                console.error('Error parsing confirmation result', error);
-                showModal('Error parsing confirmation result. Please try again.');
-                return;
-            }
-    
-            if (!confirmationResult.verificationId) {
-                showModal('Invalid confirmation result. Please try again.');
-                return;
-            }
-    
-            const verificationId = confirmationResult.verificationId;
-    
-            const codeSentTime = localStorage.getItem('codeSentTime');
-            if (codeSentTime) {
-                const elapsedTime = (Date.now() - parseInt(codeSentTime, 10)) / 1000;
-                const cooldownPeriod = 60;
-    
-                if (elapsedTime < cooldownPeriod) {
-                    startResendCooldown(cooldownPeriod - Math.floor(elapsedTime));
-                } else {
-                    const resendCodeLink = document.getElementById('resendCode');
+
+            resendTimeout = setInterval(() => {
+                timeLeft--;
+                countdownElement.textContent = `You can resend the code in ${timeLeft} seconds.`;
+                if (timeLeft <= 0) {
+                    clearInterval(resendTimeout);
                     resendCodeLink.style.display = 'block'; // Show the Resend Code link
-                    document.getElementById('resendCountdown').style.display = 'none'; // Hide the countdown element
+                    countdownElement.style.display = 'none'; // Hide the countdown element
                     resendCodeLink.addEventListener('click', resendCode);
                 }
-            } else {
-                startResendCooldown();
+            }, 1000);
             }
-    
-            document.getElementById('verifyButton').addEventListener('click', async () => {
-                const code = Array.from(document.querySelectorAll('.verification-code-input'))
-                    .map(input => input.value)
-                    .join('');
-    
-                const credential = PhoneAuthProvider.credential(verificationId, code);
-                try {
-                    const result = await signInWithCredential(auth, credential);
-                    const user = result.user;
-                    showModal('Phone Number Verified Successfully!');
-    
-                    const initialUid = localStorage.getItem('initialUid');
-                    if (initialUid) {
-                        await setDoc(doc(firestore, 'applicants', initialUid), {
-                            phoneNumber: user.phoneNumber
-                        }, { merge: true });
-                        window.location.href = 'personalinfo.html';
-                    } else {
-                        showModal('Error retrieving user information. Please try again.');
+        
+            function resendCode(event) {
+                event.preventDefault(); // Prevent default link behavior
+        
+                const phoneNumber = localStorage.getItem('phoneNumber');
+                if (!/^\+[1-9]\d{1,14}$/.test(phoneNumber)) {
+                    showModal('Invalid Phone Number Format. Please try again.');
+                    return;
+                }
+        
+                const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    'size': 'invisible',
+                    'callback': (response) => {
+                        // Do nothing, invisible reCAPTCHA will automatically trigger sendCode
                     }
+                });
+        
+                signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
+                    .then((newConfirmationResult) => {
+                        localStorage.setItem('confirmationResult', JSON.stringify(newConfirmationResult));
+                        localStorage.setItem('codeSentTime', Date.now());
+                        showModal('Verification Code Sent Successfully.');
+                        startResendCooldown();
+                    }).catch((error) => {
+                        console.error("Error during signInWithPhoneNumber", error);
+                        if (error.code === 'auth/too-many-requests') {
+                            showModal('Too many requests. Please try again later.');
+                        } else {
+                            showModal('Error sending verification code. Please try again.');
+                        }
+                    });
+            }
+        
+            window.addEventListener('load', () => {
+                const confirmationResultData = localStorage.getItem('confirmationResult');
+                if (!confirmationResultData) {
+                    showModal('No confirmation result found. Please try sending the code again.');
+                    return;
+                }
+        
+                let confirmationResult;
+                try {
+                    confirmationResult = JSON.parse(confirmationResultData);
                 } catch (error) {
-                    showModal('Error Verifying Code. Please try again.');
+                    console.error('Error parsing confirmation result', error);
+                    showModal('Error parsing confirmation result. Please try again.');
+                    return;
+                }
+        
+                if (!confirmationResult.verificationId) {
+                    showModal('Invalid confirmation result. Please try again.');
+                    return;
+                }
+        
+                const verificationId = confirmationResult.verificationId;
+        
+                const codeSentTime = localStorage.getItem('codeSentTime');
+                if (codeSentTime) {
+                    const elapsedTime = (Date.now() - parseInt(codeSentTime, 10)) / 1000;
+                    const cooldownPeriod = 60;
+        
+                    if (elapsedTime < cooldownPeriod) {
+                        startResendCooldown(cooldownPeriod - Math.floor(elapsedTime));
+                    } else {
+                        const resendCodeLink = document.getElementById('resendCode');
+                        resendCodeLink.style.display = 'block'; // Show the Resend Code link
+                        document.getElementById('resendCountdown').style.display = 'none'; // Hide the countdown element
+                        resendCodeLink.addEventListener('click', resendCode);
+                    }
+                } else {
+                    startResendCooldown();
+                }
+        
+                document.getElementById('verifyButton').addEventListener('click', async () => {
+                    const code = Array.from(document.querySelectorAll('.verification-code-input'))
+                        .map(input => input.value)
+                        .join('');
+        
+                    const credential = PhoneAuthProvider.credential(verificationId, code);
+                    try {
+                        const result = await signInWithCredential(auth, credential);
+                        const user = result.user;
+                        showModal('Phone Number Verified Successfully!');
+        
+                        const initialUid = localStorage.getItem('initialUid');
+                        if (initialUid) {
+                            await setDoc(doc(firestore, 'applicants', initialUid), {
+                                phoneNumber: user.phoneNumber
+                            }, { merge: true });
+                            window.location.href = 'personalinfo.html';
+                        } else {
+                            showModal('Error retrieving user information. Please try again.');
+                        }
+                    } catch (error) {
+                        showModal('Error Verifying Code. Please try again.');
+                    }
+                });
+        
+                const returnLink = document.getElementById('returnLink');
+                if (returnLink) {
+                    returnLink.addEventListener('click', () => {
+                        localStorage.removeItem('confirmationResult');
+                        localStorage.removeItem('phoneNumber');
+                        localStorage.removeItem('codeSentTime');
+                        Array.from(document.querySelectorAll('.verification-code-input')).forEach(input => {
+                            input.value = '';
+                        });
+                    });
+                }
+        
+                const phoneSubmitButton = document.getElementById('phoneSubmitButton');
+                if (phoneSubmitButton) {
+                    phoneSubmitButton.addEventListener('click', () => {
+                        localStorage.setItem('codeSentTime', Date.now());
+                        startResendCooldown();
+                    });
                 }
             });
-    
-            const returnLink = document.getElementById('returnLink');
-            if (returnLink) {
-                returnLink.addEventListener('click', () => {
-                    localStorage.removeItem('confirmationResult');
-                    localStorage.removeItem('phoneNumber');
-                    localStorage.removeItem('codeSentTime');
-                    Array.from(document.querySelectorAll('.verification-code-input')).forEach(input => {
-                        input.value = '';
-                    });
-                });
+
+            function showModal(message) {
+                const modal = document.getElementById('customModal');
+                const modalMessage = document.getElementById('customModalMessage');
+                modalMessage.textContent = message;
+                modal.style.display = 'block';
             }
-    
-            const phoneSubmitButton = document.getElementById('phoneSubmitButton');
-            if (phoneSubmitButton) {
-                phoneSubmitButton.addEventListener('click', () => {
-                    localStorage.setItem('codeSentTime', Date.now());
-                    startResendCooldown();
-                });
+
+            function closeModal() {
+                const modal = document.getElementById('customModal');
+                modal.style.display = 'none';
             }
-        });
-    </script>
+        </script>
 </body>
 </html>

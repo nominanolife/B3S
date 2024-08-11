@@ -37,3 +37,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+function showModal(message) {
+    const modal = document.getElementById('customModal');
+    const modalMessage = document.getElementById('customModalMessage');
+    modalMessage.textContent = message;
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    const modal = document.getElementById('customModal');
+    modal.style.display = 'none';
+}
