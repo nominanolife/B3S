@@ -10,12 +10,17 @@ const firebaseConfig = {
     storageBucket: "authentication-d6496.appspot.com",
     messagingSenderId: "195867894399",
     appId: "1:195867894399:web:596fb109d308aea8b6154a"
-  };
+};
 
 // Initialize Firebase and Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
+// Disable the PDC element immediately on page load
+const pdcElement = document.querySelector('.pdc');
+pdcElement.classList.add('disabled');
+pdcElement.setAttribute('disabled', true);
 
 async function checkTDCProgress(userId) {
     const appointmentsRef = collection(db, "appointments");
@@ -44,8 +49,6 @@ async function checkTDCProgress(userId) {
         }
     });
 
-    const pdcElement = document.querySelector('.pdc');
-
     console.log(`TDC Completed: ${tdcCompleted}`);
     console.log(`PDC Element: ${pdcElement}`);
 
@@ -53,10 +56,6 @@ async function checkTDCProgress(userId) {
         console.log("Enabling PDC...");
         pdcElement.classList.remove('disabled');
         pdcElement.removeAttribute('disabled');
-    } else {
-        console.log("Disabling PDC...");
-        pdcElement.classList.add('disabled');
-        pdcElement.setAttribute('disabled', true);
     }
 }
 
