@@ -95,11 +95,11 @@
         function startResendCooldown(initialTimeLeft = 60) {
             const resendCodeLink = document.getElementById('resendCode');
             const countdownElement = document.getElementById('resendCountdown');
-            const sendCodeButton = document.getElementById('verifyButton');
+            const verifyButton = document.getElementById('verifyButton');
     
             resendCodeLink.style.display = 'none'; // Hide the Resend Code link
             countdownElement.style.display = 'block'; // Show the countdown element
-            sendCodeButton.disabled = true; // Disable the Send OTP button
+            verifyButton.disabled = true; // Disable the Send OTP button
     
             let timeLeft = initialTimeLeft;
             countdownElement.textContent = `You can resend the code in ${timeLeft} seconds.`;
@@ -115,7 +115,7 @@
                     clearInterval(resendTimeout);
                     resendCodeLink.style.display = 'block'; // Show the Resend Code link
                     countdownElement.style.display = 'none'; // Hide the countdown element
-                    sendCodeButton.disabled = false; // Keep the Send OTP button disabled
+                    verifyButton.disabled = false; // Keep the Send OTP button disabled
                     resendCodeLink.addEventListener('click', resendCode); // Ensure resendCode is called when clicked
                 }
             }, 1000);
