@@ -69,7 +69,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getFirestore, doc, setDoc, query, collection, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-        import { encryptData } from './cryptoUtils.js'; // Import the encryption function
     
         document.addEventListener('DOMContentLoaded', () => {
             const firebaseConfig = {
@@ -192,9 +191,9 @@
                         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // Expire in 24 hours
                     });
     
-                    // Store necessary data in sessionStorage using the centralized encryption utility
-                    sessionStorage.setItem('email', encryptData(email)); // Encrypt email
-                    sessionStorage.setItem('password', encryptData(password)); // Encrypt the original password
+                    // Store necessary data in sessionStorage
+                    sessionStorage.setItem('email', CryptoJS.AES.encrypt(email, 'your-secret-key').toString()); // Encrypt email
+                    sessionStorage.setItem('password', CryptoJS.AES.encrypt(password, 'your-secret-key').toString()); // Encrypt the original password
                     sessionStorage.setItem('tempDocId', tempDocId); // Store the generated tempDocId
     
                     // Redirect to phone verification page
