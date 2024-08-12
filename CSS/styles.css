@@ -405,9 +405,9 @@ h5 {
     color: #dc3545;
 }
 
-#modalMessage {
+#modalMessage, #notificationMessage {
     font-family: Poppins;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
 }
 
