@@ -63,8 +63,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-
+        import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
             authDomain: "authentication-d6496.firebaseapp.com",
@@ -73,25 +74,26 @@
             messagingSenderId: "195867894399",
             appId: "1:195867894399:web:596fb109d308aea8b6154a"
         };
-
+    
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
+    
         document.addEventListener('DOMContentLoaded', () => {
+            // Setup ReCAPTCHA
             const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                 'size': 'invisible',
                 'callback': () => sendCode() // Trigger sendCode function
             });
-
+    
             recaptchaVerifier.render().then((widgetId) => {
                 window.recaptchaWidgetId = widgetId;
             });
-
+    
             const phoneNumberInput = document.getElementById('phoneNumber');
             let debounceTimer;
-
+    
             // Debounce function to remove leading zero after 1 second
             const debounce = (func, delay) => {
                 return function(...args) {
@@ -99,7 +101,7 @@
                     debounceTimer = setTimeout(() => func.apply(this, args), delay);
                 };
             };
-
+    
             // Function to handle input changes
             const handleInputChange = () => {
                 let value = phoneNumberInput.value;
@@ -107,33 +109,46 @@
                     phoneNumberInput.value = value.slice(1);
                 }
             };
-
+    
             // Add input event listener with debounce
             phoneNumberInput.addEventListener('input', debounce(handleInputChange, 1000));
-
+    
             document.getElementById('phoneForm').addEventListener('submit', (event) => {
                 event.preventDefault(); // Prevent default form submission
-
+    
                 const sendCodeButton = document.getElementById('sendCodeButton');
-                const message = document.getElementById('message');
                 const phoneNumber = '+63' + phoneNumberInput.value.trim();
-
+                const tempDocId = sessionStorage.getItem('tempDocId'); // Retrieve the temporary document ID from session storage
+                const email = sessionStorage.getItem('email'); // Retrieve the email from session storage
+    
                 // Validate phone number format
                 if (!/^9\d{9}$/.test(phoneNumber.slice(3))) {
                     showModal('Invalid phone number format. Please enter a valid phone number.');
                     sendCodeButton.disabled = false;
                     return;
                 }
-
+    
                 sendCodeButton.disabled = true;
-
+    
                 signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
                     .then(async (confirmationResult) => {
                         window.confirmationResult = confirmationResult;
-                        localStorage.setItem('confirmationResult', JSON.stringify(confirmationResult));
-                        localStorage.setItem('phoneNumber', phoneNumber);
-                        localStorage.setItem('codeSentTime', Date.now());
-                        window.location.href = 'verifphone.html';
+                        sessionStorage.setItem('confirmationResult', JSON.stringify(confirmationResult));
+                        sessionStorage.setItem('phoneNumber', phoneNumber);
+                        sessionStorage.setItem('codeSentTime', Date.now());
+    
+                        // Update the Firestore document with the phone number and registration phase
+                        if (tempDocId) {
+                            await updateDoc(doc(db, 'temporaryRegistrations', tempDocId), {
+                                phoneNumber: phoneNumber,
+                                registrationPhase: 2
+                            });
+                        } else {
+                            console.error("tempDocId is missing from sessionStorage.");
+                            showModal('An error occurred. Please try again.');
+                        }
+    
+                        window.location.href = 'verifphone.html'; // Proceed to the next phase
                     })
                     .catch((error) => {
                         console.error("Error during signInWithPhoneNumber", error);
@@ -144,11 +159,16 @@
                         }
                         sendCodeButton.disabled = false;
                     });
-
+    
                 setTimeout(() => {
                     sendCodeButton.disabled = false;
                 }, 60000);
             });
+    
+            function showModal(message) {
+                document.getElementById('modalMessage').innerText = message;
+                $('#promptModal').modal('show');
+            }
         });
     </script>
 </body>

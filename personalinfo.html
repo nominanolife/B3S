@@ -103,9 +103,9 @@
     <script src="JS/personal info.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-
+        import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+    
         document.addEventListener('DOMContentLoaded', () => {
             const firebaseConfig = {
                 apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
@@ -115,20 +115,23 @@
                 messagingSenderId: "195867894399",
                 appId: "1:195867894399:web:596fb109d308aea8b6154a"
             };
-
+    
             // Initialize Firebase
             const app = initializeApp(firebaseConfig);
             const firestore = getFirestore(app);
             const auth = getAuth();
-
+    
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    const initialUid = localStorage.getItem('initialUid');
-                    const email = localStorage.getItem('email');
-                    if (initialUid) {
+                    const tempDocId = sessionStorage.getItem('tempDocId');
+                    const email = sessionStorage.getItem('email');
+                    const password = sessionStorage.getItem('password');
+                    const phoneNumber = sessionStorage.getItem('phoneNumber');
+    
+                    if (tempDocId && email && phoneNumber) {
+                        const initialUid = user.uid;
                         const docRef = doc(firestore, 'applicants', initialUid);
-                        const docSnap = await getDoc(docRef);
-
+    
                         document.querySelector('#saveBtn').addEventListener('click', async () => {
                             const first = document.getElementById('first').value.trim();
                             const middle = document.getElementById('middle').value.trim();
@@ -138,33 +141,28 @@
                             const age = document.getElementById('age').value;
                             const address = document.getElementById('address').value.trim();
                             const status = document.querySelector('input[name="status"]:checked')?.value;
-
+    
                             // Validate form fields
-                            if (!first) {
-                                alert('First Name is required.');
+                            if (!first || !last || !birthday || !address || !status) {
+                                alert('All required fields must be filled out.');
                                 return;
                             }
-                            if (!last) {
-                                alert('Last Name is required.');
-                                return;
-                            }
-                            if (!birthday) {
-                                alert('Birthday is required.');
-                                return;
-                            }
-                            if (!address) {
-                                alert('Address is required.');
-                                return;
-                            }
-                            if (!status) {
-                                alert('Civil Status is required.');
-                                return;
-                            }
-
+    
                             try {
+                                // Add user to Firebase Authentication
+                                try {
+                                    await createUserWithEmailAndPassword(auth, email, password);
+                                } catch (authError) {
+                                    console.error("Authentication error:", authError);
+                                    alert('Failed to create authentication profile: ' + authError.message);
+                                    return;
+                                }
+    
+                                // Save personal information to Firestore
                                 await setDoc(docRef, {
-                                    email: email, // Save the email
-                                    role: 'applicant', // Save the role as 'applicant'
+                                    email: email,
+                                    phoneNumber: phoneNumber,
+                                    role: 'applicant',
                                     personalInfo: {
                                         first: first,
                                         middle: middle,
@@ -176,19 +174,18 @@
                                         status: status
                                     }
                                 }, { merge: true });
-
+    
                                 // Show success modal notification
                                 document.getElementById('notificationMessage').textContent = "Personal Information Saved Successfully!";
                                 const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
                                 notificationModal.show();
-
-                                // Clear localStorage after saving data
-                                localStorage.removeItem('initialUid');
-                                localStorage.removeItem('email');
-                                localStorage.removeItem('phoneNumber');
-                                localStorage.removeItem('confirmationResult');
-                                localStorage.removeItem('codeSentTime', Date.now());
-
+    
+                                // Clear sessionStorage after saving data
+                                sessionStorage.clear();
+    
+                                // Delete the temporary document in Firestore
+                                await deleteDoc(doc(firestore, 'temporaryRegistrations', tempDocId));
+    
                                 setTimeout(() => {
                                     window.location.href = 'login.html';  // Navigate to login page after a short delay
                                 }, 3500);
@@ -197,7 +194,7 @@
                             }
                         });
                     } else {
-                        console.error("Initial UID not found in localStorage");
+                        console.error("Required user information not found in sessionStorage");
                         alert('Error retrieving user information. Please try again.');
                     }
                 } else {
@@ -206,5 +203,6 @@
             });
         });
     </script>
+    
 </body>
 </html>
