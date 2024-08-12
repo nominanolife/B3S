@@ -104,6 +104,11 @@ async function fetchUserAppointments(userId) {
                         const appointmentDate = new Date(appointment.date + 'T' + appointment.timeStart);
                         const currentDate = new Date();
 
+                        // Set initial progress to "Not yet Started" if not already set
+                        if (!booking.progress) {
+                            booking.progress = 'Not yet Started';
+                        }
+
                         // Check if it's the appointment date
                         if (currentDate.toDateString() === appointmentDate.toDateString() && booking.progress !== "In Progress") {
                             // Update the booking progress to "In Progress"
