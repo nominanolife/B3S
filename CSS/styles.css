@@ -331,8 +331,7 @@ h5 {
 #modalMessage {
     font-family: Poppins;
     font-size: 12px;
-    font-weight: bold;
-    color: #dc3545;
+    font-weight: 500;
 }
 
 /* Ensure error messages are styled clearly */

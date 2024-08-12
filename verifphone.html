@@ -112,6 +112,7 @@
             timeLeft--;
             countdownElement.textContent = `You can resend the code in ${timeLeft} seconds.`;
             if (timeLeft <= 0) {
+
                 clearInterval(resendTimeout);
                 resendCodeLink.style.display = 'block'; // Show the Resend Code link
                 countdownElement.style.display = 'none'; // Hide the countdown element
