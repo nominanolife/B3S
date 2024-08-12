@@ -101,117 +101,120 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script src="JS/personal info.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-        import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-        import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-    
-        document.addEventListener('DOMContentLoaded', () => {
-            const firebaseConfig = {
-                apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
-                authDomain: "authentication-d6496.firebaseapp.com",
-                projectId: "authentication-d6496",
-                storageBucket: "authentication-d6496.appspot.com",
-                messagingSenderId: "195867894399",
-                appId: "1:195867894399:web:596fb109d308aea8b6154a"
-            };
-    
-            // Initialize Firebase
-            const app = initializeApp(firebaseConfig);
-            const firestore = getFirestore(app);
-            const auth = getAuth();
-    
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    // Retrieve encrypted data from sessionStorage
-                    const tempDocId = sessionStorage.getItem('tempDocId');
-                    const encryptedEmail = sessionStorage.getItem('email');
-                    const encryptedPassword = sessionStorage.getItem('password');
-                    const encryptedPhoneNumber = sessionStorage.getItem('phoneNumber');
-    
-                    if (tempDocId && encryptedEmail && encryptedPhoneNumber && encryptedPassword) {
-                        // Decrypt the sensitive data
-                        const email = CryptoJS.AES.decrypt(encryptedEmail, 'your-secret-key').toString(CryptoJS.enc.Utf8);
-                        const password = CryptoJS.AES.decrypt(encryptedPassword, 'your-secret-key').toString(CryptoJS.enc.Utf8);
-                        const phoneNumber = CryptoJS.AES.decrypt(encryptedPhoneNumber, 'your-secret-key').toString(CryptoJS.enc.Utf8);
-    
-                        // Get the user's UID (unique identifier)
-                        const initialUid = user.uid;
-                        const docRef = doc(firestore, 'applicants', initialUid);
-    
-                        document.querySelector('#saveBtn').addEventListener('click', async () => {
-                            // Retrieve form data
-                            const first = document.getElementById('first').value.trim();
-                            const middle = document.getElementById('middle').value.trim();
-                            const last = document.getElementById('last').value.trim();
-                            const suffix = document.getElementById('suffix').value.trim();
-                            const birthday = document.getElementById('birthday').value;
-                            const age = document.getElementById('age').value;
-                            const address = document.getElementById('address').value.trim();
-                            const status = document.querySelector('input[name="status"]:checked')?.value;
-    
-                            // Validate form fields
-                            if (!first || !last || !birthday || !address || !status) {
-                                alert('All required fields must be filled out.');
+<script src="JS/personal info.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+    import { encryptData, decryptData } from './cryptoUtils.js'; // Import encryption and decryption functions
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const firebaseConfig = {
+            apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+            authDomain: "authentication-d6496.firebaseapp.com",
+            projectId: "authentication-d6496",
+            storageBucket: "authentication-d6496.appspot.com",
+            messagingSenderId: "195867894399",
+            appId: "1:195867894399:web:596fb109d308aea8b6154a"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const firestore = getFirestore(app);
+        const auth = getAuth();
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Retrieve encrypted data from sessionStorage
+                const tempDocId = sessionStorage.getItem('tempDocId');
+                const encryptedEmail = sessionStorage.getItem('email');
+                const encryptedPassword = sessionStorage.getItem('password');
+                const encryptedPhoneNumber = sessionStorage.getItem('phoneNumber');
+
+                if (tempDocId && encryptedEmail && encryptedPhoneNumber && encryptedPassword) {
+                    // Decrypt the sensitive data using centralized decryption function
+                    const email = decryptData(encryptedEmail); 
+                    const password = decryptData(encryptedPassword); 
+                    const phoneNumber = decryptData(encryptedPhoneNumber); 
+                    console.log("Decrypted Email:", email);
+                    console.log("Decrypted Password:", password);
+
+                    // Get the user's UID (unique identifier)
+                    const initialUid = user.uid;
+                    const docRef = doc(firestore, 'applicants', initialUid);
+
+                    document.querySelector('#saveBtn').addEventListener('click', async () => {
+                        // Retrieve form data
+                        const first = document.getElementById('first').value.trim();
+                        const middle = document.getElementById('middle').value.trim();
+                        const last = document.getElementById('last').value.trim();
+                        const suffix = document.getElementById('suffix').value.trim();
+                        const birthday = document.getElementById('birthday').value;
+                        const age = document.getElementById('age').value;
+                        const address = document.getElementById('address').value.trim();
+                        const status = document.querySelector('input[name="status"]:checked')?.value;
+
+                        // Validate form fields
+                        if (!first || !last || !birthday || !address || !status) {
+                            alert('All required fields must be filled out.');
+                            return;
+                        }
+
+                        try {
+                            // Create a new user in Firebase Authentication
+                            try {
+                                await createUserWithEmailAndPassword(auth, email, password);
+                            } catch (authError) {
+                                console.error("Authentication error:", authError);
+                                alert('Failed to create authentication profile: ' + authError.message);
                                 return;
                             }
-    
-                            try {
-                                // Create a new user in Firebase Authentication
-                                try {
-                                    await createUserWithEmailAndPassword(auth, email, password);
-                                } catch (authError) {
-                                    console.error("Authentication error:", authError);
-                                    alert('Failed to create authentication profile: ' + authError.message);
-                                    return;
+
+                            // Save the personal information to Firestore
+                            await setDoc(docRef, {
+                                email: email,
+                                phoneNumber: phoneNumber,
+                                role: 'applicant',
+                                personalInfo: {
+                                    first: first,
+                                    middle: middle,
+                                    last: last,
+                                    suffix: suffix,
+                                    birthday: birthday,
+                                    age: age,
+                                    address: address,
+                                    status: status
                                 }
-    
-                                // Save the personal information to Firestore
-                                await setDoc(docRef, {
-                                    email: email,
-                                    phoneNumber: phoneNumber,
-                                    role: 'applicant',
-                                    personalInfo: {
-                                        first: first,
-                                        middle: middle,
-                                        last: last,
-                                        suffix: suffix,
-                                        birthday: birthday,
-                                        age: age,
-                                        address: address,
-                                        status: status
-                                    }
-                                }, { merge: true });
-    
-                                // Show success modal notification
-                                document.getElementById('notificationMessage').textContent = "Personal Information Saved Successfully!";
-                                const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
-                                notificationModal.show();
-    
-                                // Clear sessionStorage after saving data
-                                sessionStorage.clear();
-    
-                                // Delete the temporary document in Firestore
-                                await deleteDoc(doc(firestore, 'temporaryRegistrations', tempDocId));
-    
-                                // Redirect to the login page after a short delay
-                                setTimeout(() => {
-                                    window.location.href = 'login.html';
-                                }, 3500);
-                            } catch (error) {
-                                alert('Failed to Save Personal Information: ' + error.message);
-                            }
-                        });
-                    } else {
-                        console.error("Required user information not found in sessionStorage");
-                        alert('Error retrieving user information. Please try again.');
-                    }
+                            }, { merge: true });
+
+                            // Show success modal notification
+                            document.getElementById('notificationMessage').textContent = "Personal Information Saved Successfully!";
+                            const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+                            notificationModal.show();
+
+                            // Clear sessionStorage after saving data
+                            sessionStorage.clear();
+
+                            // Delete the temporary document in Firestore
+                            await deleteDoc(doc(firestore, 'temporaryRegistrations', tempDocId));
+
+                            // Redirect to the login page after a short delay
+                            setTimeout(() => {
+                                window.location.href = 'login.html';
+                            }, 3500);
+                        } catch (error) {
+                            alert('Failed to Save Personal Information: ' + error.message);
+                        }
+                    });
                 } else {
-                    window.location.href = 'login.html';
+                    console.error("Required user information not found in sessionStorage");
+                    alert('Error retrieving user information. Please try again.');
                 }
-            });
+            } else {
+                window.location.href = 'login.html';
+            }
         });
-    </script>
+    });
+</script>
 </body>
 </html>

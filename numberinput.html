@@ -65,6 +65,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
         import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+        import { encryptData, decryptData } from './cryptoUtils.js'; // Import encryption and decryption functions
     
         // Firebase configuration
         const firebaseConfig = {
@@ -123,7 +124,7 @@
                 const encryptedEmail = sessionStorage.getItem('email'); // Retrieve the encrypted email from session storage
     
                 // Decrypt the email before using it
-                const email = CryptoJS.AES.decrypt(encryptedEmail, 'your-secret-key').toString(CryptoJS.enc.Utf8);
+                const email = decryptData(encryptedEmail); // Use centralized decryption function
     
                 // Validate phone number format
                 if (!/^9\d{9}$/.test(phoneNumber.slice(3))) {
@@ -137,8 +138,8 @@
                 signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
                     .then(async (confirmationResult) => {
                         window.confirmationResult = confirmationResult;
-                        sessionStorage.setItem('confirmationResult', CryptoJS.AES.encrypt(JSON.stringify(confirmationResult), 'your-secret-key').toString());
-                        sessionStorage.setItem('phoneNumber', CryptoJS.AES.encrypt(phoneNumber, 'your-secret-key').toString());
+                        sessionStorage.setItem('confirmationResult', encryptData(JSON.stringify(confirmationResult))); // Use centralized encryption function
+                        sessionStorage.setItem('phoneNumber', encryptData(phoneNumber)); // Use centralized encryption function
                         sessionStorage.setItem('codeSentTime', Date.now());
     
                         // Update the Firestore document with the phone number and registration phase
