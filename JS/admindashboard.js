@@ -46,10 +46,10 @@ async function fetchBookings() {
         const appointmentData = appointmentDoc.data();
         let bookings = appointmentData.bookings;
 
-        // If bookings is not an array, log an error and treat it as an empty array
-        if (!Array.isArray(bookings)) {
-            console.error(`Bookings is not an array for document ID: ${appointmentDoc.id}`);
-            bookings = []; // Fallback to an empty array
+        // If bookings is not an array or is empty, log a message and skip this appointment
+        if (!Array.isArray(bookings) || bookings.length === 0) {
+            console.log(`No bookings found for document ID: ${appointmentDoc.id}`);
+            continue; // Skip this appointment
         }
 
         const course = appointmentData.course; // Extract course information from the main document
@@ -58,9 +58,20 @@ async function fetchBookings() {
         for (const booking of bookings) {
             // Fetch the applicant's information based on the userId in the booking
             const applicantDoc = await getDoc(doc(db, "applicants", booking.userId));
-            const applicantData = applicantDoc.data();
+            let fullName = '';  // Define fullName outside of the if block
 
-            const fullName = `${applicantData.personalInfo.first} ${applicantData.personalInfo.middle} ${applicantData.personalInfo.last} ${applicantData.personalInfo.suffix ? applicantData.personalInfo.suffix : ''}`.trim();
+            if (applicantDoc.exists()) {
+                const applicantData = applicantDoc.data();
+                if (applicantData && applicantData.personalInfo) {
+                    fullName = `${applicantData.personalInfo.first} ${applicantData.personalInfo.middle} ${applicantData.personalInfo.last} ${applicantData.personalInfo.suffix ? applicantData.personalInfo.suffix : ''}`.trim();
+                } else {
+                    console.warn(`Applicant data is missing or malformed for userId: ${booking.userId}`);
+                    continue; // Skip this booking
+                }
+            } else {
+                console.log(`Account for userId: ${booking.userId} has been deleted. Ignoring this booking.`);
+                continue; // Skip this booking
+            }
 
             // Convert time to 12-hour format if timeSlot exists
             let formattedTime = '';

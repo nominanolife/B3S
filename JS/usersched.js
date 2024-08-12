@@ -81,7 +81,6 @@ function showConfirmationModal(action, callback, redirectUrl) {
     }
 }
 
-// Function to fetch user appointments and listen for real-time updates
 async function fetchUserAppointments(userId) {
     try {
         const appointmentsRef = collection(db, "appointments");
@@ -109,8 +108,13 @@ async function fetchUserAppointments(userId) {
                             booking.progress = 'Not yet Started';
                         }
 
-                        // Check if it's the appointment date
-                        if (currentDate.toDateString() === appointmentDate.toDateString() && booking.progress !== "In Progress") {
+                        // Check if it's the appointment date and the status is not Cancelled or Rescheduled
+                        if (
+                            currentDate.toDateString() === appointmentDate.toDateString() &&
+                            booking.progress !== "In Progress" &&
+                            booking.status !== "Cancelled" &&
+                            booking.status !== "Rescheduled"
+                        ) {
                             // Update the booking progress to "In Progress"
                             updateBookingProgress(doc.id, booking.userId, 'In Progress');
                             booking.progress = 'In Progress'; // Update the local booking progress
