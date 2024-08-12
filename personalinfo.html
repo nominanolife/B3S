@@ -100,6 +100,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="JS/personal info.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
@@ -123,16 +124,24 @@
     
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
+                    // Retrieve encrypted data from sessionStorage
                     const tempDocId = sessionStorage.getItem('tempDocId');
-                    const email = sessionStorage.getItem('email');
-                    const password = sessionStorage.getItem('password');
-                    const phoneNumber = sessionStorage.getItem('phoneNumber');
+                    const encryptedEmail = sessionStorage.getItem('email');
+                    const encryptedPassword = sessionStorage.getItem('password');
+                    const encryptedPhoneNumber = sessionStorage.getItem('phoneNumber');
     
-                    if (tempDocId && email && phoneNumber) {
+                    if (tempDocId && encryptedEmail && encryptedPhoneNumber && encryptedPassword) {
+                        // Decrypt the sensitive data
+                        const email = CryptoJS.AES.decrypt(encryptedEmail, 'your-secret-key').toString(CryptoJS.enc.Utf8);
+                        const password = CryptoJS.AES.decrypt(encryptedPassword, 'your-secret-key').toString(CryptoJS.enc.Utf8);
+                        const phoneNumber = CryptoJS.AES.decrypt(encryptedPhoneNumber, 'your-secret-key').toString(CryptoJS.enc.Utf8);
+    
+                        // Get the user's UID (unique identifier)
                         const initialUid = user.uid;
                         const docRef = doc(firestore, 'applicants', initialUid);
     
                         document.querySelector('#saveBtn').addEventListener('click', async () => {
+                            // Retrieve form data
                             const first = document.getElementById('first').value.trim();
                             const middle = document.getElementById('middle').value.trim();
                             const last = document.getElementById('last').value.trim();
@@ -149,7 +158,7 @@
                             }
     
                             try {
-                                // Add user to Firebase Authentication
+                                // Create a new user in Firebase Authentication
                                 try {
                                     await createUserWithEmailAndPassword(auth, email, password);
                                 } catch (authError) {
@@ -158,7 +167,7 @@
                                     return;
                                 }
     
-                                // Save personal information to Firestore
+                                // Save the personal information to Firestore
                                 await setDoc(docRef, {
                                     email: email,
                                     phoneNumber: phoneNumber,
@@ -186,8 +195,9 @@
                                 // Delete the temporary document in Firestore
                                 await deleteDoc(doc(firestore, 'temporaryRegistrations', tempDocId));
     
+                                // Redirect to the login page after a short delay
                                 setTimeout(() => {
-                                    window.location.href = 'login.html';  // Navigate to login page after a short delay
+                                    window.location.href = 'login.html';
                                 }, 3500);
                             } catch (error) {
                                 alert('Failed to Save Personal Information: ' + error.message);
@@ -203,6 +213,5 @@
             });
         });
     </script>
-    
 </body>
 </html>

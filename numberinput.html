@@ -60,6 +60,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
@@ -119,7 +120,10 @@
                 const sendCodeButton = document.getElementById('sendCodeButton');
                 const phoneNumber = '+63' + phoneNumberInput.value.trim();
                 const tempDocId = sessionStorage.getItem('tempDocId'); // Retrieve the temporary document ID from session storage
-                const email = sessionStorage.getItem('email'); // Retrieve the email from session storage
+                const encryptedEmail = sessionStorage.getItem('email'); // Retrieve the encrypted email from session storage
+    
+                // Decrypt the email before using it
+                const email = CryptoJS.AES.decrypt(encryptedEmail, 'your-secret-key').toString(CryptoJS.enc.Utf8);
     
                 // Validate phone number format
                 if (!/^9\d{9}$/.test(phoneNumber.slice(3))) {
@@ -133,8 +137,8 @@
                 signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
                     .then(async (confirmationResult) => {
                         window.confirmationResult = confirmationResult;
-                        sessionStorage.setItem('confirmationResult', JSON.stringify(confirmationResult));
-                        sessionStorage.setItem('phoneNumber', phoneNumber);
+                        sessionStorage.setItem('confirmationResult', CryptoJS.AES.encrypt(JSON.stringify(confirmationResult), 'your-secret-key').toString());
+                        sessionStorage.setItem('phoneNumber', CryptoJS.AES.encrypt(phoneNumber, 'your-secret-key').toString());
                         sessionStorage.setItem('codeSentTime', Date.now());
     
                         // Update the Firestore document with the phone number and registration phase

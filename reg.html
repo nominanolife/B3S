@@ -65,6 +65,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getFirestore, doc, setDoc, query, collection, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
@@ -156,20 +157,20 @@
     
                 // Validate Email
                 if (!validateEmail(email)) {
-                    alert('Please Enter a Valid Email Address.');
+                    showErrorMessage('emailError', 'Please Enter a Valid Email Address.');
                     return;
                 }
     
                 // Check for duplicate email
                 const emailExists = await checkEmailExists(email);
                 if (emailExists) {
-                    alert('This Email is Already Registered.');
+                    showErrorMessage('emailError', 'This Email is Already Registered.');
                     return;
                 }
     
                 // Ensure all password requirements are met
                 if (document.querySelectorAll('.requirement.invalid').length > 0) {
-                    alert('Please make sure your password meets all requirements.');
+                    showErrorMessage('passwordError', 'Please make sure your password meets all requirements.');
                     return;
                 }
     
@@ -177,23 +178,28 @@
                     // Generate a unique temporary ID
                     const tempDocId = generateTemporaryId();
     
+                    // Hash the password using SHA-256
+                    const hashedPassword = CryptoJS.SHA256(password).toString();
+    
                     // Create a document in Firestore to temporarily store the registration info
                     const tempDocRef = doc(firestore, "temporaryRegistrations", tempDocId);
                     await setDoc(tempDocRef, {
                         email: email,
-                        password: password,
-                        registrationPhase: 1
+                        password: hashedPassword, // Store the hashed password
+                        registrationPhase: 1,
+                        createdAt: new Date(),
+                        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // Expire in 24 hours
                     });
     
                     // Store necessary data in sessionStorage
-                    sessionStorage.setItem('email', email);
-                    sessionStorage.setItem('password', password);  // Store password securely
-                    sessionStorage.setItem('tempDocId', tempDocId);  // Store the generated tempDocId
+                    sessionStorage.setItem('email', CryptoJS.AES.encrypt(email, 'your-secret-key').toString()); // Encrypt email
+                    sessionStorage.setItem('password', CryptoJS.AES.encrypt(password, 'your-secret-key').toString()); // Encrypt the original password
+                    sessionStorage.setItem('tempDocId', tempDocId); // Store the generated tempDocId
     
                     // Redirect to phone verification page
                     window.location.replace('numberinput.html');
                 } catch (error) {
-                    alert('Error saving temporary registration: ' + error.message);
+                    showErrorMessage('formError', 'Error saving temporary registration: ' + error.message);
                 }
             });
     
@@ -207,7 +213,16 @@
                 const querySnapshot = await getDocs(userQuery);
                 return !querySnapshot.empty;
             }
+    
+            function showErrorMessage(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                } else {
+                    alert(message); // Fallback if error element is not found
+                }
+            }
         });
-    </script>   
+    </script>
 </body>
 </html>

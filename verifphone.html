@@ -69,20 +69,22 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="JS/verify phone.js"></script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
     
         const firebaseConfig = {
-            apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
-            authDomain: "authentication-d6496.firebaseapp.com",
-            projectId: "authentication-d6496",
-            storageBucket: "authentication-d6496.appspot.com",
-            messagingSenderId: "195867894399",
-            appId: "1:195867894399:web:596fb109d308aea8b6154a"
-        };
+                apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+                authDomain: "authentication-d6496.firebaseapp.com",
+                projectId: "authentication-d6496",
+                storageBucket: "authentication-d6496.appspot.com",
+                messagingSenderId: "195867894399",
+                appId: "1:195867894399:web:596fb109d308aea8b6154a"
+            };
     
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -93,9 +95,11 @@
         function startResendCooldown(initialTimeLeft = 60) {
             const resendCodeLink = document.getElementById('resendCode');
             const countdownElement = document.getElementById('resendCountdown');
+            const sendCodeButton = document.getElementById('verifyButton');
     
             resendCodeLink.style.display = 'none'; // Hide the Resend Code link
             countdownElement.style.display = 'block'; // Show the countdown element
+            sendCodeButton.disabled = true; // Disable the Send OTP button
     
             let timeLeft = initialTimeLeft;
             countdownElement.textContent = `You can resend the code in ${timeLeft} seconds.`;
@@ -111,7 +115,8 @@
                     clearInterval(resendTimeout);
                     resendCodeLink.style.display = 'block'; // Show the Resend Code link
                     countdownElement.style.display = 'none'; // Hide the countdown element
-                    resendCodeLink.addEventListener('click', resendCode);
+                    sendCodeButton.disabled = false; // Keep the Send OTP button disabled
+                    resendCodeLink.addEventListener('click', resendCode); // Ensure resendCode is called when clicked
                 }
             }, 1000);
         }
@@ -119,7 +124,9 @@
         function resendCode(event) {
             event.preventDefault(); // Prevent default link behavior
     
-            const phoneNumber = sessionStorage.getItem('phoneNumber');
+            const encryptedPhoneNumber = sessionStorage.getItem('phoneNumber');
+            const phoneNumber = CryptoJS.AES.decrypt(encryptedPhoneNumber, 'your-secret-key').toString(CryptoJS.enc.Utf8);
+    
             if (!/^\+[1-9]\d{1,14}$/.test(phoneNumber)) {
                 showModal('Invalid Phone Number Format. Please try again.');
                 return;
@@ -134,10 +141,10 @@
     
             signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
                 .then((newConfirmationResult) => {
-                    sessionStorage.setItem('confirmationResult', JSON.stringify(newConfirmationResult));
+                    sessionStorage.setItem('confirmationResult', CryptoJS.AES.encrypt(JSON.stringify(newConfirmationResult), 'your-secret-key').toString());
                     sessionStorage.setItem('codeSentTime', Date.now());
                     showModal('Verification Code Sent Successfully.');
-                    startResendCooldown();
+                    startResendCooldown(); // Restart the cooldown
                 }).catch((error) => {
                     console.error("Error during signInWithPhoneNumber", error);
                     if (error.code === 'auth/too-many-requests') {
@@ -157,7 +164,7 @@
     
             let confirmationResult;
             try {
-                confirmationResult = JSON.parse(confirmationResultData);
+                confirmationResult = JSON.parse(CryptoJS.AES.decrypt(confirmationResultData, 'your-secret-key').toString(CryptoJS.enc.Utf8));
             } catch (error) {
                 console.error('Error parsing confirmation result', error);
                 showModal('Error parsing confirmation result. Please try again.');
@@ -222,11 +229,11 @@
     
                     const { email, password } = tempDocSnapshot.data();
     
-                    // Store the UID, phone number, email, and password in session storage
-                    sessionStorage.setItem('uid', user.uid);
-                    sessionStorage.setItem('phoneNumber', user.phoneNumber);
-                    sessionStorage.setItem('email', email);
-                    sessionStorage.setItem('password', password);
+                    // Encrypt and store the UID, phone number, email, and password in session storage
+                    sessionStorage.setItem('uid', CryptoJS.AES.encrypt(user.uid, 'your-secret-key').toString());
+                    sessionStorage.setItem('phoneNumber', CryptoJS.AES.encrypt(user.phoneNumber, 'your-secret-key').toString());
+                    sessionStorage.setItem('email', CryptoJS.AES.encrypt(email, 'your-secret-key').toString());
+                    sessionStorage.setItem('password', CryptoJS.AES.encrypt(password, 'your-secret-key').toString());
     
                     // Move to the next phase
                     window.location.href = 'personalinfo.html'; // Adjust this URL to the next phase if necessary
@@ -262,7 +269,5 @@
             $('#promptModal').modal('show');
         }
     </script>
-    
-    
 </body>
 </html>
