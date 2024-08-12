@@ -12,6 +12,22 @@
 </head>
 <body>
     <main class="d-flex align-items-center">
+        <div class="progress-container">
+            <div class="step active">
+                <div class="bullet">1</div>
+                <div class="title">Registration</div>
+            </div>
+            <div class="line completed"></div>
+            <div class="step active">
+                <div class="bullet">2</div>
+                <div class="title">Verification</div>
+            </div>
+            <div class="line"></div>
+            <div class="step">
+                <div class="bullet">3</div>
+                <div class="title">Personal Information</div>
+            </div>
+        </div>
         <div class="container d-flex justify-content-center">
             <div class="card login-card">
                 <div class="card-body">
@@ -46,24 +62,18 @@
     </main>
 
     <!-- Modal for prompts -->
-    <div class="modal fade" id="promptModal" >
+    <div class="modal fade" id="promptModal" tabindex="-1" aria-labelledby="promptModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="promptModalLabel">Notification</h5>
                 </div>
-                <div class="modal-body" id="modalMessage">
-                </div>
+                <div class="modal-body" id="modalMessage"></div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div id="customModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); padding:20px; background-color:white; border:1px solid #ccc; z-index:1000;">
-        <div id="customModalMessage"></div>
-        <button onclick="closeModal()">Close</button>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -78,13 +88,13 @@
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
     
         const firebaseConfig = {
-                apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
-                authDomain: "authentication-d6496.firebaseapp.com",
-                projectId: "authentication-d6496",
-                storageBucket: "authentication-d6496.appspot.com",
-                messagingSenderId: "195867894399",
-                appId: "1:195867894399:web:596fb109d308aea8b6154a"
-            };
+            apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+            authDomain: "authentication-d6496.firebaseapp.com",
+            projectId: "authentication-d6496",
+            storageBucket: "authentication-d6496.appspot.com",
+            messagingSenderId: "195867894399",
+            appId: "1:195867894399:web:596fb109d308aea8b6154a"
+        };
     
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -95,17 +105,12 @@
         function startResendCooldown(initialTimeLeft = 60) {
             const resendCodeLink = document.getElementById('resendCode');
             const countdownElement = document.getElementById('resendCountdown');
-            const verifyButton = document.getElementById('verifyButton');
     
             resendCodeLink.style.display = 'none'; // Hide the Resend Code link
             countdownElement.style.display = 'block'; // Show the countdown element
     
             let timeLeft = initialTimeLeft;
             countdownElement.textContent = `You can resend the code in ${timeLeft} seconds.`;
-    
-            if (resendTimeout) {
-                clearInterval(resendTimeout);
-            }
     
             resendTimeout = setInterval(() => {
                 timeLeft--;
@@ -114,8 +119,6 @@
                     clearInterval(resendTimeout);
                     resendCodeLink.style.display = 'block'; // Show the Resend Code link
                     countdownElement.style.display = 'none'; // Hide the countdown element
-                    verifyButton.disabled = false; // Keep the Send Verify button disabled
-                    resendCodeLink.addEventListener('click', resendCode); // Ensure resendCode is called when clicked
                 }
             }, 1000);
         }
@@ -131,18 +134,17 @@
                 return;
             }
     
-            const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            const recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
                 'size': 'invisible',
                 'callback': (response) => {
-                    // Do nothing, invisible reCAPTCHA will automatically trigger sendCode
+                    // Invisible reCAPTCHA will automatically trigger sendCode
                 }
-            });
+            }, auth);
     
             signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
                 .then((newConfirmationResult) => {
                     sessionStorage.setItem('confirmationResult', CryptoJS.AES.encrypt(JSON.stringify(newConfirmationResult), 'your-secret-key').toString());
                     sessionStorage.setItem('codeSentTime', Date.now());
-                    showModal('Verification Code Sent Successfully.');
                     startResendCooldown(); // Restart the cooldown
                 }).catch((error) => {
                     console.error("Error during signInWithPhoneNumber", error);
@@ -160,7 +162,7 @@
                 showModal('No confirmation result found. Please try sending the code again.');
                 return;
             }
-    
+        
             let confirmationResult;
             try {
                 confirmationResult = JSON.parse(CryptoJS.AES.decrypt(confirmationResultData, 'your-secret-key').toString(CryptoJS.enc.Utf8));
@@ -169,19 +171,18 @@
                 showModal('Error parsing confirmation result. Please try again.');
                 return;
             }
-    
-            if (!confirmationResult.verificationId) {
+        
+            const verificationId = confirmationResult.verificationId;
+            if (!verificationId) {
                 showModal('Invalid confirmation result. Please try again.');
                 return;
             }
-    
-            const verificationId = confirmationResult.verificationId;
-    
+        
             const codeSentTime = sessionStorage.getItem('codeSentTime');
             if (codeSentTime) {
                 const elapsedTime = (Date.now() - parseInt(codeSentTime, 10)) / 1000;
                 const cooldownPeriod = 60;
-    
+        
                 if (elapsedTime < cooldownPeriod) {
                     startResendCooldown(cooldownPeriod - Math.floor(elapsedTime));
                 } else {
@@ -193,31 +194,30 @@
             } else {
                 startResendCooldown();
             }
-    
+        
             document.getElementById('verifyButton').addEventListener('click', async () => {
                 const code = Array.from(document.querySelectorAll('.verification-code-input'))
                     .map(input => input.value)
                     .join('');
-    
+        
                 if (!verificationId) {
                     showModal('Error: Verification ID not found.');
                     return;
                 }
-    
+        
                 const credential = PhoneAuthProvider.credential(verificationId, code);
                 try {
                     const result = await signInWithCredential(auth, credential);
                     const user = result.user;
                     console.log('User authenticated:', user);  // Debugging log
-                    showModal('Phone Number Verified Successfully!');
-    
+        
                     // Retrieve the tempDocId from sessionStorage
                     const tempDocId = sessionStorage.getItem('tempDocId');
                     if (!tempDocId) {
                         showModal('Error retrieving tempDocId. Please try again.');
                         return;
                     }
-    
+        
                     // Retrieve the temporary document for the user's email and password
                     const tempDocRef = doc(firestore, 'temporaryRegistrations', tempDocId);
                     const tempDocSnapshot = await getDoc(tempDocRef);
@@ -225,21 +225,27 @@
                         showModal('Temporary document not found. Please try again.');
                         return;
                     }
-    
+        
                     const { email, password } = tempDocSnapshot.data();
-    
+        
                     // Encrypt and store the UID, phone number, email, and password in session storage
                     sessionStorage.setItem('phoneNumber', CryptoJS.AES.encrypt(user.phoneNumber, 'your-secret-key').toString());
                     sessionStorage.setItem('email', CryptoJS.AES.encrypt(email, 'your-secret-key').toString());
-    
-                    // Move to the next phase
-                    window.location.href = 'personalinfo.html'; // Adjust this URL to the next phase if necessary
+        
+                    // Show a success modal before redirecting
+                    showModal('Verification successful!');
+        
+                    // Redirect to the personal info page only after the modal is closed
+                    $('#promptModal').on('hidden.bs.modal', () => {
+                        window.location.href = 'personalinfo.html'; // Adjust this URL to the next phase if necessary
+                    });
+        
                 } catch (error) {
                     console.error('Error during verification:', error);
                     showModal('Error Verifying Code. Please try again.');
                 }
             });
-    
+        
             const returnLink = document.getElementById('returnLink');
             if (returnLink) {
                 returnLink.addEventListener('click', () => {
@@ -251,20 +257,12 @@
                     });
                 });
             }
-    
-            const phoneSubmitButton = document.getElementById('phoneSubmitButton');
-            if (phoneSubmitButton) {
-                phoneSubmitButton.addEventListener('click', () => {
-                    sessionStorage.setItem('codeSentTime', Date.now());
-                    startResendCooldown();
-                });
-            }
         });
-    
+        
         function showModal(message) {
             document.getElementById('modalMessage').innerText = message;
             $('#promptModal').modal('show');
-        }
+        }        
     </script>
 </body>
 </html>

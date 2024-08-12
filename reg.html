@@ -23,6 +23,22 @@
         </nav>
     </div>
     <main class="d-flex align-items-center">
+        <div class="progress-container">
+            <div class="step active">
+                <div class="bullet">1</div>
+                <div class="title">Registration</div>
+            </div>
+            <div class="line"></div>
+            <div class="step">
+                <div class="bullet">2</div>
+                <div class="title">Verification</div>
+            </div>
+            <div class="line"></div>
+            <div class="step">
+                <div class="bullet">3</div>
+                <div class="title">Personal Information</div>
+            </div>
+        </div>
         <div class="container d-flex justify-content-center">
             <div class="card login-card">
                 <div class="card-body">
@@ -55,12 +71,29 @@
                         <div class="d-flex justify-content-center">
                             <button type="submit" id="signUp" class="btn btn-outline-primary login-btn">CREATE ACCOUNT</button>
                         </div>
-                        <p class="text-center mt-3">Already have an account? <a href="#" id="loginLink" class="text-dark">Login Here!</a></p>
+                        <p class="text-center mt-3">Already have an account? <a href="login.html" id="loginLink" class="text-dark">Login Here!</a></p>
                     </form>
                 </div>
             </div>
         </div>
     </main>
+
+    <!-- Notification Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body" id="notificationMessage">
+                    <!-- Notification message will be set dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -215,13 +248,12 @@
             }
     
             function showErrorMessage(elementId, message) {
-                const errorElement = document.getElementById(elementId);
-                if (errorElement) {
-                    errorElement.textContent = message;
-                } else {
-                    alert(message); // Fallback if error element is not found
-                }
-            }
+                const notificationMessage = document.getElementById('notificationMessage');
+                const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+            
+                notificationMessage.textContent = message;
+                notificationModal.show();
+            }            
         });
     </script>
 </body>

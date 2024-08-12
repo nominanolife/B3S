@@ -12,6 +12,22 @@
 </head>
 <body>
     <main class="d-flex align-items-center">
+        <div class="progress-container">
+            <div class="step active">
+                <div class="bullet">1</div>
+                <div class="title">Registration</div>
+            </div>
+            <div class="line completed"></div>
+            <div class="step active">
+                <div class="bullet">2</div>
+                <div class="title">Verification</div>
+            </div>
+            <div class="line"></div>
+            <div class="step">
+                <div class="bullet">3</div>
+                <div class="title">Personal Information</div>
+            </div>
+        </div>
         <div class="container d-flex justify-content-center">
             <!-- Phone Number Entry Container -->
             <div class="card phone-entry-card">
@@ -140,7 +156,7 @@
                         sessionStorage.setItem('confirmationResult', CryptoJS.AES.encrypt(JSON.stringify(confirmationResult), 'your-secret-key').toString());
                         sessionStorage.setItem('phoneNumber', CryptoJS.AES.encrypt(phoneNumber, 'your-secret-key').toString());
                         sessionStorage.setItem('codeSentTime', Date.now());
-    
+
                         // Update the Firestore document with the phone number and registration phase
                         if (tempDocId) {
                             await updateDoc(doc(db, 'temporaryRegistrations', tempDocId), {
@@ -151,23 +167,25 @@
                             console.error("tempDocId is missing from sessionStorage.");
                             showModal('An error occurred. Please try again.');
                         }
-    
+
                         window.location.href = 'verifphone.html'; // Proceed to the next phase
                     })
                     .catch((error) => {
                         console.error("Error during signInWithPhoneNumber", error);
                         if (error.code === 'auth/too-many-requests') {
                             showModal('Too many requests. Please try again later.');
+                        } else if (error.code === 'auth/quota-exceeded') {
+                            showModal('Quota exceeded for sending verification codes. Please try again later.');
                         } else {
                             showModal('Error sending verification code. Please try again.');
                         }
                         sendCodeButton.disabled = false;
                     });
-    
-                setTimeout(() => {
-                    sendCodeButton.disabled = false;
-                }, 60000);
-            });
+                
+                    setTimeout(() => {
+                        sendCodeButton.disabled = false;
+                    }, 60000);
+                });
     
             function showModal(message) {
                 document.getElementById('modalMessage').innerText = message;
