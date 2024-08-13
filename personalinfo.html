@@ -121,8 +121,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-        import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-        
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+    
         document.addEventListener('DOMContentLoaded', () => {
             const firebaseConfig = {
                 apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
@@ -138,49 +138,42 @@
             const firestore = getFirestore(app);
             const auth = getAuth();
     
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    // User is already authenticated
-                    handleUserAuthenticated(user);
-                } else {
-                    // Retrieve encrypted data from sessionStorage
+            // Event listener for the "SAVE" button click
+            const saveBtn = document.querySelector('#saveBtn');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', async () => {
+                    // Immediately decrypt email and password on button click
                     const encryptedEmail = sessionStorage.getItem('email');
                     const encryptedPassword = sessionStorage.getItem('password');
+                    const tempDocId = sessionStorage.getItem('tempDocId');
+                    const encryptedPhoneNumber = sessionStorage.getItem('phoneNumber');
     
-                    if (encryptedEmail && encryptedPassword) {
-                        // Decrypt the email and password
-                        const email = CryptoJS.AES.decrypt(encryptedEmail, 'your-secret-key').toString(CryptoJS.enc.Utf8);
-                        const password = CryptoJS.AES.decrypt(encryptedPassword, 'your-secret-key').toString(CryptoJS.enc.Utf8);
-    
-                        try {
-                            // Create a new user in Firebase Authentication
-                            const newUser = await createUserWithEmailAndPassword(auth, email, password);
-                            handleUserAuthenticated(newUser.user);
-                        } catch (error) {
-                            displayNotification('Failed to create user in Firebase Authentication: ' + error.message);
-                            return;
-                        }
-                    } else {
-                        displayNotification('Required email and password not found in sessionStorage. Please try again.');
-                        window.location.href = 'login.html';
+                    if (!encryptedEmail || !encryptedPassword || !tempDocId || !encryptedPhoneNumber) {
+                        console.log('Required information not found in sessionStorage.');
+                        return;
                     }
-                }
-            });
     
-            function handleUserAuthenticated(user) {
-                // Retrieve other encrypted data from sessionStorage
-                const tempDocId = sessionStorage.getItem('tempDocId');
-                const encryptedPhoneNumber = sessionStorage.getItem('phoneNumber');
+                    let email, password, phoneNumber;
+                    try {
+                        email = CryptoJS.AES.decrypt(encryptedEmail, 'your-secret-key').toString(CryptoJS.enc.Utf8);
+                        password = CryptoJS.AES.decrypt(encryptedPassword, 'your-secret-key').toString(CryptoJS.enc.Utf8);
+                        phoneNumber = CryptoJS.AES.decrypt(encryptedPhoneNumber, 'your-secret-key').toString(CryptoJS.enc.Utf8);
+                        console.log("Decrypted email on button click:", email);
+                        console.log("Decrypted password on button click:", password);
+                        console.log("Decrypted phone number on button click:", phoneNumber);
+                    } catch (error) {
+                        console.log('Decryption failed. Please try again.', error);
+                        return;
+                    }
     
-                if (tempDocId && encryptedPhoneNumber) {
-                    // Decrypt the sensitive data
-                    const phoneNumber = CryptoJS.AES.decrypt(encryptedPhoneNumber, 'your-secret-key').toString(CryptoJS.enc.Utf8);
-                    console.log("User ID (UID):", user.uid);
-                    console.log("Decrypted PhoneNumber:", phoneNumber);
+                    try {
+                        // Create a new user in Firebase Authentication
+                        const newUser = await createUserWithEmailAndPassword(auth, email, password);
+                        console.log("New user created:", newUser);
     
-                    const docRef = doc(firestore, 'applicants', user.uid); // Use the UID from Firebase Authentication
+                        // Save the user's personal information to Firestore
+                        const docRef = doc(firestore, 'applicants', newUser.user.uid); // Use the UID from Firebase Authentication
     
-                    document.querySelector('#saveBtn').addEventListener('click', async () => {
                         // Retrieve form data
                         const first = document.getElementById('first').value.trim();
                         const middle = document.getElementById('middle').value.trim();
@@ -197,44 +190,43 @@
                             return;
                         }
     
-                        try {
-                            // Save the personal information to Firestore using the same UID from Firebase Authentication
-                            await setDoc(docRef, {
-                                email: user.email,  // Ensuring the email is saved in Firestore
-                                phoneNumber: phoneNumber,
-                                role: 'applicant',
-                                personalInfo: {
-                                    first: first,
-                                    middle: middle,
-                                    last: last,
-                                    suffix: suffix,
-                                    birthday: birthday,
-                                    age: age,
-                                    address: address,
-                                    status: status
-                                }
-                            }, { merge: true });
+                        await setDoc(docRef, {
+                            email: email,
+                            phoneNumber: phoneNumber,
+                            role: 'applicant',
+                            personalInfo: {
+                                first: first,
+                                middle: middle,
+                                last: last,
+                                suffix: suffix,
+                                birthday: birthday,
+                                age: age,
+                                address: address,
+                                status: status
+                            }
+                        }, { merge: true });
     
-                            // Show success modal notification
-                            displayNotification('Personal Information Saved Successfully!', true);
+                        // Show success modal notification
+                        displayNotification('Personal Information Saved Successfully!', true);
     
-                            // Clear sessionStorage after saving data
-                            sessionStorage.clear();
+                        // Clear sessionStorage after saving data
+                        sessionStorage.clear();
     
-                            // Delete the temporary document in Firestore
-                            await deleteDoc(doc(firestore, 'temporaryRegistrations', tempDocId));
+                        // Delete the temporary document in Firestore
+                        await deleteDoc(doc(firestore, 'temporaryRegistrations', tempDocId));
     
-                            // Redirect to the login page when the modal is closed
-                            document.querySelector('#notificationModal .btn-secondary').addEventListener('click', () => {
-                                window.location.href = 'login.html';
-                            });
-                        } catch (error) {
-                            displayNotification('Failed to Save Personal Information: ' + error.message);
-                        }
-                    });
-                } else {
-                    displayNotification('Error retrieving user information. Please try again.');
-                }
+                        // Redirect to the login page when the modal is closed
+                        document.querySelector('#notificationModal .btn-secondary').addEventListener('click', () => {
+                            window.location.href = 'login.html';
+                        });
+    
+                    } catch (error) {
+                        console.error('Error in saving user information:', error);
+                        displayNotification('Failed to save user information: ' + error.message);
+                    }
+                });
+            } else {
+                console.error("Button with ID 'saveBtn' not found.");
             }
     
             function displayNotification(message, success = false) {
@@ -250,6 +242,5 @@
             }
         });
     </script>
-        
 </body>
 </html>
