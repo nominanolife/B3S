@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -39,18 +39,14 @@ let currentYear = date.getFullYear();
 let appointments = [];
 let currentUserUid = null;
 
-// Fetch appointments from Firestore
-async function fetchAppointments() {
-  try {
-    const querySnapshot = await getDocs(collection(db, "appointments"));
-    appointments = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-  } catch (error) {
-    console.error("Error fetching appointments:", error);
-  }
-}
+// Listen for real-time updates in the appointments collection
+onSnapshot(collection(db, "appointments"), (snapshot) => {
+  appointments = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+  renderCalendar(currentMonth, currentYear); // Re-render the calendar to reflect updates
+});
 
 // Render the calendar
 function renderCalendar(month, year) {
@@ -270,8 +266,6 @@ async function handleBooking() {
       }
     }
 
-    await fetchAppointments();
-    renderCalendar(currentMonth, currentYear);
     showNotification('Booking successful!');
 
   } catch (error) {
@@ -313,6 +307,4 @@ onAuthStateChanged(auth, (user) => {
   currentUserUid = user ? user.uid : null;
 });
 
-fetchAppointments().then(() => {
-  renderCalendar(currentMonth, currentYear);
-});
+renderCalendar(currentMonth, currentYear);

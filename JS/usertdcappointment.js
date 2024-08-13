@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -130,7 +130,6 @@ async function updateTimeSection(date) {
     const currentDate = new Date();
     const appointmentDateObj = new Date(date);
 
-    // Check if the user has previously booked and canceled or rescheduled this slot
     const userBooking = bookings ? bookings.find(booking => 
       booking.userId === currentUserUid && 
       booking.timeSlot === `${timeStart} - ${timeEnd}` && 
@@ -138,8 +137,7 @@ async function updateTimeSection(date) {
 
     if (userBooking) {
       if (availableSlots > 0 && appointmentDateObj > currentDate) {
-        // Allow rebooking if slots are available and the appointment date is in the future
-        userHasBooked = false; // Reset so the user can rebook
+        userHasBooked = false;
       } else {
         userHasBooked = true;
       }
@@ -162,11 +160,10 @@ async function updateTimeSection(date) {
     timeBody.appendChild(label);
     timeBody.appendChild(document.createElement('br'));
 
-    // Add click event listener for radio buttons
     radioInput.addEventListener('click', () => {
       if (userHasBooked) {
         showNotification('You have already booked this slot.');
-        radioInput.checked = false; // Uncheck the radio button
+        radioInput.checked = false;
       }
     });
   });
@@ -174,12 +171,10 @@ async function updateTimeSection(date) {
   bookButton.style.display = userHasBooked ? 'none' : 'block';
 }
 
-// Show appointment details and time slots when a date is clicked
 function showAppointmentDetails(date) {  
   updateTimeSection(date);
 }
 
-// Function to convert 24-hour time to 12-hour format
 function convertTo12Hour(time24) {
   const [hour, minute] = time24.split(':').map(Number);
   const period = hour >= 12 ? 'PM' : 'AM';
@@ -187,7 +182,6 @@ function convertTo12Hour(time24) {
   return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`;
 }
 
-// Function to show notification modal
 function showNotification(message) {
   const modalBody = document.getElementById('notificationModalBody');
   modalBody.textContent = message;
@@ -219,19 +213,17 @@ async function handleBooking() {
   const currentDate = new Date();
   const appointmentDateObj = new Date(appointmentDate);
 
-  // Prevent booking if it's within one day before the appointment date or on the day of the appointment
   if (appointmentDateObj <= currentDate.setDate(currentDate.getDate() + 1)) {
     showNotification('Booking is not allowed within one day before the appointment or on the day of the appointment.');
     return;
   }
 
-  // Check if the user has any existing bookings that are not canceled or rescheduled, excluding completed appointments
   const userExistingBookings = appointments.filter(app => 
     app.bookings && app.bookings.some(booking => 
       booking.userId === currentUserUid && 
       booking.status !== 'Cancelled' && 
       booking.status !== 'Rescheduled' && 
-      booking.progress !== 'Completed' // Check the progress within the booking
+      booking.progress !== 'Completed'
     )
   );
 
@@ -246,11 +238,10 @@ async function handleBooking() {
     return;
   }
 
-  // Proceed with booking
   try {
     const appointmentRef = doc(db, "appointments", appointment.id);
     await updateDoc(appointmentRef, {
-      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "In Progress" }] // Assuming 'In Progress' for a new booking
+      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "In Progress" }]
     });
 
     const totalSlots = appointment.slots;
@@ -267,7 +258,6 @@ async function handleBooking() {
     renderCalendar(currentMonth, currentYear);
     showNotification('Booking successful!');
 
-    // Redirect to usersched.html immediately after the notification modal is closed
     $('#notificationModal').on('hidden.bs.modal', function () {
       window.location.href = 'usersched.html';
     });
@@ -306,6 +296,15 @@ todayBtn.addEventListener("click", () => {
 if (bookButton) {
   bookButton.addEventListener('click', handleBooking);
 }
+
+// Listen for real-time updates in the appointments collection
+onSnapshot(collection(db, "appointments"), (snapshot) => {
+  appointments = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+  renderCalendar(currentMonth, currentYear); // Re-render the calendar to reflect updates
+});
 
 onAuthStateChanged(auth, (user) => {
   currentUserUid = user ? user.uid : null;
