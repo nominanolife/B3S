@@ -41,7 +41,7 @@ function renderPackages(packages) {
           </div>
         </form>
       </div>
-            `;
+    `;
     packageContainer.insertAdjacentHTML('beforebegin', packageHtml);
   });
   showTiles(currentIndex);
@@ -89,41 +89,55 @@ document.querySelector('.modal .close').addEventListener('click', () => {
   $('#infoModal').modal('hide');
 });
 
-document.addEventListener('click', async (e) => {
+document.addEventListener('click', (e) => {
   if (e.target && e.target.classList.contains('enroll-now-button')) {
     const packageId = e.target.dataset.packageId;
     const packageName = e.target.dataset.packageName;
-    const user = auth.currentUser;
 
-    if (user) {
-      const userId = user.uid;
-      const selectedPackage = packages.find(pkg => pkg.id === packageId);
+    // Set the package information on the modal
+    document.getElementById('confirmEnrollButton').dataset.packageId = packageId;
+    document.getElementById('confirmEnrollButton').dataset.packageName = packageName;
 
-      if (userEnrolledPackage) {
-        showEnrollmentModal("You are currently enrolled in this package. Please consult the admin to change your enrolled package.", "error");
-      } else {
-        const confirmEnroll = confirm("Enroll in this course?");
-        if (confirmEnroll && selectedPackage) {
-          try {
-            await updateDoc(doc(db, "applicants", userId), {
-              role: "student",
-              packageName: packageName, // Store the package name
-              packagePrice: selectedPackage.price // Store the package price
-            });
-            document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
-            userEnrolledPackage = packageName;
-            showEnrollmentModal("Enrollment successful!", "success");
-          } catch (error) {
-            showEnrollmentModal("Failed to enroll. Please try again.", "error");
-          }
-        } else {
-          console.error("Package not found or enrollment not confirmed.");
-        }
-      }
-    } else {
-      console.error("No user is currently signed in.");
-    }
+    // Show the confirmation modal
+    $('#confirmModal').modal('show');
   }
+});
+
+document.getElementById('confirmEnrollButton').addEventListener('click', async () => {
+  const packageId = document.getElementById('confirmEnrollButton').dataset.packageId;
+  const packageName = document.getElementById('confirmEnrollButton').dataset.packageName;
+  const user = auth.currentUser;
+
+  if (user) {
+    const userId = user.uid;
+    const selectedPackage = packages.find(pkg => pkg.id === packageId);
+
+    if (userEnrolledPackage) {
+      showEnrollmentModal("You are currently enrolled in this package. Please consult the admin to change your enrolled package.", "error");
+    } else {
+      if (selectedPackage) {
+        try {
+          await updateDoc(doc(db, "applicants", userId), {
+            role: "student",
+            packageName: packageName, // Store the package name
+            packagePrice: selectedPackage.price // Store the package price
+          });
+          document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
+          userEnrolledPackage = packageName;
+          showEnrollmentModal("Enrollment successful!", "success");
+        } catch (error) {
+          showEnrollmentModal("Failed to enroll. Please try again.", "error");
+        }
+      } else {
+        console.error("Package not found.");
+      }
+    }
+  } else {
+    console.error("No user is currently signed in.");
+  }
+
+  // Hide the confirmation modal
+  $('#confirmModal').modal('hide');
 });
 
 // Function to show enrollment modal with a custom message
@@ -156,7 +170,7 @@ onAuthStateChanged(auth, async (user) => {
       const docSnap = await getDoc(doc(db, "applicants", userId));
       if (docSnap.exists()) {
         const userData = docSnap.data();
-        userEnrolledPackage = userData.enrolledPackage || null;
+        userEnrolledPackage = userData.packageName || null;
         if (userEnrolledPackage) {
           document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
         }
