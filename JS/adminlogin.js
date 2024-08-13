@@ -22,21 +22,24 @@ document.addEventListener('DOMContentLoaded', function() {
             db.collection("admin").doc("admin").get().then((doc) => {
                 if (doc.exists) {
                     var adminData = doc.data();
-                    if (adminData.name === name && adminData.password === password) {
+
+                    if (adminData.name !== name) {
+                        showModal("Email is incorrect");
+                    } else if (adminData.password !== password) {
+                        showModal("Password is incorrect");
+                    } else {
                         // Redirect to admin dashboard
                         window.location.href = "admindashboard.html";
-                    } else {
-                        alert("Invalid credentials");
                     }
                 } else {
-                    alert("No such document!");
+                    showModal("No such document!");
                 }
             }).catch((error) => {
                 console.error("Error getting document: ", error);
-                alert("Error logging in");
+                showModal("Error logging in");
             });
         } else {
-            alert("Please fill in both fields");
+            showModal("Please fill in both fields");
         }
     });
 
@@ -58,6 +61,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
+    }
+
+    // Function to show the modal with a specific message
+    function showModal(message) {
+        document.getElementById('notificationMessage').textContent = message;
+        const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+        notificationModal.show();
     }
 
     // Call the function with the appropriate IDs
