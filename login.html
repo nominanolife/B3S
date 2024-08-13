@@ -78,7 +78,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+        import { getAuth, fetchSignInMethodsForEmail, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
     
         // Initialize Firebase
         const firebaseConfig = {
@@ -94,51 +94,75 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
     
+        // Function to validate email format
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+    
         // Sign-in event listener
         document.getElementById('signIn').addEventListener('click', async (event) => {
             event.preventDefault(); // Prevent the default form submission
-        
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-        
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                
-                const dt = new Date();
-                const userRef = doc(db, 'applicants', user.uid);
-                await updateDoc(userRef, {
-                    last_login: dt
-                });
-        
-                window.location.href = 'userdashboard.html';
-            } catch (error) {
-                let errorMessage;
-                
-                // Customize error messages
-                switch (error.code) {
-                    case 'auth/invalid-email':
-                        errorMessage = 'The email address you entered is not valid. Please check and try again.';
-                        break;
-                    case 'auth/user-disabled':
-                        errorMessage = 'Your account has been disabled. Please contact support for assistance.';
-                        break;
-                    case 'auth/user-not-found':
-                        errorMessage = 'No account found with this email. Please check your email or register a new account.';
-                        break;
-                    case 'auth/wrong-password':
-                        errorMessage = 'The password you entered is incorrect. Please try again.';
-                        break;
-                    default:
-                        errorMessage = 'An unexpected error occurred. Please try again later.';
-                }
-                
-                // Show error modal notification
-                document.getElementById('notificationMessage').textContent = errorMessage;
-                const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
-                notificationModal.show();
+    
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+    
+            // Validate input
+            if (!email && !password) {
+                showModal('Please fill in both fields.');
+                return;
             }
-        });        
-    </script>
+            if (!email) {
+                showModal('Please enter your email.');
+                return;
+            }
+            if (!password) {
+                showModal('Please enter your password.');
+                return;
+            }
+            if (!isValidEmail(email)) {
+                showModal('Please enter a valid email address.');
+                return;
+            }
+    
+            try {
+                // Check if email exists
+                const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+                if (signInMethods.length === 0) {
+                    showModal('The account you are trying to access is not registered yet. Please register and try again.');
+                    return;
+                }
+    
+                // Attempt to sign in with email and password
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    
+                    const dt = new Date();
+                    const userRef = doc(db, 'applicants', user.uid);
+                    await updateDoc(userRef, {
+                        last_login: dt
+                    });
+    
+                    window.location.href = 'userdashboard.html';
+                } catch (error) {
+                    if (error.code === 'auth/wrong-password') {
+                        showModal('The password you entered is incorrect. Please try again.');
+                    } else {
+                        showModal('We’re having trouble signing you in. Please try again later.');
+                    }
+                }
+            } catch (error) {
+                showModal('We’re having trouble signing you in. Please check your information and try again.');
+                console.error('Error fetching sign-in methods:', error);
+            }
+        });
+    
+        function showModal(message) {
+            document.getElementById('notificationMessage').textContent = message;
+            const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+            notificationModal.show();
+        }
+    </script>                   
 </body>
 </html>
