@@ -190,14 +190,14 @@
     
                 // Validate Email
                 if (!validateEmail(email)) {
-                    showErrorMessage('emailError', 'Please Enter a Valid Email Address.');
+                    showErrorMessage('emailError', 'Please Enter a valid email address.');
                     return;
                 }
     
                 // Check for duplicate email
                 const emailExists = await checkEmailExists(email);
                 if (emailExists) {
-                    showErrorMessage('emailError', 'This Email is Already Registered.');
+                    showErrorMessage('emailError', 'This email is already registered.');
                     return;
                 }
     

@@ -7,7 +7,7 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="CSS/styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap">
     <link rel="icon" href="Assets/logo.png" type="image/x-icon">
 </head>
 <body>
@@ -78,7 +78,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-        import { getAuth, fetchSignInMethodsForEmail, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
     
         // Initialize Firebase
         const firebaseConfig = {
@@ -103,10 +103,10 @@
         // Sign-in event listener
         document.getElementById('signIn').addEventListener('click', async (event) => {
             event.preventDefault(); // Prevent the default form submission
-    
+        
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
-    
+        
             // Validate input
             if (!email && !password) {
                 showModal('Please fill in both fields.');
@@ -124,45 +124,34 @@
                 showModal('Please enter a valid email address.');
                 return;
             }
-    
+        
             try {
-                // Check if email exists
-                const signInMethods = await fetchSignInMethodsForEmail(auth, email);
-                if (signInMethods.length === 0) {
-                    showModal('The account you are trying to access is not registered yet. Please register and try again.');
-                    return;
-                }
-    
                 // Attempt to sign in with email and password
-                try {
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    
-                    const dt = new Date();
-                    const userRef = doc(db, 'applicants', user.uid);
-                    await updateDoc(userRef, {
-                        last_login: dt
-                    });
-    
-                    window.location.href = 'userdashboard.html';
-                } catch (error) {
-                    if (error.code === 'auth/wrong-password') {
-                        showModal('The password you entered is incorrect. Please try again.');
-                    } else {
-                        showModal('We’re having trouble signing you in. Please try again later.');
-                    }
-                }
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                const dt = new Date();
+                const userRef = doc(db, 'applicants', user.uid);
+                await updateDoc(userRef, {
+                    last_login: dt
+                });
+        
+                window.location.href = 'userdashboard.html';
             } catch (error) {
-                showModal('We’re having trouble signing you in. Please check your information and try again.');
-                console.error('Error fetching sign-in methods:', error);
+                // Handle specific error code
+                if (error.code === "auth/invalid-credential") {
+                    showModal('Invalid credentials. Please check your email and password.');
+                } else {
+                    showModal('An error occurred during sign-in. Please try again.');
+                }
             }
         });
-    
+        
+        // Function to show the modal with a custom message
         function showModal(message) {
-            document.getElementById('notificationMessage').textContent = message;
-            const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
-            notificationModal.show();
-        }
+            document.getElementById('notificationMessage').innerText = message;
+            $('#notificationModal').modal('show');
+        }                        
     </script>                   
 </body>
 </html>
