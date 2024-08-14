@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, onSnapshot, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -52,12 +52,11 @@ applyStoredPDCState();
 
 async function checkTDCProgress(userId) {
     const appointmentsRef = collection(db, "appointments");
-    const completedBookingsRef = collection(db, "completedBookings");
 
     let tdcCompleted = false;
 
     // Check active bookings in "appointments" collection
-    const unsubscribe = onSnapshot(appointmentsRef, (snapshot) => {
+    const unsubscribe = onSnapshot(query(appointmentsRef, where("bookings.userId", "==", userId)), (snapshot) => {
         snapshot.forEach((doc) => {
             const appointment = doc.data();
 
@@ -84,22 +83,23 @@ async function checkTDCProgress(userId) {
 }
 
 async function checkCompletedBookings(userId) {
-    const completedBookingsRef = collection(db, "completedBookings");
+    const completedBookingDocRef = doc(db, "completedBookings", userId);
+    const completedBookingDoc = await getDoc(completedBookingDocRef);
 
-    // Query the "completedBookings" collection for TDC course
-    const q = query(completedBookingsRef, where("completedBookings.course", "==", "TDC"), where("completedBookings.userId", "==", userId));
-    const querySnapshot = await getDocs(q);
-
-    querySnapshot.forEach((doc) => {
-        const completedBooking = doc.data();
-        console.log("Completed booking found in completedBookings:", completedBooking);
+    if (completedBookingDoc.exists()) {
+        const completedBookings = completedBookingDoc.data().completedBookings || [];
+        console.log("Completed booking found in completedBookings:", completedBookings);
 
         // If TDC is completed in completedBookings, enable the PDC
-        if (completedBooking.progress === "Completed") {
-            console.log("TDC is completed in completedBookings!");
-            enablePDC();
-        }
-    });
+        completedBookings.forEach(booking => {
+            if (booking.course === "TDC" && booking.progress === "Completed") {
+                console.log("TDC is completed in completedBookings!");
+                enablePDC();
+            }
+        });
+    } else {
+        console.log("No completed bookings document found for the user.");
+    }
 }
 
 // Get the logged-in user's ID
