@@ -138,7 +138,6 @@ async function updateBookingProgress(appointmentId, userId, newProgress) {
         console.error("Error updating booking progress:", error);
     }
 }
-
 async function fetchUserAppointments(userId) {
     try {
         const appointmentsRef = collection(db, "appointments");
@@ -179,25 +178,24 @@ async function fetchUserAppointments(userId) {
 
         console.log("Fetching completed bookings...");
 
-        // Fetch documents that contain the completedBookings array for the logged-in user
-        const completedSnapshot = await getDocs(completedBookingsParentRef);
+        // Fetch the completed bookings for the logged-in user
+        const completedSnapshot = await getDoc(doc(completedBookingsParentRef, userId));
 
-        console.log("Completed bookings parent snapshot size:", completedSnapshot.size);
+        console.log("Completed bookings snapshot:", completedSnapshot.exists());
 
-        completedSnapshot.forEach((doc) => {
-            const completedBookingDoc = doc.data();
-            console.log("Parent Document Data:", completedBookingDoc);
+        if (completedSnapshot.exists()) {
+            const completedBookingDoc = completedSnapshot.data();
+            console.log("Completed Booking Document Data:", completedBookingDoc);
 
             // Check if the completedBookings field exists and is an array
             if (Array.isArray(completedBookingDoc.completedBookings)) {
-                // Filter the completedBookings for the logged-in user
                 completedBookingDoc.completedBookings.forEach(booking => {
                     const bookingKey = `${booking.date}_${booking.startTime}`;
                     console.log("Completed Booking Key:", bookingKey, "Booking Data:", booking);
 
                     // Add the completed booking only if there's no active booking for the same date and time
                     if (!activeBookingsMap.has(bookingKey)) {
-                        appointmentsData.push({ appointment: booking, booking, docId: doc.id, isCompleted: true });
+                        appointmentsData.push({ appointment: booking, booking, docId: userId, isCompleted: true });
                         console.log("Added completed booking to appointmentsData:", booking);
                     } else {
                         console.log("Skipped adding completed booking because an active booking exists for the same time slot:", bookingKey);
@@ -206,7 +204,7 @@ async function fetchUserAppointments(userId) {
             } else {
                 console.log("No completed bookings found in this document.");
             }
-        });
+        }
 
         // Combine active bookings from map into the appointmentsData array
         activeBookingsMap.forEach(value => {
@@ -232,7 +230,6 @@ async function fetchUserAppointments(userId) {
         console.error("Error fetching appointments:", error);
     }
 }
-
 
 function renderAppointmentRow(appointment, booking, docId, isCompleted = false) {
     const row = document.createElement('tr');
