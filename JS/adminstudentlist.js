@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getFirestore, collection, getDocs, doc, updateDoc, getDoc, setDoc, deleteField } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { getFirestore, collection, onSnapshot, doc, updateDoc, getDoc, setDoc, deleteField } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
 
 // Your web app's Firebase configuration
@@ -30,81 +30,91 @@ let totalPages = 1; // Total number of pages
 
 async function fetchAppointments() {
   try {
-      const studentsMap = new Map();
+    const studentsMap = new Map();
 
-      // Fetch all applicants who have the student role and check for course status or active bookings
-      const applicantsSnapshot = await getDocs(collection(db, "applicants"));
+    // Real-time listener for applicants
+    const unsubscribeApplicants = onSnapshot(collection(db, "applicants"), (applicantsSnapshot) => {
       applicantsSnapshot.forEach(applicantDoc => {
-          const applicantData = applicantDoc.data();
-          
-          // Only process if the role is "student"
-          if (applicantData.role === "student") {
-              // Initialize the bookings array if it doesn't exist
-              applicantData.bookings = [];
+        const applicantData = applicantDoc.data();
 
-              // Check if they have completed any of the courses
-              if (applicantData.TDCStatus === "Completed" || 
-                  applicantData["PDC-4WheelsStatus"] === "Completed" || 
-                  applicantData["PDC-MotorsStatus"] === "Completed") {
-                  studentsMap.set(applicantDoc.id, applicantData);
-              }
+        // Only process if the role is "student"
+        if (applicantData.role === "student") {
+          // Initialize the bookings array if it doesn't exist
+          applicantData.bookings = [];
+
+          // Check if they have completed any of the courses
+          if (applicantData.TDCStatus === "Completed" || 
+              applicantData["PDC-4WheelsStatus"] === "Completed" || 
+              applicantData["PDC-MotorsStatus"] === "Completed") {
+            studentsMap.set(applicantDoc.id, applicantData);
           }
+        }
       });
 
       // Fetch all appointments and add to studentsMap if they have bookings
-      const appointmentsSnapshot = await getDocs(collection(db, "appointments"));
-      for (const appointment of appointmentsSnapshot.docs) {
+      onSnapshot(collection(db, "appointments"), (appointmentsSnapshot) => {
+        appointmentsSnapshot.forEach(appointment => {
           const appointmentData = appointment.data();
           const bookings = Array.isArray(appointmentData.bookings) ? appointmentData.bookings : [];
 
-          for (const booking of bookings) {
-              if (booking.status === "Cancelled" || booking.status === "Rescheduled") {
-                  continue;
-              }
+          bookings.forEach(booking => {
+            if (booking.status === "Cancelled" || booking.status === "Rescheduled") {
+              return;
+            }
 
-              const studentDocRef = doc(db, "applicants", booking.userId);
-              const studentDoc = await getDoc(studentDocRef);
+            const studentDocRef = doc(db, "applicants", booking.userId);
+            getDoc(studentDocRef).then(studentDoc => {
               if (studentDoc.exists()) {
-                  const studentData = studentDoc.data();
+                const studentData = studentDoc.data();
 
-                  // Ensure that only users with the role "student" are included
-                  if (studentData.role === "student") {
-                      if (!studentsMap.has(booking.userId)) {
-                          studentData.bookings = [];
-                          studentsMap.set(booking.userId, studentData);
-                      }
-                      const student = studentsMap.get(booking.userId);
-                      student.bookings.push({ ...booking, appointmentId: appointment.id, course: appointmentData.course });
+                // Ensure that only users with the role "student" are included
+                if (studentData.role === "student") {
+                  if (!studentsMap.has(booking.userId)) {
+                    studentData.bookings = [];
+                    studentsMap.set(booking.userId, studentData);
                   }
+                  const student = studentsMap.get(booking.userId);
+                  student.bookings.push({ ...booking, appointmentId: appointment.id, course: appointmentData.course });
+                }
               }
-          }
-      }
+            });
+          });
+        });
 
-      // Fetch completedBookings and update the map with completed courses
-      const completedBookingsSnapshot = await getDocs(collection(db, "completedBookings"));
-      completedBookingsSnapshot.forEach(doc => {
-          const completedBookings = doc.data().completedBookings || [];
-          const userId = doc.id;
+        // Fetch completedBookings and update the map with completed courses
+        onSnapshot(collection(db, "completedBookings"), (completedBookingsSnapshot) => {
+          completedBookingsSnapshot.forEach(doc => {
+            const completedBookings = doc.data().completedBookings || [];
+            const userId = doc.id;
 
-          if (studentsMap.has(userId)) {
+            if (studentsMap.has(userId)) {
               const studentData = studentsMap.get(userId);
               completedBookings.forEach(booking => {
-                  const course = booking.course;
+                const course = booking.course;
 
-                  if (!studentData[`${course}Status`] || studentData[`${course}Status`] !== "Completed") {
-                      studentData[`${course}Status`] = "Completed";
-                  }
+                if (!studentData[`${course}Status`] || studentData[`${course}Status`] !== "Completed") {
+                  studentData[`${course}Status`] = "Completed";
+                }
               });
-          }
-      });
+            }
+          });
 
-      studentsData = Array.from(studentsMap.values());
-      filteredStudentsData = studentsData;
-      totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
-      renderStudents();
-      updatePaginationControls();
+          // After processing all data, update the global arrays and re-render the UI
+          studentsData = Array.from(studentsMap.values());
+          filteredStudentsData = studentsData;
+          totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
+          renderStudents();
+          updatePaginationControls();
+        });
+      });
+    });
+
+    // Optional: Return unsubscribe functions if you need to stop listening later
+    return {
+      unsubscribeApplicants,
+    };
   } catch (error) {
-      console.error("Error fetching appointments: ", error);
+    console.error("Error fetching appointments: ", error);
   }
 }
 
@@ -139,66 +149,75 @@ function renderStudents() {
     studentList.insertAdjacentHTML('beforeend', studentHtml);
   });
 
-
   function renderCourseStatus(course, status, bookings = []) {
-    // Check if the course status in the applicant's document is "Completed"
     if (status === "Completed") {
+      return `
+          <td class="table-row-content">
+              <label class="status-label">
+                  <input type="checkbox" class="status-toggle" checked disabled>
+                  Completed
+              </label>
+          </td>
+      `;
+    } else {
+      const booking = bookings.find(b => b.course === course && b.status === "Booked");
+      if (booking) {
         return `
             <td class="table-row-content">
                 <label class="status-label">
-                    <input type="checkbox" class="status-toggle" checked disabled>
+                    <input type="checkbox" class="status-toggle" 
+                           data-booking-id="${booking.appointmentId}" 
+                           data-user-id="${booking.userId}" 
+                           data-column="${course}">
                     Completed
                 </label>
             </td>
         `;
-    } else {
-        // If there's an active booking for the course
-        const booking = bookings.find(b => b.course === course && b.status === "Booked");
-        if (booking) {
-            return `
-                <td class="table-row-content">
-                    <label class="status-label">
-                        <input type="checkbox" class="status-toggle" 
-                               data-booking-id="${booking.appointmentId}" 
-                               data-user-id="${booking.userId}" 
-                               data-column="${course}">
-                        Completed
-                    </label>
-                </td>
-            `;
-        } else {
-            return '<td class="table-row-content"></td>';
-        }
+      } else {
+        return '<td class="table-row-content"></td>';
+      }
     }
-}
+  }
 
-  // Update status in Firestore when a checkbox is toggled
   document.querySelectorAll('.status-toggle').forEach(toggle => {
     toggle.addEventListener('change', async (event) => {
+      event.preventDefault(); // Prevent the default checkbox toggle behavior
+
       const appointmentId = event.target.dataset.bookingId;
       const userId = event.target.dataset.userId;
       const course = event.target.dataset.column;
       const isCompleted = event.target.checked;
 
-      await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
+      const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {
+        backdrop: 'static',
+        keyboard: false 
+      });
+      confirmationModal.show();
+
+      document.getElementById('confirmButton').onclick = async () => {
+        confirmationModal.hide();
+        await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
+      };
+
+      document.getElementById('confirmationModal').querySelector('.btn-secondary').onclick = () => {
+        event.target.checked = !isCompleted;
+        confirmationModal.hide();
+      };
     });
   });
 }
 
-// Function to toggle the completion status and update Firestore
 async function toggleCompletionStatus(userId, course, isCompleted, appointmentId) {
   try {
-    // Update the applicants collection with the status
     const applicantDocRef = doc(db, "applicants", userId);
     const updateData = {};
     if (isCompleted) {
       updateData[`${course}Status`] = "Completed";
     } else {
-      updateData[`${course}Status`] = deleteField(); // Remove the field if unchecked
+      updateData[`${course}Status`] = deleteField();
     }
     await updateDoc(applicantDocRef, updateData);
 
-    // Update the appointments collection if appointmentId exists
     if (appointmentId) {
       const docRef = doc(db, "appointments", appointmentId);
       const docSnapshot = await getDoc(docRef);
@@ -221,7 +240,7 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
 
         if (isCompleted) {
           const completedBookingData = {
-            course: course, // The course name
+            course: course,
             date: appointmentData.date,
             startTime: appointmentData.timeStart,
             endTime: appointmentData.timeEnd,
@@ -240,30 +259,25 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
   }
 }
 
-// Function to update the completedBookings collection
 async function updateCompletedBookings(userId, bookingDetails) {
   try {
     const completedBookingRef = doc(db, "completedBookings", userId);
     const completedBookingSnap = await getDoc(completedBookingRef);
 
     if (completedBookingSnap.exists()) {
-      // Document exists, update the array with course check
       const existingBookings = completedBookingSnap.data().completedBookings || [];
-
-      // Check if a booking for this course already exists, and update it if necessary
       const courseIndex = existingBookings.findIndex(b => b.course === bookingDetails.course);
 
       if (courseIndex !== -1) {
-        existingBookings[courseIndex] = bookingDetails; // Update existing course booking
+        existingBookings[courseIndex] = bookingDetails;
       } else {
-        existingBookings.push(bookingDetails); // Add new course booking
+        existingBookings.push(bookingDetails);
       }
 
       await updateDoc(completedBookingRef, {
         completedBookings: existingBookings
       });
     } else {
-      // Document does not exist, create it with the first booking
       await setDoc(completedBookingRef, {
         completedBookings: [bookingDetails]
       });
@@ -277,7 +291,6 @@ function updatePaginationControls() {
   const paginationControls = document.querySelector('.pagination-controls');
   paginationControls.innerHTML = '';
 
-  // Create the previous button
   const prevButton = document.createElement('i');
   prevButton.className = 'bi bi-caret-left';
   if (currentPage === 1) {
@@ -292,7 +305,6 @@ function updatePaginationControls() {
     }
   });
 
-  // Create the next button
   const nextButton = document.createElement('i');
   nextButton.className = 'bi bi-caret-right';
   if (currentPage === totalPages) {
@@ -307,7 +319,6 @@ function updatePaginationControls() {
     }
   });
 
-  // Create the page number display
   const pageNumberDisplay = document.createElement('span');
   pageNumberDisplay.className = 'page-number';
   pageNumberDisplay.textContent = `Page ${currentPage} of ${totalPages}`;
@@ -343,7 +354,7 @@ function filterStudents(searchTerm) {
     const fullName = `${student.personalInfo.first || ''} ${student.personalInfo.last || ''}`.toLowerCase();
     return fullName.startsWith(searchTerm);
   });
-  currentPage = 1; // Reset to the first page after filtering
+  currentPage = 1;
   totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
   renderStudents();
   updatePaginationControls();

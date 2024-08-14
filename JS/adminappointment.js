@@ -48,30 +48,55 @@ document.addEventListener("DOMContentLoaded", async function() {
         const timeStart = document.getElementById("time-start").value;
         const timeEnd = document.getElementById("time-end").value;
         const slots = document.getElementById("slots").value;
-    
+        
         if (!course || !date || !timeStart || !timeEnd || !slots) {
             showSuccessModal("Please Fill Out All Fields Correctly.");
             return;
         }
-    
+        
         // Validate the date
         const today = new Date();
         const selectedDate = new Date(date);
-    
+        
         if (selectedDate.toString() === "Invalid Date") {
             showSuccessModal("Please enter a valid date.");
             return;
         }
-    
+        
         if (selectedDate < today.setHours(0, 0, 0, 0)) {
-            showSuccessModal("The selected date cannot be in the past.");
+            showSuccessModal("The selected date has passed. Please choose another date.");
             return;
         }
-    
+        
         if (selectedDate.toDateString() === today.toDateString()) {
             // Allow today's date
         }
-    
+        
+        // Validate the time: Start time and End time cannot be the same
+        if (timeStart === timeEnd) {
+            showSuccessModal("Start time and end time cannot be the same. Please choose other time range.");
+            return;
+        }
+        
+        // Validate the time: End time cannot be earlier than the start time
+        if (timeEnd <= timeStart) {
+            showSuccessModal("End time cannot be earlier than the start time. Please choose other time range.");
+            return;
+        }
+        
+        // Validate the time based on course type
+        const [endHour, endMinute] = timeEnd.split(":").map(Number);
+        
+        if (course.value === 'TDC' && (endHour > 17 || (endHour === 17 && endMinute >= 1))) {
+            showSuccessModal("The time is beyond our operating hours. Please choose a valid time.");
+            return;
+        }
+        
+        if ((course.value === 'PDC-4Wheels' || course.value === 'PDC-Motors') && (endHour > 21 || (endHour === 21 && endMinute >= 1))) {
+            showSuccessModal("The time is beyond our operating hours. Please choose a valid time.");
+            return;
+        }
+        
         if (selectedAppointmentId) {
             // Update the existing document
             try {
@@ -104,12 +129,12 @@ document.addEventListener("DOMContentLoaded", async function() {
                 console.error("Error Adding Appointment: ", e);
             }
         }
-    
+        
         // Re-fetch appointments and re-render the table and calendar
         await fetchAppointments();
         renderCalendar();
         clearForm();
-    }
+    }              
 
     // Clear button click event listener
     document.getElementById("btn-clear").addEventListener("click", clearForm);

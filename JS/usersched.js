@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, onSnapshot, doc, updateDoc, getDoc, setDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, doc, updateDoc, getDoc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -32,11 +32,10 @@ function parseDateTime(dateStr, timeStr) {
     const [hours, minutes] = timeStr.split(':');
     const date = new Date(year, month - 1, day, hours, minutes);
 
-    // Convert to 12-hour format
     let hour = date.getHours();
     const ampm = hour >= 12 ? 'PM' : 'AM';
     hour = hour % 12;
-    hour = hour ? hour : 12; // the hour '0' should be '12'
+    hour = hour ? hour : 12;
     const minutesStr = date.getMinutes().toString().padStart(2, '0');
 
     return {
@@ -45,7 +44,6 @@ function parseDateTime(dateStr, timeStr) {
     };
 }
 
-// Helper function to show notification modal
 function showNotificationModal(message, redirectUrl = null) {
     const modal = document.querySelector('#notificationModal');
     if (modal) {
@@ -64,7 +62,6 @@ function showNotificationModal(message, redirectUrl = null) {
     }
 }
 
-// Helper function to show confirmation modal
 function showConfirmationModal(action, callback, redirectUrl) {
     const modal = document.querySelector('#confirmationModal');
     if (modal) {
@@ -74,8 +71,8 @@ function showConfirmationModal(action, callback, redirectUrl) {
 
         const confirmButton = modal.querySelector('#confirmButton');
         confirmButton.onclick = async () => {
-            await callback(); // Execute the callback
-            modalInstance.hide(); // Hide the modal
+            await callback();
+            modalInstance.hide();
             if (redirectUrl) {
                 showNotificationModal(`${action} successful.`, redirectUrl);
             }
@@ -87,7 +84,6 @@ function showConfirmationModal(action, callback, redirectUrl) {
     }
 }
 
-// Function to move completed bookings to a new collection
 async function moveToCompletedBookings(userId, appointment, booking) {
     try {
         const completedBookingRef = doc(db, "completedBookings", `${userId}_${appointment.date}_${appointment.course}`);
@@ -108,7 +104,6 @@ async function moveToCompletedBookings(userId, appointment, booking) {
     }
 }
 
-// Function to update booking progress and move to completed bookings if necessary
 async function updateBookingProgress(appointmentId, userId, newProgress) {
     try {
         const appointmentRef = doc(db, "appointments", appointmentId);
@@ -119,7 +114,6 @@ async function updateBookingProgress(appointmentId, userId, newProgress) {
             const updatedBookings = appointmentData.bookings.map(booking => {
                 if (booking.userId === userId && booking.status !== 'Cancelled' && booking.status !== 'Rescheduled') {
                     if (newProgress === 'Completed') {
-                        // Move the booking to the 'completedBookings' collection
                         moveToCompletedBookings(userId, appointmentData, booking);
                     }
                     return { ...booking, progress: newProgress };
@@ -138,6 +132,7 @@ async function updateBookingProgress(appointmentId, userId, newProgress) {
         console.error("Error updating booking progress:", error);
     }
 }
+
 async function fetchUserAppointments(userId) {
     try {
         const appointmentsRef = collection(db, "appointments");
@@ -146,89 +141,85 @@ async function fetchUserAppointments(userId) {
         let appointmentsData = [];
         let activeBookingsMap = new Map();
 
-        // Fetch ongoing and upcoming appointments
-        const appointmentSnapshot = await getDocs(appointmentsRef);
+        // Real-time listener for ongoing and upcoming appointments
+        onSnapshot(appointmentsRef, (snapshot) => {
+            console.log("Real-time update for active bookings...");
 
-        console.log("Fetching active bookings...");
+            snapshot.forEach((doc) => {
+                const appointment = doc.data();
+                console.log("Active Appointment Data:", appointment);
 
-        appointmentSnapshot.forEach((doc) => {
-            const appointment = doc.data();
-            console.log("Active Appointment Data:", appointment);
-
-            if (Array.isArray(appointment.bookings)) {
-                // Filter bookings to include only those for the logged-in user
-                const userBookings = appointment.bookings.filter(booking => booking.userId === userId);
-                userBookings.forEach(booking => {
-                    const bookingKey = `${appointment.date}_${appointment.timeStart}`;
-                    
-                    // Check if the booking is completed and should take priority
-                    if (booking.progress === 'Completed') {
-                        activeBookingsMap.set(bookingKey, { appointment, booking, docId: doc.id });
-                        console.log("Priority Booking Key (Completed):", bookingKey, "Booking Data:", booking);
-                    } else {
-                        // Only set the booking if there's no existing priority booking
-                        if (!activeBookingsMap.has(bookingKey)) {
+                if (Array.isArray(appointment.bookings)) {
+                    const userBookings = appointment.bookings.filter(booking => booking.userId === userId);
+                    userBookings.forEach(booking => {
+                        const bookingKey = `${appointment.date}_${appointment.timeStart}`;
+                        
+                        if (booking.progress === 'Completed') {
                             activeBookingsMap.set(bookingKey, { appointment, booking, docId: doc.id });
-                            console.log("Active Booking Key:", bookingKey, "Booking Data:", booking);
+                            console.log("Priority Booking Key (Completed):", bookingKey, "Booking Data:", booking);
+                        } else {
+                            if (!activeBookingsMap.has(bookingKey)) {
+                                activeBookingsMap.set(bookingKey, { appointment, booking, docId: doc.id });
+                                console.log("Active Booking Key:", bookingKey, "Booking Data:", booking);
+                            }
                         }
-                    }
-                });
+                    });
+                }
+            });
+
+            updateAppointmentData(activeBookingsMap, appointmentsData, userId);
+        });
+
+        // Real-time listener for completed bookings
+        onSnapshot(doc(completedBookingsParentRef, userId), (completedSnapshot) => {
+            console.log("Real-time update for completed bookings...");
+
+            if (completedSnapshot.exists()) {
+                const completedBookingDoc = completedSnapshot.data();
+                console.log("Completed Booking Document Data:", completedBookingDoc);
+
+                if (Array.isArray(completedBookingDoc.completedBookings)) {
+                    completedBookingDoc.completedBookings.forEach(booking => {
+                        const bookingKey = `${booking.date}_${booking.startTime}`;
+                        console.log("Completed Booking Key:", bookingKey, "Booking Data:", booking);
+
+                        if (!activeBookingsMap.has(bookingKey)) {
+                            appointmentsData.push({ appointment: booking, booking, docId: userId, isCompleted: true });
+                            console.log("Added completed booking to appointmentsData:", booking);
+                        } else {
+                            console.log("Skipped adding completed booking because an active booking exists for the same time slot:", bookingKey);
+                        }
+                    });
+                } else {
+                    console.log("No completed bookings found in this document.");
+                }
             }
-        });
 
-        console.log("Fetching completed bookings...");
-
-        // Fetch the completed bookings for the logged-in user
-        const completedSnapshot = await getDoc(doc(completedBookingsParentRef, userId));
-
-        console.log("Completed bookings snapshot:", completedSnapshot.exists());
-
-        if (completedSnapshot.exists()) {
-            const completedBookingDoc = completedSnapshot.data();
-            console.log("Completed Booking Document Data:", completedBookingDoc);
-
-            // Check if the completedBookings field exists and is an array
-            if (Array.isArray(completedBookingDoc.completedBookings)) {
-                completedBookingDoc.completedBookings.forEach(booking => {
-                    const bookingKey = `${booking.date}_${booking.startTime}`;
-                    console.log("Completed Booking Key:", bookingKey, "Booking Data:", booking);
-
-                    // Add the completed booking only if there's no active booking for the same date and time
-                    if (!activeBookingsMap.has(bookingKey)) {
-                        appointmentsData.push({ appointment: booking, booking, docId: userId, isCompleted: true });
-                        console.log("Added completed booking to appointmentsData:", booking);
-                    } else {
-                        console.log("Skipped adding completed booking because an active booking exists for the same time slot:", bookingKey);
-                    }
-                });
-            } else {
-                console.log("No completed bookings found in this document.");
-            }
-        }
-
-        // Combine active bookings from map into the appointmentsData array
-        activeBookingsMap.forEach(value => {
-            appointmentsData.push(value);
-            console.log("Added active booking to appointmentsData:", value);
-        });
-
-        // Sort appointments by date or other criteria as needed
-        appointmentsData.sort((a, b) => {
-            const dateA = new Date(`${a.appointment.date}T${a.appointment.timeStart}`);
-            const dateB = new Date(`${b.appointment.date}T${b.appointment.timeStart}`);
-            return dateA - dateB;
-        });
-
-        console.log("Final appointmentsData:", appointmentsData);
-
-        // Clear and re-render the table
-        appointmentsTableBody.innerHTML = "";
-        appointmentsData.forEach(({ appointment, booking, docId, isCompleted }) => {
-            renderAppointmentRow(appointment, booking, docId, isCompleted);
+            updateAppointmentData(activeBookingsMap, appointmentsData, userId);
         });
     } catch (error) {
         console.error("Error fetching appointments:", error);
     }
+}
+
+function updateAppointmentData(activeBookingsMap, appointmentsData, userId) {
+    // Combine active bookings from map into the appointmentsData array
+    appointmentsData = Array.from(activeBookingsMap.values());
+
+    // Sort appointments by date or other criteria as needed
+    appointmentsData.sort((a, b) => {
+        const dateA = new Date(`${a.appointment.date}T${a.appointment.timeStart}`);
+        const dateB = new Date(`${b.appointment.date}T${b.appointment.timeStart}`);
+        return dateA - dateB;
+    });
+
+    console.log("Final appointmentsData:", appointmentsData);
+
+    // Clear and re-render the table
+    appointmentsTableBody.innerHTML = "";
+    appointmentsData.forEach(({ appointment, booking, docId, isCompleted }) => {
+        renderAppointmentRow(appointment, booking, docId, isCompleted);
+    });
 }
 
 function renderAppointmentRow(appointment, booking, docId, isCompleted = false) {
@@ -255,27 +246,25 @@ function renderAppointmentRow(appointment, booking, docId, isCompleted = false) 
     row.appendChild(endTimeCell);
 
     const progressCell = document.createElement('td');
-    progressCell.innerText = booking.progress || 'Not started'; // Ensure 'Not started' is displayed if no progress is set
+    progressCell.innerText = booking.progress || 'Not started';
     row.appendChild(progressCell);
 
     const statusCell = document.createElement('td');
-    statusCell.innerText = booking.status || 'Pending'; // Default to 'Pending' if no status is set
+    statusCell.innerText = booking.status || 'Pending';
 
-    // Apply color based on status
     if (booking.status === 'Booked') {
-        statusCell.style.color = '#28a745'; // Green (Bootstrap's success color)
+        statusCell.style.color = '#28a745'; 
     } else if (booking.status === 'Cancelled') {
-        statusCell.style.color = '#dc3545'; // Red (Bootstrap's danger color)
+        statusCell.style.color = '#dc3545'; 
     } else if (booking.status === 'Rescheduled') {
-        statusCell.style.color = '#ffc107'; // Yellow (Bootstrap's warning color)
+        statusCell.style.color = '#ffc107'; 
     } else {
-        statusCell.style.color = '#6c757d'; // Grey (Bootstrap's secondary color for Pending)
+        statusCell.style.color = '#6c757d'; 
     }
 
     row.appendChild(statusCell);
 
     const actionCell = document.createElement('td');
-    // Disable buttons if progress is "Completed" or the status is "Cancelled" or "Rescheduled"
     const isDisabled = isCompleted || booking.progress === 'Completed' || booking.status === 'Cancelled' || booking.status === 'Rescheduled';
     appendActionButtons(actionCell, isDisabled, docId, booking, appointment);
     row.appendChild(actionCell);
@@ -283,7 +272,6 @@ function renderAppointmentRow(appointment, booking, docId, isCompleted = false) 
     appointmentsTableBody.appendChild(row);
 }
 
-// Function to append action buttons based on conditions
 function appendActionButtons(actionCell, isDisabled, docId, booking, appointment) {
     if (!isDisabled) {
         const appointmentStartDate = new Date(appointment.date + 'T' + appointment.timeStart);
@@ -301,7 +289,6 @@ function appendActionButtons(actionCell, isDisabled, docId, booking, appointment
         actionCell.innerHTML += `<button class="btn btn-danger cancel-btn" disabled style="display:none;">Cancel</button>`;
     }
 
-    // Add event listeners for Cancel and Reschedule buttons
     actionCell.querySelectorAll('.cancel-btn, .reschedule-btn').forEach(button => {
         button.addEventListener('click', async (e) => {
             const appointmentId = e.target.getAttribute('data-appointment-id');
@@ -310,7 +297,6 @@ function appendActionButtons(actionCell, isDisabled, docId, booking, appointment
 
             const action = e.target.classList.contains('cancel-btn') ? 'Cancel' : 'Reschedule';
 
-            // Get the userId from auth
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     const userId = user.uid;
@@ -324,10 +310,7 @@ function appendActionButtons(actionCell, isDisabled, docId, booking, appointment
                         if (currentDate >= oneDayBefore) {
                             showNotificationModal("You cannot cancel or reschedule 1 day before the appointment.");
                         } else {
-                            // Disable the clicked button immediately
                             e.target.disabled = true;
-
-                            // Disable the sibling button immediately
                             const siblingButton = e.target.classList.contains('cancel-btn') ?
                                 e.target.nextElementSibling : e.target.previousElementSibling;
                             if (siblingButton) {
@@ -337,7 +320,6 @@ function appendActionButtons(actionCell, isDisabled, docId, booking, appointment
                             try {
                                 const appointmentRef = doc(db, "appointments", appointmentId);
 
-                                // Update the status and increment slots based on the action
                                 const updatedBookings = appointment.bookings.map(b => {
                                     if (b.userId === booking.userId) {
                                         if (action === 'Cancel') {
@@ -349,7 +331,7 @@ function appendActionButtons(actionCell, isDisabled, docId, booking, appointment
                                     return b;
                                 });
 
-                                const updatedSlots = appointment.slots + 1; // Increment slots
+                                const updatedSlots = appointment.slots + 1;
 
                                 await updateDoc(appointmentRef, {
                                     bookings: updatedBookings,
@@ -361,7 +343,6 @@ function appendActionButtons(actionCell, isDisabled, docId, booking, appointment
                             } catch (error) {
                                 console.error("Error updating booking:", error);
                                 showNotificationModal("An error occurred. Please try again.");
-                                // Optionally re-enable the buttons in case of error
                                 if (row) {
                                     row.querySelectorAll('button').forEach(btn => btn.disabled = false);
                                 }
@@ -376,7 +357,6 @@ function appendActionButtons(actionCell, isDisabled, docId, booking, appointment
     });
 }
 
-// Check if user is authenticated
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         const userId = user.uid;
