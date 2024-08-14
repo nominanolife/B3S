@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -52,32 +52,52 @@ applyStoredPDCState();
 
 async function checkTDCProgress(userId) {
     const appointmentsRef = collection(db, "appointments");
+    const completedBookingsRef = collection(db, "completedBookings");
 
-    // Listen for real-time updates in the "appointments" collection
-    onSnapshot(appointmentsRef, (snapshot) => {
-        let tdcCompleted = false;
+    let tdcCompleted = false;
 
+    // Check active bookings in "appointments" collection
+    const unsubscribe = onSnapshot(appointmentsRef, (snapshot) => {
         snapshot.forEach((doc) => {
             const appointment = doc.data();
 
             if (Array.isArray(appointment.bookings)) {
-                const userBookings = appointment.bookings.filter(booking => booking.userId === userId);
+                const userBookings = appointment.bookings.filter(booking => booking.userId === userId && booking.course === "TDC");
 
                 userBookings.forEach(booking => {
                     console.log(`Booking found: ${JSON.stringify(booking)}`);
                     if (booking.progress === "Completed") {
-                        console.log("TDC is completed!");
+                        console.log("TDC is completed in active bookings!");
                         tdcCompleted = true;
                     }
                 });
             }
         });
 
-        // Update the PDC element state based on TDC completion status
         if (tdcCompleted) {
             enablePDC();
         } else {
-            disablePDC();
+            // Check the "completedBookings" collection if not found in active bookings
+            checkCompletedBookings(userId);
+        }
+    });
+}
+
+async function checkCompletedBookings(userId) {
+    const completedBookingsRef = collection(db, "completedBookings");
+
+    // Query the "completedBookings" collection for TDC course
+    const q = query(completedBookingsRef, where("completedBookings.course", "==", "TDC"), where("completedBookings.userId", "==", userId));
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc) => {
+        const completedBooking = doc.data();
+        console.log("Completed booking found in completedBookings:", completedBooking);
+
+        // If TDC is completed in completedBookings, enable the PDC
+        if (completedBooking.progress === "Completed") {
+            console.log("TDC is completed in completedBookings!");
+            enablePDC();
         }
     });
 }
