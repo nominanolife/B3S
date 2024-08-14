@@ -157,6 +157,7 @@ async function fetchUserAppointments(userId) {
             console.log("Active Appointment Data:", appointment);
 
             if (Array.isArray(appointment.bookings)) {
+                // Filter bookings to include only those for the logged-in user
                 const userBookings = appointment.bookings.filter(booking => booking.userId === userId);
                 userBookings.forEach(booking => {
                     const bookingKey = `${appointment.date}_${appointment.timeStart}`;
@@ -178,7 +179,7 @@ async function fetchUserAppointments(userId) {
 
         console.log("Fetching completed bookings...");
 
-        // Fetch documents that contain the completedBookings array
+        // Fetch documents that contain the completedBookings array for the logged-in user
         const completedSnapshot = await getDocs(completedBookingsParentRef);
 
         console.log("Completed bookings parent snapshot size:", completedSnapshot.size);
@@ -189,6 +190,7 @@ async function fetchUserAppointments(userId) {
 
             // Check if the completedBookings field exists and is an array
             if (Array.isArray(completedBookingDoc.completedBookings)) {
+                // Filter the completedBookings for the logged-in user
                 completedBookingDoc.completedBookings.forEach(booking => {
                     const bookingKey = `${booking.date}_${booking.startTime}`;
                     console.log("Completed Booking Key:", bookingKey, "Booking Data:", booking);
