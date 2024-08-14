@@ -132,27 +132,25 @@
                 messagingSenderId: "195867894399",
                 appId: "1:195867894399:web:596fb109d308aea8b6154a"
             };
-    
+        
             // Initialize Firebase
             const app = initializeApp(firebaseConfig);
             const firestore = getFirestore(app);
             const auth = getAuth();
-    
-            // Event listener for the "SAVE" button click
+        
             const saveBtn = document.querySelector('#saveBtn');
             if (saveBtn) {
                 saveBtn.addEventListener('click', async () => {
-                    // Immediately decrypt email and password on button click
                     const encryptedEmail = sessionStorage.getItem('email');
                     const encryptedPassword = sessionStorage.getItem('password');
                     const tempDocId = sessionStorage.getItem('tempDocId');
                     const encryptedPhoneNumber = sessionStorage.getItem('phoneNumber');
-    
+        
                     if (!encryptedEmail || !encryptedPassword || !tempDocId || !encryptedPhoneNumber) {
                         console.log('Required information not found in sessionStorage.');
                         return;
                     }
-    
+        
                     let email, password, phoneNumber;
                     try {
                         email = CryptoJS.AES.decrypt(encryptedEmail, 'your-secret-key').toString(CryptoJS.enc.Utf8);
@@ -165,31 +163,57 @@
                         console.log('Decryption failed. Please try again.', error);
                         return;
                     }
-    
+        
+                    const first = document.getElementById('first').value.trim();
+                    const middle = document.getElementById('middle').value.trim() || ""; // Handle empty value
+                    const last = document.getElementById('last').value.trim();
+                    const suffix = document.getElementById('suffix').value.trim() || ""; // Handle empty value
+                    const birthday = document.getElementById('birthday').value;
+                    const address = document.getElementById('address').value.trim();
+                    const status = document.querySelector('input[name="status"]:checked')?.value;
+        
+                    if (!first) {
+                        displayNotification('Please enter your first name.');
+                        return;
+                    }
+                    if (!last) {
+                        displayNotification('Please enter your last name.');
+                        return;
+                    }
+                    if (!birthday) {
+                        displayNotification('Please enter your birthday.');
+                        return;
+                    }
+                    if (!address) {
+                        displayNotification('Please enter your address.');
+                        return;
+                    }
+                    if (!status) {
+                        displayNotification('Please select your civil status.');
+                        return;
+                    }
+        
+                    // Calculate age
+                    const birthDate = new Date(birthday);
+                    const today = new Date();
+                    let age = today.getFullYear() - birthDate.getFullYear();
+                    const monthDifference = today.getMonth() - birthDate.getMonth();
+        
+                    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+        
+                    if (age < 16) {
+                        displayNotification('You are not qualified to apply to the driving school.');
+                        return;
+                    }
+        
                     try {
-                        // Create a new user in Firebase Authentication
                         const newUser = await createUserWithEmailAndPassword(auth, email, password);
                         console.log("New user created:", newUser);
-    
-                        // Save the user's personal information to Firestore
-                        const docRef = doc(firestore, 'applicants', newUser.user.uid); // Use the UID from Firebase Authentication
-    
-                        // Retrieve form data
-                        const first = document.getElementById('first').value.trim();
-                        const middle = document.getElementById('middle').value.trim();
-                        const last = document.getElementById('last').value.trim();
-                        const suffix = document.getElementById('suffix').value.trim();
-                        const birthday = document.getElementById('birthday').value;
-                        const age = document.getElementById('age').value;
-                        const address = document.getElementById('address').value.trim();
-                        const status = document.querySelector('input[name="status"]:checked')?.value;
-    
-                        // Validate form fields
-                        if (!first || !last || !birthday || !address || !status) {
-                            displayNotification('All required fields must be filled out.');
-                            return;
-                        }
-    
+        
+                        const docRef = doc(firestore, 'applicants', newUser.user.uid);
+        
                         await setDoc(docRef, {
                             email: email,
                             phoneNumber: phoneNumber,
@@ -205,21 +229,16 @@
                                 status: status
                             }
                         }, { merge: true });
-    
-                        // Show success modal notification
+        
                         displayNotification('Personal Information Saved Successfully!', true);
-    
-                        // Clear sessionStorage after saving data
+        
                         sessionStorage.clear();
-    
-                        // Delete the temporary document in Firestore
                         await deleteDoc(doc(firestore, 'temporaryRegistrations', tempDocId));
-    
-                        // Redirect to the login page when the modal is closed
+        
                         document.querySelector('#notificationModal .btn-secondary').addEventListener('click', () => {
                             window.location.href = 'login.html';
                         });
-    
+        
                     } catch (error) {
                         console.error('Error in saving user information:', error);
                         displayNotification('Failed to save user information: ' + error.message);
@@ -228,19 +247,19 @@
             } else {
                 console.error("Button with ID 'saveBtn' not found.");
             }
-    
+        
             function displayNotification(message, success = false) {
                 document.getElementById('notificationMessage').textContent = message;
                 const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
                 notificationModal.show();
-    
+        
                 if (success) {
                     document.querySelector('#notificationModal .btn-secondary').addEventListener('click', () => {
                         window.location.href = 'login.html';
                     });
                 }
             }
-        });
+        });                                
     </script>
 </body>
 </html>

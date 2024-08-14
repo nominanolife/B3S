@@ -7,7 +7,7 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="CSS/styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap">
     <link rel="icon" href="Assets/logo.png" type="image/x-icon">
 </head>
 <body>
@@ -94,14 +94,39 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
     
+        // Function to validate email format
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+    
         // Sign-in event listener
         document.getElementById('signIn').addEventListener('click', async (event) => {
             event.preventDefault(); // Prevent the default form submission
         
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+        
+            // Validate input
+            if (!email && !password) {
+                showModal('Please fill in both fields.');
+                return;
+            }
+            if (!email) {
+                showModal('Please enter your email address.');
+                return;
+            }
+            if (!password) {
+                showModal('Please enter your password.');
+                return;
+            }
+            if (!isValidEmail(email)) {
+                showModal('Please enter a valid email address.');
+                return;
+            }
         
             try {
+                // Attempt to sign in with email and password
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
@@ -113,32 +138,20 @@
         
                 window.location.href = 'userdashboard.html';
             } catch (error) {
-                let errorMessage;
-                
-                // Customize error messages
-                switch (error.code) {
-                    case 'auth/invalid-email':
-                        errorMessage = 'The email address you entered is not valid. Please check and try again.';
-                        break;
-                    case 'auth/user-disabled':
-                        errorMessage = 'Your account has been disabled. Please contact support for assistance.';
-                        break;
-                    case 'auth/user-not-found':
-                        errorMessage = 'No account found with this email. Please check your email or register a new account.';
-                        break;
-                    case 'auth/wrong-password':
-                        errorMessage = 'The password you entered is incorrect. Please try again.';
-                        break;
-                    default:
-                        errorMessage = 'An unexpected error occurred. Please try again later.';
+                // Handle specific error code
+                if (error.code === "auth/invalid-credential") {
+                    showModal('Invalid credentials. Please check your email and password.');
+                } else {
+                    showModal('An error occurred during sign-in. Please try again.');
                 }
-                
-                // Show error modal notification
-                document.getElementById('notificationMessage').textContent = errorMessage;
-                const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
-                notificationModal.show();
             }
-        });        
-    </script>
+        });
+        
+        // Function to show the modal with a custom message
+        function showModal(message) {
+            document.getElementById('notificationMessage').innerText = message;
+            $('#notificationModal').modal('show');
+        }                        
+    </script>                   
 </body>
 </html>

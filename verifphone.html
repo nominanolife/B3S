@@ -130,7 +130,7 @@
             const phoneNumber = CryptoJS.AES.decrypt(encryptedPhoneNumber, 'your-secret-key').toString(CryptoJS.enc.Utf8);
     
             if (!/^\+[1-9]\d{1,14}$/.test(phoneNumber)) {
-                showModal('Invalid Phone Number Format. Please try again.');
+                showModal('Invalid phone number format. Please try again.');
                 return;
             }
     
