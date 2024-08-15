@@ -14,29 +14,6 @@ let currentPage = 1; // Tracks the current page
 const itemsPerPage = 10; // Number of items to display per page
 let totalPages = 1; // Total number of pages
 
-// Function to fetch and display applicants
-async function fetchApplicants() {
-    const contentElement = document.querySelector('.applicant-list');
-
-    try {
-        const querySnapshot = await db.collection('applicants').get();
-        applicantsData = [];
-
-        querySnapshot.forEach((doc) => {
-            const applicant = doc.data();
-            if (applicant.role === 'applicant') {
-                applicantsData.push(applicant);
-            }
-        });
-
-        totalPages = Math.ceil(applicantsData.length / itemsPerPage);
-        renderApplicants();
-        updatePaginationControls();
-    } catch (error) {
-        console.error("Error fetching applicants: ", error);
-    }
-}
-
 // Function to render applicants based on the current page
 function renderApplicants() {
     const contentElement = document.querySelector('.applicant-list');
@@ -152,6 +129,27 @@ function renderFilteredApplicants(filteredApplicants) {
     });
 }
 
+// Real-time listener for applicants collection
+function setupRealTimeListener() {
+    db.collection('applicants').onSnapshot((snapshot) => {
+        applicantsData = [];
+
+        snapshot.forEach((doc) => {
+            const applicant = doc.data();
+            if (applicant.role === 'applicant') {
+                applicantsData.push(applicant);
+            }
+        });
+
+        totalPages = Math.ceil(applicantsData.length / itemsPerPage);
+        currentPage = 1; // Reset to the first page on data update
+        renderApplicants();
+        updatePaginationControls();
+    }, (error) => {
+        console.error("Error with real-time listener: ", error);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const buttons = document.querySelectorAll('.button-right');
     const searchInput = document.querySelector('.search');
@@ -166,6 +164,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Attach event listener to search input
     searchInput.addEventListener('input', searchApplicants);
 
-    // Fetch and display applicants on page load
-    fetchApplicants();
+    // Set up real-time listener to automatically fetch and display applicants when there's a change
+    setupRealTimeListener();
 });

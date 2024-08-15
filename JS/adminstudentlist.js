@@ -39,7 +39,6 @@ async function fetchAppointments() {
 
         // Only process if the role is "student"
         if (applicantData.role === "student") {
-          // Initialize the bookings array if it doesn't exist
           applicantData.bookings = [];
 
           // Check if they have completed any of the courses
@@ -51,8 +50,8 @@ async function fetchAppointments() {
         }
       });
 
-      // Fetch all appointments and add to studentsMap if they have bookings
-      onSnapshot(collection(db, "appointments"), (appointmentsSnapshot) => {
+      // Listen to appointments changes
+      const unsubscribeAppointments = onSnapshot(collection(db, "appointments"), (appointmentsSnapshot) => {
         appointmentsSnapshot.forEach(appointment => {
           const appointmentData = appointment.data();
           const bookings = Array.isArray(appointmentData.bookings) ? appointmentData.bookings : [];
@@ -67,7 +66,6 @@ async function fetchAppointments() {
               if (studentDoc.exists()) {
                 const studentData = studentDoc.data();
 
-                // Ensure that only users with the role "student" are included
                 if (studentData.role === "student") {
                   if (!studentsMap.has(booking.userId)) {
                     studentData.bookings = [];
@@ -81,8 +79,8 @@ async function fetchAppointments() {
           });
         });
 
-        // Fetch completedBookings and update the map with completed courses
-        onSnapshot(collection(db, "completedBookings"), (completedBookingsSnapshot) => {
+        // Listen to completedBookings changes
+        const unsubscribeCompletedBookings = onSnapshot(collection(db, "completedBookings"), (completedBookingsSnapshot) => {
           completedBookingsSnapshot.forEach(doc => {
             const completedBookings = doc.data().completedBookings || [];
             const userId = doc.id;
@@ -109,7 +107,6 @@ async function fetchAppointments() {
       });
     });
 
-    // Optional: Return unsubscribe functions if you need to stop listening later
     return {
       unsubscribeApplicants,
     };

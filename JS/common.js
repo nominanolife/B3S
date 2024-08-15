@@ -1,6 +1,6 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
-import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -34,7 +34,44 @@ function disableLinks() {
             anchor.style.cursor = 'default';  // Change cursor to default
         }
     });
+    // Store the state in local storage
+    localStorage.setItem('linksState', 'disabled');
 }
+
+// Function to enable sidebar links
+function enableLinks() {
+    const linksToEnable = [
+        'usermodule.html',
+        'uservideolearning.html',
+        'userquiz.html',
+        'userappointment.html'
+    ];
+
+    linksToEnable.forEach(link => {
+        const anchor = document.querySelector(`a[href="${link}"]`);
+        if (anchor) {
+            anchor.classList.remove('disabled-link');
+            anchor.style.pointerEvents = 'auto';  // Make the link clickable again
+            anchor.style.color = '';  // Reset color
+            anchor.style.cursor = 'pointer';  // Change cursor back to pointer
+        }
+    });
+    // Store the state in local storage
+    localStorage.setItem('linksState', 'enabled');
+}
+
+// Function to check the stored links state and apply it
+function applyStoredLinksState() {
+    const storedState = localStorage.getItem('linksState');
+    if (storedState === 'enabled') {
+        enableLinks();
+    } else {
+        disableLinks();
+    }
+}
+
+// Apply the stored links state immediately on page load
+applyStoredLinksState();
 
 // Function to set up logout and profile functionality
 function setupButtons() {
@@ -75,6 +112,8 @@ function checkUserRole() {
                     // Disable links based on user role
                     if (userRole !== "student") {
                         disableLinks();
+                    } else {
+                        enableLinks();
                     }
                 } else {
                     console.error("No such document!");
@@ -87,11 +126,6 @@ function checkUserRole() {
         }
     });
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    setupButtons();  // Call the function to set up logout and profile button functionality
-    checkUserRole();
-});
 
 document.addEventListener('DOMContentLoaded', function() {
     const currentPath = window.location.pathname;
