@@ -160,6 +160,15 @@ body {
     margin-top: 120px;
 }
 
+.main-content-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 20px 30px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #D9D9D9;
+}
+
 .header {
     position: fixed;
     top: 0;
@@ -170,6 +179,10 @@ body {
     background-color: #ffffff;
     justify-content: center;
     z-index: 1000;
+}
+
+.title {
+    margin-left: auto;
 }
 
 h3 {
@@ -183,7 +196,7 @@ h2 {
     font-family: Poppins;
     font-size: 24px;
     font-weight: normal;
-    color: #ffffff;
+    color: #2F2E2E;
 }
 
 .page-content {
@@ -261,6 +274,7 @@ h2 {
 .notification-bell-container {
     display: flex;
     flex-direction: row;
+    margin-left: auto;
 }
 
 /* Bell icon */
@@ -268,13 +282,12 @@ h2 {
     font-size: 24px;
     cursor: pointer;
     color: #333;
-    margin-left: auto;
 }
 
 /* Notification list (dropdown/popup) */
 .notification-list {
     position: absolute;
-    top: 175px;
+    top: 70px;
     right: 30px;
     width: 300px;
     background-color: white;
@@ -317,6 +330,12 @@ h2 {
     padding: 20px;
     border-radius: 8px;
     color: white;
+}
+
+.roadmap-container h2 {
+    font-family: Poppins;
+    font-size: 24px;
+    color: #ffffff;
 }
 
 .roadmap-item {

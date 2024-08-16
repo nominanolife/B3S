@@ -57,6 +57,18 @@ document.addEventListener("DOMContentLoaded", async function() {
     cancelButton.style.fontSize = "14px";
     cancelButton.style.fontWeight = "bold";
 
+    // Function to restrict input to numbers only
+    function restrictToNumbers(inputElement) {
+        inputElement.addEventListener('input', function(event) {
+            // Remove any non-numeric characters
+            this.value = this.value.replace(/[^0-9.]/g, '');
+        });
+    }
+
+    // Apply the restriction to both price inputs
+    restrictToNumbers(packagePriceInput);
+    restrictToNumbers(editPackagePriceInput);
+
     // Add the cancel button to the buttons container
     const buttonsContainer = document.querySelector('.buttons');
     buttonsContainer.appendChild(cancelButton);
@@ -234,7 +246,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         packageElement.setAttribute("data-id", id);
         packageElement.innerHTML = `
             <h2>${packageName}</h2>
-            <span>Tuition Fee: &#8369;${packagePrice}</span>
+            <span>Price: &#8369;${packagePrice}</span>
             <h4>${packageDescription}</h4>
             <button class="edit-button"><i class="bi bi-three-dots-vertical"></i></button>
             <button class="delete-button">&times;</button>
@@ -370,10 +382,10 @@ document.addEventListener("DOMContentLoaded", async function() {
                 // Update the package in Firestore
                 await updatePackageInFirestore(packageIdToEdit, packageName, packagePrice, packageDescription);
                 
-                // Update the package in the DOM with "Tuition Fee:" label and currency symbol
+                // Update the package in the DOM with "Price" label and currency symbol
                 const packageElement = document.querySelector(`.package-text[data-id="${packageIdToEdit}"]`);
                 packageElement.querySelector("h2").textContent = packageName;
-                packageElement.querySelector("span").innerHTML = `Tuition Fee: &#8369;${packagePrice}`;
+                packageElement.querySelector("span").innerHTML = `Price: &#8369;${packagePrice}`;
                 packageElement.querySelector("h4").textContent = packageDescription;
 
                 // Hide the edit modal
@@ -385,7 +397,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                 editPackageDescriptionInput.value = '';
             }
         } else {
-            alert("Please fill out all fields.");
+            showNotificationModal("Please fill out all fields.", "error");
         }
     });
 
@@ -428,7 +440,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             packagePriceInput.value = '';
             packageDescriptionInput.value = '';
         } else {
-            alert("Please fill out all fields.");
+            showNotificationModal("Please fill out all fields.", "error");
         }
     });
 });

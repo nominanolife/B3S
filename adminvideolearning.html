@@ -46,10 +46,37 @@
                 <h2>Video Learning</h2>
             </div>
             <div class="page-content">
-                <!-- Add your dashboard content here -->
+                <div class="buttons">
+                    <button class="add-video" type="button" id="addButton">Upload Video</button>
+                    <button class="delete-video" type="button" id="deleteButton">Delete Video</button>
+                </div>
+                <div class="video-list" id="videoList">
+                    
+                </div>
             </div>
         </div>
     </div>
+
+        <div class="modal" id="videoModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Upload Video</h4>
+                    </div>
+                    <form class="modal-body">
+                        <div class="input-body">
+                            <input type="file" class="video-file">
+                            <input type="text" class="video-name" placeholder="Video Name" required>
+                            <input type="text" class="video-description" placeholder="Description" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="save-video" type="submit">Upload</button>
+                            <button class="close-modal" type="button">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Logout Confirmation Modal -->
         <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">

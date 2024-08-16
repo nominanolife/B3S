@@ -30,36 +30,44 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to display notifications
     function displayNotifications(notifications) {
         notificationList.innerHTML = ""; // Clear existing notifications
-    
+
         if (notifications.length === 0) {
             notificationList.innerHTML = "<div class='notification-item'>No new notifications</div>";
             return;
         }
-    
+
         notifications.forEach(notification => {
             const notificationElement = document.createElement("div");
             notificationElement.className = "notification-item";
             notificationElement.style.cursor = "pointer"; // Make it clear that the item is clickable
-    
+
             notificationElement.innerHTML = `
                 ${notification.message}
                 <span class="close-btn">&times;</span>
             `;
-    
+
             notificationList.appendChild(notificationElement);
-    
+
             // Add click event to close the notification
             notificationElement.querySelector('.close-btn').addEventListener('click', function(event) {
                 event.stopPropagation(); // Prevent the redirection when closing
                 notificationElement.remove();
             });
-    
+
             // Redirect to the appointment page when the notification is clicked
             notificationElement.addEventListener('click', function() {
                 window.location.href = 'userappointment.html';
             });
         });
-    }    
+    }
+
+     // Close the notification list when clicking outside of it
+    document.addEventListener('click', function(event) {
+        if (!notificationList.contains(event.target) && !notificationBell.contains(event.target)) {
+            notificationList.classList.add('hidden');
+            notificationList.classList.remove('show');
+        }
+    });
 
     onAuthStateChanged(auth, async function(user) {
         if (user) {
@@ -69,26 +77,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
                     const userRole = userData.role;
-
+    
                     if (userRole === "applicant") {
                         disableLinks();
-                        displayNotifications([]); // Show "No new notifications" message
                     }
-
+    
+                    // If the user is a student, start the notification listener
                     if (userRole === "student") {
                         const notificationsRef = query(
                             collection(db, "notifications"), 
-                            where("audience", "==", user.uid),
+                            where("audience", "==", "student"),
                             orderBy("date", "desc"), // Order by date, latest first
                             limit(10) // Limit to the 10 most recent notifications
                         );
-                    
-                        // Listen to notification changes
                         onSnapshot(notificationsRef, (snapshot) => {
                             const notifications = snapshot.docs.map(doc => doc.data());
-                            displayNotifications(notifications); // Display notifications
+                            displayNotifications(notifications);
                         });
-                    }                    
+                    }
     
                     // Fetch the user's upcoming appointment
                     const appointmentsRef = collection(db, "appointments");
@@ -181,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
                             balanceCard.innerHTML = `
                                 <h5 class="card-title">Current Balance</h5>
-                                <p style="color: red; font-size: 22px;">&#8369; ${userData.packagePrice}</p>
+                                <p class="card-title" style="color: red; font-size: 40px;">&#8369; ${userData.packagePrice}</p>
                                 <button class="btn btn-primary" id="viewDetailsBtn">View Details</button>
                             `;
             
@@ -242,9 +248,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
-    // Initialize the roadmap modal functionality
-    initializeRoadmap(userData);
 
     function initializeRoadmap(userData) {
         const roadmapItems = document.querySelectorAll('.roadmap-item');
