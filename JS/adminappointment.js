@@ -124,6 +124,16 @@ document.addEventListener("DOMContentLoaded", async function() {
                     timeEnd: timeEnd,
                     slots: parseInt(slots)
                 });
+    
+                // Add a new notification to the centralized notifications collection
+                await addDoc(collection(db, "notifications"), {
+                    course: course.value,
+                    message: `A new appointment has been added for ${course.value} on ${date}.`,
+                    date: new Date(),
+                    audience: "student", // Add this field
+                    isRead: false
+                });
+    
                 showSuccessModal("Appointment Added Successfully!");
             } catch (e) {
                 console.error("Error Adding Appointment: ", e);
@@ -134,7 +144,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         await fetchAppointments();
         renderCalendar();
         clearForm();
-    }              
+    }                    
 
     // Clear button click event listener
     document.getElementById("btn-clear").addEventListener("click", clearForm);
