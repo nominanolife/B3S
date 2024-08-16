@@ -155,10 +155,16 @@ async function fetchUserAppointments(userId) {
                         const bookingKey = `${appointment.date}_${appointment.timeStart}`;
                         
                         if (booking.progress === 'Completed') {
+                            // Always update completed bookings
                             activeBookingsMap.set(bookingKey, { appointment, booking, docId: doc.id });
                             console.log("Priority Booking Key (Completed):", bookingKey, "Booking Data:", booking);
                         } else {
-                            if (!activeBookingsMap.has(bookingKey)) {
+                            if (activeBookingsMap.has(bookingKey)) {
+                                // Update the existing booking in the map with the latest status
+                                activeBookingsMap.set(bookingKey, { appointment, booking, docId: doc.id });
+                                console.log("Updated existing booking in map:", bookingKey, "Booking Data:", booking);
+                            } else {
+                                // Add new booking for the first time
                                 activeBookingsMap.set(bookingKey, { appointment, booking, docId: doc.id });
                                 console.log("Active Booking Key:", bookingKey, "Booking Data:", booking);
                             }
@@ -184,6 +190,7 @@ async function fetchUserAppointments(userId) {
                         console.log("Completed Booking Key:", bookingKey, "Booking Data:", booking);
 
                         if (!activeBookingsMap.has(bookingKey)) {
+                            // Only add to history if no active booking exists with the same date/time
                             appointmentsData.push({ appointment: booking, booking, docId: userId, isCompleted: true });
                             console.log("Added completed booking to appointmentsData:", booking);
                         } else {
@@ -245,17 +252,8 @@ function renderAppointmentRow(appointment, booking, docId, isCompleted = false) 
     endTimeCell.innerText = endTime;
     row.appendChild(endTimeCell);
 
-    const currentDate = new Date();
-    const appointmentDate = new Date(`${appointment.date}T${appointment.timeStart}`);
-
     const progressCell = document.createElement('td');
-    if (currentDate < appointmentDate) {
-        progressCell.innerText = 'Not yet started';
-    } else if (currentDate.toDateString() === appointmentDate.toDateString()) {
-        progressCell.innerText = 'In progress';
-    } else {
-        progressCell.innerText = booking.progress || 'Completed';
-    }
+    progressCell.innerText = booking.progress || 'Not started';
     row.appendChild(progressCell);
 
     const statusCell = document.createElement('td');
