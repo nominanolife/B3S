@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
                     if (userRole === "applicant") {
                         disableLinks();
+
                     }
     
                     // If the user is a student, start the notification listener
@@ -90,6 +91,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             orderBy("date", "desc"), // Order by date, latest first
                             limit(10) // Limit to the 10 most recent notifications
                         );
+
+
                         onSnapshot(notificationsRef, (snapshot) => {
                             const notifications = snapshot.docs.map(doc => doc.data());
                             displayNotifications(notifications);
@@ -248,6 +251,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // Initialize the roadmap modal functionality
+    initializeRoadmap(userData);
 
     function initializeRoadmap(userData) {
         const roadmapItems = document.querySelectorAll('.roadmap-item');
