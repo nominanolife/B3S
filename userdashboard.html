@@ -44,19 +44,20 @@
         </div>
         <div class="main-content">
             <div class="header">
-                <h2>Dashboard</h2>
-            </div>
-            <div class="page-content">
+                <div class="title">
+                    <h2>Dashboard</h2>
+                </div>
                 <div class="notification-bell-container">
                     <i id="notification-bell" class="fas fa-bell"></i>
                     <div id="notification-list" class="notification-list hidden">
                         <!-- Notifications will be dynamically inserted here -->
                     </div>
                 </div>
-
+            </div>
+            <div class="page-content">
                 <!-- Roadmap Section -->
                 <div class="roadmap-container my-4 text-center">
-                    <h4>Driving School Roadmap</h4>
+                    <h2>Driving School Roadmap</h2>
                     <div class="roadmap d-flex justify-content-center align-items-center">
                         <div class="roadmap-item mx-2" data-toggle="modal" data-target="#roadmapModal" data-step="1">
                             <div class="circle">1</div>
@@ -85,16 +86,12 @@
                     <div class="col-md-6 mb-3">
                         <div class="card appointment-card">
                             <div class="card-body text-center">
-                                <h5 class="card-title">Upcoming Appointment</h5>
-                                <button class="btn btn-primary">Reschedule</button>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
                         <div class="card balance-card">
                             <div class="card-body text-center">
-                                <h5 class="card-title">Balance</h5>
-                                <button class="btn btn-primary">View Details</button>
                             </div>
                         </div>
                     </div>
@@ -146,17 +143,17 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="packageModalLabel">Package Details</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true" class="close">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <!-- Package details will be inserted here -->
-                    <p id="packageName"></p>
-                    <p id="packagePrice"></p>
-                    <p id="packageDescription"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <div id="packageModalBody">
+                        <p id="packageName"></p>
+                        <p id="packagePrice"></p>
+                        <p id="packageDescription"></p>
+                    </div>
+                    
                 </div>
             </div>
         </div>

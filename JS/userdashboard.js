@@ -61,6 +61,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+     // Close the notification list when clicking outside of it
+    document.addEventListener('click', function(event) {
+        if (!notificationList.contains(event.target) && !notificationBell.contains(event.target)) {
+            notificationList.classList.add('hidden');
+            notificationList.classList.remove('show');
+        }
+    });
+
     onAuthStateChanged(auth, async function(user) {
         if (user) {
             try {
@@ -69,15 +77,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
                     const userRole = userData.role;
-                    const userFirstName = userData.personalInfo.first;
-    
-                    // Check if the welcome message element exists before setting the text
-                    const welcomeMessageElement = document.querySelector('.page-content h2');
-                    if (welcomeMessageElement) {
-                        welcomeMessageElement.textContent = `Welcome, ${userFirstName}!`;
-                    } else {
-                        console.error("Welcome message element not found.");
-                    }
     
                     if (userRole === "applicant") {
                         disableLinks();
@@ -97,86 +96,128 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                     }
     
-                    // Initialize the roadmap modal functionality
-                    initializeRoadmap(userData);
-    
                     // Fetch the user's upcoming appointment
                     const appointmentsRef = collection(db, "appointments");
                     const q = query(appointmentsRef, where("bookings", "!=", null)); // Query for documents with bookings array
                     
                     const querySnapshot = await getDocs(q);
     
-                    if (!querySnapshot.empty) {
-                        let foundAppointment = false;
-                        querySnapshot.forEach(doc => {
-                            const appointmentData = doc.data();
-                            const bookingDetails = appointmentData.bookings.find(
-                                booking => booking.userId === user.uid && booking.status === "Booked"
-                            );
+                    // Select the appointmentCard element
+                    const appointmentCard = document.querySelector('.appointment-card .card-body');
     
-                            if (bookingDetails) {
-                                // Correctly access the date from the main appointment document
-                                const appointmentDate = appointmentData.date;
-                                const appointmentTimeSlot = bookingDetails.timeSlot;
-    
-                                // Update appointment details in UI
-                                const appointmentCard = document.querySelector('.appointment-card .card-body');
+                    if (appointmentCard) {
+                        if (!querySnapshot.empty) {
+                            let foundAppointment = false;
+                            querySnapshot.forEach(doc => {
+                                const appointmentData = doc.data();
+                                const bookingDetails = appointmentData.bookings.find(
+                                    booking => booking.userId === user.uid && booking.status === "Booked"
+                                );
+                    
+                                if (bookingDetails) {
+                                    // Remove the centering class if it exists
+                                    appointmentCard.classList.remove('center-content');
+                    
+                                    const appointmentDate = new Date(appointmentData.date).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    });
+                    
+                                    const appointmentTimeSlot = bookingDetails.timeSlot;
+                                    const [startTime, endTime] = appointmentTimeSlot.split(' - ');
+                    
+                                    function formatTimeTo12Hr(time) {
+                                        const [hours, minutes] = time.split(':');
+                                        let period = 'AM';
+                                        let hoursIn12HrFormat = parseInt(hours);
+                    
+                                        if (hoursIn12HrFormat >= 12) {
+                                            period = 'PM';
+                                            if (hoursIn12HrFormat > 12) {
+                                                hoursIn12HrFormat -= 12;
+                                            }
+                                        } else if (hoursIn12HrFormat === 0) {
+                                            hoursIn12HrFormat = 12;
+                                        }
+                    
+                                        return `${hoursIn12HrFormat}:${minutes} ${period}`;
+                                    }
+                    
+                                    const formattedStartTime = formatTimeTo12Hr(startTime);
+                                    const formattedEndTime = formatTimeTo12Hr(endTime);
+                    
+                                    const appointmentHTML = `
+                                        <h5 class="card-title">Upcoming Appointment</h5>
+                                        <div>
+                                            <p>${appointmentDate}</p>
+                                            <p style="color: green;">${formattedStartTime} to ${formattedEndTime}</p>
+                                        </div>
+                                        <button class="btn btn-primary" id="myscheduleBtn">My Schedule</button>
+                                    `;
+                                    appointmentCard.innerHTML = appointmentHTML;
                                 
-                                // Inject the appointment details into the card
-                                const appointmentHTML = `
+                                    document.getElementById("myscheduleBtn").addEventListener("click", function() {
+                                        window.location.href = "usersched.html";
+                                    });
+                                
+                                    foundAppointment = true;
+                                }
+                            });
+                    
+                            if (!foundAppointment) {
+                                appointmentCard.classList.add('center-content');
+                                appointmentCard.innerHTML = `
                                     <h5 class="card-title">Upcoming Appointment</h5>
-                                    <p>${appointmentDate} at ${appointmentTimeSlot}</p>
-                                    <button class="btn btn-primary" id="rescheduleBtn">Reschedule</button>
+                                    <p style="color: red;">No appointment yet</p>
                                 `;
-                                appointmentCard.innerHTML = appointmentHTML;
-    
-                                // Add event listener to the Reschedule button
-                                document.getElementById("rescheduleBtn").addEventListener("click", function() {
-                                    window.location.href = "usersched.html";
-                                });
-    
-                                foundAppointment = true;
                             }
-                        });
-    
-                        if (!foundAppointment) {
-                            console.log("No upcoming appointments found for this user.");
                         }
                     } else {
-                        console.log("No appointments found in the database.");
+                        console.error("Appointment card element not found.");
                     }
     
                     // Display the package price in the balance card
-                    const packagePrice = userData.packagePrice;
-                    const packageName = userData.packageName;
                     const balanceCard = document.querySelector('.balance-card .card-body');
-                    balanceCard.innerHTML = `
-                        <h5 class="card-title">Balance</h5>
-                        <p>₱${packagePrice}</p>
-                        <button class="btn btn-primary" id="viewDetailsBtn">View Details</button>
-                    `;
+                    
+                    if (balanceCard) {
+                        if (userData.packagePrice && userData.packageName) {
+                            // Remove the centering class if it exists
+                            balanceCard.classList.remove('center-content');
     
-                    // Add event listener to the "View Details" button
-                    document.getElementById("viewDetailsBtn").addEventListener("click", async function() {
-                        // Fetch the package details from the 'packages' collection
-                        const packagesRef = collection(db, "packages");
-                        const packageQuery = query(packagesRef, where("name", "==", packageName));
-                        const packageSnapshot = await getDocs(packageQuery);
-    
-                        if (!packageSnapshot.empty) {
-                            const packageData = packageSnapshot.docs[0].data();
-    
-                            // Populate the modal with package details
-                            document.getElementById("packageName").textContent = `Package Name: ${packageData.name}`;
-                            document.getElementById("packagePrice").textContent = `Price: ₱${packageData.price}`;
-                            document.getElementById("packageDescription").textContent = `Description: ${packageData.description}`;
-    
-                            // Show the modal
-                            $('#packageModal').modal('show');
+                            balanceCard.innerHTML = `
+                                <h5 class="card-title">Current Balance</h5>
+                                <p class="card-title" style="color: red; font-size: 40px;">&#8369; ${userData.packagePrice}</p>
+                                <button class="btn btn-primary" id="viewDetailsBtn">View Details</button>
+                            `;
+            
+                            document.getElementById("viewDetailsBtn").addEventListener("click", async function() {
+                                const packagesRef = collection(db, "packages");
+                                const packageQuery = query(packagesRef, where("name", "==", userData.packageName));
+                                const packageSnapshot = await getDocs(packageQuery);
+            
+                                if (!packageSnapshot.empty) {
+                                    const packageData = packageSnapshot.docs[0].data();
+            
+                                    document.getElementById("packageName").textContent = `${packageData.name}`;
+                                    document.getElementById("packagePrice").innerHTML = `&#8369;${packageData.price}`;
+                                    document.getElementById("packageDescription").textContent = `${packageData.description}`;
+            
+                                    $('#packageModal').modal('show');
+                                } else {
+                                    console.log("Package details not found.");
+                                }
+                            });
                         } else {
-                            console.log("Package details not found.");
+                            balanceCard.classList.add('center-content');
+                            balanceCard.innerHTML = `
+                                <h5 class="card-title">Current Balance</h5>
+                                <p style="color: #142A74;">No balance</p>
+                            `;
                         }
-                    });
+                    } else {
+                        console.error("Balance card element not found.");
+                    }
                     
                 } else {
                     console.error("No such document!");
@@ -187,9 +228,8 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             console.error("No user is currently signed in.");
         }
-    });
+    });        
 
-    // Function to disable sidebar links
     function disableLinks() {
         const linksToDisable = [
             'usermodule.html',
@@ -202,14 +242,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const anchor = document.querySelector(`a[href="${link}"]`);
             if (anchor) {
                 anchor.classList.add('disabled-link');
-                anchor.style.pointerEvents = 'none';  // Make the link unclickable
-                anchor.style.color = 'gray';  // Change color to indicate it's disabled
-                anchor.style.cursor = 'default';  // Change cursor to default
+                anchor.style.pointerEvents = 'none';
+                anchor.style.color = 'gray';
+                anchor.style.cursor = 'default';
             }
         });
     }
 
-    // Function to initialize the roadmap modal functionality
     function initializeRoadmap(userData) {
         const roadmapItems = document.querySelectorAll('.roadmap-item');
 
@@ -238,7 +277,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         stepDetails = "<p>Invalid step</p>";
                 }
 
-                // Display the appropriate content in the modal
                 document.getElementById('step-details').innerHTML = stepDetails;
             });
         });
