@@ -52,32 +52,30 @@ applyStoredPDCState();
 
 async function checkTDCProgress(userId) {
     const appointmentsRef = collection(db, "appointments");
-
     let tdcCompleted = false;
 
     // Check active bookings in "appointments" collection
-    const unsubscribe = onSnapshot(query(appointmentsRef, where("bookings.userId", "==", userId)), (snapshot) => {
-        snapshot.forEach((doc) => {
-            const appointment = doc.data();
-
-            if (Array.isArray(appointment.bookings)) {
-                const userBookings = appointment.bookings.filter(booking => booking.userId === userId && booking.course === "TDC");
-
-                userBookings.forEach(booking => {
-                    console.log(`Booking found: ${JSON.stringify(booking)}`);
-                    if (booking.progress === "Completed") {
-                        console.log("TDC is completed in active bookings!");
-                        tdcCompleted = true;
-                    }
-                });
-            }
-        });
-
-        if (tdcCompleted) {
-            enablePDC();
+    const unsubscribe = onSnapshot(query(appointmentsRef, where("bookings.userId", "==", userId)), async (snapshot) => {
+        if (snapshot.empty) {
+            // No active bookings found
+            await checkCompletedBookings(userId);
         } else {
-            // Check the "completedBookings" collection if not found in active bookings
-            checkCompletedBookings(userId);
+            snapshot.forEach((doc) => {
+                const appointment = doc.data();
+                if (Array.isArray(appointment.bookings)) {
+                    const userBookings = appointment.bookings.filter(booking => booking.userId === userId && booking.course === "TDC");
+                    userBookings.forEach(booking => {
+                        if (booking.progress === "Completed") {
+                            console.log("TDC is completed in active bookings!");
+                            tdcCompleted = true;
+                            enablePDC();
+                        }
+                    });
+                }
+            });
+            if (!tdcCompleted) {
+                await checkCompletedBookings(userId);
+            }
         }
     });
 }
@@ -88,9 +86,6 @@ async function checkCompletedBookings(userId) {
 
     if (completedBookingDoc.exists()) {
         const completedBookings = completedBookingDoc.data().completedBookings || [];
-        console.log("Completed booking found in completedBookings:", completedBookings);
-
-        // If TDC is completed in completedBookings, enable the PDC
         completedBookings.forEach(booking => {
             if (booking.course === "TDC" && booking.progress === "Completed") {
                 console.log("TDC is completed in completedBookings!");
@@ -99,10 +94,11 @@ async function checkCompletedBookings(userId) {
         });
     } else {
         console.log("No completed bookings document found for the user.");
+        disablePDC(); // No completion found, ensure PDC stays disabled
     }
 }
 
-// Get the logged-in user's ID
+// Get the logged-in user's ID and check TDC progress
 onAuthStateChanged(auth, (user) => {
     if (user) {
         const userId = user.uid;
