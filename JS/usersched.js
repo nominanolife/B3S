@@ -245,8 +245,17 @@ function renderAppointmentRow(appointment, booking, docId, isCompleted = false) 
     endTimeCell.innerText = endTime;
     row.appendChild(endTimeCell);
 
+    const currentDate = new Date();
+    const appointmentDate = new Date(`${appointment.date}T${appointment.timeStart}`);
+
     const progressCell = document.createElement('td');
-    progressCell.innerText = booking.progress || 'Not started';
+    if (currentDate < appointmentDate) {
+        progressCell.innerText = 'Not yet started';
+    } else if (currentDate.toDateString() === appointmentDate.toDateString()) {
+        progressCell.innerText = 'In progress';
+    } else {
+        progressCell.innerText = booking.progress || 'Completed';
+    }
     row.appendChild(progressCell);
 
     const statusCell = document.createElement('td');

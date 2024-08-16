@@ -183,7 +183,7 @@ h2 {
     font-family: Poppins;
     font-size: 24px;
     font-weight: normal;
-    color: #2F2E2E;
+    color: #ffffff;
 }
 
 .page-content {
@@ -257,20 +257,10 @@ h2 {
     background-color: #b60505ec;
 }
 
-/* Notification container */
-.notification-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 300px;
-    z-index: 1000;
-    padding: 10px;
-}
-
 /* Notification bell container */
 .notification-bell-container {
-    position: relative;
-    display: inline-block;
+    display: flex;
+    flex-direction: row;
 }
 
 /* Bell icon */
@@ -278,13 +268,14 @@ h2 {
     font-size: 24px;
     cursor: pointer;
     color: #333;
+    margin-left: auto;
 }
 
 /* Notification list (dropdown/popup) */
 .notification-list {
     position: absolute;
-    top: 30px;
-    right: 0;
+    top: 175px;
+    right: 30px;
     width: 300px;
     background-color: white;
     border: 1px solid #ccc;
@@ -292,9 +283,10 @@ h2 {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     display: none;
-    max-height: 400px;
-    overflow-y: auto;
     padding: 10px;
+    overflow-y: auto;
+    font-family: Poppins;
+    font-size: 14px;
 }
 
 /* Individual notification item */
@@ -309,16 +301,6 @@ h2 {
 /* Last item should not have a bottom border */
 .notification-item:last-child {
     border-bottom: none;
-}
-
-/* Close button */
-.notification-item .close-btn {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #721c24; /* Dark red */
 }
 
 /* Show/Hide the notification list */
@@ -375,4 +357,76 @@ h2 {
     display: block;
     font-size: 16px;
     color: white; /* Button color for the text below the circle */
+}
+
+.card-title {
+    font-family: Poppins;
+    font-size: 24px;
+    font-weight: bold;
+    color: #142A74;
+}
+
+.card-title h5 {
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: bold;
+    color: #414141;
+}
+
+.appointment-card, .balance-card {
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    min-height: 300px;
+}
+
+.appointment-card p, .balance-card p {
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: 500;
+    color: #2F2E2E;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.center-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#packageModalBody {
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#packageName {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2F2E2E;
+}
+
+#packagePrice {
+    font-size: 14px;
+    font-weight: bold;
+    color: #B60505;
+}
+
+#packageDescription {
+    font-size: 14px;
+    color: #2F2E2E;
+    font-weight: 500;
 }
