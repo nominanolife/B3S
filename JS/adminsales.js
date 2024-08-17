@@ -26,223 +26,244 @@ const auth = getAuth(app);
 let studentsData = [];
 let filteredStudentsData = [];
 let currentMonth = new Date().toLocaleString('default', { month: 'long' });
+let currentYear = new Date().getFullYear(); // Get the current year
 let currentPage = 1;
 const itemsPerPage = 10;
 let totalPages = 1;
 
-// Object to store filtered data for each month
-let monthData = {};
+// Object to store filtered data for each month and year
+let monthYearData = {};
 
-// Auto-detect current month and set it in the dropdown
+// Auto-detect current month and year and set them in the dropdowns
 document.addEventListener('DOMContentLoaded', () => {
-  const monthSelector = document.getElementById('monthSelector');
-  for (let i = 0; i < monthSelector.options.length; i++) {
-    if (monthSelector.options[i].value === currentMonth) {
-      monthSelector.selectedIndex = i;
-      break;
+    const monthSelector = document.getElementById('monthSelector');
+    const yearSelector = document.getElementById('yearSelector');
+
+    // Populate the year selector with a range of years
+    for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        yearSelector.appendChild(option);
     }
-  }
+    yearSelector.value = currentYear;
 
-  monthSelector.addEventListener('change', (event) => {
-    currentMonth = event.target.value;
-    filterStudents(); // Re-filter students based on current month selection
-  });
+    // Set current month as selected
+    for (let i = 0; i < monthSelector.options.length; i++) {
+        if (monthSelector.options[i].value === currentMonth) {
+            monthSelector.selectedIndex = i;
+            break;
+        }
+    }
 
-  fetchStudentData();
+    // Event listeners for month and year change
+    monthSelector.addEventListener('change', (event) => {
+        currentMonth = event.target.value;
+        filterStudents(); // Re-filter students based on current month and year selection
+    });
+
+    yearSelector.addEventListener('change', (event) => {
+        currentYear = event.target.value;
+        filterStudents(); // Re-filter students based on current month and year selection
+    });
+
+    fetchStudentData();
 });
 
 // Fetch Student Data with Validations
 async function fetchStudentData() {
-  try {
-    const studentsMap = new Map();
+    try {
+        const studentsMap = new Map();
 
-    // Real-time listener for applicants collection
-    const unsubscribeApplicants = onSnapshot(collection(db, "applicants"), (applicantsSnapshot) => {
-      applicantsSnapshot.forEach(applicantDoc => {
-        const applicantData = applicantDoc.data();
+        // Real-time listener for applicants collection
+        const unsubscribeApplicants = onSnapshot(collection(db, "applicants"), (applicantsSnapshot) => {
+            applicantsSnapshot.forEach(applicantDoc => {
+                const applicantData = applicantDoc.data();
 
-        // Check if the user has the role "student"
-        if (applicantData.role === "student") {
+                // Check if the user has the role "student"
+                if (applicantData.role === "student") {
 
-          // Check if the student has completed any of the courses
-          if (applicantData.TDCStatus === "Completed" || 
-              applicantData["PDC-4WheelsStatus"] === "Completed" || 
-              applicantData["PDC-MotorsStatus"] === "Completed") {
+                    // Check if the student has completed any of the courses
+                    if (applicantData.TDCStatus === "Completed" || 
+                        applicantData["PDC-4WheelsStatus"] === "Completed" || 
+                        applicantData["PDC-MotorsStatus"] === "Completed") {
 
-            studentsMap.set(applicantDoc.id, applicantData);
-          }
-        }
-      });
-
-      // Listen to appointments to check for active bookings
-      const unsubscribeAppointments = onSnapshot(collection(db, "appointments"), (appointmentsSnapshot) => {
-        appointmentsSnapshot.forEach(appointment => {
-          const appointmentData = appointment.data();
-          const bookings = Array.isArray(appointmentData.bookings) ? appointmentData.bookings : [];
-
-          bookings.forEach(booking => {
-            if (booking.status === "Cancelled" || booking.status === "Rescheduled") {
-              return;
-            }
-
-            const studentDocRef = doc(db, "applicants", booking.userId);
-            getDoc(studentDocRef).then(studentDoc => {
-              if (studentDoc.exists()) {
-                const studentData = studentDoc.data();
-
-                if (studentData.role === "student") {
-                  if (!studentsMap.has(booking.userId)) {
-                    studentData.bookings = [];
-                    studentsMap.set(booking.userId, studentData);
-                  }
-                  const student = studentsMap.get(booking.userId);
-                  student.bookings.push({ ...booking, appointmentId: appointment.id, course: appointmentData.course });
+                        studentsMap.set(applicantDoc.id, applicantData);
+                    }
                 }
-              }
             });
-          });
+
+            // Listen to appointments to check for active bookings
+            const unsubscribeAppointments = onSnapshot(collection(db, "appointments"), (appointmentsSnapshot) => {
+                appointmentsSnapshot.forEach(appointment => {
+                    const appointmentData = appointment.data();
+                    const bookings = Array.isArray(appointmentData.bookings) ? appointmentData.bookings : [];
+
+                    bookings.forEach(booking => {
+                        if (booking.status === "Cancelled" || booking.status === "Rescheduled") {
+                            return;
+                        }
+
+                        const studentDocRef = doc(db, "applicants", booking.userId);
+                        getDoc(studentDocRef).then(studentDoc => {
+                            if (studentDoc.exists()) {
+                                const studentData = studentDoc.data();
+
+                                if (studentData.role === "student") {
+                                    if (!studentsMap.has(booking.userId)) {
+                                        studentData.bookings = [];
+                                        studentsMap.set(booking.userId, studentData);
+                                    }
+                                    const student = studentsMap.get(booking.userId);
+                                    student.bookings.push({ ...booking, appointmentId: appointment.id });
+                                }
+                            }
+                        });
+                    });
+                });
+
+                // After processing all data, update the global arrays and store month and year data
+                studentsData = Array.from(studentsMap.values());
+                storeMonthYearData(); // Store the data for the current month and year
+                filterStudents(); // Filter students based on current month and year selection
+                totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
+                renderStudents();
+                updatePaginationControls();
+            });
         });
 
-        // After processing all data, update the global arrays and store month data
-        studentsData = Array.from(studentsMap.values());
-        storeMonthData(); // Store the data for the current month
-        filterStudents(); // Filter students based on current month and search term
-        totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
-        renderStudents();
-        updatePaginationControls();
-      });
-    });
-
-    return {
-      unsubscribeApplicants,
-    };
-  } catch (error) {
-    console.error("Error fetching student data: ", error);
-  }
+        return {
+            unsubscribeApplicants,
+        };
+    } catch (error) {
+        console.error("Error fetching student data: ", error);
+    }
 }
 
-// Store filtered data for the current month
-function storeMonthData() {
-  monthData[currentMonth] = studentsData;
+// Store filtered data for the current month and year
+function storeMonthYearData() {
+    const key = `${currentMonth}-${currentYear}`;
+    monthYearData[key] = studentsData;
 }
 
 // Render Students Report
 function renderStudents() {
-  const studentList = document.querySelector('.sales-list');
-  if (!studentList) {
-    console.error("Student list element not found.");
-    return;
-  }
+    const studentList = document.querySelector('.sales-list');
+    if (!studentList) {
+        console.error("Student list element not found.");
+        return;
+    }
 
-  studentList.innerHTML = '';
+    studentList.innerHTML = '';
 
-  const start = (currentPage - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  const paginatedStudents = filteredStudentsData.slice(start, end);
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const paginatedStudents = filteredStudentsData.slice(start, end);
 
-  paginatedStudents.forEach(student => {
-    const personalInfo = student.personalInfo || {};
+    paginatedStudents.forEach(student => {
+        const personalInfo = student.personalInfo || {};
 
-    const studentHtml = `
-      <tr class="table-row">
-        <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
-        <td class="table-row-content">${student.packageName || ''}</td>
-        <td class="table-row-content"></td> <!-- Leave Payment Status empty -->
-        <td class="table-row-content"></td> <!-- Leave Date of Payment empty -->
-        <td class="table-row-content"></td> <!-- Leave Amount Paid empty -->
-        <td class="table-row-content">
-          <i class="bi bi-three-dots-vertical"></i> <!-- Hamburger Icon -->
-        </td>
-      </tr>
-    `;
-    studentList.insertAdjacentHTML('beforeend', studentHtml);
-  });
+        const studentHtml = `
+            <tr class="table-row">
+                <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
+                <td class="table-row-content">${student.packageName || ''}</td>
+                <td class="table-row-content"></td> <!-- Leave Payment Status empty -->
+                <td class="table-row-content"></td> <!-- Leave Date of Payment empty -->
+                <td class="table-row-content"></td> <!-- Leave Amount Paid empty -->
+                <td class="table-row-content">
+                    <i class="bi bi-three-dots-vertical"></i> <!-- Hamburger Icon -->
+                </td>
+            </tr>
+        `;
+        studentList.insertAdjacentHTML('beforeend', studentHtml);
+    });
 }
 
 // Update Pagination Controls
 function updatePaginationControls() {
-  const paginationControls = document.querySelector('.pagination-controls');
-  if (!paginationControls) {
-    console.error("Pagination controls element not found.");
-    return;
-  }
-
-  paginationControls.innerHTML = '';
-
-  const prevButton = document.createElement('i');
-  prevButton.className = 'bi bi-caret-left';
-  if (currentPage === 1) {
-    prevButton.classList.add('disabled');
-    prevButton.style.opacity = '0.5';
-  }
-  prevButton.addEventListener('click', () => {
-    if (currentPage > 1) {
-      currentPage--;
-      renderStudents();
-      updatePaginationControls();
+    const paginationControls = document.querySelector('.pagination-controls');
+    if (!paginationControls) {
+        console.error("Pagination controls element not found.");
+        return;
     }
-  });
 
-  const nextButton = document.createElement('i');
-  nextButton.className = 'bi bi-caret-right';
-  if (currentPage === totalPages) {
-    nextButton.classList.add('disabled');
-    nextButton.style.opacity = '0.5';
-  }
-  nextButton.addEventListener('click', () => {
-    if (currentPage < totalPages) {
-      currentPage++;
-      renderStudents();
-      updatePaginationControls();
+    paginationControls.innerHTML = '';
+
+    const prevButton = document.createElement('i');
+    prevButton.className = 'bi bi-caret-left';
+    if (currentPage === 1) {
+        prevButton.classList.add('disabled');
+        prevButton.style.opacity = '0.5';
     }
-  });
+    prevButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderStudents();
+            updatePaginationControls();
+        }
+    });
 
-  const pageNumberDisplay = document.createElement('span');
-  pageNumberDisplay.className = 'page-number';
-  pageNumberDisplay.textContent = `Page ${currentPage} of ${totalPages}`;
+    const nextButton = document.createElement('i');
+    nextButton.className = 'bi bi-caret-right';
+    if (currentPage === totalPages) {
+        nextButton.classList.add('disabled');
+        nextButton.style.opacity = '0.5';
+    }
+    nextButton.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderStudents();
+            updatePaginationControls();
+        }
+    });
 
-  paginationControls.appendChild(prevButton);
-  paginationControls.appendChild(pageNumberDisplay);
-  paginationControls.appendChild(nextButton);
+    const pageNumberDisplay = document.createElement('span');
+    pageNumberDisplay.className = 'page-number';
+    pageNumberDisplay.textContent = `Page ${currentPage} of ${totalPages}`;
+
+    paginationControls.appendChild(prevButton);
+    paginationControls.appendChild(pageNumberDisplay);
+    paginationControls.appendChild(nextButton);
 }
 
 // Check user authentication and fetch students on page load
 onAuthStateChanged(auth, (user) => {
-  if (user) {
-    fetchStudentData();
-  } else {
-    console.error("No user is currently signed in.");
-  }
+    if (user) {
+        fetchStudentData();
+    } else {
+        console.error("No user is currently signed in.");
+    }
 });
 
 // Fetch students on DOM load
 document.addEventListener('DOMContentLoaded', () => {
-  fetchStudentData();
+    fetchStudentData();
 
-  // Add search functionality
-  const searchInput = document.querySelector('.search');
-  if (searchInput) {
-    searchInput.addEventListener('input', (event) => {
-      const searchTerm = event.target.value.toLowerCase();
-      filterStudents(searchTerm);
-    });
-  }
+    // Add search functionality
+    const searchInput = document.querySelector('.search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (event) => {
+            const searchTerm = event.target.value.toLowerCase();
+            filterStudents(searchTerm);
+        });
+    }
 });
 
 function filterStudents(searchTerm = '') {
-  // Check if data for the current month is already stored
-  if (monthData[currentMonth]) {
-    filteredStudentsData = monthData[currentMonth].filter(student => {
-      const fullName = `${student.personalInfo.first || ''} ${student.personalInfo.last || ''}`.toLowerCase();
-      return fullName.startsWith(searchTerm);
-    });
-  } else {
-    // If no data is stored for the current month, show no students
-    filteredStudentsData = [];
-  }
+    const key = `${currentMonth}-${currentYear}`;
+    // Check if data for the current month and year is already stored
+    if (monthYearData[key]) {
+        filteredStudentsData = monthYearData[key].filter(student => {
+            const fullName = `${student.personalInfo.first || ''} ${student.personalInfo.last || ''}`.toLowerCase();
+            return fullName.startsWith(searchTerm);
+        });
+    } else {
+        // If no data is stored for the current month and year, show no students
+        filteredStudentsData = [];
+    }
 
-  currentPage = 1;
-  totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
-  renderStudents();
-  updatePaginationControls();
+    currentPage = 1;
+    totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
+    renderStudents();
+    updatePaginationControls();
 }
