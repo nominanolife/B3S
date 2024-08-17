@@ -223,7 +223,6 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 30px;
 }
 
 .page-content-header h2 {
@@ -238,12 +237,24 @@ h2 {
 }
 
 .sales-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
     background-color: #ffffff;
     padding: 30px;
     border: 1px solid #D9D9D9;
     border-radius: 20px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     min-height: 760px;
+}
+
+.sales-container .table {
+    flex-grow: 1; /* Allows the table to take up the remaining space */
+}
+
+.sales-container .table tfoot {
+    margin-top: auto; /* Push the footer to the bottom of the table */
 }
 
 .table-headers-title{
@@ -259,6 +270,91 @@ h2 {
     font-family: Poppins;
     font-size: 14px;
     text-align: left;
+}
+
+.table th, .table td {
+    padding: 15px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.table th {
+    font-family: Poppins;
+    font-size: 16px;
+    font-weight: bold;
+    color: #585353;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.table-row-content {
+    justify-content: center;
+    align-items: center;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.table-row i {
+    font-size: 24px;
+    color: #2F2E2E;
+    border: none;
+    background: none;
+    display: flex;
+    padding-left: 15px;
+    cursor: pointer;
+}
+
+.table td:nth-child(3), .table th:nth-child(3), .table td:nth-child(4), .table th:nth-child(4), .table td:nth-child(5), .table th:nth-child(5), .table td:nth-child(6), .table th:nth-child(6) {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table td:nth-child(6) .action-button {
+    display: flex;
+    justify-content: center;
+}
+
+.table td:nth-child(6) .edit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2F2E2E;
+    margin-left: auto;
+    margin-right: 20px;
+    margin-top: auto;
+}
+
+.pagination-controls .page-number {
+    margin: 0 10px;
+}
+
+.pagination-controls .bi-caret-left, .pagination-controls .bi-caret-right {
+    font-size: 32px;
+    color: #142A74;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.pagination-controls .bi-caret-left.disabled, .pagination-controls .bi-caret-right.disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.pagination-controls .bi-caret-left:hover, .pagination-controls .bi-caret-right:hover {
+    color: #2045CF;
 }
 
 .modal-header, .modal-body, .input-body, .modal-footer {
@@ -287,6 +383,73 @@ h2 {
     flex-direction: column;
     font-size: 14px;
 }
+
+#editSalesModal .modal-content {
+    padding: 20px;
+    border-radius: 20px;
+}
+
+#editSalesModal .modal-header {
+    border-bottom: none;
+    background: #f8f9fa;
+}
+
+#editSalesModal .modal-body {
+    padding: 10px;
+}
+
+#editSalesModal .modal-footer {
+    border-top: none;
+}
+
+.edit-sales-name, .edit-sales-package, .edit-sales-payment, .edit-sales-date, .edit-sales-amount {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+
+.update-sales {
+    background-color: #142A74;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.update-sales:hover {
+    background-color: #1B3286;
+}
+
+.close-edit-modal {
+    background-color: #7B1719;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.close-edit-modal:hover {
+    background-color: #c9302c;
+}
+
+.input-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-body input {
+    font-family: Poppins;
+    font-size: 14px;
+    padding: 10px;
+    border: 1px solid #D9D9D9;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
 /* Cancel Button */
 .btn-cancel {
     font-family: Poppins, sans-serif;

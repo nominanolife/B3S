@@ -56,7 +56,6 @@
                         <table class="table">
                             <thead class="table-headers">
                                 <tr class="table-headers-title">
-                                    <th>STUDENT NUMBER</th>
                                     <th>NAME</th>
                                     <th>PACKAGE</th>
                                     <th>PAYMENT STATUS</th>
@@ -67,10 +66,40 @@
                             </thead>
                             <tbody class="sales-list">
                                 
-                            </tbody>                          
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-headers-title">
+                                    <td colspan="4" style="text-align: right; font-weight: bold;">Total:</td>
+                                    <td style="text-align: center; font-weight: bold;">&#8369;</td>
+                                </tr>
+                            </tfoot>                                                                              
                         </table>
-                    </div>
+                        <div class="pagination-controls cancelled-pagination-controls"></div>
+                    </div>                    
                 </div>    
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editSalesModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Edit Information</h4>
+                </div>
+                <form class="modal-body">
+                    <div class="input-body">
+                        <input type="text" class="edit-sales-name" placeholder="Name" required>
+                        <input type="text" class="edit-sales-package" placeholder="Package" required>
+                        <input type="text" class="edit-sales-payment" placeholder="Payment Status" required>
+                        <input type="text" class="edit-sales-date" placeholder="Date of Payment" required>
+                        <input type="text" class="edit-sales-amount" placeholder="Amount" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="update-sales" type="submit">Update</button>
+                        <button class="close-edit-modal" type="button">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
