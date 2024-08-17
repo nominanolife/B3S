@@ -239,22 +239,11 @@ h2 {
 .sales-container {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    background-color: #ffffff;
     padding: 30px;
     border: 1px solid #D9D9D9;
     border-radius: 20px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     min-height: 760px;
-}
-
-.sales-container .table {
-    flex-grow: 1; /* Allows the table to take up the remaining space */
-}
-
-.sales-container .table tfoot {
-    margin-top: auto; /* Push the footer to the bottom of the table */
 }
 
 .table-headers-title{
@@ -304,7 +293,7 @@ h2 {
     cursor: pointer;
 }
 
-.table td:nth-child(3), .table th:nth-child(3), .table td:nth-child(4), .table th:nth-child(4), .table td:nth-child(5), .table th:nth-child(5), .table td:nth-child(6), .table th:nth-child(6) {
+.table td:nth-child(3), .table th:nth-child(3), .table td:nth-child(4), .table th:nth-child(4), .table td:nth-child(5), .table th:nth-child(5) {
     text-align: center;
     vertical-align: middle;
 }
@@ -367,7 +356,7 @@ h2 {
 }
 
 .modal-dialog {
-    top: 30%;
+    top: 20%;
     left: 5%;
     border-radius: 20px;
 }

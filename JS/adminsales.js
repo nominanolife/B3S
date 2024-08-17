@@ -160,23 +160,47 @@ function renderStudents() {
     const end = start + itemsPerPage;
     const paginatedStudents = filteredStudentsData.slice(start, end);
 
-    paginatedStudents.forEach(student => {
+    paginatedStudents.forEach((student, index) => {
         const personalInfo = student.personalInfo || {};
 
         const studentHtml = `
-            <tr class="table-row">
-                <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
-                <td class="table-row-content">${student.packageName || ''}</td>
-                <td class="table-row-content"></td> <!-- Leave Payment Status empty -->
-                <td class="table-row-content"></td> <!-- Leave Date of Payment empty -->
-                <td class="table-row-content"></td> <!-- Leave Amount Paid empty -->
-                <td class="table-row-content">
-                    <i class="bi bi-three-dots-vertical"></i> <!-- Hamburger Icon -->
-                </td>
-            </tr>
+        <tr class="table-row">
+            <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
+            <td class="table-row-content">${student.packageName || ''}</td>
+            <td class="table-row-content">${student.paymentStatus || ''}</td> <!-- Payment Status -->
+            <td class="table-row-content">${student.paymentDate || ''}</td> <!-- Date of Payment -->
+            <td class="table-row-content">${student.amountPaid || ''}</td> <!-- Amount Paid -->
+            <td class="table-row-content">
+            <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
+            </td>
+        </tr>
         `;
         studentList.insertAdjacentHTML('beforeend', studentHtml);
     });
+
+    // Add event listeners to the edit icons
+    const editIcons = studentList.querySelectorAll('.edit-icon');
+    editIcons.forEach(icon => {
+        icon.addEventListener('click', (event) => {
+        const studentIndex = event.target.getAttribute('data-index');
+        openEditModal(studentIndex);
+        });
+    });
+}
+
+// Function to open the modal and pre-fill with student data
+function openEditModal(studentIndex) {
+  const selectedStudent = filteredStudentsData[studentIndex];
+
+  // Pre-fill the modal fields with the selected student's data
+  document.querySelector('.edit-sales-name').value = selectedStudent.personalInfo.first || '';
+  document.querySelector('.edit-sales-package').value = selectedStudent.packageName || '';
+  document.querySelector('.edit-sales-payment').value = selectedStudent.paymentStatus || '';
+  document.querySelector('.edit-sales-date').value = selectedStudent.paymentDate || '';
+  document.querySelector('.edit-sales-amount').value = selectedStudent.amountPaid || '';
+
+  // Show the modal
+  $('#editSalesModal').modal('show');
 }
 
 // Update Pagination Controls

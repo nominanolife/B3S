@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getFirestore, collection, query, where, orderBy, limit, onSnapshot, doc, getDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
-import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
+import { getFirestore, collection, query, where, orderBy, limit, onSnapshot, doc, getDoc, getDocs, updateDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -20,9 +20,10 @@ const auth = getAuth(app);
 document.addEventListener('DOMContentLoaded', function () {
     const notificationBell = document.getElementById('notification-bell');
     const notificationList = document.getElementById('notification-list');
+    const notificationIndicator = document.getElementById('notification-indicator');
 
     // Toggle the visibility of the notification list when the bell is clicked
-    notificationBell.addEventListener('click', function() {
+    notificationBell.addEventListener('click', function () {
         notificationList.classList.toggle('show');
         notificationList.classList.toggle('hidden');
     });
@@ -30,38 +31,114 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to display notifications
     function displayNotifications(notifications) {
         notificationList.innerHTML = ""; // Clear existing notifications
-
+    
+        // Create a container for the title and "Mark all as read" button
+        const notificationHeader = document.createElement('div');
+        notificationHeader.className = 'notification-header';
+    
+        const notificationTitle = document.createElement('div');
+        notificationTitle.className = 'notification-title';
+        notificationTitle.innerHTML = "<h2>Notification</h2>";
+    
+        const markAllReadContainer = document.createElement('div');
+        markAllReadContainer.id = 'mark-all-read-container';
+        markAllReadContainer.innerHTML = `
+            <button id="mark-all-read" class="btn btn-link">Mark all as read</button>
+        `;
+    
+        notificationHeader.appendChild(notificationTitle);
+        notificationHeader.appendChild(markAllReadContainer);
+        notificationList.appendChild(notificationHeader);
+    
         if (notifications.length === 0) {
             notificationList.innerHTML = "<div class='notification-item'>No new notifications</div>";
+            notificationIndicator.classList.remove('show'); // Hide the indicator if no notifications
             return;
         }
-
+    
+        let hasUnread = false;
+    
         notifications.forEach(notification => {
             const notificationElement = document.createElement("div");
             notificationElement.className = "notification-item";
             notificationElement.style.cursor = "pointer"; // Make it clear that the item is clickable
-
+    
+            // Check if the notification is unread and add the "unread" class
+            if (!notification.read) {
+                notificationElement.classList.add("unread");
+                hasUnread = true; // Mark that there is at least one unread notification
+            }
+    
             notificationElement.innerHTML = `
                 ${notification.message}
-                <span class="close-btn">&times;</span>
             `;
-
+    
             notificationList.appendChild(notificationElement);
-
-            // Add click event to close the notification
-            notificationElement.querySelector('.close-btn').addEventListener('click', function(event) {
-                event.stopPropagation(); // Prevent the redirection when closing
-                notificationElement.remove();
-            });
-
+    
             // Redirect to the appointment page when the notification is clicked
             notificationElement.addEventListener('click', function() {
                 window.location.href = 'userappointment.html';
             });
         });
+    
+        // Show or hide the indicator based on the presence of unread notifications
+        if (hasUnread) {
+            notificationIndicator.classList.add('show');
+        } else {
+            notificationIndicator.classList.remove('show');
+        }
+    
+        // Add event listener for the "Mark all as read" button
+        const markAllReadBtn = document.getElementById('mark-all-read');
+        markAllReadBtn.addEventListener('click', async function () {
+            try {
+                const userDocRef = doc(db, "applicants", auth.currentUser.uid);
+    
+                // Update the user's document to mark all notifications as read
+                await updateDoc(userDocRef, { notificationsRead: true });
+    
+                // Update each notification's read status in Firestore
+                const notificationsQuery = query(collection(db, "notifications"), where("audience", "==", "student"));
+                const snapshot = await getDocs(notificationsQuery);
+    
+                const batch = writeBatch(db); // Use a batch to update all notifications at once
+                snapshot.forEach(doc => {
+                    batch.update(doc.ref, { read: true });
+                });
+                await batch.commit(); // Commit the batch update
+    
+                // Re-fetch the user's document to confirm notificationsRead status
+                const updatedDocSnap = await getDoc(userDocRef);
+                if (updatedDocSnap.exists() && updatedDocSnap.data().notificationsRead) {
+                    const notificationItems = document.querySelectorAll('.notification-item');
+                    notificationItems.forEach(item => {
+                        item.classList.remove('unread');
+                    });
+                    notificationIndicator.classList.remove('show');
+                }
+    
+            } catch (error) {
+                console.error("Error updating document:", error);
+            }
+        });
+    }    
+
+    // Check if there are unread notifications and adjust the indicator accordingly
+    async function checkNotifications() {
+        const userDocRef = doc(db, "applicants", auth.currentUser.uid);
+        const docSnap = await getDoc(userDocRef);
+
+        if (docSnap.exists()) {
+            const notificationsRead = docSnap.data().notificationsRead;
+            if (notificationsRead) {
+                notificationIndicator.classList.remove('show');
+            } else {
+                notificationIndicator.classList.add('show');
+            }
+        }
     }
 
-     // Close the notification list when clicking outside of it
+    // Close the notification list when clicking outside of it
     document.addEventListener('click', function(event) {
         if (!notificationList.contains(event.target) && !notificationBell.contains(event.target)) {
             notificationList.classList.add('hidden');
