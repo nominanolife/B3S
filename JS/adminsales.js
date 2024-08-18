@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getFirestore, collection, onSnapshot, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { getFirestore, collection, onSnapshot, doc, getDoc, getDocs, updateDoc, addDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
 
 // Your web app's Firebase configuration
@@ -112,17 +112,23 @@ async function fetchStudentData() {
                         getDoc(studentDocRef).then(studentDoc => {
                             if (studentDoc.exists()) {
                                 const studentData = studentDoc.data();
-
+                        
                                 if (studentData.role === "student") {
                                     if (!studentsMap.has(booking.userId)) {
-                                        studentData.bookings = [];
+                                        studentData.bookings = []; // Initialize bookings array if not present
                                         studentsMap.set(booking.userId, studentData);
                                     }
                                     const student = studentsMap.get(booking.userId);
+                        
+                                    // Ensure the bookings array exists
+                                    if (!student.bookings) {
+                                        student.bookings = [];
+                                    }
+                        
                                     student.bookings.push({ ...booking, appointmentId: appointment.id });
                                 }
                             }
-                        });
+                        });  
                     });
                 });
 
@@ -150,7 +156,6 @@ function storeMonthYearData() {
     monthYearData[key] = studentsData;
 }
 
-// Render Students Report
 function renderStudents() {
     const studentList = document.querySelector('.sales-list');
     if (!studentList) {
@@ -176,7 +181,7 @@ function renderStudents() {
             <td class="table-row-content">${student.paymentDate || ''}</td> <!-- Date of Payment -->
             <td class="table-row-content">${student.amountPaid || ''}</td> <!-- Amount Paid -->
             <td class="table-row-content">
-                <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
+            <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
             </td>
         </tr>
         `;
@@ -196,19 +201,72 @@ function renderStudents() {
     calculateTotalSales();
 }
 
-// Function to open the modal and pre-fill with student data
-function openEditModal(studentIndex) {
+async function openEditModal(studentIndex) {
     const selectedStudent = filteredStudentsData[studentIndex];
+
+    // Try to fetch the existing sales data for this student
+    let existingSalesDocId = null;
+    const salesQuery = collection(db, "sales");
+    const salesSnapshot = await getDocs(salesQuery);
+    
+    salesSnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.name === selectedStudent.personalInfo.first && data.packageName === selectedStudent.packageName) {
+            existingSalesDocId = doc.id;
+            document.querySelector('.edit-sales-date').value = data.paymentDate || '';
+            document.querySelector('.edit-sales-amount').value = data.amountPaid || '';
+        }
+    });
 
     // Pre-fill the modal fields with the selected student's data
     document.querySelector('.edit-sales-name').value = selectedStudent.personalInfo.first || '';
     document.querySelector('.edit-sales-package').value = selectedStudent.packageName || '';
     document.querySelector('.edit-sales-package-price').value = selectedStudent.packagePrice || ''; // Package Price
-    document.querySelector('.edit-sales-date').value = selectedStudent.paymentDate || '';
-    document.querySelector('.edit-sales-amount').value = selectedStudent.amountPaid || '';
 
     // Show the modal
     $('#editSalesModal').modal('show');
+
+    // Attach an event listener to the "Update" button to save changes
+    document.querySelector('.update-sales').onclick = async (event) => {
+        event.preventDefault(); // Prevent the form from submitting in the traditional way
+        await saveSalesData(studentIndex, existingSalesDocId);
+    };
+}
+
+async function saveSalesData(studentIndex, existingSalesDocId = null) {
+    const selectedStudent = filteredStudentsData[studentIndex];
+
+    // Gather the updated data from the modal
+    const updatedData = {
+        name: document.querySelector('.edit-sales-name').value,
+        packageName: document.querySelector('.edit-sales-package').value,
+        packagePrice: document.querySelector('.edit-sales-package-price').value,
+        paymentDate: document.querySelector('.edit-sales-date').value,
+        amountPaid: document.querySelector('.edit-sales-amount').value,
+    };
+
+    try {
+        if (existingSalesDocId) {
+            // If a document ID exists, update the existing document
+            const salesDocRef = doc(db, "sales", existingSalesDocId);
+            await updateDoc(salesDocRef, updatedData);
+            console.log('Sales data successfully updated.');
+        } else {
+            // If no document ID exists, create a new document
+            await addDoc(collection(db, "sales"), updatedData);
+            console.log('Sales data successfully saved.');
+        }
+
+    } catch (error) {
+        console.error("Error saving sales data: ", error);
+    }
+
+    // Close the modal after saving
+    $('#editSalesModal').modal('hide');
+
+    // Refresh the student data to reflect changes
+    await fetchStudentData();
+    renderStudents();
 }
 
 function calculateTotalSales() {
