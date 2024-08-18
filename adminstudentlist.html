@@ -74,6 +74,8 @@
                                     <th>TDC</th>
                                     <th>4 Wheels</th>
                                     <th>Motors</th>
+                                    <th>CERTIFICATE CONTROL NUMBER</th>
+                                    <th>ACTION</th>
                                 </tr>
                             </thead>
                             <tbody class="student-list" id="student-list">
@@ -84,6 +86,43 @@
                         <div class="pagination-controls"></div>
                     </div>
                 </div>                
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Certificate Control Number Modal -->
+    <div class="modal" id="editModal" data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Edit Certificate Control Number</h4>
+                </div>
+                <form class="modal-body">
+                    <div class="input-body">
+                        <input type="text" class="edit-cert-number" id="certificateControlNumberInput" placeholder="Certificate Control Number" required>
+                    </div>                    
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="saveChangesBtn">Confirm</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body" id="successModalBody">
+                    <!-- Message will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                </div>
             </div>
         </div>
     </div>

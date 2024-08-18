@@ -176,7 +176,7 @@ function renderStudents() {
             <td class="table-row-content">${student.paymentDate || ''}</td> <!-- Date of Payment -->
             <td class="table-row-content">${student.amountPaid || ''}</td> <!-- Amount Paid -->
             <td class="table-row-content">
-            <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
+                <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
             </td>
         </tr>
         `;

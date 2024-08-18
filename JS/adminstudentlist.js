@@ -28,6 +28,18 @@ let currentPage = 1; // Tracks the current page for pagination
 const itemsPerPage = 10; // Number of items to display per page
 let totalPages = 1; // Total number of pages
 
+// Function to show the notification modal
+function showNotification(message) {
+    const successModalBody = document.getElementById('successModalBody');
+    successModalBody.textContent = message;
+    
+    const successModal = new bootstrap.Modal(document.getElementById('successModal'), {
+        backdrop: 'static',
+        keyboard: false 
+    });
+    successModal.show();
+}
+
 async function fetchAppointments() {
   try {
     const studentsMap = new Map();
@@ -123,84 +135,89 @@ function renderStudents() {
   const end = start + itemsPerPage;
   const paginatedStudents = filteredStudentsData.slice(start, end);
 
-  paginatedStudents.forEach(student => {
-    const personalInfo = student.personalInfo || {};
-    const statuses = {
-      TDC: student.TDCStatus || null,
-      "PDC-4Wheels": student['PDC-4WheelsStatus'] || null,
-      "PDC-Motors": student['PDC-MotorsStatus'] || null
-    };
+  paginatedStudents.forEach((student, index) => {
+      const personalInfo = student.personalInfo || {};
+      const statuses = {
+          TDC: student.TDCStatus || null,
+          "PDC-4Wheels": student['PDC-4WheelsStatus'] || null,
+          "PDC-Motors": student['PDC-MotorsStatus'] || null
+      };
 
-    const studentHtml = `
-      <tr class="table-row">
-        <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
-        <td class="table-row-content">${student.email}</td>
-        <td class="table-row-content">${student.phoneNumber || ''}</td>
-        <td class="table-row-content">${student.packageName}</td>
-        <td class="table-row-content">&#8369; ${student.packagePrice || ''}</td>
-        ${renderCourseStatus('TDC', statuses.TDC, student.bookings)}
-        ${renderCourseStatus('PDC-4Wheels', statuses["PDC-4Wheels"], student.bookings)}
-        ${renderCourseStatus('PDC-Motors', statuses["PDC-Motors"], student.bookings)}
-      </tr>
+      // Assuming the certificate control number is stored in a field named `certificateControlNumber`
+      const certificateControlNumber = student.certificateControlNumber || '';
+
+      const studentHtml = `
+        <tr class="table-row">
+            <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
+            <td class="table-row-content">${student.email}</td>
+            <td class="table-row-content">${student.phoneNumber || ''}</td>
+            <td class="table-row-content">${student.packageName}</td>
+            <td class="table-row-content package-price">&#8369; ${student.packagePrice || ''}</td>
+            ${renderCourseStatus('TDC', statuses.TDC, student.bookings)}
+            ${renderCourseStatus('PDC-4Wheels', statuses["PDC-4Wheels"], student.bookings)}
+            ${renderCourseStatus('PDC-Motors', statuses["PDC-Motors"], student.bookings)}
+            <td class="table-row-content">${certificateControlNumber}</td>
+            <td class="table-row-content">
+                <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
+            </td>
+        </tr>
     `;
-    studentList.insertAdjacentHTML('beforeend', studentHtml);
+      studentList.insertAdjacentHTML('beforeend', studentHtml);
   });
 
   function renderCourseStatus(course, status, bookings = []) {
-    if (status === "Completed") {
-      return `
-          <td class="table-row-content">
-              <label class="status-label">
-                  <input type="checkbox" class="status-toggle" checked disabled>
-                  Completed
-              </label>
-          </td>
-      `;
-    } else {
-      const booking = bookings.find(b => b.course === course && b.status === "Booked");
-      if (booking) {
-        return `
-            <td class="table-row-content">
-                <label class="status-label">
-                    <input type="checkbox" class="status-toggle" 
-                           data-booking-id="${booking.appointmentId}" 
-                           data-user-id="${booking.userId}" 
-                           data-column="${course}">
-                    Completed
-                </label>
-            </td>
-        `;
+      if (status === "Completed") {
+          return `
+              <td class="table-row-content">
+                  <label class="status-label">
+                      <input type="checkbox" class="status-toggle" checked disabled>
+                  </label>
+              </td>
+          `;
       } else {
-        return '<td class="table-row-content"></td>';
+          const booking = bookings.find(b => b.course === course && b.status === "Booked");
+          if (booking) {
+              return `
+                  <td class="table-row-content">
+                      <label class="status-label">
+                          <input type="checkbox" class="status-toggle" 
+                                 data-booking-id="${booking.appointmentId}" 
+                                 data-user-id="${booking.userId}" 
+                                 data-column="${course}">
+                      </label>
+                  </td>
+              `;
+          } else {
+              return '<td class="table-row-content"></td>';
+          }
       }
-    }
   }
 
   document.querySelectorAll('.status-toggle').forEach(toggle => {
-    toggle.addEventListener('change', async (event) => {
-      event.preventDefault(); // Prevent the default checkbox toggle behavior
+      toggle.addEventListener('change', async (event) => {
+          event.preventDefault(); // Prevent the default checkbox toggle behavior
 
-      const appointmentId = event.target.dataset.bookingId;
-      const userId = event.target.dataset.userId;
-      const course = event.target.dataset.column;
-      const isCompleted = event.target.checked;
+          const appointmentId = event.target.dataset.bookingId;
+          const userId = event.target.dataset.userId;
+          const course = event.target.dataset.column;
+          const isCompleted = event.target.checked;
 
-      const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {
-        backdrop: 'static',
-        keyboard: false 
+          const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {
+              backdrop: 'static',
+              keyboard: false 
+          });
+          confirmationModal.show();
+
+          document.getElementById('confirmButton').onclick = async () => {
+              confirmationModal.hide();
+              await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
+          };
+
+          document.getElementById('confirmationModal').querySelector('.btn-secondary').onclick = () => {
+              event.target.checked = !isCompleted;
+              confirmationModal.hide();
+          };
       });
-      confirmationModal.show();
-
-      document.getElementById('confirmButton').onclick = async () => {
-        confirmationModal.hide();
-        await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
-      };
-
-      document.getElementById('confirmationModal').querySelector('.btn-secondary').onclick = () => {
-        event.target.checked = !isCompleted;
-        confirmationModal.hide();
-      };
-    });
   });
 }
 
@@ -359,6 +376,58 @@ onAuthStateChanged(auth, (user) => {
   } else {
     console.error("No user is currently signed in.");
   }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Event listener for edit icons
+  document.getElementById('student-list').addEventListener('click', async (event) => {
+      if (event.target.classList.contains('edit-icon')) {
+          const studentId = event.target.dataset.index;
+          const studentData = studentsData[studentId];
+          const currentCertificate = studentData.certificateControlNumber || '';
+
+          // Populate modal with current certificate control number
+          document.getElementById('certificateControlNumberInput').value = currentCertificate;
+
+          // Show the modal
+          const editModal = new bootstrap.Modal(document.getElementById('editModal'), {
+              backdrop: 'static',
+              keyboard: false 
+          });
+          editModal.show();
+
+          // Handle save changes
+          document.getElementById('saveChangesBtn').onclick = async () => {
+            const newCertificateNumber = document.getElementById('certificateControlNumberInput').value;
+
+            // Update the certificate control number in Firestore
+            try {
+                const studentDocRef = doc(db, "applicants", studentData.id);
+                await updateDoc(studentDocRef, {
+                    certificateControlNumber: newCertificateNumber
+                });
+
+                // Update the local data structure with the new certificate control number
+                studentData.certificateControlNumber = newCertificateNumber;
+
+                // Re-render the student list to reflect the changes
+                renderStudents();
+
+                // Show success notification modal
+                showNotification("Certificate Control Number updated successfully!");
+
+                // Hide the modal
+                editModal.hide();
+
+            } catch (error) {
+                console.error("Error updating certificate control number: ", error);
+
+                // Show failure notification modal
+                showNotification("Failed to update certificate control number.");
+            }
+          };
+      }
+  });
 });
 
 // Fetch students on DOM load

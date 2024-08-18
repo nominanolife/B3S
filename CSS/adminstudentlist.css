@@ -303,9 +303,14 @@ h2 {
     border-bottom: 1px solid #D9D9D9;
 }
 
+.table td.package-price {
+    text-align: center;
+    vertical-align: middle;
+}
+
 .table th {
     font-family: Poppins;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     color: #585353;
     text-align: left;
@@ -320,12 +325,38 @@ h2 {
 }
 
 .table-row i {
-    font-size: 24px;
+    font-size: 20px;
     color: #2F2E2E;
     border: none;
     background: none;
     display: flex;
     padding-left: 15px;
+    cursor: pointer;
+}
+
+.status-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.status-toggle {
+    margin: 0 auto;
+    display: flex;
+}
+
+
+.action-button {
+    display: flex;
+    justify-content: center;
+}
+
+.edit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
     cursor: pointer;
 }
 
@@ -518,6 +549,32 @@ h2 {
 
 .modal-body {
     font-size: 14px;
+}
+
+#editModal .modal-content {
+    padding: 20px;
+    border-radius: 20px;
+}
+
+#editModal .modal-header {
+    border-bottom: none;
+    color: #142A74;
+}
+
+#editModal .modal-body {
+    padding: 10px;
+}
+
+#editModal .modal-footer {
+    border-top: none;
+}
+
+.edit-cert-number {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
 }
 
 .close {
