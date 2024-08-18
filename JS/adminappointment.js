@@ -84,19 +84,6 @@ document.addEventListener("DOMContentLoaded", async function() {
             return;
         }
         
-        // Validate the time based on course type
-        const [endHour, endMinute] = timeEnd.split(":").map(Number);
-        
-        if (course.value === 'TDC' && (endHour > 17 || (endHour === 17 && endMinute >= 1))) {
-            showSuccessModal("The time is beyond our operating hours. Please choose a valid time.");
-            return;
-        }
-        
-        if ((course.value === 'PDC-4Wheels' || course.value === 'PDC-Motors') && (endHour > 21 || (endHour === 21 && endMinute >= 1))) {
-            showSuccessModal("The time is beyond our operating hours. Please choose a valid time.");
-            return;
-        }
-        
         if (selectedAppointmentId) {
             // Update the existing document
             try {
@@ -144,7 +131,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         await fetchAppointments();
         renderCalendar();
         clearForm();
-    }                    
+    }                        
 
     // Clear button click event listener
     document.getElementById("btn-clear").addEventListener("click", clearForm);

@@ -232,8 +232,35 @@ h2 {
     color: #2F2E2E;
 }
 
+.filter-date {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.filter-date select {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #585353;
+    border-radius: 5px;
+    border: 1px solid #D9D9D9;
+    background-color: #F4F4F4;
+    cursor: pointer;
+    width: 10%;
+}
+
+.filter-date select:hover {
+    background-color: #f5f5f5;
+}
+
+.filter-date option {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #585353;
+}
+
 .page-body {
-    margin-top: 30px;
+    margin-top: 10px;
 }
 
 .sales-container {
@@ -293,23 +320,42 @@ h2 {
     cursor: pointer;
 }
 
-.table td:nth-child(3), .table th:nth-child(3), .table td:nth-child(4), .table th:nth-child(4), .table td:nth-child(5), .table th:nth-child(5) {
+.table td:nth-child(3), .table th:nth-child(3), .table td:nth-child(4), .table th:nth-child(4), .table td:nth-child(5), .table th:nth-child(5), .table td:nth-child(6), .table th:nth-child(6) {
     text-align: center;
     vertical-align: middle;
 }
 
-.table td:nth-child(6) .action-button {
+.table td:nth-child(7) .action-button {
     display: flex;
     justify-content: center;
 }
 
-.table td:nth-child(6) .edit-button {
+.table td:nth-child(7) .edit-button {
     display: flex;
     align-items: center;
     justify-content: center;
     border: none;
     background: none;
     cursor: pointer;
+}
+
+.pagination {
+    margin-top: auto;
+}
+
+.total-sales {
+    display: flex;
+    color: #2F2E2E;
+    margin-right: 20px;
+    margin-top: auto;
+}
+
+.total-sales h4 {
+    font-family: Poppins;
+    font-size: 16px;
+    font-weight: bold;
+    color: #585353;
+    margin-right: 10px;
 }
 
 .pagination-controls {

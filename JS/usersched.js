@@ -220,15 +220,24 @@ function updateAppointmentData(activeBookingsMap, appointmentsData, userId) {
 
     // Combine active bookings from map into the appointmentsData array
     const activeBookingsArray = Array.from(activeBookingsMap.values());
-    console.log("Active Bookings Array:", activeBookingsArray);
 
     // Merge active and completed bookings
     appointmentsData = appointmentsData.concat(activeBookingsArray);
 
-    console.log("Merged Appointments Data (before sort):", appointmentsData);
+    // Clear the table body before rendering new rows
+    appointmentsTableBody.innerHTML = "";
 
+    // Check if there are no appointments
     if (appointmentsData.length === 0) {
-        console.log("No appointments data found, check if something is being filtered out.");
+        // Display a default message when there are no schedules
+        const noScheduleRow = document.createElement('tr');
+        const noScheduleCell = document.createElement('td');
+        noScheduleCell.setAttribute('colspan', '7'); // Span all columns
+        noScheduleCell.classList.add('text-center'); // Center the text
+        noScheduleCell.innerText = "No schedules yet.";
+        noScheduleRow.appendChild(noScheduleCell);
+        appointmentsTableBody.appendChild(noScheduleRow);
+        return;
     }
 
     // Sort appointments by date or other criteria as needed
@@ -238,17 +247,10 @@ function updateAppointmentData(activeBookingsMap, appointmentsData, userId) {
         return dateA - dateB;
     });
 
-    console.log("Final sorted appointmentsData:", appointmentsData);
-
-    // Clear and re-render the table
-    appointmentsTableBody.innerHTML = "";
-    if (appointmentsData.length === 0) {
-        console.log("No appointments to render. Check the merging logic.");
-    } else {
-        appointmentsData.forEach(({ appointment, booking, docId, isCompleted }) => {
-            renderAppointmentRow(appointment, booking, docId, isCompleted);
-        });
-    }
+    // Render each appointment row
+    appointmentsData.forEach(({ appointment, booking, docId, isCompleted }) => {
+        renderAppointmentRow(appointment, booking, docId, isCompleted);
+    });
 }
 
 function renderAppointmentRow(appointment, booking, docId, isCompleted = false) {

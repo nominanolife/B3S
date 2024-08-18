@@ -50,25 +50,26 @@
                 <div class="page-content-header">
                     <h2>B3S Driving School - Manila</h2>
                     <h2>Sales Report</h2>
-                    <h2>For the Month of 
-                        <select id="monthSelector" class="form-control" style="display: inline-block; width: auto;">
-                            <option value="January">January</option>
-                            <option value="February">February</option>
-                            <option value="March">March</option>
-                            <option value="April">April</option>
-                            <option value="May">May</option>
-                            <option value="June">June</option>
-                            <option value="July">July</option>
-                            <option value="August">August</option>
-                            <option value="September">September</option>
-                            <option value="October">October</option>
-                            <option value="November">November</option>
-                            <option value="December">December</option>
-                        </select>
-                        <select id="yearSelector" class="form-control" style="display: inline-block; width: auto;">
-                            <!-- Populate with dynamic years -->
-                        </select>
-                    </h2>
+                    <h2>For the Month of <span id="currentMonthDisplay"></span></h2>
+                </div>
+                <div class="filter-date">
+                    <select id="monthSelector" class="form-control">
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                    <select id="yearSelector" class="form-control">
+                        <!-- Populate with dynamic years -->
+                    </select>
                 </div>
                 <div class="page-body">
                     <div class="sales-container">
@@ -77,6 +78,7 @@
                                 <tr class="table-headers-title">
                                     <th>NAME</th>
                                     <th>PACKAGE</th>
+                                    <th>PACKAGE PRICE</th>
                                     <th>PAYMENT STATUS</th>
                                     <th>DATE OF PAYMENT</th>
                                     <th>AMOUNT PAID</th>
@@ -87,7 +89,12 @@
                                 
                             </tbody>                                                                       
                         </table>
-                        <div class="pagination-controls cancelled-pagination-controls"></div>
+                        <div class="pagination">
+                            <div class="total-sales">
+                                <h4>Total Sales: &#8369;<span id="totalSalesAmount"></span></h4>
+                            </div>
+                            <div class="pagination-controls cancelled-pagination-controls"></div>
+                        </div>
                     </div>                    
                 </div>    
             </div>
@@ -104,10 +111,10 @@
                     <div class="input-body">
                         <input type="text" class="edit-sales-name" placeholder="Name" readonly>
                         <input type="text" class="edit-sales-package" placeholder="Package" readonly>
-                        <input type="text" class="edit-sales-payment" placeholder="Payment Status" required>
+                        <input type="text" class="edit-sales-package-price" placeholder="Package Price" readonly>
                         <input type="text" class="edit-sales-date" placeholder="Date of Payment" required>
                         <input type="text" class="edit-sales-amount" placeholder="Amount" required>
-                    </div>
+                    </div>                    
                     <div class="modal-footer">
                         <button class="update-sales" type="submit">Update</button>
                         <button class="close-edit-modal" type="button" data-dismiss="modal">Cancel</button>

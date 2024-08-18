@@ -36,6 +36,9 @@ let monthYearData = {};
 
 // Auto-detect current month and year and set them in the dropdowns
 document.addEventListener('DOMContentLoaded', () => {
+    const currentMonthDisplay = document.getElementById('currentMonthDisplay');
+    currentMonthDisplay.textContent = currentMonth;
+    
     const monthSelector = document.getElementById('monthSelector');
     const yearSelector = document.getElementById('yearSelector');
 
@@ -59,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listeners for month and year change
     monthSelector.addEventListener('change', (event) => {
         currentMonth = event.target.value;
+        document.getElementById('currentMonthDisplay').textContent = currentMonth; // Update the displayed month
         filterStudents(); // Re-filter students based on current month and year selection
     });
 
@@ -167,6 +171,7 @@ function renderStudents() {
         <tr class="table-row">
             <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
             <td class="table-row-content">${student.packageName || ''}</td>
+            <td class="table-row-content">&#8369; ${student.packagePrice || ''}</td> <!-- Package Price -->
             <td class="table-row-content">${student.paymentStatus || ''}</td> <!-- Payment Status -->
             <td class="table-row-content">${student.paymentDate || ''}</td> <!-- Date of Payment -->
             <td class="table-row-content">${student.amountPaid || ''}</td> <!-- Amount Paid -->
@@ -186,21 +191,33 @@ function renderStudents() {
         openEditModal(studentIndex);
         });
     });
+
+    // Calculate and display the total sales
+    calculateTotalSales();
 }
 
 // Function to open the modal and pre-fill with student data
 function openEditModal(studentIndex) {
-  const selectedStudent = filteredStudentsData[studentIndex];
+    const selectedStudent = filteredStudentsData[studentIndex];
 
-  // Pre-fill the modal fields with the selected student's data
-  document.querySelector('.edit-sales-name').value = selectedStudent.personalInfo.first || '';
-  document.querySelector('.edit-sales-package').value = selectedStudent.packageName || '';
-  document.querySelector('.edit-sales-payment').value = selectedStudent.paymentStatus || '';
-  document.querySelector('.edit-sales-date').value = selectedStudent.paymentDate || '';
-  document.querySelector('.edit-sales-amount').value = selectedStudent.amountPaid || '';
+    // Pre-fill the modal fields with the selected student's data
+    document.querySelector('.edit-sales-name').value = selectedStudent.personalInfo.first || '';
+    document.querySelector('.edit-sales-package').value = selectedStudent.packageName || '';
+    document.querySelector('.edit-sales-package-price').value = selectedStudent.packagePrice || ''; // Package Price
+    document.querySelector('.edit-sales-date').value = selectedStudent.paymentDate || '';
+    document.querySelector('.edit-sales-amount').value = selectedStudent.amountPaid || '';
 
-  // Show the modal
-  $('#editSalesModal').modal('show');
+    // Show the modal
+    $('#editSalesModal').modal('show');
+}
+
+function calculateTotalSales() {
+    let totalSales = filteredStudentsData.reduce((total, student) => {
+        return total + (parseFloat(student.amountPaid) || 0);
+    }, 0);
+
+    // Update the total sales display
+    document.getElementById('totalSalesAmount').textContent = totalSales.toFixed(2);
 }
 
 // Update Pagination Controls
@@ -290,4 +307,5 @@ function filterStudents(searchTerm = '') {
     totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
     renderStudents();
     updatePaginationControls();
+    calculateTotalSales(); // Recalculate the total sales after filtering
 }
