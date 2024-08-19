@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getFirestore, collection, onSnapshot, doc, getDoc, getDocs, updateDoc, addDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { getFirestore, collection, onSnapshot, doc, getDoc, getDocs, updateDoc, addDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
 
 // Your web app's Firebase configuration
@@ -12,7 +12,6 @@ const firebaseConfig = {
   appId: "1:195867894399:web:596fb109d308aea8b6154a"
 };
 
-// Initialize Firebase
 let app;
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
@@ -30,6 +29,8 @@ let currentYear = new Date().getFullYear(); // Get the current year
 let currentPage = 1;
 const itemsPerPage = 10;
 let totalPages = 1;
+let popularPackage = ''; // To store the most popular package
+let popularPackageCount = 0; // To store the count of the most popular package
 
 // Object to store filtered data for each month and year
 let monthYearData = {};
@@ -38,7 +39,7 @@ let monthYearData = {};
 document.addEventListener('DOMContentLoaded', () => {
     const currentMonthDisplay = document.getElementById('currentMonthDisplay');
     currentMonthDisplay.textContent = currentMonth;
-    
+
     const monthSelector = document.getElementById('monthSelector');
     const yearSelector = document.getElementById('yearSelector');
 
@@ -74,72 +75,51 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchStudentData();
 });
 
-// Fetch Student Data with Validations
 async function fetchStudentData() {
     try {
         const studentsMap = new Map();
 
         // Real-time listener for applicants collection
-        const unsubscribeApplicants = onSnapshot(collection(db, "applicants"), (applicantsSnapshot) => {
+        const unsubscribeApplicants = onSnapshot(collection(db, "applicants"), async (applicantsSnapshot) => {
             applicantsSnapshot.forEach(applicantDoc => {
                 const applicantData = applicantDoc.data();
+                const userId = applicantDoc.id; // Get the document ID (userId)
 
                 // Check if the user has the role "student"
                 if (applicantData.role === "student") {
-
                     // Check if the student has completed any of the courses
                     if (applicantData.TDCStatus === "Completed" || 
                         applicantData["PDC-4WheelsStatus"] === "Completed" || 
                         applicantData["PDC-MotorsStatus"] === "Completed") {
 
-                        studentsMap.set(applicantDoc.id, applicantData);
+                        // Store student data in the map using the userId as the key
+                        studentsMap.set(userId, { ...applicantData, userId }); // Include userId in the student data
                     }
                 }
             });
 
-            // Listen to appointments to check for active bookings
-            const unsubscribeAppointments = onSnapshot(collection(db, "appointments"), (appointmentsSnapshot) => {
-                appointmentsSnapshot.forEach(appointment => {
-                    const appointmentData = appointment.data();
-                    const bookings = Array.isArray(appointmentData.bookings) ? appointmentData.bookings : [];
+            // Fetch the sales data and integrate with applicants data
+            const salesSnapshot = await getDocs(collection(db, "sales"));
+            salesSnapshot.forEach(saleDoc => {
+                const saleData = saleDoc.data();
+                const userId = saleDoc.id; // Assume sales are saved with userId as the document ID
 
-                    bookings.forEach(booking => {
-                        if (booking.status === "Cancelled" || booking.status === "Rescheduled") {
-                            return;
-                        }
-
-                        const studentDocRef = doc(db, "applicants", booking.userId);
-                        getDoc(studentDocRef).then(studentDoc => {
-                            if (studentDoc.exists()) {
-                                const studentData = studentDoc.data();
-                        
-                                if (studentData.role === "student") {
-                                    if (!studentsMap.has(booking.userId)) {
-                                        studentData.bookings = []; // Initialize bookings array if not present
-                                        studentsMap.set(booking.userId, studentData);
-                                    }
-                                    const student = studentsMap.get(booking.userId);
-                        
-                                    // Ensure the bookings array exists
-                                    if (!student.bookings) {
-                                        student.bookings = [];
-                                    }
-                        
-                                    student.bookings.push({ ...booking, appointmentId: appointment.id });
-                                }
-                            }
-                        });  
-                    });
-                });
-
-                // After processing all data, update the global arrays and store month and year data
-                studentsData = Array.from(studentsMap.values());
-                storeMonthYearData(); // Store the data for the current month and year
-                filterStudents(); // Filter students based on current month and year selection
-                totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
-                renderStudents();
-                updatePaginationControls();
+                if (studentsMap.has(userId)) {
+                    const student = studentsMap.get(userId);
+                    student.paymentDate = saleData.paymentDate;
+                    student.amountPaid = saleData.amountPaid;
+                    student.paymentStatus = saleData.paymentStatus;
+                }
             });
+
+            // After processing all data, update the global arrays and store month and year data
+            studentsData = Array.from(studentsMap.values());
+            storeMonthYearData(); // Store the data for the current month and year
+            filterStudents(); // Filter students based on current month and year selection
+            totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
+            calculatePopularPackage(); // Calculate the most popular package
+            renderStudents();
+            updatePaginationControls();
         });
 
         return {
@@ -199,6 +179,9 @@ function renderStudents() {
 
     // Calculate and display the total sales
     calculateTotalSales();
+
+    // Display the most popular package
+    document.getElementById('popularPackage').textContent = `${popularPackage} (${popularPackageCount} students)`;
 }
 
 async function openEditModal(studentIndex) {
@@ -208,7 +191,7 @@ async function openEditModal(studentIndex) {
     let existingSalesDocId = null;
     const salesQuery = collection(db, "sales");
     const salesSnapshot = await getDocs(salesQuery);
-    
+
     salesSnapshot.forEach((doc) => {
         const data = doc.data();
         if (data.name === selectedStudent.personalInfo.first && data.packageName === selectedStudent.packageName) {
@@ -236,13 +219,40 @@ async function openEditModal(studentIndex) {
 async function saveSalesData(studentIndex, existingSalesDocId = null) {
     const selectedStudent = filteredStudentsData[studentIndex];
 
+    // Check if userId is available
+    const userId = selectedStudent.userId;
+    if (!userId) {
+        console.error("User ID is undefined or missing for the selected student.");
+        return;
+    }
+
+    console.log(`Saving data for user ID: ${userId}`); // Debugging output
+
     // Gather the updated data from the modal
+    const amountPaid = parseInt(document.querySelector('.edit-sales-amount').value, 10);
+    const packagePrice = parseInt(selectedStudent.packagePrice, 10);
+
+    // Validate amountPaid
+    if (isNaN(amountPaid) || amountPaid <= 0) {
+        alert("Please enter a valid amount greater than 0.");
+        return;
+    }
+
+    // Determine payment status
+    let paymentStatus = "Not Paid";
+    if (amountPaid >= packagePrice) {
+        paymentStatus = "Paid";
+    } else if (amountPaid >= packagePrice * 0.10) {
+        paymentStatus = "Partial Payment";
+    }
+
     const updatedData = {
         name: document.querySelector('.edit-sales-name').value,
         packageName: document.querySelector('.edit-sales-package').value,
-        packagePrice: document.querySelector('.edit-sales-package-price').value,
+        packagePrice: packagePrice.toString(),
         paymentDate: document.querySelector('.edit-sales-date').value,
-        amountPaid: document.querySelector('.edit-sales-amount').value,
+        amountPaid: amountPaid.toString(),
+        paymentStatus: paymentStatus,
     };
 
     try {
@@ -252,8 +262,9 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
             await updateDoc(salesDocRef, updatedData);
             console.log('Sales data successfully updated.');
         } else {
-            // If no document ID exists, create a new document
-            await addDoc(collection(db, "sales"), updatedData);
+            // If no document ID exists, create a new document using userId as the document ID
+            const salesDocRef = doc(db, "sales", userId);
+            await setDoc(salesDocRef, updatedData); // Use setDoc to create or overwrite
             console.log('Sales data successfully saved.');
         }
 
@@ -267,6 +278,24 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
     // Refresh the student data to reflect changes
     await fetchStudentData();
     renderStudents();
+}
+
+// Function to calculate the most popular package
+function calculatePopularPackage() {
+    const packageCounts = {};
+
+    filteredStudentsData.forEach(student => {
+        const packageName = student.packageName || 'Unknown Package';
+        if (packageCounts[packageName]) {
+            packageCounts[packageName]++;
+        } else {
+            packageCounts[packageName] = 1;
+        }
+    });
+
+    // Determine the most popular package
+    popularPackage = Object.keys(packageCounts).reduce((a, b) => packageCounts[a] > packageCounts[b] ? a : b);
+    popularPackageCount = packageCounts[popularPackage];
 }
 
 function calculateTotalSales() {
@@ -366,4 +395,5 @@ function filterStudents(searchTerm = '') {
     renderStudents();
     updatePaginationControls();
     calculateTotalSales(); // Recalculate the total sales after filtering
+    calculatePopularPackage(); // Recalculate the most popular package after filtering
 }
