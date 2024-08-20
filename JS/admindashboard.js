@@ -90,6 +90,20 @@ async function fetchBookings() {
                 formattedTime = `${formattedStartTime} - ${formattedEndTime}`;
             }
 
+            // Check if the appointment date is exactly 1 day past the current date
+            const appointmentDate = new Date(appointmentData.date);
+            const currentDate = new Date();
+
+            const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // Milliseconds in one day
+            const differenceInTime = currentDate.getTime() - appointmentDate.getTime();
+            const differenceInDays = Math.floor(differenceInTime / oneDayInMilliseconds);
+
+            // Skip this booking if the appointment date is exactly 1 day past the current date
+            if (differenceInDays > 1) {
+                console.log(`Appointment on ${appointmentData.date} has passed more than 1 day. Ignoring this booking.`);
+                continue; // Skip this booking
+            }
+
             const rowHtml = `
                 <tr>
                     <td>${fullName}</td>
