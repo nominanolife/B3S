@@ -154,9 +154,6 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    width: calc(100% - 300px);
-    height: calc(100vh - 120px);
-    height: 100vh;
     margin-left: 300px;
     margin-top: 120px;
 }
@@ -177,7 +174,7 @@ h3 {
     font-family: Poppins;
     font-size: 22px;
     font-weight: bold;
-    color: #2F2E2E;
+    color: #142A74;
 }
 
 h2 {

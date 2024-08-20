@@ -23,6 +23,7 @@ const auth = getAuth(app);
 
 // Variables for student data
 let studentsData = [];
+let allStudentsData = []; // Store all student data here for year calculation
 let filteredStudentsData = [];
 let currentMonth = new Date().toLocaleString('default', { month: 'long' });
 let currentYear = new Date().getFullYear(); // Get the current year
@@ -35,6 +36,12 @@ let popularPackageCount = 0; // To store the count of the most popular package
 // Object to store filtered data for each month and year
 let monthYearData = {};
 
+function formatDateToMDY(dateString) {
+    const date = new Date(dateString);
+    const options = { month: 'long', day: 'numeric', year: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+}
+
 // Auto-detect current month and year and set them in the dropdowns
 document.addEventListener('DOMContentLoaded', () => {
     const currentMonthDisplay = document.getElementById('currentMonthDisplay');
@@ -42,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const monthSelector = document.getElementById('monthSelector');
     const yearSelector = document.getElementById('yearSelector');
+    const yearFilter = document.getElementById('yearFilter');
+    const yearlySalesYear = document.getElementById('yearlySalesYear');
 
     // Populate the year selector with a range of years
     for (let i = currentYear - 5; i <= currentYear + 5; i++) {
@@ -49,8 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
         option.value = i;
         option.textContent = i;
         yearSelector.appendChild(option);
+        yearFilter.appendChild(option.cloneNode(true));  // Populate yearFilter as well
     }
+
     yearSelector.value = currentYear;
+    yearFilter.value = currentYear;
+
+    // Set the current year in the yearly sales display
+    yearlySalesYear.textContent = currentYear;
 
     // Set current month as selected
     for (let i = 0; i < monthSelector.options.length; i++) {
@@ -72,8 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
         filterStudents(); // Re-filter students based on current month and year selection
     });
 
+    yearFilter.addEventListener('change', (event) => {
+        const selectedYear = event.target.value;
+        yearlySalesYear.textContent = selectedYear;  // Update the yearly sales year
+        updateTotalSalesForYear(selectedYear);  // Update total sales based on selected year
+    });
+
     fetchStudentData();
+    updateTotalSalesForYear(currentYear);  // Initial load of total sales for the current year
 });
+
 
 async function fetchStudentData() {
     try {
@@ -113,13 +136,17 @@ async function fetchStudentData() {
             });
 
             // After processing all data, update the global arrays and store month and year data
-            studentsData = Array.from(studentsMap.values());
+            allStudentsData = Array.from(studentsMap.values()); // Save all data for year calculation
+            studentsData = [...allStudentsData]; // Also set this for filtering
             storeMonthYearData(); // Store the data for the current month and year
             filterStudents(); // Filter students based on current month and year selection
             totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
             calculatePopularPackage(); // Calculate the most popular package
             renderStudents();
             updatePaginationControls();
+
+            // Update the sales data for the year after fetching the student data
+            updateTotalSalesForYear(currentYear);
         });
 
         return {
@@ -151,6 +178,8 @@ function renderStudents() {
 
     paginatedStudents.forEach((student, index) => {
         const personalInfo = student.personalInfo || {};
+        const formattedPaymentDate = student.paymentDate ? formatDateToMDY(student.paymentDate) : '';
+        const amountPaid = student.amountPaid ? `&#8369; ${student.amountPaid}` : ''; // Conditionally add peso sign
 
         const studentHtml = `
         <tr class="table-row">
@@ -158,13 +187,12 @@ function renderStudents() {
             <td class="table-row-content">${student.packageName || ''}</td>
             <td class="table-row-content">&#8369; ${student.packagePrice || ''}</td> <!-- Package Price -->
             <td class="table-row-content">${student.paymentStatus || ''}</td> <!-- Payment Status -->
-            <td class="table-row-content">${student.paymentDate || ''}</td> <!-- Date of Payment -->
-            <td class="table-row-content">${student.amountPaid || ''}</td> <!-- Amount Paid -->
+            <td class="table-row-content">${formattedPaymentDate}</td> <!-- Date of Payment -->
+            <td class="table-row-content">${amountPaid}</td> <!-- Amount Paid -->
             <td class="table-row-content">
-            <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
+                <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
             </td>
-        </tr>
-        `;
+        </tr>`;
         studentList.insertAdjacentHTML('beforeend', studentHtml);
     });
 
@@ -177,12 +205,14 @@ function renderStudents() {
         });
     });
 
-    // Calculate and display the total sales
-    calculateTotalSales();
-
     // Display the most popular package
     document.getElementById('popularPackage').textContent = `${popularPackage} (${popularPackageCount} students)`;
 }
+
+document.querySelector('.edit-sales-amount').addEventListener('input', function(event) {
+    // Allow only numbers and decimal point
+    this.value = this.value.replace(/[^0-9.]/g, '');
+});
 
 async function openEditModal(studentIndex) {
     const selectedStudent = filteredStudentsData[studentIndex];
@@ -226,11 +256,18 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
         return;
     }
 
-    console.log(`Saving data for user ID: ${userId}`); // Debugging output
-
     // Gather the updated data from the modal
     const amountPaid = parseInt(document.querySelector('.edit-sales-amount').value, 10);
     const packagePrice = parseInt(selectedStudent.packagePrice, 10);
+
+    // Validation: Ensure amountPaid does not exceed packagePrice
+    const amountPaidErrorElement = document.getElementById('amountPaidError');
+    if (amountPaid > packagePrice) {
+        amountPaidErrorElement.textContent = "Amount paid cannot exceed the package price.";
+        return; // Stop further execution
+    } else {
+        amountPaidErrorElement.textContent = ""; // Clear any previous error messages
+    }
 
     // Validate amountPaid
     if (isNaN(amountPaid) || amountPaid <= 0) {
@@ -298,15 +335,6 @@ function calculatePopularPackage() {
     popularPackageCount = packageCounts[popularPackage];
 }
 
-function calculateTotalSales() {
-    let totalSales = filteredStudentsData.reduce((total, student) => {
-        return total + (parseFloat(student.amountPaid) || 0);
-    }, 0);
-
-    // Update the total sales display
-    document.getElementById('totalSalesAmount').textContent = totalSales.toFixed(2);
-}
-
 // Update Pagination Controls
 function updatePaginationControls() {
     const paginationControls = document.querySelector('.pagination-controls');
@@ -363,37 +391,167 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Fetch students on DOM load
-document.addEventListener('DOMContentLoaded', () => {
-    fetchStudentData();
-
-    // Add search functionality
-    const searchInput = document.querySelector('.search');
-    if (searchInput) {
-        searchInput.addEventListener('input', (event) => {
-            const searchTerm = event.target.value.toLowerCase();
-            filterStudents(searchTerm);
-        });
-    }
-});
-
+// Function to filter students based on selected month and year (this won't affect total sales for the year)
 function filterStudents(searchTerm = '') {
     const key = `${currentMonth}-${currentYear}`;
-    // Check if data for the current month and year is already stored
-    if (monthYearData[key]) {
-        filteredStudentsData = monthYearData[key].filter(student => {
-            const fullName = `${student.personalInfo.first || ''} ${student.personalInfo.last || ''}`.toLowerCase();
-            return fullName.startsWith(searchTerm);
-        });
-    } else {
-        // If no data is stored for the current month and year, show no students
-        filteredStudentsData = [];
-    }
+    filteredStudentsData = studentsData.filter(student => {
+        const fullName = `${student.personalInfo.first || ''} ${student.personalInfo.last || ''}`.toLowerCase();
+        const paymentDate = new Date(student.paymentDate);
+        const paymentMonth = paymentDate.toLocaleString('default', { month: 'long' });
+        const paymentYear = paymentDate.getFullYear();
+        
+        return fullName.startsWith(searchTerm) && paymentMonth === currentMonth && paymentYear == currentYear;
+    });
 
     currentPage = 1;
     totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
+
     renderStudents();
     updatePaginationControls();
-    calculateTotalSales(); // Recalculate the total sales after filtering
     calculatePopularPackage(); // Recalculate the most popular package after filtering
+
+    // Update the spline chart with sales data
+    updateSplineChartWithSalesData();
 }
+
+// Event listener for month and year filters
+document.getElementById('monthSelector').addEventListener('change', () => {
+    currentMonth = document.getElementById('monthSelector').value;
+    filterStudents();
+});
+
+// Initial load
+document.addEventListener('DOMContentLoaded', () => {
+    const yearFilter = document.getElementById('yearFilter');
+    yearFilter.addEventListener('change', () => {
+        const selectedYear = yearFilter.value;
+        updateTotalSalesForYear(selectedYear);  // This only updates the year sales, not affected by month filter
+    });
+
+    updateTotalSalesForYear(currentYear);  // Initial load of total sales for the year
+});
+
+const ctx = document.getElementById('splineChart').getContext('2d');
+const splineChart = new Chart(ctx, {
+    type: 'line',  // Spline chart is a type of line chart
+    data: {
+        labels: [],  // Initialize with empty data
+        datasets: [{
+            label: 'Total Monthly Sales',
+            data: [],  // Initialize with empty data
+            fill: false,
+            borderColor: '#142A74',
+            tension: 0.5  // This makes it a spline chart (smooth curve)
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Month of the Year'
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Total Sales (PHP)'
+                }
+            }
+        }
+    }
+});
+
+function updateSplineChartWithSalesData() {
+    // Reset the chart data
+    splineChart.data.labels = [];
+    splineChart.data.datasets[0].data = [];
+
+    // Create an object to store sales by month
+    const salesByMonth = {};
+
+    // Aggregate sales data by month
+    studentsData.forEach(student => {
+        if (student.paymentDate) {
+            const date = new Date(student.paymentDate);
+            const month = date.toLocaleString('default', { month: 'long' });
+            const year = date.getFullYear();
+            const key = `${month} ${year}`;
+
+            if (!salesByMonth[key]) {
+                salesByMonth[key] = 0;
+            }
+
+            // Add the amount paid to the sales for that month
+            salesByMonth[key] += parseFloat(student.amountPaid) || 0;
+        }
+    });
+
+    // Sort the months in chronological order
+    const sortedMonths = Object.keys(salesByMonth).sort((a, b) => {
+        const [monthA, yearA] = a.split(' ');
+        const [monthB, yearB] = b.split(' ');
+        const dateA = new Date(`${monthA} 1, ${yearA}`);
+        const dateB = new Date(`${monthB} 1, ${yearB}`);
+        return dateA - dateB;
+    });
+
+    // Update the chart with the sorted monthly data
+    sortedMonths.forEach(month => {
+        splineChart.data.labels.push(month);
+        splineChart.data.datasets[0].data.push(salesByMonth[month]);
+    });
+
+    splineChart.update();
+}
+
+function updateTotalSalesForYear(selectedYear) {
+    // Filter data for the selected year
+    const filteredYearData = allStudentsData.filter(student => {
+        const paymentYear = new Date(student.paymentDate).getFullYear();
+        return paymentYear === parseInt(selectedYear);
+    });
+
+    const yearlySalesAmountElement = document.getElementById('yearlySalesAmount');
+    const splineChartElement = document.getElementById('splineChart');
+
+    // If there's no data for the selected year, hide the chart and clear the sales amount
+    if (filteredYearData.length === 0) {
+        yearlySalesAmountElement.textContent = '₱0.00';
+        splineChartElement.style.display = 'none';
+    } else {
+        // Otherwise, calculate the total sales and show the chart
+        const totalSales = filteredYearData.reduce((sum, student) => sum + parseFloat(student.amountPaid || 0), 0);
+        yearlySalesAmountElement.textContent = `₱${totalSales.toFixed(2)}`;
+        splineChartElement.style.display = 'block';
+
+        // You can re-draw the chart here if needed
+        // drawSplineChart(filteredYearData);
+    }
+}
+
+// Call this function when the year is changed in the yearFilter dropdown
+document.getElementById('yearFilter').addEventListener('change', (event) => {
+    const selectedYear = event.target.value;
+    document.getElementById('yearlySalesYear').textContent = selectedYear;
+    updateTotalSalesForYear(selectedYear);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButton = document.getElementById('toggleSalesInfo');
+    const salesInfoContainer = document.getElementById('salesInfoContainer');
+
+    // Initially hide the sales-info-container
+    salesInfoContainer.style.display = 'none';
+
+    toggleButton.addEventListener('click', function() {
+        if (salesInfoContainer.style.display === 'none') {
+            salesInfoContainer.style.display = 'flex';
+            toggleButton.textContent = 'Hide';
+        } else {
+            salesInfoContainer.style.display = 'none';
+            toggleButton.textContent = 'Overview';
+        }
+    });
+});

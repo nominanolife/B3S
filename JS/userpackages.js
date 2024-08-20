@@ -26,6 +26,12 @@ let userEnrolledPackage = null; // To store the user's enrolled package
 
 function renderPackages(packages) {
   packageContainer.innerHTML = '';
+  
+  if (packages.length === 0) {
+    packageContainer.innerHTML = '<h3>No packages are available at the moment.</h3>';
+    return;
+  }
+  
   packages.forEach(pkg => {
     const packageHtml = `
       <div class="package-tiles">
@@ -44,6 +50,7 @@ function renderPackages(packages) {
     `;
     packageContainer.insertAdjacentHTML('beforebegin', packageHtml);
   });
+  
   showTiles(currentIndex);
 }
 

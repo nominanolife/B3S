@@ -47,10 +47,26 @@
                 <h2>Sales Report</h2>
             </div>
             <div class="page-content">
+                <div class="show-sales">
+                    <button id="toggleSalesInfo" class="btn btn-primary">Overview</button>
+                </div>
+                <div class="sales-info-container" id="salesInfoContainer">
+                    <div class="pupular-package">
+                        <h4><span id="popularPackage"></span></h4>
+                        <canvas id="packageChart"></canvas>
+                    </div>
+                    <div class="total-sales">
+                        <div class="amount-sales">
+                            <h4>Sales of the Year <span id="yearlySalesYear"></span> <br> <span id="yearlySalesAmount"></span></h4>
+                            <select id="yearFilter" class="form-control year-filter">
+                                <!-- Year options will be dynamically added here -->
+                            </select>
+                        </div>                        
+                        <canvas id="splineChart"></canvas>
+                    </div>                                        
+                </div>
                 <div class="page-content-header">
-                    <h2>B3S Driving School - Manila</h2>
-                    <h2>Sales Report</h2>
-                    <h2>For the Month of <span id="currentMonthDisplay"></span></h2>
+                    <h2>Sales for the Month of <span id="currentMonthDisplay"></span></h2>
                 </div>
                 <div class="filter-date">
                     <select id="monthSelector" class="form-control">
@@ -90,15 +106,9 @@
                             </tbody>                                                                       
                         </table>
                         <div class="pagination">
-                            <div class="total-sales">
-                                <h4>Total Sales: &#8369;<span id="totalSalesAmount"></span></h4>
-                            </div>
-                            <div class="pupular-package">
-                                <h4>Popular Package: <span id="popularPackage"></span></h4>
-                            </div>
                             <div class="pagination-controls cancelled-pagination-controls"></div>
                         </div>
-                    </div>                    
+                    </div>                  
                 </div>    
             </div>
         </div>
@@ -115,8 +125,9 @@
                         <input type="text" class="edit-sales-name" placeholder="Name" readonly>
                         <input type="text" class="edit-sales-package" placeholder="Package" readonly>
                         <input type="text" class="edit-sales-package-price" placeholder="Package Price" readonly>
-                        <input type="text" class="edit-sales-date" placeholder="Date of Payment" required>
+                        <input type="date" class="edit-sales-date" placeholder="Date of Payment" required>
                         <input type="text" class="edit-sales-amount" placeholder="Amount" required>
+                        <small class="form-text text-danger validation-error" id="amountPaidError"></small>
                     </div>                    
                     <div class="modal-footer">
                         <button class="update-sales" type="submit">Update</button>
@@ -126,7 +137,7 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Logout Confirmation Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -151,6 +162,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="JS/adminsales.js"></script>
     <script src="JS/admincommon.js"></script>
 </body>
