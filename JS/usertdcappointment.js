@@ -214,8 +214,12 @@ async function handleBooking() {
   const appointmentDateObj = new Date(appointmentDate);
 
   if (appointmentDateObj <= currentDate.setDate(currentDate.getDate() + 1)) {
-    showNotification('Booking is not allowed within one day before the appointment or on the day of the appointment.');
-    return;
+    // Show a confirmation modal
+    const userConfirmed = confirm('Booking this appointment is not cancellable or reschedulable. Are you sure you want to proceed?');
+    
+    if (!userConfirmed) {
+        return;
+    }
   }
 
   const userExistingBookings = appointments.filter(app => 
