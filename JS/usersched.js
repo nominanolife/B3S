@@ -286,7 +286,7 @@ function renderAppointmentRow(appointment, booking, docId, isCompleted = false) 
     const statusCell = document.createElement('td');
     statusCell.innerText = statusText;
     if (isCompleted || progressText === 'Completed') {
-        statusCell.style.color = '#6c757d'; // Grey color for completed
+        statusCell.style.color = '#28a745'; // Grey color for completed
     } else if (statusText === 'Booked') {
         statusCell.style.color = '#28a745'; 
     } else if (statusText === 'Cancelled') {

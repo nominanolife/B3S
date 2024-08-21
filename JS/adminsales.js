@@ -202,7 +202,7 @@ function renderStudents() {
     studentList.innerHTML = '';
 
     if (filteredStudentsData.length === 0) {
-        studentList.innerHTML = '<tr><td colspan="7">No students found for the selected criteria.</td></tr>';
+        studentList.innerHTML = '<tr><td colspan="7" >No students found for the selected criteria.</td></tr>';
         return;
     }
 
@@ -280,6 +280,16 @@ async function openEditModal(studentIndex) {
     };
 }
 
+document.querySelector('.edit-sales-amount').addEventListener('input', function() {
+    const amountPaidInput = document.querySelector('.edit-sales-amount');
+    const amountPaid = parseInt(amountPaidInput.value, 10);
+    const amountPaidErrorElement = document.getElementById('amountPaidError');
+
+    if (!isNaN(amountPaid) && amountPaid > 0) {
+        amountPaidErrorElement.textContent = ""; // Clear validation message if the input is valid
+    }
+});
+
 async function saveSalesData(studentIndex, existingSalesDocId = null) {
     const selectedStudent = filteredStudentsData[studentIndex];
 
@@ -291,11 +301,13 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
     }
 
     // Gather the updated data from the modal
-    const amountPaid = parseInt(document.querySelector('.edit-sales-amount').value, 10);
+    const amountPaidInput = document.querySelector('.edit-sales-amount');
+    const amountPaid = parseInt(amountPaidInput.value, 10);
     const packagePrice = parseInt(selectedStudent.packagePrice, 10);
 
-    // Validation: Ensure amountPaid does not exceed packagePrice
     const amountPaidErrorElement = document.getElementById('amountPaidError');
+
+    // Validation: Ensure amountPaid does not exceed packagePrice
     if (amountPaid > packagePrice) {
         amountPaidErrorElement.textContent = "Amount paid cannot exceed the package price.";
         return; // Stop further execution
@@ -305,8 +317,10 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
 
     // Validate amountPaid
     if (isNaN(amountPaid) || amountPaid <= 0) {
-        alert("Please enter a valid amount greater than 0.");
-        return;
+        amountPaidErrorElement.textContent = "Please enter a valid amount greater than 0.";
+        return; // Stop further execution
+    } else {
+        amountPaidErrorElement.textContent = ""; // Clear any previous error messages
     }
 
     // Determine payment status
@@ -474,16 +488,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const ctx = document.getElementById('splineChart').getContext('2d');
 const splineChart = new Chart(ctx, {
-    type: 'line',  // Spline chart is a type of line chart
+    type: 'line',
     data: {
-        labels: [],  // Initialize with empty data
+        labels: [],
         datasets: [{
             label: 'Total Monthly Sales',
-            data: [],  // Initialize with empty data
-            fill: false,
+            data: [],
+            fill: true, // This fill property was set to true in the previous example.
             backgroundColor: '#5a699d',
             borderColor: '#142A74',
-            tension: 0.5  // This makes it a spline chart (smooth curve)
+            tension: 0.5,
         }]
     },
     options: {
@@ -492,13 +506,42 @@ const splineChart = new Chart(ctx, {
             x: {
                 title: {
                     display: true,
-                    text: 'Month of the Year'
+                    text: 'Month of the Year',
+                    font: {
+                        size: 16, // Font size for x-axis title
+                        weight: 'bold' // Font weight for x-axis title
+                    }
+                },
+                ticks: {
+                    font: {
+                        size: 16 // Adjust the font size of the x-axis labels
+                    }
                 }
             },
             y: {
                 title: {
                     display: true,
-                    text: 'Total Sales (PHP)'
+                    text: 'Total Sales (PHP)',
+                    font: {
+                        size: 16, // Font size for y-axis title
+                        weight: 'bold' // Font weight for y-axis title
+                    }
+                },
+                ticks: {
+                    font: {
+                        size: 14 // Adjust the font size of the y-axis labels
+                    }
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                labels: {
+                    usePointStyle: true,
+                    pointStyle: 'rectRounded',
+                    font: {
+                        size: 14 // Font size for legend labels
+                    }
                 }
             }
         }
@@ -649,7 +692,9 @@ function renderPackageBarChart(packageData) {
                 data: data,
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
+                borderWidth: 1,
+                barThickness: 100, // Customize the thickness of bars
+                borderRadius: 3, // Rounded corners on bars
             }]
         },
         options: {
@@ -657,18 +702,42 @@ function renderPackageBarChart(packageData) {
                 y: {
                     title: {
                         display: true,
-                        text: 'Number of Students'
+                        text: 'Number of Students',
+                        font: {
+                            size: 16, // Font size for y-axis title
+                            weight: 'bold' // Font weight for y-axis title
+                        }
                     }
                 },
                 x: {
                     title: {
                         display: true,
-                        text: 'Package Name'
+                        text: 'Package Name',
+                        font: {
+                            size: 16, // Font size for x-axis title
+                            weight: 'bold' // Font weight for x-axis title
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: 16 // Adjust the font size of the package names
+                        }
                     }
                 }
             },
             responsive: true,
-            maintainAspectRatio: true
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'rectRounded',
+                        font: {
+                            size: 14 // Font size for legend labels
+                        }
+                    }
+                }
+            }
         }
-    });
+    });     
 }

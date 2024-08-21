@@ -223,28 +223,41 @@ async function handleBooking() {
   const appointmentDateObj = new Date(appointmentDate);
 
   if (appointmentDateObj <= currentDate.setDate(currentDate.getDate() + 1)) {
-    // Show a confirmation modal
-    const userConfirmed = confirm('Booking this appointment is not cancellable or reschedulable. Are you sure you want to proceed?');
-    
-    if (!userConfirmed) {
-        return;
-    }
-  }
-
-  // Check if the user has any existing bookings that are not canceled or rescheduled, excluding completed appointments
-  const userExistingBookings = appointments.filter(app => 
-    app.bookings && app.bookings.some(booking => 
-      booking.userId === currentUserUid && 
-      booking.status !== 'Cancelled' && 
-      booking.status !== 'Rescheduled' && 
-      booking.progress !== 'Completed' // Check the progress within the booking
-    )
-  );
-
-  if (userExistingBookings.length > 0) {
-    showNotification('You already have an ongoing appointment. Please cancel or reschedule it before booking a new one.');
+    // Show the confirmation modal
+    showConfirmationModal(async () => {
+      await proceedWithBooking(selectedSlot, appointment);
+    });
     return;
   }
+
+  await proceedWithBooking(selectedSlot, appointment);
+}
+
+// Function to show the confirmation modal
+function showConfirmationModal(callback) {
+  const confirmButton = document.getElementById('confirmBooking');
+  
+  // Show the modal
+  const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+  confirmationModal.show();
+
+  // Attach event listener to the confirm button
+  confirmButton.addEventListener('click', function handleConfirm() {
+    // Execute the callback function when the user confirms
+    callback();
+    
+    // Hide the modal
+    confirmationModal.hide();
+    
+    // Clean up the event listener to avoid multiple triggers
+    confirmButton.removeEventListener('click', handleConfirm);
+  });
+}
+
+// Function to proceed with the booking
+async function proceedWithBooking(selectedSlot, appointment) {
+  const timeSlot = selectedSlot.value;
+  const appointmentId = selectedSlot.dataset.appointmentId;
 
   const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
   if (bookedSlots >= appointment.slots) {
@@ -252,11 +265,10 @@ async function handleBooking() {
     return;
   }
 
-  // Proceed with booking
   try {
     const appointmentRef = doc(db, "appointments", appointment.id);
     await updateDoc(appointmentRef, {
-      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "In Progress" }] // Assuming 'In Progress' for a new booking
+      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "In Progress" }]
     });
 
     const totalSlots = appointment.slots;
