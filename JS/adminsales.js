@@ -103,24 +103,50 @@ async function fetchStudentData() {
 
         // Real-time listener for applicants collection
         const unsubscribeApplicants = onSnapshot(collection(db, "applicants"), async (applicantsSnapshot) => {
+            // Clear the studentsMap to avoid duplicates
+            studentsMap.clear();
+
+            // Fetch appointments data to check for active bookings
+            const appointmentsSnapshot = await getDocs(collection(db, "appointments"));
+            appointmentsSnapshot.forEach(appointmentDoc => {
+                const appointmentData = appointmentDoc.data();
+                const bookings = appointmentData.bookings || [];
+
+                bookings.forEach(booking => {
+                    const userId = booking.userId;
+
+                    // Only add students with active bookings
+                    const applicantDoc = applicantsSnapshot.docs.find(doc => doc.id === userId);
+                    if (applicantDoc) {
+                        const applicantData = applicantDoc.data();
+
+                        // Add the student to the map if they have an active booking
+                        if (applicantData.role === "student") {
+                            // Add or update the student data in the map
+                            studentsMap.set(userId, { ...applicantData, userId, activeBooking: booking });
+                        }
+                    }
+                });
+            });
+
+            // Further validate with completed status if the student has no active booking
             applicantsSnapshot.forEach(applicantDoc => {
                 const applicantData = applicantDoc.data();
-                const userId = applicantDoc.id; // Get the document ID (userId)
+                const userId = applicantDoc.id;
 
-                // Check if the user has the role "student"
-                if (applicantData.role === "student") {
-                    // Check if the student has completed any of the courses
+                if (!studentsMap.has(userId) && applicantData.role === "student") {
+                    // If no active booking, check for completed status
                     if (applicantData.TDCStatus === "Completed" || 
                         applicantData["PDC-4WheelsStatus"] === "Completed" || 
                         applicantData["PDC-MotorsStatus"] === "Completed") {
-
-                        // Store student data in the map using the userId as the key
-                        studentsMap.set(userId, { ...applicantData, userId }); // Include userId in the student data
+                        
+                        // Add the student with completed status to the map
+                        studentsMap.set(userId, { ...applicantData, userId });
                     }
                 }
             });
 
-            // Fetch the sales data and integrate with applicants data
+            // Fetch sales data and integrate with applicants data
             const salesSnapshot = await getDocs(collection(db, "sales"));
             salesSnapshot.forEach(saleDoc => {
                 const saleData = saleDoc.data();
@@ -131,10 +157,11 @@ async function fetchStudentData() {
                     student.paymentDate = saleData.paymentDate;
                     student.amountPaid = saleData.amountPaid;
                     student.paymentStatus = saleData.paymentStatus;
+                    studentsMap.set(userId, student);
                 }
             });
 
-            // After processing all data, update the global arrays and store month and year data
+            // Update global arrays and store month and year data
             allStudentsData = Array.from(studentsMap.values()); // Save all data for year calculation
             studentsData = [...allStudentsData]; // Also set this for filtering
             storeMonthYearData(); // Store the data for the current month and year
@@ -144,8 +171,12 @@ async function fetchStudentData() {
             renderStudents();
             updatePaginationControls();
 
-            // Update the sales data for the year after fetching the student data
+            // Update the sales data for the year
             updateTotalSalesForYear(currentYear);
+            updatePackageData();
+
+            // Debug: Log final student data
+            console.log("All students data:", allStudentsData);
         });
 
         return {
@@ -155,7 +186,6 @@ async function fetchStudentData() {
         console.error("Error fetching student data: ", error);
     }
 }
-
 // Store filtered data for the current month and year
 function storeMonthYearData() {
     const key = `${currentMonth}-${currentYear}`;
@@ -171,21 +201,29 @@ function renderStudents() {
 
     studentList.innerHTML = '';
 
+    if (filteredStudentsData.length === 0) {
+        studentList.innerHTML = '<tr><td colspan="7">No students found for the selected criteria.</td></tr>';
+        return;
+    }
+
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const paginatedStudents = filteredStudentsData.slice(start, end);
 
     paginatedStudents.forEach((student, index) => {
-        const personalInfo = student.personalInfo || {};
-        const formattedPaymentDate = student.paymentDate ? formatDateToMDY(student.paymentDate) : '';
-        const amountPaid = student.amountPaid ? `&#8369; ${student.amountPaid}` : ''; // Conditionally add peso sign
+        const personalInfo = student.personalInfo || { first: "N/A", last: "" };
+        const packageName = student.packageName || "N/A";
+        const packagePrice = student.packagePrice || "N/A";
+        const formattedPaymentDate = student.paymentDate ? formatDateToMDY(student.paymentDate) : 'N/A';
+        const amountPaid = student.amountPaid ? `&#8369; ${student.amountPaid}` : 'N/A'; // Conditionally add peso sign
+        const paymentStatus = student.paymentStatus || 'Not Paid'; // Default payment status if not paid
 
         const studentHtml = `
         <tr class="table-row">
-            <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
-            <td class="table-row-content">${student.packageName || ''}</td>
-            <td class="table-row-content">&#8369; ${student.packagePrice || ''}</td> <!-- Package Price -->
-            <td class="table-row-content">${student.paymentStatus || ''}</td> <!-- Payment Status -->
+            <td class="table-row-content">${personalInfo.first} ${personalInfo.last}</td>
+            <td class="table-row-content">${packageName}</td>
+            <td class="table-row-content">&#8369; ${packagePrice}</td> <!-- Package Price -->
+            <td class="table-row-content">${paymentStatus}</td> <!-- Payment Status -->
             <td class="table-row-content">${formattedPaymentDate}</td> <!-- Date of Payment -->
             <td class="table-row-content">${amountPaid}</td> <!-- Amount Paid -->
             <td class="table-row-content">
@@ -199,8 +237,8 @@ function renderStudents() {
     const editIcons = studentList.querySelectorAll('.edit-icon');
     editIcons.forEach(icon => {
         icon.addEventListener('click', (event) => {
-        const studentIndex = event.target.getAttribute('data-index');
-        openEditModal(studentIndex);
+            const studentIndex = event.target.getAttribute('data-index');
+            openEditModal(studentIndex);
         });
     });
 }
@@ -317,6 +355,7 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
 function calculatePopularPackage() {
     const packageCounts = {};
 
+    // Count occurrences of each package
     filteredStudentsData.forEach(student => {
         const packageName = student.packageName || 'Unknown Package';
         if (packageCounts[packageName]) {
@@ -325,6 +364,12 @@ function calculatePopularPackage() {
             packageCounts[packageName] = 1;
         }
     });
+
+    // Check if there are any packages to avoid reducing an empty array
+    if (Object.keys(packageCounts).length === 0) {
+        console.error('No packages found.');
+        return;
+    }
 
     // Determine the most popular package
     popularPackage = Object.keys(packageCounts).reduce((a, b) => packageCounts[a] > packageCounts[b] ? a : b);
@@ -386,16 +431,19 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Function to filter students based on selected month and year (this won't affect total sales for the year)
 function filterStudents(searchTerm = '') {
     const key = `${currentMonth}-${currentYear}`;
     filteredStudentsData = studentsData.filter(student => {
-        const fullName = `${student.personalInfo.first || ''} ${student.personalInfo.last || ''}`.toLowerCase();
-        const paymentDate = new Date(student.paymentDate);
-        const paymentMonth = paymentDate.toLocaleString('default', { month: 'long' });
-        const paymentYear = paymentDate.getFullYear();
+        const fullName = `${student.personalInfo?.first || ''} ${student.personalInfo?.last || ''}`.toLowerCase();
         
-        return fullName.startsWith(searchTerm) && paymentMonth === currentMonth && paymentYear == currentYear;
+        if (student.paymentDate) {
+            const paymentDate = new Date(student.paymentDate);
+            const paymentMonth = paymentDate.toLocaleString('default', { month: 'long' });
+            const paymentYear = paymentDate.getFullYear();
+            return fullName.startsWith(searchTerm) && paymentMonth === currentMonth && paymentYear == currentYear;
+        } else {
+            return fullName.startsWith(searchTerm); // Include students without payment date
+        }
     });
 
     currentPage = 1;
@@ -404,8 +452,6 @@ function filterStudents(searchTerm = '') {
     renderStudents();
     updatePaginationControls();
     calculatePopularPackage(); // Recalculate the most popular package after filtering
-
-    // Update the spline chart with sales data
     updateSplineChartWithSalesData();
 }
 
@@ -554,19 +600,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Assuming the data in the table might be dynamic, you may need to call this function
-    // after you're sure the table is fully populated.
-    setTimeout(updatePackageData, 1000); // Adjust the timeout as needed based on when your table gets populated
+    // Ensure the function is called after data is fully loaded
+    setTimeout(updatePackageData, 1000); // Adjust the timeout as needed based on when your data gets populated
 });
 
 function updatePackageData() {
     const packageData = [];
-    
-    // Ensure table rows are populated; this may need adjustment based on how your data is loaded.
-    document.querySelectorAll('.sales-list tr').forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const packageName = cells[1].textContent.trim();
-        let count = 1; // Each row is one package availed.
+    console.log("All Students Data:", allStudentsData);
+
+    // Iterate over all students data instead of just the current page
+    allStudentsData.forEach(student => {
+        console.log("Student:", student); // Add this line to see each student's data
+        const packageName = student.packageName || 'Unknown Package';
+        let count = 1; // Each student represents one package availed
 
         let found = packageData.find(p => p.packageName === packageName);
         if (found) {
@@ -577,7 +623,7 @@ function updatePackageData() {
     });
 
     // Check data integrity in the console
-    console.log(packageData);
+    console.log("Package Data for Chart:", packageData);
 
     // Proceed to render the chart
     renderPackageBarChart(packageData);
@@ -586,6 +632,9 @@ function updatePackageData() {
 function renderPackageBarChart(packageData) {
     const labels = packageData.map(item => item.packageName);
     const data = packageData.map(item => item.count);
+
+    console.log("Labels for Chart:", labels); // Log labels
+    console.log("Data for Chart:", data); // Log data
 
     const ctx = document.getElementById('packageBarChart').getContext('2d');
     if(window.packageBarChartInstance) {
