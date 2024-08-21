@@ -31,7 +31,6 @@ let currentPage = 1;
 const itemsPerPage = 10;
 let totalPages = 1;
 let popularPackage = ''; // To store the most popular package
-let popularPackageCount = 0; // To store the count of the most popular package
 
 // Object to store filtered data for each month and year
 let monthYearData = {};
@@ -204,9 +203,6 @@ function renderStudents() {
         openEditModal(studentIndex);
         });
     });
-
-    // Display the most popular package
-    document.getElementById('popularPackage').textContent = `${popularPackage} (${popularPackageCount} students)`;
 }
 
 document.querySelector('.edit-sales-amount').addEventListener('input', function(event) {
@@ -332,7 +328,6 @@ function calculatePopularPackage() {
 
     // Determine the most popular package
     popularPackage = Object.keys(packageCounts).reduce((a, b) => packageCounts[a] > packageCounts[b] ? a : b);
-    popularPackageCount = packageCounts[popularPackage];
 }
 
 // Update Pagination Controls
@@ -440,6 +435,7 @@ const splineChart = new Chart(ctx, {
             label: 'Total Monthly Sales',
             data: [],  // Initialize with empty data
             fill: false,
+            backgroundColor: '#5a699d',
             borderColor: '#142A74',
             tension: 0.5  // This makes it a spline chart (smooth curve)
         }]
@@ -525,9 +521,6 @@ function updateTotalSalesForYear(selectedYear) {
         const totalSales = filteredYearData.reduce((sum, student) => sum + parseFloat(student.amountPaid || 0), 0);
         yearlySalesAmountElement.textContent = `₱${totalSales.toFixed(2)}`;
         splineChartElement.style.display = 'block';
-
-        // You can re-draw the chart here if needed
-        // drawSplineChart(filteredYearData);
     }
 }
 
@@ -546,12 +539,87 @@ document.addEventListener('DOMContentLoaded', function() {
     salesInfoContainer.style.display = 'none';
 
     toggleButton.addEventListener('click', function() {
-        if (salesInfoContainer.style.display === 'none') {
-            salesInfoContainer.style.display = 'flex';
+        if (salesInfoContainer.style.display === 'none' || !salesInfoContainer.classList.contains('show')) {
+            salesInfoContainer.style.display = 'flex'; // Ensure it’s visible before transitioning
+            requestAnimationFrame(() => { // Ensure the display change is applied before adding the class
+                salesInfoContainer.classList.add('show');
+            });
             toggleButton.textContent = 'Hide';
         } else {
-            salesInfoContainer.style.display = 'none';
+            salesInfoContainer.classList.remove('show');
+            setTimeout(() => salesInfoContainer.style.display = 'none', 800); // Hide after transition
             toggleButton.textContent = 'Overview';
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Assuming the data in the table might be dynamic, you may need to call this function
+    // after you're sure the table is fully populated.
+    setTimeout(updatePackageData, 1000); // Adjust the timeout as needed based on when your table gets populated
+});
+
+function updatePackageData() {
+    const packageData = [];
+    
+    // Ensure table rows are populated; this may need adjustment based on how your data is loaded.
+    document.querySelectorAll('.sales-list tr').forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const packageName = cells[1].textContent.trim();
+        let count = 1; // Each row is one package availed.
+
+        let found = packageData.find(p => p.packageName === packageName);
+        if (found) {
+            found.count += count;
+        } else {
+            packageData.push({ packageName, count });
+        }
+    });
+
+    // Check data integrity in the console
+    console.log(packageData);
+
+    // Proceed to render the chart
+    renderPackageBarChart(packageData);
+}
+
+function renderPackageBarChart(packageData) {
+    const labels = packageData.map(item => item.packageName);
+    const data = packageData.map(item => item.count);
+
+    const ctx = document.getElementById('packageBarChart').getContext('2d');
+    if(window.packageBarChartInstance) {
+        window.packageBarChartInstance.destroy(); // Destroy previous instance if exists
+    }
+    window.packageBarChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Students per Package',
+                data: data,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Number of Students'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Package Name'
+                    }
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+}

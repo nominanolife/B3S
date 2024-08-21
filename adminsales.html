@@ -51,22 +51,21 @@
                     <button id="toggleSalesInfo" class="btn btn-primary">Overview</button>
                 </div>
                 <div class="sales-info-container" id="salesInfoContainer">
-                    <div class="pupular-package">
-                        <h4><span id="popularPackage"></span></h4>
-                        <canvas id="packageChart"></canvas>
+                    <div class="popular-package">
+                        <div class="availed-package">
+                            <h4>MOST AVAILED PACKAGE OF ALL TIME</span></h4>
+                        </div>
+                        <canvas id="packageBarChart"></canvas>
                     </div>
                     <div class="total-sales">
                         <div class="amount-sales">
-                            <h4>Sales of the Year <span id="yearlySalesYear"></span> <br> <span id="yearlySalesAmount"></span></h4>
+                            <h4>SALES OF THE YEAR <span id="yearlySalesYear"></span> <br> <span id="yearlySalesAmount"></span></h4>
                             <select id="yearFilter" class="form-control year-filter">
                                 <!-- Year options will be dynamically added here -->
                             </select>
                         </div>                        
                         <canvas id="splineChart"></canvas>
                     </div>                                        
-                </div>
-                <div class="page-content-header">
-                    <h2>Sales for the Month of <span id="currentMonthDisplay"></span></h2>
                 </div>
                 <div class="filter-date">
                     <select id="monthSelector" class="form-control">
@@ -89,6 +88,9 @@
                 </div>
                 <div class="page-body">
                     <div class="sales-container">
+                        <div class="page-content-header">
+                            <h2>Sales for the Month of <span id="currentMonthDisplay"></span></h2>
+                        </div>
                         <table class="table">
                             <thead class="table-headers">
                                 <tr class="table-headers-title">
