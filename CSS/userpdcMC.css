@@ -62,9 +62,10 @@ body {
 .sidebar-dashboard a {
   font-family: Poppins;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: normal;
   text-decoration: none;
   color: #2F2E2E;
+  margin-top: 20px;
   padding: 20px 30px;
 }
 
