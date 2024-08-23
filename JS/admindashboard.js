@@ -41,24 +41,20 @@ async function fetchBookings() {
     allBookingsUpcoming = [];
     allBookingsCancelled = [];
 
-    // Iterate over each appointment document
     for (const appointmentDoc of appointmentsSnapshot.docs) {
         const appointmentData = appointmentDoc.data();
         let bookings = appointmentData.bookings;
 
-        // If bookings is not an array or is empty, log a message and skip this appointment
         if (!Array.isArray(bookings) || bookings.length === 0) {
             console.log(`No bookings found for document ID: ${appointmentDoc.id}`);
-            continue; // Skip this appointment
+            continue;
         }
 
-        const course = appointmentData.course; // Extract course information from the main document
+        const course = appointmentData.course;
 
-        // Iterate over each booking in the bookings array
         for (const booking of bookings) {
-            // Fetch the applicant's information based on the userId in the booking
             const applicantDoc = await getDoc(doc(db, "applicants", booking.userId));
-            let fullName = '';  // Define fullName outside of the if block
+            let fullName = '';
 
             if (applicantDoc.exists()) {
                 const applicantData = applicantDoc.data();
@@ -66,14 +62,13 @@ async function fetchBookings() {
                     fullName = `${applicantData.personalInfo.first} ${applicantData.personalInfo.middle} ${applicantData.personalInfo.last} ${applicantData.personalInfo.suffix ? applicantData.personalInfo.suffix : ''}`.trim();
                 } else {
                     console.warn(`Applicant data is missing or malformed for userId: ${booking.userId}`);
-                    continue; // Skip this booking
+                    continue;
                 }
             } else {
                 console.log(`Account for userId: ${booking.userId} has been deleted. Ignoring this booking.`);
-                continue; // Skip this booking
+                continue;
             }
 
-            // Convert time to 12-hour format if timeSlot exists
             let formattedTime = '';
             if (booking.timeSlot) {
                 const [startHour, startMinute] = booking.timeSlot.split('-')[0].split(':');
@@ -90,18 +85,13 @@ async function fetchBookings() {
                 formattedTime = `${formattedStartTime} - ${formattedEndTime}`;
             }
 
-            // Check if the appointment date is exactly 1 day past the current date
             const appointmentDate = new Date(appointmentData.date);
             const currentDate = new Date();
 
-            const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // Milliseconds in one day
-            const differenceInTime = currentDate.getTime() - appointmentDate.getTime();
-            const differenceInDays = Math.floor(differenceInTime / oneDayInMilliseconds);
-
-            // Skip this booking if the appointment date is exactly 1 day past the current date
-            if (differenceInDays > 1) {
-                console.log(`Appointment on ${appointmentData.date} has passed more than 1 day. Ignoring this booking.`);
-                continue; // Skip this booking
+            // Skip past appointments
+            if (appointmentDate < currentDate) {
+                console.log(`Appointment on ${appointmentData.date} has already passed. Ignoring this booking.`);
+                continue;
             }
 
             const rowHtml = `
@@ -121,11 +111,9 @@ async function fetchBookings() {
         }
     }
 
-    // Calculate total pages
     totalPagesUpcoming = Math.ceil(allBookingsUpcoming.length / itemsPerPage);
     totalPagesCancelled = Math.ceil(allBookingsCancelled.length / itemsPerPage);
 
-    // Display the bookings for the current page
     displayBookings('upcoming');
     displayBookings('cancelled');
     updatePaginationControls('upcoming');
