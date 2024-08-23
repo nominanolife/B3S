@@ -188,59 +188,6 @@ h2 {
     height: 100%;
 }
 
-.start-quiz-image {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.start-quiz-image img {
-    border-radius: 20px;
-    margin-right: 20px;
-}
-
-.quiz-description {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-left: 20px;
-}
-
-.quiz-description h3 {
-    font-family: Poppins;
-    font-size: 32px;
-    font-weight: bold;
-    color: #2F2E2E;
-}
-
-.quiz-description p {
-    font-family: Poppins;
-    font-size: 20px;
-    font-weight: normal;
-    color: #2F2E2E;
-    margin-top: 20px;
-}
-
-.quiz-description li {
-    font-family: Poppins;
-    font-size: 18px;
-    font-weight: normal;
-    color: #2F2E2E;
-    margin-top: 20px;
-}
-
-.quiz-description button {
-    font-family: Poppins;
-    font-size: 14px;
-    font-weight: bold;
-    color: #ffffff;
-    background-color: #142A74;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 30px;
-    margin-top: 20px;
-}
-
 .modal-header, .modal-body, .modal-footer {
     border: none;
 }
