@@ -71,10 +71,17 @@ document.addEventListener('DOMContentLoaded', function () {
     
             notificationElement.innerHTML = `
                 ${notification.message}
+
             `;
     
             notificationList.appendChild(notificationElement);
     
+
+
+
+
+
+
             // Redirect to the appointment page when the notification is clicked
             notificationElement.addEventListener('click', function() {
                 window.location.href = 'userappointment.html';
@@ -155,85 +162,96 @@ document.addEventListener('DOMContentLoaded', function () {
                     const userData = docSnap.data();
                     const userRole = userData.role;
     
-                    // Disable links if the user is an applicant
                     if (userRole === "applicant") {
                         disableLinks();
+
                     }
     
-                    // Real-time listener for appointments
+                    // If the user is a student, start the notification listener
+                    if (userRole === "student") {
+                        const notificationsRef = query(
+                            collection(db, "notifications"), 
+                            where("audience", "==", "student"),
+                            orderBy("date", "desc"), // Order by date, latest first
+                            limit(10) // Limit to the 10 most recent notifications
+                        );
+
+
+                        onSnapshot(notificationsRef, (snapshot) => {
+                            const notifications = snapshot.docs.map(doc => doc.data());
+                            displayNotifications(notifications);
+                        });
+                    }
+    
+                    // Fetch the user's upcoming appointment
                     const appointmentsRef = collection(db, "appointments");
-                    const q = query(appointmentsRef, where("bookings", "!=", null));
+                    const q = query(appointmentsRef, where("bookings", "!=", null)); // Query for documents with bookings array
+                    
+                    const querySnapshot = await getDocs(q);
     
-                    onSnapshot(q, (querySnapshot) => {
-                        const appointmentCard = document.querySelector('.appointment-card .card-body');
+                    // Select the appointmentCard element
+                    const appointmentCard = document.querySelector('.appointment-card .card-body');
     
-                        if (appointmentCard) {
+                    if (appointmentCard) {
+                        if (!querySnapshot.empty) {
                             let foundAppointment = false;
-    
-                            if (!querySnapshot.empty) {
-                                querySnapshot.forEach(doc => {
-                                    const appointmentData = doc.data();
-                                    const bookingDetails = appointmentData.bookings.find(
-                                        booking => booking.userId === user.uid && booking.status === "Booked"
-                                    );
-    
-                                    if (bookingDetails && !["Completed", "Canceled", "Rescheduled"].includes(bookingDetails.status)) {
-                                        const appointmentDate = new Date(appointmentData.date);
-                                        const currentDate = new Date();
-                                        const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
-                                        const differenceInTime = appointmentDate.getTime() - currentDate.getTime();
-                                        const differenceInDays = Math.floor(differenceInTime / oneDayInMilliseconds);
-    
-                                        if (differenceInDays >= 0) {
-                                            const appointmentDateFormatted = appointmentDate.toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            });
-    
-                                            const appointmentTimeSlot = bookingDetails.timeSlot;
-                                            const [startTime, endTime] = appointmentTimeSlot.split(' - ');
-    
-                                            function formatTimeTo12Hr(time) {
-                                                const [hours, minutes] = time.split(':');
-                                                let period = 'AM';
-                                                let hoursIn12HrFormat = parseInt(hours);
-    
-                                                if (hoursIn12HrFormat >= 12) {
-                                                    period = 'PM';
-                                                    if (hoursIn12HrFormat > 12) {
-                                                        hoursIn12HrFormat -= 12;
-                                                    }
-                                                } else if (hoursIn12HrFormat === 0) {
-                                                    hoursIn12HrFormat = 12;
-                                                }
-    
-                                                return `${hoursIn12HrFormat}:${minutes} ${period}`;
+                            querySnapshot.forEach(doc => {
+                                const appointmentData = doc.data();
+                                const bookingDetails = appointmentData.bookings.find(
+                                    booking => booking.userId === user.uid && booking.status === "Booked"
+                                );
+                    
+                                if (bookingDetails) {
+                                    // Remove the centering class if it exists
+                                    appointmentCard.classList.remove('center-content');
+                    
+                                    const appointmentDate = new Date(appointmentData.date).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    });
+                    
+                                    const appointmentTimeSlot = bookingDetails.timeSlot;
+                                    const [startTime, endTime] = appointmentTimeSlot.split(' - ');
+                    
+                                    function formatTimeTo12Hr(time) {
+                                        const [hours, minutes] = time.split(':');
+                                        let period = 'AM';
+                                        let hoursIn12HrFormat = parseInt(hours);
+                    
+                                        if (hoursIn12HrFormat >= 12) {
+                                            period = 'PM';
+                                            if (hoursIn12HrFormat > 12) {
+                                                hoursIn12HrFormat -= 12;
                                             }
-    
-                                            const formattedStartTime = formatTimeTo12Hr(startTime);
-                                            const formattedEndTime = formatTimeTo12Hr(endTime);
-    
-                                            const appointmentHTML = `
-                                                <h5 class="card-title">Upcoming Appointment</h5>
-                                                <div>
-                                                    <p>${appointmentDateFormatted}</p>
-                                                    <p style="color: green;">${formattedStartTime} to ${formattedEndTime}</p>
-                                                </div>
-                                                <button class="btn btn-primary" id="myscheduleBtn">My Schedule</button>
-                                            `;
-                                            appointmentCard.innerHTML = appointmentHTML;
-    
-                                            document.getElementById("myscheduleBtn").addEventListener("click", function() {
-                                                window.location.href = "usersched.html";
-                                            });
-    
-                                            foundAppointment = true;
+                                        } else if (hoursIn12HrFormat === 0) {
+                                            hoursIn12HrFormat = 12;
                                         }
+                    
+                                        return `${hoursIn12HrFormat}:${minutes} ${period}`;
                                     }
-                                });
-                            }
-    
+                    
+                                    const formattedStartTime = formatTimeTo12Hr(startTime);
+                                    const formattedEndTime = formatTimeTo12Hr(endTime);
+                    
+                                    const appointmentHTML = `
+                                        <h5 class="card-title">Upcoming Appointment</h5>
+                                        <div>
+                                            <p>${appointmentDate}</p>
+                                            <p style="color: green;">${formattedStartTime} to ${formattedEndTime}</p>
+                                        </div>
+                                        <button class="btn btn-primary" id="myscheduleBtn">My Schedule</button>
+                                    `;
+                                    appointmentCard.innerHTML = appointmentHTML;
+                                
+                                    document.getElementById("myscheduleBtn").addEventListener("click", function() {
+                                        window.location.href = "usersched.html";
+                                    });
+                                
+                                    foundAppointment = true;
+                                }
+                            });
+                    
                             if (!foundAppointment) {
                                 appointmentCard.classList.add('center-content');
                                 appointmentCard.innerHTML = `
@@ -241,16 +259,17 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <p style="color: red;">No appointment yet</p>
                                 `;
                             }
-                        } else {
-                            console.error("Appointment card element not found.");
                         }
-                    });
+                    } else {
+                        console.error("Appointment card element not found.");
+                    }
     
                     // Display the package price in the balance card
                     const balanceCard = document.querySelector('.balance-card .card-body');
-    
+                    
                     if (balanceCard) {
                         if (userData.packagePrice && userData.packageName) {
+                            // Remove the centering class if it exists
                             balanceCard.classList.remove('center-content');
     
                             balanceCard.innerHTML = `
@@ -258,19 +277,19 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <p class="card-title" style="color: red; font-size: 40px;">&#8369; ${userData.packagePrice}</p>
                                 <button class="btn btn-primary" id="viewDetailsBtn">View Details</button>
                             `;
-    
+            
                             document.getElementById("viewDetailsBtn").addEventListener("click", async function() {
                                 const packagesRef = collection(db, "packages");
                                 const packageQuery = query(packagesRef, where("name", "==", userData.packageName));
                                 const packageSnapshot = await getDocs(packageQuery);
-    
+            
                                 if (!packageSnapshot.empty) {
                                     const packageData = packageSnapshot.docs[0].data();
-    
+            
                                     document.getElementById("packageName").textContent = `${packageData.name}`;
                                     document.getElementById("packagePrice").innerHTML = `&#8369;${packageData.price}`;
                                     document.getElementById("packageDescription").textContent = `${packageData.description}`;
-    
+            
                                     $('#packageModal').modal('show');
                                 } else {
                                     console.log("Package details not found.");
@@ -286,6 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         console.error("Balance card element not found.");
                     }
+                    
                 } else {
                     console.error("No such document!");
                 }
@@ -295,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             console.error("No user is currently signed in.");
         }
-    });           
+    });        
 
     function disableLinks() {
         const linksToDisable = [
