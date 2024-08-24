@@ -183,75 +183,82 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                     }
     
-                    // Fetch the user's upcoming appointment
+                   // Fetch the user's upcoming appointment
                     const appointmentsRef = collection(db, "appointments");
                     const q = query(appointmentsRef, where("bookings", "!=", null)); // Query for documents with bookings array
-                    
+
                     const querySnapshot = await getDocs(q);
-    
+
                     // Select the appointmentCard element
                     const appointmentCard = document.querySelector('.appointment-card .card-body');
-    
+
                     if (appointmentCard) {
                         if (!querySnapshot.empty) {
                             let foundAppointment = false;
+                            const currentDate = new Date(); // Get the current date
+
                             querySnapshot.forEach(doc => {
                                 const appointmentData = doc.data();
                                 const bookingDetails = appointmentData.bookings.find(
                                     booking => booking.userId === user.uid && booking.status === "Booked"
                                 );
-                    
+
                                 if (bookingDetails) {
-                                    // Remove the centering class if it exists
-                                    appointmentCard.classList.remove('center-content');
-                    
-                                    const appointmentDate = new Date(appointmentData.date).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric'
-                                    });
-                    
-                                    const appointmentTimeSlot = bookingDetails.timeSlot;
-                                    const [startTime, endTime] = appointmentTimeSlot.split(' - ');
-                    
-                                    function formatTimeTo12Hr(time) {
-                                        const [hours, minutes] = time.split(':');
-                                        let period = 'AM';
-                                        let hoursIn12HrFormat = parseInt(hours);
-                    
-                                        if (hoursIn12HrFormat >= 12) {
-                                            period = 'PM';
-                                            if (hoursIn12HrFormat > 12) {
-                                                hoursIn12HrFormat -= 12;
+                                    const appointmentDate = new Date(appointmentData.date);
+
+                                    // Check if the appointment date is in the future
+                                    if (appointmentDate > currentDate) {
+                                        // Remove the centering class if it exists
+                                        appointmentCard.classList.remove('center-content');
+
+                                        const formattedAppointmentDate = appointmentDate.toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        });
+
+                                        const appointmentTimeSlot = bookingDetails.timeSlot;
+                                        const [startTime, endTime] = appointmentTimeSlot.split(' - ');
+
+                                        function formatTimeTo12Hr(time) {
+                                            const [hours, minutes] = time.split(':');
+                                            let period = 'AM';
+                                            let hoursIn12HrFormat = parseInt(hours);
+
+                                            if (hoursIn12HrFormat >= 12) {
+                                                period = 'PM';
+                                                if (hoursIn12HrFormat > 12) {
+                                                    hoursIn12HrFormat -= 12;
+                                                }
+                                            } else if (hoursIn12HrFormat === 0) {
+                                                hoursIn12HrFormat = 12;
                                             }
-                                        } else if (hoursIn12HrFormat === 0) {
-                                            hoursIn12HrFormat = 12;
+
+                                            return `${hoursIn12HrFormat}:${minutes} ${period}`;
                                         }
-                    
-                                        return `${hoursIn12HrFormat}:${minutes} ${period}`;
+
+                                        const formattedStartTime = formatTimeTo12Hr(startTime);
+                                        const formattedEndTime = formatTimeTo12Hr(endTime);
+
+                                        const appointmentHTML = `
+                                            <h5 class="card-title">Upcoming Appointment</h5>
+                                            <div>
+                                                <p>${formattedAppointmentDate}</p>
+                                                <p style="color: green;">${formattedStartTime} to ${formattedEndTime}</p>
+                                            </div>
+                                            <button class="btn btn-primary" id="myscheduleBtn">My Schedule</button>
+                                        `;
+                                        appointmentCard.innerHTML = appointmentHTML;
+
+                                        document.getElementById("myscheduleBtn").addEventListener("click", function() {
+                                            window.location.href = "usersched.html";
+                                        });
+
+                                        foundAppointment = true;
                                     }
-                    
-                                    const formattedStartTime = formatTimeTo12Hr(startTime);
-                                    const formattedEndTime = formatTimeTo12Hr(endTime);
-                    
-                                    const appointmentHTML = `
-                                        <h5 class="card-title">Upcoming Appointment</h5>
-                                        <div>
-                                            <p>${appointmentDate}</p>
-                                            <p style="color: green;">${formattedStartTime} to ${formattedEndTime}</p>
-                                        </div>
-                                        <button class="btn btn-primary" id="myscheduleBtn">My Schedule</button>
-                                    `;
-                                    appointmentCard.innerHTML = appointmentHTML;
-                                
-                                    document.getElementById("myscheduleBtn").addEventListener("click", function() {
-                                        window.location.href = "usersched.html";
-                                    });
-                                
-                                    foundAppointment = true;
                                 }
                             });
-                    
+
                             if (!foundAppointment) {
                                 appointmentCard.classList.add('center-content');
                                 appointmentCard.innerHTML = `
@@ -263,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         console.error("Appointment card element not found.");
                     }
-    
+
                     // Display the package price in the balance card
                     const balanceCard = document.querySelector('.balance-card .card-body');
                     
