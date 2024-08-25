@@ -245,6 +245,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         packageElement.classList.add("package-text");
         packageElement.setAttribute("data-id", id);
         packageElement.innerHTML = `
+            <h1><h1>
             <h2>${packageName}</h2>
             <span>Price: &#8369;${packagePrice}</span>
             <h4>${packageDescription}</h4>

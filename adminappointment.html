@@ -99,12 +99,21 @@
                             </div>
                             <div class="course-body">
                                 <b><label>Theoretical Driving Course</label></b>
-                                <label><input type="radio" name="course" value="TDC"> Seminar</label>
-                                <b><label> Practical Driving Course</label></b>
-                                <label><input type="radio" name="course" value="PDC-4Wheels"> 4-Wheels</label>
-                                <label><input type="radio" name="course" value="PDC-Motors"> Motorcycle</label>
+                                <label class="custom-radio">
+                                    <input type="radio" name="course" value="TDC">
+                                    <span class="radio-label">Seminar</span>
+                                </label>
+                                <b><label>Practical Driving Course</label></b>
+                                <label class="custom-radio">
+                                    <input type="radio" name="course" value="PDC-4Wheels">
+                                    <span class="radio-label">4-Wheels</span>
+                                </label>
+                                <label class="custom-radio">
+                                    <input type="radio" name="course" value="PDC-Motors">
+                                    <span class="radio-label">Motorcycle</span>
+                                </label>
                             </div>                        
-                        </div>
+                        </div>                        
                         <div class="slots-section">
                             <div class="slots-header">
                                 <h2>Slots</h2>
@@ -116,7 +125,7 @@
                                         <input type="date" id="datepicker" class="form-control" placeholder="Select a date">
                                     </div>
                                 </div>                            
-                                <div class="form-group">
+                                <div class="form-group time-group">
                                     <label for="time-start">Time Starts:</label>
                                     <input type="time" id="time-start" class="form-control">
                                     <label for="time-end">Time Ends:</label>
@@ -124,12 +133,12 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="slots">Slots</label>
-                                    <input type="number" id="slots" class="form-control" min="1" placeholder="Number of slots">
-                                </div>
+                                    <input type="text" id="slots" class="form-control" placeholder="Number of slots">
+                                </div>                                                                
                                 <button type="button" class="btn-add" id="btn-add">Add</button>
                                 <button type="button" class="btn-update" id="btn-update" style="display: none;">Update</button>
                                 <button type="button" class="btn-clear" id="btn-clear">Clear</button>
-                            </div>
+                            </div>                            
                         </div>
                     </div>
                 </form>

@@ -277,7 +277,6 @@ h2 {
 .form-group-all {
     display: flex;
     flex-direction: column;
-    
 }
 
 .custom-checkbox {

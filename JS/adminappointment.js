@@ -42,15 +42,21 @@ document.addEventListener("DOMContentLoaded", async function() {
         await saveAppointment();
     });
 
+    document.getElementById("slots").addEventListener("input", function() {
+        // Remove non-numeric characters
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+    
     async function saveAppointment() {
         const course = document.querySelector('input[name="course"]:checked');
         const date = document.getElementById("datepicker").value;
         const timeStart = document.getElementById("time-start").value;
         const timeEnd = document.getElementById("time-end").value;
-        const slots = document.getElementById("slots").value;
+        const slotsValue = document.getElementById("slots").value;
+        const slots = parseInt(slotsValue, 10);
         
-        if (!course || !date || !timeStart || !timeEnd || !slots) {
-            showSuccessModal("Please Fill Out All Fields Correctly.");
+        if (!course || !date || !timeStart || !timeEnd || isNaN(slots) || slots <= 0) {
+            showSuccessModal("Please Fill Out All Fields Correctly and Enter a Valid Number of Slots.");
             return;
         }
         

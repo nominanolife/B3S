@@ -35,7 +35,10 @@ function renderPackages(packages) {
   packages.forEach(pkg => {
     const packageHtml = `
       <div class="package-tiles">
-        <i class="info bi bi-info-circle" data-toggle="modal" data-target="#infoModal"></i>
+        <div class="package-header">
+          <h1></h1>
+          <i class="info bi bi-info-circle" data-toggle="modal" data-target="#infoModal"></i>
+        </div>
         <form class="package-body">
           <div class="package-text">
             <h2>${pkg.name}</h2>

@@ -31,89 +31,90 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to display notifications
     function displayNotifications(notifications) {
         notificationList.innerHTML = ""; // Clear existing notifications
-    
+
         // Create a container for the title and "Mark all as read" button
         const notificationHeader = document.createElement('div');
         notificationHeader.className = 'notification-header';
-    
+
         const notificationTitle = document.createElement('div');
         notificationTitle.className = 'notification-title';
         notificationTitle.innerHTML = "<h2>Notification</h2>";
-    
+
         const markAllReadContainer = document.createElement('div');
         markAllReadContainer.id = 'mark-all-read-container';
         markAllReadContainer.innerHTML = `
             <button id="mark-all-read" class="btn btn-link">Mark all as read</button>
         `;
-    
+
         notificationHeader.appendChild(notificationTitle);
         notificationHeader.appendChild(markAllReadContainer);
         notificationList.appendChild(notificationHeader);
-    
+
         if (notifications.length === 0) {
             notificationList.innerHTML = "<div class='notification-item'>No new notifications</div>";
             notificationIndicator.classList.remove('show'); // Hide the indicator if no notifications
             return;
         }
-    
+
         let hasUnread = false;
-    
+
         notifications.forEach(notification => {
             const notificationElement = document.createElement("div");
             notificationElement.className = "notification-item";
             notificationElement.style.cursor = "pointer"; // Make it clear that the item is clickable
-    
+
             // Check if the notification is unread and add the "unread" class
             if (!notification.read) {
                 notificationElement.classList.add("unread");
                 hasUnread = true; // Mark that there is at least one unread notification
             }
-    
+
             notificationElement.innerHTML = `
                 ${notification.message}
-
             `;
-    
+
             notificationList.appendChild(notificationElement);
-    
 
+            // Redirect to the appointment page and mark the notification as read when the notification is clicked
+            notificationElement.addEventListener('click', async function() {
+                try {
+                    const notificationRef = doc(db, "notifications", notification.id); // Reference to the specific notification document
+                    await updateDoc(notificationRef, { read: true }); // Mark notification as read
 
-
-
-
-
-            // Redirect to the appointment page when the notification is clicked
-            notificationElement.addEventListener('click', function() {
-                window.location.href = 'userappointment.html';
+                    // Redirect to the appointment page
+                    window.location.href = 'userappointment.html';
+                } catch (error) {
+                    console.error("Error updating notification:", error);
+                }
             });
         });
-    
+
         // Show or hide the indicator based on the presence of unread notifications
         if (hasUnread) {
             notificationIndicator.classList.add('show');
         } else {
             notificationIndicator.classList.remove('show');
         }
-    
+
         // Add event listener for the "Mark all as read" button
         const markAllReadBtn = document.getElementById('mark-all-read');
         markAllReadBtn.addEventListener('click', async function () {
             try {
                 const userDocRef = doc(db, "applicants", auth.currentUser.uid);
-    
+
                 // Update the user's document to mark all notifications as read
                 await updateDoc(userDocRef, { notificationsRead: true });
-    
+
                 // Update each notification's read status in Firestore
                 const notificationsQuery = query(collection(db, "notifications"), where("audience", "==", "student"));
                 const snapshot = await getDocs(notificationsQuery);
-    
+
                 const batch = writeBatch(db); // Use a batch to update all notifications at once
                 snapshot.forEach(doc => {
                     batch.update(doc.ref, { read: true });
                 });
                 await batch.commit(); // Commit the batch update
-    
+
                 // Re-fetch the user's document to confirm notificationsRead status
                 const updatedDocSnap = await getDoc(userDocRef);
                 if (updatedDocSnap.exists() && updatedDocSnap.data().notificationsRead) {
@@ -123,12 +124,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                     notificationIndicator.classList.remove('show');
                 }
-    
+
             } catch (error) {
                 console.error("Error updating document:", error);
             }
         });
-    }    
+    }
 
     // Check if there are unread notifications and adjust the indicator accordingly
     async function checkNotifications() {
@@ -161,12 +162,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
                     const userRole = userData.role;
-    
+
                     if (userRole === "applicant") {
                         disableLinks();
-
                     }
-    
+
                     // If the user is a student, start the notification listener
                     if (userRole === "student") {
                         const notificationsRef = query(
@@ -176,14 +176,13 @@ document.addEventListener('DOMContentLoaded', function () {
                             limit(10) // Limit to the 10 most recent notifications
                         );
 
-
                         onSnapshot(notificationsRef, (snapshot) => {
-                            const notifications = snapshot.docs.map(doc => doc.data());
+                            const notifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Include doc.id for the notification reference
                             displayNotifications(notifications);
                         });
                     }
-    
-                   // Fetch the user's upcoming appointment
+
+                    // Fetch the user's upcoming appointment
                     const appointmentsRef = collection(db, "appointments");
                     const q = query(appointmentsRef, where("bookings", "!=", null)); // Query for documents with bookings array
 
@@ -230,30 +229,19 @@ document.addEventListener('DOMContentLoaded', function () {
                                                 if (hoursIn12HrFormat > 12) {
                                                     hoursIn12HrFormat -= 12;
                                                 }
-                                            } else if (hoursIn12HrFormat === 0) {
+                                            }
+                                            if (hoursIn12HrFormat === 0) {
                                                 hoursIn12HrFormat = 12;
                                             }
 
                                             return `${hoursIn12HrFormat}:${minutes} ${period}`;
                                         }
 
-                                        const formattedStartTime = formatTimeTo12Hr(startTime);
-                                        const formattedEndTime = formatTimeTo12Hr(endTime);
-
-                                        const appointmentHTML = `
-                                            <h5 class="card-title">Upcoming Appointment</h5>
-                                            <div>
-                                                <p>${formattedAppointmentDate}</p>
-                                                <p style="color: green;">${formattedStartTime} to ${formattedEndTime}</p>
-                                            </div>
-                                            <button class="btn btn-primary" id="myscheduleBtn">My Schedule</button>
+                                        appointmentCard.innerHTML = `
+                                            <h3>Upcoming Appointment</h3>
+                                            <p>Date: ${formattedAppointmentDate}</p>
+                                            <p>Time: ${formatTimeTo12Hr(startTime)} - ${formatTimeTo12Hr(endTime)}</p>
                                         `;
-                                        appointmentCard.innerHTML = appointmentHTML;
-
-                                        document.getElementById("myscheduleBtn").addEventListener("click", function() {
-                                            window.location.href = "usersched.html";
-                                        });
-
                                         foundAppointment = true;
                                     }
                                 }

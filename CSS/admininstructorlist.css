@@ -605,12 +605,96 @@ input:checked + .slider .slider-label-on {
     font-size: 14px;
 }
 
+#instructorModal .modal-dialog {
+    top: 25%;
+    left: 5%;
+    border-radius: 20px;
+}
+
 .instructor-name, .instructor-course {
     width: 100%;
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ced4da;
+}
+
+.personal-traits {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.personal-traits h5 {
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: bold;
+    color: #142A74;
+    margin-bottom: 15px;
+}
+
+.traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: calc(50% - 20px);
+    box-sizing: border-box;
+}
+
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-checkbox input + .checkbox-label {
+    position: relative;
+    padding-left: 30px;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #142A74;
+    cursor: pointer;
+}
+
+.custom-checkbox input + .checkbox-label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #2F2E2E;
+    border-radius: 4px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+.custom-checkbox input:checked + .checkbox-label::before {
+    background-color: #142A74;
+    border-color: #142A74;
+}
+
+.custom-checkbox input + .checkbox-label::after {
+    content: '\2714';
+    position: absolute;
+    left: 4px;
+    top: 0px;
+    font-size: 14px;
+    color: #ffffff;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.custom-checkbox input:checked + .checkbox-label::after {
+    opacity: 1;
 }
 
 .save-instructor {
