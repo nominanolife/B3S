@@ -31,82 +31,90 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Function to display notifications
     function displayNotifications(notifications) {
         notificationList.innerHTML = ""; // Clear existing notifications
-    
+
         // Create a container for the title and "Mark all as read" button
         const notificationHeader = document.createElement('div');
         notificationHeader.className = 'notification-header';
-    
+
         const notificationTitle = document.createElement('div');
         notificationTitle.className = 'notification-title';
         notificationTitle.innerHTML = "<h2>Notification</h2>";
-    
+
         const markAllReadContainer = document.createElement('div');
         markAllReadContainer.id = 'mark-all-read-container';
         markAllReadContainer.innerHTML = `
             <button id="mark-all-read" class="btn btn-link">Mark all as read</button>
         `;
-    
+
         notificationHeader.appendChild(notificationTitle);
         notificationHeader.appendChild(markAllReadContainer);
         notificationList.appendChild(notificationHeader);
-    
+
         if (notifications.length === 0) {
             notificationList.innerHTML = "<div class='notification-item'>No new notifications</div>";
             notificationIndicator.classList.remove('show'); // Hide the indicator if no notifications
             return;
         }
-    
+
         let hasUnread = false;
-    
+
         notifications.forEach(notification => {
             const notificationElement = document.createElement("div");
             notificationElement.className = "notification-item";
             notificationElement.style.cursor = "pointer"; // Make it clear that the item is clickable
-    
+
             // Check if the notification is unread and add the "unread" class
             if (!notification.read) {
                 notificationElement.classList.add("unread");
                 hasUnread = true; // Mark that there is at least one unread notification
             }
-    
+
             notificationElement.innerHTML = `
                 ${notification.message}
             `;
-    
+
             notificationList.appendChild(notificationElement);
-    
-            // Redirect to the appointment page when the notification is clicked
-            notificationElement.addEventListener('click', function() {
-                window.location.href = 'userappointment.html';
+
+            // Redirect to the appointment page and mark the notification as read when the notification is clicked
+            notificationElement.addEventListener('click', async function() {
+                try {
+                    const notificationRef = doc(db, "notifications", notification.id); // Reference to the specific notification document
+                    await updateDoc(notificationRef, { read: true }); // Mark notification as read
+
+                    // Redirect to the appointment page
+                    window.location.href = 'userappointment.html';
+                } catch (error) {
+                    console.error("Error updating notification:", error);
+                }
             });
         });
-    
+
         // Show or hide the indicator based on the presence of unread notifications
         if (hasUnread) {
             notificationIndicator.classList.add('show');
         } else {
             notificationIndicator.classList.remove('show');
         }
-    
+
         // Add event listener for the "Mark all as read" button
         const markAllReadBtn = document.getElementById('mark-all-read');
         markAllReadBtn.addEventListener('click', async function () {
             try {
                 const userDocRef = doc(db, "applicants", auth.currentUser.uid);
-    
+
                 // Update the user's document to mark all notifications as read
                 await updateDoc(userDocRef, { notificationsRead: true });
-    
+
                 // Update each notification's read status in Firestore
                 const notificationsQuery = query(collection(db, "notifications"), where("audience", "==", "student"));
                 const snapshot = await getDocs(notificationsQuery);
-    
+
                 const batch = writeBatch(db); // Use a batch to update all notifications at once
                 snapshot.forEach(doc => {
                     batch.update(doc.ref, { read: true });
                 });
                 await batch.commit(); // Commit the batch update
-    
+
                 // Re-fetch the user's document to confirm notificationsRead status
                 const updatedDocSnap = await getDoc(userDocRef);
                 if (updatedDocSnap.exists() && updatedDocSnap.data().notificationsRead) {
@@ -116,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     });
                     notificationIndicator.classList.remove('show');
                 }
-    
+
             } catch (error) {
                 console.error("Error updating document:", error);
             }
@@ -177,11 +185,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
                     const userRole = userData.role;
-    
+
                     if (userRole === "applicant") {
                         disableLinks();
                     }
-    
+
                     // If the user is a student, start the notification listener
                     if (userRole === "student") {
                         const notificationsRef = query(
@@ -192,11 +200,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                         );
 
                         onSnapshot(notificationsRef, (snapshot) => {
-                            const notifications = snapshot.docs.map(doc => doc.data());
+                            const notifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Include doc.id for the notification reference
                             displayNotifications(notifications);
                         });
                     }
-    
+
                     // Fetch the user's upcoming appointment
                     const appointmentsRef = collection(db, "appointments");
                     const q = query(appointmentsRef, where("bookings", "!=", null)); // Query for documents with bookings array
@@ -209,6 +217,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                     if (appointmentCard) {
                         if (!querySnapshot.empty) {
                             let foundAppointment = false;
+                            const currentDate = new Date(); // Get the current date
+
                             querySnapshot.forEach(doc => {
                                 const appointmentData = doc.data();
                                 const bookingDetails = appointmentData.bookings.find(
@@ -216,67 +226,47 @@ document.addEventListener('DOMContentLoaded', async function () {
                                 );
 
                                 if (bookingDetails) {
-                                    // Check if the appointment date is exactly 1 day past the current date
                                     const appointmentDate = new Date(appointmentData.date);
-                                    const currentDate = new Date();
 
-                                    const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // Milliseconds in one day
-                                    const differenceInTime = currentDate.getTime() - appointmentDate.getTime();
-                                    const differenceInDays = Math.floor(differenceInTime / oneDayInMilliseconds);
+                                    // Check if the appointment date is in the future
+                                    if (appointmentDate > currentDate) {
+                                        // Remove the centering class if it exists
+                                        appointmentCard.classList.remove('center-content');
 
-                                    // Skip this booking if the appointment date is more than 1 day past the current date
-                                    if (differenceInDays > 1) {
-                                        console.log(`Appointment on ${appointmentData.date} has passed more than 1 day. Ignoring this booking.`);
-                                        return; // Skip this booking
-                                    }
+                                        const formattedAppointmentDate = appointmentDate.toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        });
 
-                                    // Remove the centering class if it exists
-                                    appointmentCard.classList.remove('center-content');
+                                        const appointmentTimeSlot = bookingDetails.timeSlot;
+                                        const [startTime, endTime] = appointmentTimeSlot.split(' - ');
 
-                                    const appointmentDateFormatted = appointmentDate.toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric'
-                                    });
+                                        function formatTimeTo12Hr(time) {
+                                            const [hours, minutes] = time.split(':');
+                                            let period = 'AM';
+                                            let hoursIn12HrFormat = parseInt(hours);
 
-                                    const appointmentTimeSlot = bookingDetails.timeSlot;
-                                    const [startTime, endTime] = appointmentTimeSlot.split(' - ');
-
-                                    function formatTimeTo12Hr(time) {
-                                        const [hours, minutes] = time.split(':');
-                                        let period = 'AM';
-                                        let hoursIn12HrFormat = parseInt(hours);
-
-                                        if (hoursIn12HrFormat >= 12) {
-                                            period = 'PM';
-                                            if (hoursIn12HrFormat > 12) {
-                                                hoursIn12HrFormat -= 12;
+                                            if (hoursIn12HrFormat >= 12) {
+                                                period = 'PM';
+                                                if (hoursIn12HrFormat > 12) {
+                                                    hoursIn12HrFormat -= 12;
+                                                }
                                             }
-                                        } else if (hoursIn12HrFormat === 0) {
-                                            hoursIn12HrFormat = 12;
+                                            if (hoursIn12HrFormat === 0) {
+                                                hoursIn12HrFormat = 12;
+                                            }
+
+                                            return `${hoursIn12HrFormat}:${minutes} ${period}`;
                                         }
 
-                                        return `${hoursIn12HrFormat}:${minutes} ${period}`;
+                                        appointmentCard.innerHTML = `
+                                            <h3>Upcoming Appointment</h3>
+                                            <p>Date: ${formattedAppointmentDate}</p>
+                                            <p>Time: ${formatTimeTo12Hr(startTime)} - ${formatTimeTo12Hr(endTime)}</p>
+                                        `;
+                                        foundAppointment = true;
                                     }
-
-                                    const formattedStartTime = formatTimeTo12Hr(startTime);
-                                    const formattedEndTime = formatTimeTo12Hr(endTime);
-
-                                    const appointmentHTML = `
-                                        <h5 class="card-title">Upcoming Appointment</h5>
-                                        <div>
-                                            <p>${appointmentDateFormatted}</p>
-                                            <p style="color: green;">${formattedStartTime} to ${formattedEndTime}</p>
-                                        </div>
-                                        <button class="btn btn-primary" id="myscheduleBtn">My Schedule</button>
-                                    `;
-                                    appointmentCard.innerHTML = appointmentHTML;
-                                
-                                    document.getElementById("myscheduleBtn").addEventListener("click", function() {
-                                        window.location.href = "usersched.html";
-                                    });
-                                
-                                    foundAppointment = true;
                                 }
                             });
 
@@ -291,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     } else {
                         console.error("Appointment card element not found.");
                     }
-    
+
                     // Display the package price in the balance card
                     const balanceCard = document.querySelector('.balance-card .card-body');
                     

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B3S Driving School - Manila</title>
+    <title>DriveHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="CSS/uservideolearning.css">
+    <link rel="stylesheet" href="CSS/useronlinetdc.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -19,19 +19,18 @@
                 <div class="logo">
                     <img src="Assets/logo.png" class="b3slogo" alt="B3S Logo">
                     <div class="brand-name">
-                        <span class="brand-title">B3S</span>
-                        <span class="sub-title">Driving School</span>
+                        <span class="brand-title">DriveHub</span>
                     </div>
                 </div>
                 <div class="sidebar-dashboard">
                     <a href="userdashboard.html"><i class="bi bi-columns-gap"></i>Dashboard</a>
+                    <a href="userinstructor.html"><i class="bi bi-people"></i>Instructors</a>
                 </div>
                 <div class="sidebar-menu">
                     <a href="userpackages.html"><i class="bi bi-mortarboard"></i>Packages</a>
                     <a href="userappointment.html"><i class="bi bi-calendar2-week"></i>Appointment</a>
                     <a href="usermodule.html"><i class="bi bi-book"></i>Modules</a>
-                    <a href="uservideolearning.html"class="active"><i class="bi bi-collection-play-fill"></i>Video Learning</a>
-                    <a href="userquiz.html"><i class="bi bi-journals"></i>Quiz</a>
+                    <a href="useronlinetdc.html" class="active"><i class="bi bi-journals"></i>Online TDC</a>
                 </div>
                 <div class="sidebar-account">
                     <button class="profile" type="button" id="profileBtn"><i class="bi bi-person-circle"></i>Profile</button>
@@ -41,11 +40,21 @@
         </div>
         <div class="main-content">
             <div class="header">
-                <h2>Video Learning</h2>
+                <h2>Online TDC</h2>
             </div>
             <div class="page-content">
-                <h2></h2> <!-- This will be dynamically updated -->
-            </div>  
+                <div class="left-content">
+                    <img src="Assets/tdcpic.png" alt="TDC" class="tdc-img">
+                </div>
+                <div class="right-content">
+                    <div class="tdc-content">
+                        <h3>Ready to take your Online TDC exam?</h3>
+                        <p>Online TDC is a platform where you can learn and practice the Traffic Discipline Course (TDC) online. The course is designed to help you understand the rules and regulations of the road and to help you become a better driver. The course is divided into several modules, each covering a different aspect of driving. You can take the course at your own pace and complete it in your own time. Once you have completed the course, you will be awarded a certificate of completion which you can use to show that you have successfully completed the course.</p>
+                        <p>Click on the button below to start the course.</p>
+                        <a href="#" class="btn btn-primary">Start Course</a>
+                    </div>
+                </div>
+            </div> 
         </div>
     </div>
 
@@ -71,6 +80,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="module" src="JS/common.js"></script>
-    <script type="module" src="JS/uservideolearning.js"></script>
+    <script type="module" src="JS/useronlinetdc.js"></script>
 </body>
 </html>

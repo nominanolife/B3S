@@ -47,15 +47,7 @@ body {
 
 .brand-title {
     font-family: Poppins; 
-    font-size: 36px;
-    font-weight: bold;
-    margin: 0;
-    padding-left: 10px;
-}
-
-.sub-title {
-    font-family: Poppins;
-    font-size: 12px;
+    font-size: 20px;
     font-weight: bold;
     margin: 0;
     padding-left: 10px;
@@ -265,13 +257,60 @@ h2 {
     font-family: Poppins;
     font-size: 18px;
     color: #2F2E2E;
+    margin-left: 10px;
     margin-bottom: 10px;
 }
 
-.course-body input {
+.custom-radio input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-radio input + .radio-label {
+    position: relative;
+    margin-left: 20px;
+    padding-left: 30px;
     font-family: Poppins;
-    font-size: 14px;
-    padding: 10px;
+    font-size: 18px;
+    color: #2F2E2E;
+    cursor: pointer;
+}
+
+.custom-radio input + .radio-label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #2F2E2E;
+    border-radius: 50%;
+    background-color: #fff;
+    transform: translateY(-50%);
+    transition: all 0.3s ease;
+}
+
+.custom-radio input:checked + .radio-label::before {
+    background-color: #142A74;
+    border-color: #142A74;
+}
+
+.custom-radio input + .radio-label::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 8px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.custom-radio input:checked + .radio-label::after {
+    opacity: 1;
 }
 
 .slots-section {

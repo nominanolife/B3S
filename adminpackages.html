@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B3S Driving School - Manila</title>
+    <title>DriveHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="CSS/adminpackages.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
@@ -20,8 +20,7 @@
                 <div class="logo">
                     <img src="Assets/logo.png" class="b3slogo" alt="B3S Logo">
                     <div class="brand-name">
-                        <span class="brand-title">B3S</span>
-                        <span class="sub-title">Driving School</span>
+                        <span class="brand-title">DriveHub</span>
                     </div>
                 </div>
                 <div class="sidebar-dashboard">
@@ -47,10 +46,19 @@
                 <h2>Packages</h2>
             </div>
             <div class="page-content">
-                <div class="buttons">
-                    <button class="add-package" type="button" id="addButton">Add Package</button>
-                    <button class="delete-package" type="button" id="deleteButton">Delete Package</button>
-                    <button class="cancel-delete" type="button" id="cancelButton" style="display: none;">Cancel</button>
+                <div class="package-header">
+                    <div class="filter-container">
+                        <select class="form-control course-filter" id="courseFilter">
+                            <option value="">All</option>
+                            <option value="TDC">TDC</option>
+                            <option value="PDC-4Wheels">PDC</option>
+                        </select>
+                    </div>
+                    <div class="buttons">
+                        <button class="add-package" type="button" id="addButton">Add Package</button>
+                        <button class="delete-package" type="button" id="deleteButton">Delete Package</button>
+                        <button class="cancel-delete" type="button" id="cancelButton" style="display: none;">Cancel</button>
+                    </div>
                 </div>
                 <div class="package-list" id="packageList">
                     
@@ -65,6 +73,19 @@
                         <h4>Create Package</h4>
                     </div>
                     <form class="modal-body">
+                        <div class="package-type">
+                            <h4>Package Type</h4>
+                            <div class="package-input">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="courseType" value="TDC">
+                                    <span class="checkbox-label">TDC</span>
+                                </label>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="courseType" value="PDC">
+                                    <span class="checkbox-label">PDC</span>
+                                </label>
+                            </div>
+                        </div>                   
                         <div class="input-body">
                             <input type="text" class="package-name" placeholder="Package Name" required>
                             <input type="text" class="package-price" placeholder="Price" required>

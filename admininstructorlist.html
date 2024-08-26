@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B3S Driving School - Manila</title>
+    <title>DriveHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="CSS/admininstructorlist.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
@@ -19,8 +19,7 @@
                 <div class="logo">
                     <img src="Assets/logo.png" class="b3slogo" alt="B3S Logo">
                     <div class="brand-name">
-                        <span class="brand-title">B3S</span>
-                        <span class="sub-title">Driving School</span>
+                        <span class="brand-title">DriveHub</span>
                     </div>
                 </div>
                 <div class="sidebar-dashboard">
@@ -72,6 +71,7 @@
                                     <th>NAME</th>
                                     <th>COURSE</th>
                                     <th>ACTION</th>
+                                    <th>AVAILABILITY</th>
                                 </tr>
                             </thead>
                             <tbody class="instructor-list">
@@ -97,6 +97,31 @@
                         <input type="text" class="instructor-name" placeholder="Instructor Name" required>
                         <input type="text" class="instructor-course" placeholder="Course" required>
                     </div>
+                    <div class="personal-traits">
+                        <h5>Personal Traits</h5>
+                        <div class="traits">
+                            <div class="custom-checkbox trait">
+                                <input type="checkbox" class="trait-checkbox" id="trait1">
+                                <label for="trait1" class="checkbox-label">Punctual</label>
+                            </div>
+                            <div class="custom-checkbox trait">
+                                <input type="checkbox" class="trait-checkbox" id="trait2">
+                                <label for="trait2" class="checkbox-label">Patient</label>
+                            </div>
+                            <div class="custom-checkbox trait">
+                                <input type="checkbox" class="trait-checkbox" id="trait3">
+                                <label for="trait3" class="checkbox-label">Friendly</label>
+                            </div>
+                            <div class="custom-checkbox trait">
+                                <input type="checkbox" class="trait-checkbox" id="trait4">
+                                <label for="trait4" class="checkbox-label">Professional</label>
+                            </div>
+                            <div class="custom-checkbox trait">
+                                <input type="checkbox" class="trait-checkbox" id="trait5">
+                                <label for="trait5" class="checkbox-label">Experienced</label>
+                            </div>
+                        </div>
+                    </div>                    
                     <div class="modal-footer">
                         <button class="save-instructor" type="submit">Save</button>
                         <button class="close-modal" type="button">Cancel</button>

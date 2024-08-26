@@ -64,11 +64,21 @@ function renderInstructors() {
           </div>
         </div>
       </td>
+      <td>
+        <label class="switch">
+          <input type="checkbox" class="slider-switch" data-id="${instructor.id}">
+          <span class="slider">
+            <span class="slider-label-off">OFF</span>
+            <span class="slider-label-on">ON</span>
+          </span>
+        </label>
+      </td>
     `;
     instructorList.appendChild(row);
   });
 
   handleDropdowns();
+  handleSliderSwitch(); // Handles the slider switch functionality
 }
 
 // Handle dropdown functionality
@@ -102,6 +112,25 @@ function handleDropdowns() {
     if (!event.target.closest('.dropdown')) {
       closeAllDropdowns();
     }
+  });
+}
+
+// Handle slider switch functionality
+function handleSliderSwitch() {
+  document.querySelectorAll('.slider-switch').forEach(switchElement => {
+    switchElement.addEventListener('change', async function () {
+      const instructorId = this.dataset.id;
+      const isChecked = this.checked;
+      
+      try {
+        await updateDoc(doc(db, 'instructors', instructorId), {
+          active: isChecked
+        });
+        console.log(`Instructor ${instructorId} is now ${isChecked ? 'active' : 'inactive'}`);
+      } catch (error) {
+        console.error('Error updating instructor status:', error);
+      }
+    });
   });
 }
 
