@@ -143,6 +143,7 @@ async function updateTimeSection(date) {
       userHasBooked = bookings && bookings.some(booking => booking.userId === currentUserUid);
     }
 
+    // Create the radio input element
     const radioInput = document.createElement('input');
     radioInput.type = 'radio';
     radioInput.name = 'time-slot';
@@ -151,19 +152,34 @@ async function updateTimeSection(date) {
     radioInput.dataset.date = date;
     radioInput.dataset.appointmentId = appointment.id;
 
+    // Apply the custom-radio class to the radio input's parent label
     const label = document.createElement('label');
+    label.classList.add('custom-radio');
     label.htmlFor = radioInput.id;
+
+    // Create the custom radio button styling
+    const radioBtnSpan = document.createElement('span');
+    radioBtnSpan.classList.add('radio-btn');
+
+    // Set the label text content
     label.textContent = `${convertTo12Hour(timeStart)} - ${convertTo12Hour(timeEnd)} (${availableSlots} slots left)`;
-    timeBody.appendChild(radioInput);
+
+    // Append the radio input and the styled span to the label
+    label.insertBefore(radioInput, label.firstChild);
+    label.appendChild(radioBtnSpan);
+
+    // Append the label to the timeBody container
     timeBody.appendChild(label);
+
+    // Add a line break for spacing (optional)
     timeBody.appendChild(document.createElement('br'));
 
-    // Add click event listener for radio buttons
+    // Add an event listener for the radio input
     radioInput.addEventListener('click', () => {
-      if (userHasBooked) {
-        showNotification('You have already booked this slot.');
-        radioInput.checked = false; // Uncheck the radio button
-      }
+        if (userHasBooked) {
+            showNotification('You have already booked this slot.');
+            radioInput.checked = false;
+        }
     });
   });
 
