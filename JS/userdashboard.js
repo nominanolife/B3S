@@ -17,7 +17,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
     const notificationBell = document.getElementById('notification-bell');
     const notificationList = document.getElementById('notification-list');
     const notificationIndicator = document.getElementById('notification-indicator');
@@ -121,23 +121,46 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error("Error updating document:", error);
             }
         });
-    }    
-
-    // Check if there are unread notifications and adjust the indicator accordingly
-    async function checkNotifications() {
-        const userDocRef = doc(db, "applicants", auth.currentUser.uid);
-        const docSnap = await getDoc(userDocRef);
-
-        if (docSnap.exists()) {
-            const notificationsRead = docSnap.data().notificationsRead;
-            if (notificationsRead) {
-                notificationIndicator.classList.remove('show');
-            } else {
-                notificationIndicator.classList.add('show');
-            }
-        }
     }
 
+    // Function to check and delete old notifications
+    const checkAndDeleteOldNotifications = async () => {
+        const notificationRef = collection(db, "notifications");
+        const snapshot = await getDocs(query(notificationRef, where('audience', '==', 'student')));
+
+        const batch = writeBatch(db);
+
+        snapshot.forEach(doc => {
+            const notification = doc.data();
+            const appointmentDate = notification.date.toDate(); // Convert Firestore Timestamp to JS Date
+            const now = new Date();
+
+            // Calculate the difference in days between now and the appointment date
+            const diffInDays = Math.floor((now - appointmentDate) / (1000 * 60 * 60 * 24));
+
+            if (diffInDays > 1) { // If the notification is more than one day after the appointment date
+                batch.delete(doc.ref);
+            }
+        });
+
+        await batch.commit().then(() => {
+            console.log('Deleted outdated notifications');
+        }).catch(error => {
+            console.error('Error deleting notifications: ', error);
+        });
+    };
+
+    // Call the function to check and delete old notifications when the user logs in or opens the app
+    await checkAndDeleteOldNotifications();
+
+    // Fetch notifications after deletion
+    const notificationsQuery = query(collection(db, "notifications"), where("audience", "==", "student"));
+    const snapshot = await getDocs(notificationsQuery);
+    const notifications = snapshot.docs.map(doc => doc.data());
+
+    // Display notifications
+    displayNotifications(notifications);
+  
     // Close the notification list when clicking outside of it
     document.addEventListener('click', function(event) {
         if (!notificationList.contains(event.target) && !notificationBell.contains(event.target)) {
@@ -157,7 +180,6 @@ document.addEventListener('DOMContentLoaded', function () {
     
                     if (userRole === "applicant") {
                         disableLinks();
-
                     }
     
                     // If the user is a student, start the notification listener
@@ -168,7 +190,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             orderBy("date", "desc"), // Order by date, latest first
                             limit(10) // Limit to the 10 most recent notifications
                         );
-
 
                         onSnapshot(notificationsRef, (snapshot) => {
                             const notifications = snapshot.docs.map(doc => doc.data());
@@ -342,9 +363,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
-    // Initialize the roadmap modal functionality
-    initializeRoadmap(userData);
 
     function initializeRoadmap(userData) {
         const roadmapItems = document.querySelectorAll('.roadmap-item');
