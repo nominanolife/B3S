@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
 
 // Firebase configuration
@@ -39,8 +39,12 @@ document.addEventListener("DOMContentLoaded", async function() {
     const editPackagePriceInput = document.querySelector(".edit-package-price");
     const editPackageDescriptionInput = document.querySelector(".edit-package-description");
 
+    // Get element for the filter dropdown
+    const courseFilter = document.getElementById("courseFilter");
+
     let packageElementToDelete = null;
     let packageIdToEdit = null;
+    let allPackages = [];  // Store all packages to filter them
 
     // Create and style cancel button
     const cancelButton = document.createElement('button');
@@ -191,20 +195,6 @@ document.addEventListener("DOMContentLoaded", async function() {
             packageElementToDelete = null;
 
             // Cancel delete mode after successful deletion
-            cancelDeleteMode();
-        }
-    });
-
-
-    // Confirm delete button click event
-    confirmDeleteButton.addEventListener("click", async function() {
-        if (packageElementToDelete) {
-            const packageId = packageElementToDelete.getAttribute("data-id");
-            await deletePackageFromFirestore(packageId);
-            deleteConfirmModal.style.display = "none";
-            packageElementToDelete = null;
-
-            // Cancel delete mode after successful deletion
             cancelButton.style.display = "none"; // Hide cancel button
             addButton.style.display = "inline"; // Show add button
             deleteButton.style.display = "inline"; // Show delete button
@@ -218,34 +208,34 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     });
 
-    // Function to add package to Firestore
-    async function addPackageToFirestore(packageName, packagePrice, packageDescription) {
+    // Function to create a new package
+    async function addPackageToFirestore(packageName, packagePrice, packageDescription, packageType) {
         try {
+            // Save package data to Firestore
             const docRef = await addDoc(collection(db, "packages"), {
                 name: packageName,
                 price: packagePrice,
-                description: packageDescription
+                description: packageDescription,
+                type: packageType  // Include the package type
             });
-            addPackageToDOM(docRef.id, packageName, packagePrice, packageDescription);
 
-            // Show success notification modal
-            showNotificationModal("Package added successfully!", "success");
+            addPackageToDOM(docRef.id, packageName, packagePrice, packageDescription, packageType);
+
+            showNotificationModal("Package Added Successfully!", "success");
 
         } catch (e) {
             console.error("Error adding document: ", e);
-
-            // Show error notification modal
             showNotificationModal("Failed to add package. Please try again.", "error");
         }
     }
 
     // Function to add package to the DOM
-    function addPackageToDOM(id, packageName, packagePrice, packageDescription) {
+    function addPackageToDOM(id, packageName, packagePrice, packageDescription, packageType) {
         const packageElement = document.createElement("div");
         packageElement.classList.add("package-text");
         packageElement.setAttribute("data-id", id);
         packageElement.innerHTML = `
-            <h1><h1>
+            <h1>${packageType.join(' + ')}</h1>
             <h2>${packageName}</h2>
             <span>Price: &#8369;${packagePrice}</span>
             <h4>${packageDescription}</h4>
@@ -288,44 +278,49 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     }
 
-    async function updatePackageInFirestore(packageId, packageName, packagePrice, packageDescription) {
+    async function updatePackageInFirestore(packageId, packageName, packagePrice, packageDescription, packageType) {
         const batch = writeBatch(db);
         try {
+            // Ensure there are no duplicate values in packageType
+            const uniquePackageTypes = [...new Set(packageType)];
+    
             // Update the package document
             const packageRef = doc(db, "packages", packageId);
             batch.update(packageRef, {
                 name: packageName,
                 price: packagePrice,
-                description: packageDescription
+                description: packageDescription,
+                type: uniquePackageTypes // Use the unique package types
             });
-        
+            
             // Fetch all applicants
             const applicantsSnapshot = await getDocs(collection(db, "applicants"));
-        
+            
             // Update enrolled package information for relevant applicants
             let updatedCount = 0;
             for (const applicantDoc of applicantsSnapshot.docs) {
                 const applicantData = applicantDoc.data();
-        
-                if (applicantData.packageName) {
+            
+                if (applicantData.packageName === packageName) { // Ensure it updates relevant applicants
                     const applicantRef = doc(db, "applicants", applicantDoc.id);
-        
+            
                     batch.update(applicantRef, {
                         enrolledPackage: packageName,
-                        packagePrice: packagePrice
+                        packagePrice: packagePrice,
+                        packageType: uniquePackageTypes // Use the unique package types
                     });
                     updatedCount++;
                 }
             }
-        
-            await batch.commit();
+            
+            await batch.commit(); // Commit the batch operation
             console.log(`Updated ${updatedCount} applicants.`);
-        
+            
             // Show success notification modal
             showNotificationModal("Package updated successfully!", "success");
         } catch (e) {
             console.error("Error updating document: ", e);
-        
+            
             // Show error notification modal
             showNotificationModal("Failed to update package. Please try again.", "error");
         }
@@ -345,76 +340,192 @@ document.addEventListener("DOMContentLoaded", async function() {
     
         $(notificationModal).modal('show');
     }
-    
 
-    // Function to show edit modal and populate fields
+    //Function to handle checkbox changes
+    function handleCheckboxChange(packageId, checkbox) {
+        // Get the current package document reference
+        const packageRef = doc(db, "packages", packageId);
+    
+        // Get the current value of the package type from the database
+        getDoc(packageRef).then((docSnap) => {
+            if (docSnap.exists()) {
+                let packageTypes = docSnap.data().type || [];
+    
+                if (checkbox.checked) {
+                    // If checked and not already in the array, add the type
+                    if (!packageTypes.includes(checkbox.value)) {
+                        packageTypes.push(checkbox.value);
+                    }
+                } else {
+                    // If unchecked, remove the type from the array
+                    packageTypes = packageTypes.filter(type => type !== checkbox.value);
+                }
+    
+                // Update the package in Firestore
+                updateDoc(packageRef, { type: packageTypes })
+                    .then(() => {
+                        console.log("Package types updated successfully.");
+                    })
+                    .catch((error) => {
+                        console.error("Error updating package types: ", error);
+                    });
+            }
+        });
+    }
+    
+    // Show the edit modal and populate fields
     function showEditModal(packageElement) {
         packageIdToEdit = packageElement.getAttribute("data-id");
         const name = packageElement.querySelector("h2").textContent;
         const priceText = packageElement.querySelector("span").textContent;
-        
-        // Extract only the numeric part from the price text
-        const price = priceText.replace(/[^0-9.]/g, ''); // Keep only digits and dot
-        
+        const price = priceText.replace(/[^0-9.]/g, '');
         const description = packageElement.querySelector("h4").textContent;
-
-        // Populate the edit modal with current package details
-        editPackageNameInput.value = name;
-        editPackagePriceInput.value = price;
-        editPackageDescriptionInput.value = description;
-
-        // Show the edit modal
-        editPackageModal.style.display = "block";
+    
+        document.querySelector(".edit-package-name").value = name;
+        document.querySelector(".edit-package-price").value = price;
+        document.querySelector(".edit-package-description").value = description;
+    
+        document.querySelectorAll('input[name="editCourseType"]').forEach(checkbox => {
+            checkbox.checked = false; // Clear previous selections
+        });
+    
+        const packageTypes = packageElement.querySelector("h1").textContent.split(" + ");
+        packageTypes.forEach(type => {
+            const checkbox = document.querySelector(`input[name="editCourseType"][value="${type.trim()}"]`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+    
+        document.querySelectorAll('input[name="editCourseType"]').forEach(checkbox => {
+            // Attach the change event listener to each checkbox
+            checkbox.addEventListener('change', function() {
+                handleCheckboxChange(packageIdToEdit, checkbox);
+            });
+        });
+    
+        const editPackageModal = document.getElementById("editPackageModal");
+        if (editPackageModal) {
+            editPackageModal.style.display = "block";
+        } else {
+            console.error("Edit modal not found in the DOM.");
+        }
     }
-
+    
 
     // Update package details
-    updatePackage.addEventListener("click", async function(event) {
-        event.preventDefault(); // Prevent form submission
+    // Update package details
+updatePackage.addEventListener("click", async function(event) {
+    event.preventDefault(); // Prevent form submission
 
-        // Get updated package details from inputs
-        const packageName = editPackageNameInput.value;
-        const packagePrice = editPackagePriceInput.value;
-        const packageDescription = editPackageDescriptionInput.value;
+    // Get updated package details from inputs
+    const packageName = editPackageNameInput.value;
+    const packagePrice = editPackagePriceInput.value;
+    const packageDescription = editPackageDescriptionInput.value;
 
-        // Check if all fields are filled
-        if (packageName && packagePrice && packageDescription) {
-            if (packageIdToEdit) {
-                // Update the package in Firestore
-                await updatePackageInFirestore(packageIdToEdit, packageName, packagePrice, packageDescription);
-                
-                // Update the package in the DOM with "Price" label and currency symbol
-                const packageElement = document.querySelector(`.package-text[data-id="${packageIdToEdit}"]`);
-                packageElement.querySelector("h2").textContent = packageName;
-                packageElement.querySelector("span").innerHTML = `Price: &#8369;${packagePrice}`;
-                packageElement.querySelector("h4").textContent = packageDescription;
+    // Get selected package types from checkboxes
+    const selectedTypes = document.querySelectorAll('input[name="editCourseType"]:checked');
+    const packageType = Array.from(selectedTypes).map(input => input.value);
 
-                // Hide the edit modal
-                editPackageModal.style.display = "none";
+    if (packageName && packagePrice && packageDescription) {
+        if (packageIdToEdit) {
+            // Update the package in Firestore
+            await updatePackageInFirestore(packageIdToEdit, packageName, packagePrice, packageDescription, packageType);
+            
+            // Update the package in the DOM
+            const packageElement = document.querySelector(`.package-text[data-id="${packageIdToEdit}"]`);
+            
+            if (packageElement) {
+                const packageNameElement = packageElement.querySelector("h2");
+                const packagePriceElement = packageElement.querySelector("span:nth-child(2)");
+                const packageTypeElement = packageElement.querySelector("h1");
+                const packageDescriptionElement = packageElement.querySelector("h4");
 
-                // Clear the input fields
-                editPackageNameInput.value = '';
-                editPackagePriceInput.value = '';
-                editPackageDescriptionInput.value = '';
+                if (packageNameElement) {
+                    packageNameElement.textContent = packageName;
+                }
+                if (packagePriceElement) {
+                    packagePriceElement.innerHTML = `Price: &#8369;${packagePrice}`;
+                }
+                if (packageTypeElement) {
+                    packageTypeElement.innerHTML = packageType.join(' + ');
+                }
+                if (packageDescriptionElement) {
+                    packageDescriptionElement.textContent = packageDescription;
+                }
+            } else {
+                console.error(`Package element with ID ${packageIdToEdit} not found.`);
             }
-        } else {
-            showNotificationModal("Please fill out all fields.", "error");
-        }
-    });
 
+            // Hide the edit modal
+            editPackageModal.style.display = "none";
+
+            // Clear the input fields
+            editPackageNameInput.value = '';
+            editPackagePriceInput.value = '';
+            editPackageDescriptionInput.value = '';
+        }
+    } else {
+        showNotificationModal("Please fill out all fields.", "error");
+    }
+});
 
     // Load existing packages from Firestore and add to DOM
     async function loadPackages() {
         try {
             const querySnapshot = await getDocs(collection(db, "packages"));
-            querySnapshot.forEach((doc) => {
+            allPackages = querySnapshot.docs.map((doc) => {
                 const data = doc.data();
-                addPackageToDOM(doc.id, data.name, data.price, data.description);
+                return {
+                    id: doc.id,
+                    ...data
+                };
             });
+
+            renderPackages(allPackages);
         } catch (e) {
             console.error("Error loading packages: ", e);
         }
     }
+
+    // Function to render packages based on the filter
+    function renderPackages(packages) {
+        packageList.innerHTML = ''; // Clear the current package list
+        packages.forEach(pkg => {
+            addPackageToDOM(pkg.id, pkg.name, pkg.price, pkg.description, pkg.type || []);
+        });
+    }
+
+   // Filter packages when dropdown value changes
+    courseFilter.addEventListener('change', async function() {
+        const selectedType = this.value;
+
+        try {
+            // Re-fetch the packages from Firestore when the filter is changed
+            const querySnapshot = await getDocs(collection(db, "packages"));
+            allPackages = querySnapshot.docs.map((doc) => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...data
+                };
+            });
+
+            // Filter packages based on the selected type
+            if (selectedType === "") {
+                // Show all packages if 'All' is selected
+                renderPackages(allPackages);
+            } else {
+                // Filter packages by selected type
+                const filteredPackages = allPackages.filter(pkg => {
+                    return Array.isArray(pkg.type) && pkg.type.includes(selectedType);
+                });
+                renderPackages(filteredPackages);
+            }
+        } catch (e) {
+            console.error("Error reloading packages: ", e);
+        }
+    });
 
     // Load packages on page load
     loadPackages();
@@ -428,10 +539,14 @@ document.addEventListener("DOMContentLoaded", async function() {
         const packagePrice = packagePriceInput.value;
         const packageDescription = packageDescriptionInput.value;
 
+        // Get selected package types from checkboxes
+        const selectedTypes = document.querySelectorAll('input[name="courseType"]:checked');
+        const packageType = Array.from(selectedTypes).map(input => input.value);
+
         // Check if all fields are filled
         if (packageName && packagePrice && packageDescription) {
             // Add the package to Firestore
-            addPackageToFirestore(packageName, packagePrice, packageDescription);
+            addPackageToFirestore(packageName, packagePrice, packageDescription, packageType);
 
             // Hide the modal
             packageModal.style.display = "none";
@@ -440,6 +555,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             packageNameInput.value = '';
             packagePriceInput.value = '';
             packageDescriptionInput.value = '';
+            document.querySelectorAll('input[name="courseType"]').forEach(input => input.checked = false); // Clear checkbox selections
         } else {
             showNotificationModal("Please fill out all fields.", "error");
         }

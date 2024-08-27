@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
 import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
-import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -24,15 +24,17 @@ const packageContainer = document.querySelector('.package-container');
 let packages = [];
 let userEnrolledPackage = null; // To store the user's enrolled package
 
-function renderPackages(packages) {
+function renderPackages(packagesToRender) {
   packageContainer.innerHTML = '';
-  
-  if (packages.length === 0) {
+
+  if (packagesToRender.length === 0) {
     packageContainer.innerHTML = '<h3>No packages are available at the moment.</h3>';
     return;
   }
-  
-  packages.forEach(pkg => {
+
+  packagesToRender.forEach(pkg => {
+    const packageType = Array.isArray(pkg.type) && pkg.type.length > 0 ? pkg.type.join(', ') : ''; // Ensure type is valid and not empty
+
     const packageHtml = `
       <div class="package-tiles">
         <div class="package-header">
@@ -41,19 +43,20 @@ function renderPackages(packages) {
         </div>
         <form class="package-body">
           <div class="package-text">
+            <h1>${packageType}</h1> <!-- Displaying Package Type -->
             <h2>${pkg.name}</h2>
             <span>Tuition Fee: &#8369;${pkg.price}</span>
             <h3>${pkg.description}</h3>
           </div>
           <div class="package-footer">
-            <button class="enroll-now-button" type="button" data-package-id="${pkg.id}" data-package-name="${pkg.name}">Enroll Now</button>
+            <button class="enroll-now-button" type="button" data-package-id="${pkg.id}" data-package-name="${pkg.name}" ${userEnrolledPackage ? 'disabled' : ''}>Enroll Now</button>
           </div>
         </form>
       </div>
     `;
     packageContainer.insertAdjacentHTML('beforebegin', packageHtml);
   });
-  
+
   showTiles(currentIndex);
 }
 
@@ -130,7 +133,8 @@ document.getElementById('confirmEnrollButton').addEventListener('click', async (
           await updateDoc(doc(db, "applicants", userId), {
             role: "student",
             packageName: packageName, // Store the package name
-            packagePrice: selectedPackage.price // Store the package price
+            packagePrice: selectedPackage.price, // Store the package price
+            packageType: selectedPackage.type // Store the package type
           });
           document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
           userEnrolledPackage = packageName;

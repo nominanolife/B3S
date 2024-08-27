@@ -51,7 +51,7 @@
                         <select class="form-control course-filter" id="courseFilter">
                             <option value="">All</option>
                             <option value="TDC">TDC</option>
-                            <option value="PDC-4Wheels">PDC</option>
+                            <option value="PDC">PDC</option>
                         </select>
                     </div>
                     <div class="buttons">
@@ -107,6 +107,19 @@
                         <h4>Edit Package</h4>
                     </div>
                     <form class="modal-body">
+                        <div class="package-type">
+                            <h4>Package Type</h4>
+                            <div class="package-input">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="editCourseType" value='TDC'>
+                                    <span class="checkbox-label">TDC</span>
+                                </label>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="editCourseType" value='PDC'>
+                                    <span class="checkbox-label">PDC</span>
+                                </label>
+                            </div>
+                        </div>
                         <div class="input-body">
                             <input type="text" class="edit-package-name" placeholder="Package Name" required>
                             <input type="text" class="edit-package-price" placeholder="Price" required>
@@ -119,8 +132,7 @@
                     </form>
                 </div>
             </div>
-        </div>        
-    </div>
+        </div>
 
     <div class="modal" id="deleteConfirmModal">
         <div class="modal-dialog">

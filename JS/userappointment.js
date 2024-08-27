@@ -50,6 +50,9 @@ function applyStoredPDCState() {
 // Apply the stored PDC state immediately on page load
 applyStoredPDCState();
 
+// Apply the stored PDC state immediately on page load
+applyStoredPDCState();
+
 async function checkTDCProgress(userId) {
     const appointmentsRef = collection(db, "appointments");
     let tdcCompleted = false;
@@ -86,23 +89,90 @@ async function checkCompletedBookings(userId) {
 
     if (completedBookingDoc.exists()) {
         const completedBookings = completedBookingDoc.data().completedBookings || [];
+        let hasCompletedTDC = false;
+
         completedBookings.forEach(booking => {
             if (booking.course === "TDC" && booking.progress === "Completed") {
                 console.log("TDC is completed in completedBookings!");
-                enablePDC();
+                hasCompletedTDC = true;
+                enablePDC(); // Enable PDC if TDC is completed
             }
         });
+
+        if (!hasCompletedTDC) {
+            console.log("TDC not completed in completedBookings.");
+            // Check if PDC should remain enabled based on user's package type
+            const userDocRef = doc(db, "applicants", userId);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                const packageType = userData.packageType;
+                
+                if (packageType && packageType.includes("PDC")) {
+                    enablePDC(); // Ensure PDC remains enabled if user has PDC type
+                } else {
+                    disablePDC(); // Disable PDC if the user does not have the PDC type
+                }
+            } else {
+                disablePDC(); // No user document found, ensure PDC is disabled
+            }
+        }
     } else {
         console.log("No completed bookings document found for the user.");
-        disablePDC(); // No completion found, ensure PDC stays disabled
+        // Check if PDC should remain enabled based on user's package type
+        const userDocRef = doc(db, "applicants", userId);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            const packageType = userData.packageType;
+            
+            if (packageType && packageType.includes("PDC")) {
+                enablePDC(); // Ensure PDC remains enabled if user has PDC type
+            } else {
+                disablePDC(); // Disable PDC if the user does not have the PDC type
+            }
+        } else {
+            disablePDC(); // No user document found, ensure PDC is disabled
+        }
     }
 }
 
-// Get the logged-in user's ID and check TDC progress
+// Function to check the user's enrolled package and adjust the UI
+async function checkUserEnrolledPackage(userId) {
+    try {
+        const userDocRef = doc(db, "applicants", userId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            const packageType = userData.packageType; // Assume this is an array
+
+            console.log("User's Package Type:", packageType); // Debugging statement
+
+            if (packageType && packageType.includes("PDC")) {
+                enablePDC(); // Enable PDC if user has enrolled in a package with PDC
+            } else if (packageType && packageType.includes("TDC")) {
+                disablePDC(); // Disable PDC if user has only enrolled in TDC
+            } else {
+                console.log("Neither PDC nor TDC found in user's package type.");
+                disablePDC(); // Ensure PDC stays disabled if no valid type is found
+            }
+        } else {
+            console.log("No user document found.");
+            disablePDC();
+        }
+    } catch (error) {
+        console.error("Error checking user's enrolled package:", error);
+        disablePDC();
+    }
+}
+
+// Get the logged-in user's ID and check their package and TDC progress
 onAuthStateChanged(auth, (user) => {
     if (user) {
         const userId = user.uid;
-        checkTDCProgress(userId);
+        checkUserEnrolledPackage(userId); // Check the user's enrolled package
+        checkTDCProgress(userId); // Check TDC progress as before
     } else {
         console.log("No user is signed in.");
     }
