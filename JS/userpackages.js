@@ -33,17 +33,16 @@ function renderPackages(packagesToRender) {
   }
 
   packagesToRender.forEach(pkg => {
-    const packageType = Array.isArray(pkg.type) && pkg.type.length > 0 ? pkg.type.join(', ') : ''; // Ensure type is valid and not empty
+    const packageType = Array.isArray(pkg.type) && pkg.type.length > 0 ? pkg.type.join(' + ') : ''; // Ensure type is valid and not empty
 
     const packageHtml = `
       <div class="package-tiles">
         <div class="package-header">
-          <h1></h1>
+          <h1>${packageType}</h1>
           <i class="info bi bi-info-circle" data-toggle="modal" data-target="#infoModal"></i>
         </div>
         <form class="package-body">
           <div class="package-text">
-            <h1>${packageType}</h1> <!-- Displaying Package Type -->
             <h2>${pkg.name}</h2>
             <span>Tuition Fee: &#8369;${pkg.price}</span>
             <h3>${pkg.description}</h3>

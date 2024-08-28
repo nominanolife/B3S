@@ -93,6 +93,11 @@
                     <h4>Edit Instructor</h4>
                 </div>
                 <form class="modal-body">
+                    <div class="profile-pic-container">
+                        <img id="profilePicPreview" class="profile-pic-modal" src="Assets/default-profile.png" alt="Profile Picture">
+                        <i id="uploadIcon" class="fa fa-camera"></i>
+                        <input type="file" id="editProfilePic" accept="image/*" style="display: none;">
+                    </div>
                     <div class="input-body">
                         <input type="text" class="instructor-name" placeholder="Instructor Name" required>
                         <input type="text" class="instructor-course" placeholder="Course" required>
