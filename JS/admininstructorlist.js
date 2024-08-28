@@ -183,18 +183,44 @@ async function addInstructor(event) {
   const course = instructorCourseInput.value.trim();
 
   if (!name || !course) {
-    alert('Please fill in both fields.');
+    alert('Please fill in all the required fields.');
     return;
   }
 
   try {
-    await addDoc(collection(db, 'instructors'), { name, course });
-    fetchInstructors(); // Refresh the list
-    instructorModal.hide();
+    await addDoc(collection(db, 'instructors'), {
+      name: name,
+      course: course,
+      active: false, // Default status to inactive (OFF)
+    });
+
+    instructorModal.hide(); // Close the modal
+    fetchInstructors(); // Refresh the instructor list
+    resetForm(); // Clear the form after submission
   } catch (error) {
     console.error('Error adding instructor:', error);
   }
 }
+
+// Reset form function
+function resetForm() {
+  instructorNameInput.value = '';
+  instructorCourseInput.value = '';
+  closeModalButton.click(); // Close modal
+}
+
+// Event listener for the add instructor button
+addInstructorButton.addEventListener('click', () => {
+  instructorModal.show();
+  resetForm();
+});
+
+// Event listener for the save button in the modal
+saveInstructorBtn.addEventListener('click', addInstructor);
+
+// Fetch instructors on page load
+window.onload = fetchInstructors;
+
 
 // Edit instructor
 async function editInstructor(event) {
@@ -227,6 +253,23 @@ async function editInstructor(event) {
     };
   }
 }
+
+// Function to trigger file input when camera icon is clicked
+document.getElementById('uploadIcon').addEventListener('click', function() {
+  document.getElementById('editProfilePic').click();
+});
+
+// Function to preview the image when a new image is selected
+document.getElementById('editProfilePic').addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+          document.getElementById('profilePicPreview').src = e.target.result;
+      }
+      reader.readAsDataURL(file);
+  }
+});
 
 // Store the delete confirmation modal instance
 const deleteConfirmationModalElement = document.getElementById('deleteConfirmationModal');

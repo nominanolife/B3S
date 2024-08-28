@@ -606,9 +606,40 @@ input:checked + .slider .slider-label-on {
 }
 
 #instructorModal .modal-dialog {
-    top: 25%;
+    top: 14%;
     left: 5%;
     border-radius: 20px;
+}
+
+#profilePicPreview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: block;
+    margin: 20px auto;
+}
+
+#profilePicPreview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #dfe4ea;
+}
+
+#uploadIcon {
+    position: absolute;
+    top: 150px;
+    left: 260px;
+    color: #ffffff;
+    background-color: #2f3542;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#uploadIcon:hover {
+    background-color: #57606f;
 }
 
 .instructor-name, .instructor-course {
