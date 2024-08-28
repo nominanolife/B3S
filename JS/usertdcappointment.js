@@ -39,18 +39,33 @@ let currentYear = date.getFullYear();
 let appointments = [];
 let currentUserUid = null;
 
-// Fetch appointments from Firestore
+// Fetch appointments from Firestore and filter out past dates
 async function fetchAppointments() {
   try {
     const querySnapshot = await getDocs(collection(db, "appointments"));
-    appointments = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to the start of the day to compare only the date part
+
+    appointments = querySnapshot.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .filter(app => {
+        const appointmentDate = new Date(app.date);
+        appointmentDate.setHours(0, 0, 0, 0); // Normalize to the start of the day
+        return appointmentDate >= today; // Include today's and future dates
+      });
+
   } catch (error) {
     console.error("Error fetching appointments:", error);
   }
 }
+
+// Re-render calendar and initialize data on page load
+fetchAppointments().then(() => {
+  renderCalendar(currentMonth, currentYear);
+});
 
 // Render the calendar
 function renderCalendar(month, year) {

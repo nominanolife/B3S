@@ -210,6 +210,12 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     // Function to create a new package
     async function addPackageToFirestore(packageName, packagePrice, packageDescription, packageType) {
+        // Validate input fields and checkbox
+        if (!packageName || !packagePrice || !packageDescription || !packageType) {
+            showNotificationModal("Please fill in all fields and select at least one package type.", "error");
+            return; // Exit the function if validation fails
+        }
+
         try {
             // Save package data to Firestore
             const docRef = await addDoc(collection(db, "packages"), {
@@ -279,11 +285,18 @@ document.addEventListener("DOMContentLoaded", async function() {
     }
 
     async function updatePackageInFirestore(packageId, packageName, packagePrice, packageDescription, packageType) {
-        const batch = writeBatch(db);
-        try {
-            // Ensure there are no duplicate values in packageType
-            const uniquePackageTypes = [...new Set(packageType)];
+        // Validate input fields and ensure no duplicate values in packageType
+        if (!packageName || !packagePrice || !packageDescription || !packageType || packageType.length === 0) {
+            showNotificationModal("Please fill in all fields and select at least one package type.", "error");
+            return; // Exit the function if validation fails
+        }
     
+        // Ensure there are no duplicate values in packageType
+        const uniquePackageTypes = [...new Set(packageType)];
+    
+        const batch = writeBatch(db);
+        
+        try {
             // Update the package document
             const packageRef = doc(db, "packages", packageId);
             batch.update(packageRef, {
@@ -412,8 +425,6 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
     }
     
-
-    // Update package details
     // Update package details
 updatePackage.addEventListener("click", async function(event) {
     event.preventDefault(); // Prevent form submission

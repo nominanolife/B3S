@@ -41,10 +41,18 @@ let currentUserUid = null;
 
 // Listen for real-time updates in the appointments collection
 onSnapshot(collection(db, "appointments"), (snapshot) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Normalize to the start of the day for accurate comparison
+
   appointments = snapshot.docs.map(doc => ({
     id: doc.id,
     ...doc.data()
-  }));
+  })).filter(app => {
+    const appointmentDate = new Date(app.date);
+    appointmentDate.setHours(0, 0, 0, 0); // Normalize to the start of the day
+    return appointmentDate >= today; // Include today's and future appointments only
+  });
+
   renderCalendar(currentMonth, currentYear); // Re-render the calendar to reflect updates
 });
 
