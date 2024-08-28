@@ -1,5 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
 import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
@@ -13,6 +14,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // DOM Elements
 const instructorList = document.querySelector('.instructor-list');
@@ -26,6 +28,7 @@ const instructorNameInput = document.querySelector('.instructor-name');
 const instructorCourseInput = document.querySelector('.instructor-course');
 const paginationControls = document.querySelector('.pagination-controls');
 let instructorIdToDelete = null; // Store the ID of the instructor to delete
+let currentInstructorId = null; // Store the current instructor's ID for editing
 
 let instructors = []; // Store all instructors data
 let filteredInstructors = []; // Store filtered instructors data
@@ -66,7 +69,7 @@ function renderInstructors() {
       </td>
       <td>
         <label class="switch">
-          <input type="checkbox" class="slider-switch" data-id="${instructor.id}">
+          <input type="checkbox" class="slider-switch" data-id="${instructor.id}" ${instructor.active ? 'checked' : ''}>
           <span class="slider">
             <span class="slider-label-off">OFF</span>
             <span class="slider-label-on">ON</span>
@@ -176,11 +179,29 @@ function updatePaginationControls() {
   paginationControls.appendChild(nextButton);
 }
 
-// Add instructor
-async function addInstructor(event) {
+// Upload image to Firebase Storage and return the download URL
+async function uploadImage(file, instructorId) {
+  if (!file) return null; // If no file is selected, return null
+
+  // Use the instructorId as the file name to ensure uniqueness
+  const storageRef = ref(storage, `instructor_pictures/${instructorId}.jpg`); // Save with instructor UID as the image name
+
+  try {
+    const snapshot = await uploadBytes(storageRef, file); // Upload the file
+    const downloadURL = await getDownloadURL(snapshot.ref); // Get the file's URL
+    return downloadURL; // Return the image URL
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    return null;
+  }
+}
+
+// Add or Edit instructor based on the mode
+async function saveInstructor(event) {
   event.preventDefault();
   const name = instructorNameInput.value.trim();
   const course = instructorCourseInput.value.trim();
+  const file = document.getElementById('editProfilePic').files[0]; // Get the selected file
 
   if (!name || !course) {
     alert('Please fill in all the required fields.');
@@ -188,17 +209,41 @@ async function addInstructor(event) {
   }
 
   try {
-    await addDoc(collection(db, 'instructors'), {
-      name: name,
-      course: course,
-      active: false, // Default status to inactive (OFF)
-    });
+    let imageUrl = null;
+
+    if (currentInstructorId) {
+      // Editing an existing instructor
+      if (file) {
+        imageUrl = await uploadImage(file, currentInstructorId); // Upload the new image if there's a new file
+      }
+      
+      await updateDoc(doc(db, 'instructors', currentInstructorId), {
+        name: name,
+        course: course,
+        ...(imageUrl && { imageUrl: imageUrl }) // Update the image URL only if there's a new image
+      });
+
+    } else {
+      // Adding a new instructor
+      const docRef = await addDoc(collection(db, 'instructors'), {
+        name: name,
+        course: course,
+        active: false, // Default status to inactive (OFF)
+        imageUrl: '' // Placeholder for image URL
+      });
+
+      imageUrl = await uploadImage(file, docRef.id); // Upload the image with the instructor's ID
+
+      await updateDoc(doc(db, 'instructors', docRef.id), {
+        imageUrl: imageUrl
+      });
+    }
 
     instructorModal.hide(); // Close the modal
     fetchInstructors(); // Refresh the instructor list
     resetForm(); // Clear the form after submission
   } catch (error) {
-    console.error('Error adding instructor:', error);
+    console.error('Error saving instructor:', error);
   }
 }
 
@@ -206,7 +251,9 @@ async function addInstructor(event) {
 function resetForm() {
   instructorNameInput.value = '';
   instructorCourseInput.value = '';
+  document.getElementById('profilePicPreview').src = 'Assets/default-profile.png'; // Reset profile pic to default
   closeModalButton.click(); // Close modal
+  currentInstructorId = null; // Reset current instructor ID
 }
 
 // Event listener for the add instructor button
@@ -216,41 +263,22 @@ addInstructorButton.addEventListener('click', () => {
 });
 
 // Event listener for the save button in the modal
-saveInstructorBtn.addEventListener('click', addInstructor);
+saveInstructorBtn.removeEventListener('click', saveInstructor); // Remove previous listener
+saveInstructorBtn.addEventListener('click', saveInstructor);
 
 // Fetch instructors on page load
 window.onload = fetchInstructors;
-
 
 // Edit instructor
 async function editInstructor(event) {
   const id = event.target.dataset.id;
   const instructor = instructors.find(instructor => instructor.id === id);
   if (instructor) {
+    currentInstructorId = id; // Set the current instructor ID for editing
     instructorNameInput.value = instructor.name;
     instructorCourseInput.value = instructor.course;
+    document.getElementById('profilePicPreview').src = instructor.imageUrl || 'Assets/default-profile.png'; // Set existing image or default
     instructorModal.show();
-
-    saveInstructorBtn.onclick = async function (e) {
-      e.preventDefault();
-      const updatedName = instructorNameInput.value.trim();
-      const updatedCourse = instructorCourseInput.value.trim();
-      if (!updatedName || !updatedCourse) {
-        alert('Please fill in both fields.');
-        return;
-      }
-
-      try {
-        await updateDoc(doc(db, 'instructors', id), {
-          name: updatedName,
-          course: updatedCourse
-        });
-        fetchInstructors(); // Refresh the list
-        instructorModal.hide();
-      } catch (error) {
-        console.error('Error updating instructor:', error);
-      }
-    };
   }
 }
 
@@ -312,7 +340,6 @@ addInstructorButton.addEventListener('click', () => {
   instructorModal.show();
   instructorNameInput.value = ''; // Clear fields before opening the modal
   instructorCourseInput.value = '';
-  saveInstructorBtn.onclick = addInstructor;
 });
 
 closeModalButton.addEventListener('click', () => instructorModal.hide());

@@ -295,7 +295,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const uniquePackageTypes = [...new Set(packageType)];
     
         const batch = writeBatch(db);
-        
+    
         try {
             // Update the package document
             const packageRef = doc(db, "packages", packageId);
@@ -305,35 +305,36 @@ document.addEventListener("DOMContentLoaded", async function() {
                 description: packageDescription,
                 type: uniquePackageTypes // Use the unique package types
             });
-            
+    
             // Fetch all applicants
             const applicantsSnapshot = await getDocs(collection(db, "applicants"));
-            
+    
             // Update enrolled package information for relevant applicants
             let updatedCount = 0;
             for (const applicantDoc of applicantsSnapshot.docs) {
                 const applicantData = applicantDoc.data();
-            
-                if (applicantData.packageName === packageName) { // Ensure it updates relevant applicants
+    
+                // Check if the applicant is enrolled in the package by matching the package ID
+                if (applicantData.packageId === packageId) { // Ensure it updates relevant applicants by package ID
                     const applicantRef = doc(db, "applicants", applicantDoc.id);
-            
+    
                     batch.update(applicantRef, {
-                        enrolledPackage: packageName,
-                        packagePrice: packagePrice,
-                        packageType: uniquePackageTypes // Use the unique package types
+                        enrolledPackage: packageName,  // Update to new package name
+                        packagePrice: packagePrice,   // Update to new package price
+                        packageType: uniquePackageTypes // Update to new package types
                     });
                     updatedCount++;
                 }
             }
-            
+    
             await batch.commit(); // Commit the batch operation
             console.log(`Updated ${updatedCount} applicants.`);
-            
+    
             // Show success notification modal
             showNotificationModal("Package updated successfully!", "success");
         } catch (e) {
             console.error("Error updating document: ", e);
-            
+    
             // Show error notification modal
             showNotificationModal("Failed to update package. Please try again.", "error");
         }
