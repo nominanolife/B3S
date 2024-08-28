@@ -247,30 +247,6 @@ h2 {
     justify-content: space-between;
 }
 
-.filter-container {
-    width: 10%;
-}
-
-.course-filter {
-    font-family: Poppins;
-    font-size: 14px;
-    color: #585353;
-    border-radius: 5px;
-    border: 1px solid #D9D9D9;
-    background-color: #F4F4F4;
-    cursor: pointer;
-}
-
-.course-filter:hover {
-    background-color: #f5f5f5;
-}
-
-.course-filter option {
-    font-family: Poppins;
-    font-size: 14px;
-    color: #585353;
-}
-
 .packages {
     display: flex;
     flex-direction: row;
