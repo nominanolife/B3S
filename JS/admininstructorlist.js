@@ -56,7 +56,7 @@ function renderInstructors() {
   paginatedInstructors.forEach(instructor => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${instructor.name}</td>
+      <td><img src="${instructor.imageUrl || 'Assets/default-profile.png'}">${instructor.name}</td>
       <td>${instructor.course}</td>
       <td class="table-row-content">
         <div class="dropdown">
