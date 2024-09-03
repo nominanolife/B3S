@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const slots = parseInt(slotsValue, 10);
         
         if (!course || !date || !timeStart || !timeEnd || isNaN(slots) || slots <= 0) {
-            showSuccessModal("Please Fill Out All Fields Correctly and Enter a Valid Number of Slots.");
+            showSuccessModal("Please fill out all fields correctly and enter a valid number of slots.");
             return;
         }
         
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
         
         if (selectedDate < today.setHours(0, 0, 0, 0)) {
-            showSuccessModal("The selected date has passed. Please choose another date.");
+            showSuccessModal("The selected date has been passed. Please choose another date.");
             return;
         }
         
@@ -273,20 +273,23 @@ async function populateFormForEdit(id) {
     let appointments = [];
 
     async function fetchAppointments() {
+        // Delete past appointments before fetching current ones
+        await deletePastAppointments();
+    
         const q = query(collection(db, "appointments"));
         const querySnapshot = await getDocs(q);
         const tableBody = document.getElementById("slots-table-body");
         tableBody.innerHTML = "";
-    
+        
         // Extract and sort appointments by date
         const appointments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         appointments.sort((a, b) => new Date(a.date) - new Date(b.date));  // Sort by closest date
-    
+        
         // Add sorted appointments to the table
         for (const appointment of appointments) {
             addTableRow(appointment);
         }
-    }
+    }    
 
     // Update the table with real-time changes
     async function updateTable() {
@@ -413,5 +416,18 @@ async function populateFormForEdit(id) {
         okButton.addEventListener("click", function() {
             successModal.hide();
         }, { once: true }); // Ensures event listener is only added once
+    }
+
+    // Function to delete past appointments
+    async function deletePastAppointments() {
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0]; // Get date in YYYY-MM-DD format
+
+        const q = query(collection(db, "appointments"), where("date", "<", todayString));
+        const querySnapshot = await getDocs(q);
+
+        for (const doc of querySnapshot.docs) {
+            await deleteDoc(doc.ref);
+        }
     }
 });

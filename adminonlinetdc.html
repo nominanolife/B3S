@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DriveHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="CSS/adminvideolearning.css">
+    <link rel="stylesheet" href="CSS/adminonlinetdc.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -31,9 +31,8 @@
                     <a href="adminpackages.html"><i class="bi bi-mortarboard"></i>Packages</a>
                 </div>
                 <div class="sidebar-learning">
-                    <a href="adminvideolearning.html" class="active"><i class="bi bi-collection-play-fill"></i>Video Learning</a>
                     <a href="adminmodules.html"><i class="bi bi-book"></i>Modules</a>
-                    <a href="adminquiz.html"><i class="bi bi-journals"></i>Quiz</a>
+                    <a href="adminonlinetdc.html"><i class="bi bi-journals"></i>Online TDC</a>
                 </div>
                 <div class="sidebar-account">
                     <button class="logout" type="button" data-toggle="modal" data-target="#logoutModal"><i class="bi bi-box-arrow-left"></i>Logout</button>
@@ -42,40 +41,13 @@
         </div>
         <div class="main-content">
             <div class="header">
-                <h2>Video Learning</h2>
+                <h2>Online TDC</h2>
             </div>
             <div class="page-content">
-                <div class="buttons">
-                    <button class="add-video" type="button" id="addButton">Upload Video</button>
-                    <button class="delete-video" type="button" id="deleteButton">Delete Video</button>
-                </div>
-                <div class="video-list" id="videoList">
-                    
-                </div>
+                <!-- Add your dashboard content here -->
             </div>
         </div>
     </div>
-
-        <div class="modal" id="videoModal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4>Upload Video</h4>
-                    </div>
-                    <form class="modal-body">
-                        <div class="input-body">
-                            <input type="file" class="video-file">
-                            <input type="text" class="video-name" placeholder="Video Name" required>
-                            <input type="text" class="video-description" placeholder="Description" required>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="save-video" type="submit">Upload</button>
-                            <button class="close-modal" type="button">Cancel</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
 
         <!-- Logout Confirmation Modal -->
         <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
@@ -93,16 +65,15 @@
                     </div>
                 </div>
             </div>
-        </div>  
+        </div>
     
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-        <script src="JS/adminvideolearning.js"></script>
-        <script src="JS/admincommon.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="JS/adminonlinetdc.js"></script>
+    <script src="JS/admincommon.js"></script>
 
 </body>
 </html>

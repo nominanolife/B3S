@@ -494,7 +494,7 @@ const splineChart = new Chart(ctx, {
         datasets: [{
             label: 'Total Monthly Sales',
             data: [],
-            fill: true, // This fill property was set to true in the previous example.
+            fill: false, // This fill property was set to true in the previous example.
             backgroundColor: '#5a699d',
             borderColor: '#142A74',
             tension: 0.5,

@@ -251,97 +251,51 @@ h2 {
     height: 100%;
 }
 
-.container-body h4 {
+.personality-check-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.personality-body-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.personality-body-header i {
+    font-size: 24px;
+    color: #142A74;
+    cursor: pointer;
+}
+
+.personality-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.personality-body img {
+    width: 300px;
+    height: 300px;
+}
+
+.personality-body p {
     font-family: Poppins;
     font-size: 18px;
     font-weight: normal;
     color: #2F2E2E;
 }
 
-.traits {
+.matching-button {
     display: flex;
     flex-direction: row;
-    height: 100%;
-}
-
-.personality-form {
-    display: flex;
-    flex-direction: column;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 20px;
-    width: 100%;
-    height: 100%;
-}
-
-.form-group-all {
-    display: flex;
-    flex-direction: column;
-}
-
-.custom-checkbox {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.custom-checkbox input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-}
-
-.custom-checkbox input + .checkbox-label {
-    position: relative;
-    padding-left: 30px;
-    font-family: Poppins;
-    font-size: 14px;
-    font-weight: normal;
-    color: #2F2E2E;
-}
-
-.custom-checkbox input + .checkbox-label::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #2F2E2E;
-    border-radius: 4px;
-    background-color: #fff;
-    transition: all 0.3s ease;
-}
-
-.custom-checkbox input:checked + .checkbox-label::before {
-    background-color: #142A74;
-    border-color: #142A74;
-}
-
-.custom-checkbox input + .checkbox-label::after {
-    content: '\2714';
-    position: absolute;
-    left: 4px;
-    top: 0px;
-    font-size: 14px;
-    color: #ffffff;
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-.custom-checkbox input:checked + .checkbox-label::after {
-    opacity: 1;
-}
-
-.save-button {
+    margin-top: 60px;
     margin-left: auto;
-    margin-top: auto;
 }
 
-.btn-save {
+.matching-button button {
     font-family: Poppins;
     font-size: 14px;
-    font-weight: bold;
     color: #ffffff;
     background-color: #142A74;
     border: none;
@@ -349,15 +303,8 @@ h2 {
     padding: 10px 30px;
 }
 
-.btn-save:hover {
+.matching-button button:hover {
     background-color: #0e1e59;
-}
-
-.disabled-link {
-    pointer-events: none;
-    color: gray;
-    text-decoration: none;  /* Remove underline */
-    cursor: default;  /* Change cursor to default */
 }
 
 .modal-header, .modal-body, .modal-footer {
@@ -431,44 +378,63 @@ h2 {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins;
 }
 
-.loader .car-loader {
-    width: 80px;
+.loading-gif {
+    width: 150px;
     height: 80px;
-    border: 4px solid #ccc;
-    border-radius: 50%;
-    border-top: 4px solid #142A74;
-    animation: spin 2s linear infinite;
-    position: relative;
+}
+
+.loading-bar-container {
+    position: flex;
+    width: 80%;
+    max-width: 600px;
+    background-color: #ffffff;
+    border: 2px solid #142A74;
+    border-radius: 30px;
+    overflow: hidden;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.loading-bar {
+    width: 0;
+    height: 22px;
+    background-color: #142A74;
+    border-radius: 10px;
+    position: flex;
+}
+
+.loading-percentage {
+    position: absolute;
+    top: 52.3%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    color: #142A74;
+    font-weight: bold;
 }
 
 .loader p {
-    margin-top: 20px;
+    margin-top: 10px;
     font-size: 18px;
     color: #142A74;
-    position: relative;
+    font-weight: normal;
+    position: relative; /* To position the dots correctly */
 }
 
 .dots {
     display: inline-block;
     font-size: 18px;
-    font-weight: bold;
 }
 
-.dots::after {
-    content: '';
-    display: inline-block;
-    animation: dot-flashing 1.5s infinite linear;
+.dots::before {
+    content: '.';
+    animation: slideDots 1.5s infinite;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-@keyframes dot-flashing {
+@keyframes slideDots {
     0% {
         content: '.';
     }

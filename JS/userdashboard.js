@@ -217,8 +217,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                     if (appointmentCard) {
                         if (!querySnapshot.empty) {
                             let foundAppointment = false;
-                            const currentDate = new Date(); // Get the current date
-
                             querySnapshot.forEach(doc => {
                                 const appointmentData = doc.data();
                                 const bookingDetails = appointmentData.bookings.find(
@@ -226,47 +224,66 @@ document.addEventListener('DOMContentLoaded', async function () {
                                 );
 
                                 if (bookingDetails) {
+                                    // Check if the appointment date is exactly 1 day past the current date
                                     const appointmentDate = new Date(appointmentData.date);
+                                    const currentDate = new Date();
 
-                                    // Check if the appointment date is in the future
-                                    if (appointmentDate > currentDate) {
-                                        // Remove the centering class if it exists
-                                        appointmentCard.classList.remove('center-content');
+                                    const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // Milliseconds in one day
+                                    const differenceInTime = currentDate.getTime() - appointmentDate.getTime();
+                                    const differenceInDays = Math.floor(differenceInTime / oneDayInMilliseconds);
 
-                                        const formattedAppointmentDate = appointmentDate.toLocaleDateString('en-US', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        });
+                                    // Skip this booking if the appointment date is more than 1 day past the current date
+                                    if (differenceInDays > 1) {
+                                        console.log(`Appointment on ${appointmentData.date} has passed more than 1 day. Ignoring this booking.`);
+                                        return; // Skip this booking
+                                    }
 
-                                        const appointmentTimeSlot = bookingDetails.timeSlot;
-                                        const [startTime, endTime] = appointmentTimeSlot.split(' - ');
+                                    // Remove the centering class if it exists
+                                    appointmentCard.classList.remove('center-content');
 
-                                        function formatTimeTo12Hr(time) {
-                                            const [hours, minutes] = time.split(':');
-                                            let period = 'AM';
-                                            let hoursIn12HrFormat = parseInt(hours);
+                                    const appointmentDateFormatted = appointmentDate.toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    });
 
-                                            if (hoursIn12HrFormat >= 12) {
-                                                period = 'PM';
-                                                if (hoursIn12HrFormat > 12) {
-                                                    hoursIn12HrFormat -= 12;
-                                                }
+                                    const appointmentTimeSlot = bookingDetails.timeSlot;
+                                    const [startTime, endTime] = appointmentTimeSlot.split(' - ');
+
+                                    function formatTimeTo12Hr(time) {
+                                        const [hours, minutes] = time.split(':');
+                                        let period = 'AM';
+                                        let hoursIn12HrFormat = parseInt(hours);
+
+                                        if (hoursIn12HrFormat >= 12) {
+                                            period = 'PM';
+                                            if (hoursIn12HrFormat > 12) {
+                                                hoursIn12HrFormat -= 12;
                                             }
-                                            if (hoursIn12HrFormat === 0) {
-                                                hoursIn12HrFormat = 12;
-                                            }
-
-                                            return `${hoursIn12HrFormat}:${minutes} ${period}`;
+                                        } else if (hoursIn12HrFormat === 0) {
+                                            hoursIn12HrFormat = 12;
                                         }
 
-                                        appointmentCard.innerHTML = `
-                                            <h3>Upcoming Appointment</h3>
-                                            <p>Date: ${formattedAppointmentDate}</p>
-                                            <p>Time: ${formatTimeTo12Hr(startTime)} - ${formatTimeTo12Hr(endTime)}</p>
-                                        `;
-                                        foundAppointment = true;
+                                        return `${hoursIn12HrFormat}:${minutes} ${period}`;
                                     }
+
+                                    const formattedStartTime = formatTimeTo12Hr(startTime);
+                                    const formattedEndTime = formatTimeTo12Hr(endTime);
+
+                                    const appointmentHTML = 
+                                        `<h5 class="card-title">Upcoming Appointment</h5>
+                                        <div>
+                                            <p>${appointmentDateFormatted}</p>
+                                            <p style="color: green;">${formattedStartTime} to ${formattedEndTime}</p>
+                                        </div>
+                                        <button class="btn btn-primary" id="myscheduleBtn">My Schedule</button>`;
+                                    appointmentCard.innerHTML = appointmentHTML;
+                                
+                                    document.getElementById("myscheduleBtn").addEventListener("click", function() {
+                                        window.location.href = "usersched.html";
+                                    });
+                                
+                                    foundAppointment = true;
                                 }
                             });
 

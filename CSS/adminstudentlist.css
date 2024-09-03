@@ -289,13 +289,14 @@ h2 {
 }
 
 .table th, .table td {
-    padding: 15px;
+    padding-top: 15px;
+    padding-bottom: 15px;
     text-align: left;
     vertical-align: middle;
     border-bottom: 1px solid #D9D9D9;
 }
 
-.table td.package-price {
+.table th.package-price, .table td.package-price {
     text-align: center;
     vertical-align: middle;
 }
@@ -437,24 +438,6 @@ h2 {
 
 .pagination-controls .bi-caret-left:hover, .pagination-controls .bi-caret-right:hover {
     color: #2045CF;
-}
-
-.student-item {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
-    margin: 10px 0;
-    background-color: #f9f9f9;
-}
-
-.student-item h3 {
-    margin: 0;
-    font-size: 1.5em;
-}
-
-.student-item p {
-    margin: 5px 0;
-    font-size: 1em;
 }
 
 .modal-header, .modal-body, .input-body, .modal-footer {

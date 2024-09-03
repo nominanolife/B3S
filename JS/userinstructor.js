@@ -19,6 +19,9 @@ const auth = getAuth(app); // Initialize authentication
 
 // Function to handle the saving of traits
 document.getElementById('saveButton').addEventListener('click', function() {
+  // Show loader
+  document.getElementById('loader').style.display = 'flex';
+
   // Listen for authentication state changes
   onAuthStateChanged(auth, async (user) => {
     if (user) {
@@ -44,21 +47,31 @@ document.getElementById('saveButton').addEventListener('click', function() {
         document.getElementById('notificationModalBody').innerText = "Traits saved successfully!";
         $('#notificationModal').modal('show');
 
+        // Hide loader
+        document.getElementById('loader').style.display = 'none';
+
         // Redirect to the userinstructormatch.html page after saving
         $('#notificationModal').on('hidden.bs.modal', function () {
-          window.location.href = 'userinstructormatch.html';
+          window.location.href = 'userinstructorreminder.html';
         });
 
       } catch (error) {
         console.error("Error saving traits: ", error);
+
         // Display error notification
         document.getElementById('notificationModalBody').innerText = "An error occurred while saving traits.";
         $('#notificationModal').modal('show');
+
+        // Hide loader
+        document.getElementById('loader').style.display = 'none';
       }
     } else {
       // User is not signed in
       document.getElementById('notificationModalBody').innerText = "You must be logged in to save traits.";
       $('#notificationModal').modal('show');
+
+      // Hide loader
+      document.getElementById('loader').style.display = 'none';
     }
   });
 });

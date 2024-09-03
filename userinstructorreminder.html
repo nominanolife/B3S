@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DriveHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="CSS/userinstructor.css">
+    <link rel="stylesheet" href="CSS/userinstructorreminder.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -53,46 +53,20 @@
                         </div>
                     </div>
                     <div class="container-body">
-                        <h4>This will help us find the best instructor for you!</h4>
-                        <form class="traits">
-                            <div class="personality-form">
-                                <div class="form-group-all">
-                                    <div class="form-group">
-                                        <label class="custom-checkbox">
-                                            <input type="checkbox" name="traits">
-                                            <span class="checkbox-label">Determined</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="custom-checkbox">
-                                            <input type="checkbox" name="traits">
-                                            <span class="checkbox-label">Anxious</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="custom-checkbox">
-                                            <input type="checkbox" name="traits">
-                                            <span class="checkbox-label">Adaptable</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="custom-checkbox">
-                                            <input type="checkbox" name="traits">
-                                            <span class="checkbox-label">Curious</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="custom-checkbox">
-                                            <input type="checkbox" name="traits">
-                                            <span class="checkbox-label">Patient</span>
-                                        </label>
-                                    </div>
+                        <div class="personality-check-container">
+                            <div class="personality-body-container">
+                                <div class="personality-body-header">
+                                    <i class="bi bi-arrow-left"></i>
                                 </div>
-                                <div class="save-button">
-                                    <button type="button" id="saveButton" class="btn-save">Save</button>
-                                </div>                                
+                                <div class="personality-body">
+                                    <img src="Assets/megaphone-icon.png" alt="megaphone icon">
+                                    <p>Please note that you must have a confirmed PDC appointment before a matched instructor can be assigned to you.</p>
+                                </div>
+                                <div class="matching-button">
+                                    <button id="findMatchBtn" class="btn btn-primary">Find your match</button>
+                                </div>
                             </div>
-                        </form>                        
+                        </div>                  
                     </div>
                 </div>
             </div>
@@ -100,25 +74,13 @@
     </div>
 
     <div id="loader" class="loader">
-        <div class="car-loader"></div>
-        <p>Saving your traits<span class="dots"></span></p>
-    </div>    
-
-    <div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
-                </div>
-                <div class="modal-body" id="notificationModalBody">
-                    <!-- Notification message will be inserted here -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
-                </div>
-            </div>
+        <img src="Assets/Broom broom.gif" alt="Loading GIF" class="loading-gif">
+        <div class="loading-bar-container">
+            <div class="loading-bar"></div>
+            <span class="loading-percentage">0%</span>
         </div>
-    </div>
+        <p>Matching Instructor<span class="dots"></span></p>
+    </div>    
 
     <!-- Logout Confirmation Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
@@ -143,6 +105,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="module" src="JS/common.js"></script>
-    <script type="module" src="JS/userinstructor.js"></script>
+    <script type="module" src="JS/userinstructorreminder.js"></script>
 </body>
 </html>
