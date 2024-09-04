@@ -44,28 +44,140 @@
                 <h2>Modules</h2>
             </div>
             <div class="page-content">
-                <!-- Add your dashboard content here -->
-            </div>
-        </div>
-    </div>
-
-        <!-- Logout Confirmation Modal -->
-        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to logout?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary btn-logout" id="confirmLogoutBtn">Logout</button>
-                        <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
+                <div class="button">
+                    <button class="upload-module" type="button">Upload Module</button>
+                </div>
+                <div class="module-list">
+                    <div class="module-container">
+                        <div class="module-preview">
+                            <img src="" alt="Module 1" class="preview-image">
+                            <i class="bi bi-folder2 default-icon"></i>
+                        </div>
+                        <div class="module-details">
+                            <div class="description">
+                                <h3>Module 1</h3>
+                                <p>Module Description</p>
+                            </div>
+                            <div class="module-options">
+                                <i class="bi bi-three-dots-vertical"></i>
+                                <div class="triple-dot-options">
+                                    <i class="option-dropdown">Edit</i>
+                                    <i class="option-dropdown">Delete</i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="modal" id="editModuleModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Edit Module</h4>
+                </div>
+                <form class="modal-body">
+                    <div class="image-preview">
+                        <img src="" alt="Module Preview" class="preview-image">
+                        <i class="bi bi-folder2 default-icon"></i>
+                    </div>
+                    <div class="input-body">
+                        <!-- Custom image input -->
+                        <div class="file-input-wrapper">
+                            <label class="custom-file-upload">
+                                <input type="file" class="edit-module-image" accept="image/*" required>
+                                <i class="bi bi-upload"></i> Choose Preview Image
+                            </label>
+                            <span class="file-name image-file-name">No image selected</span>
+                        </div>
+                        <!-- Custom file input -->
+                        <div class="file-input-wrapper">
+                            <label class="custom-file-upload">
+                                <input type="file" class="edit-module-file" required>
+                                <i class="bi bi-upload"></i> Choose File
+                            </label>
+                            <span class="file-name file-file-name">No file selected</span>
+                        </div>
+                        <input type="text" class="edit-module-name" placeholder="Module Name" required>
+                        <input type="text" class="edit-module-description" placeholder="Description" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="update-module" type="submit">Update</button>
+                        <button class="close-edit-modal" type="button">Cancel</button>
+                    </div>
+                </form>                
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="moduleModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Upload Module</h4>
+                </div>
+                <form class="modal-body">
+                    <div class="preview">
+                        <img src="" alt="Module Preview" class="preview-image">
+                        <i class="bi bi-folder2 default-icon" style="display:none;"></i>
+                    </div>
+                    <div class="input-body">
+                        <!-- Updated file input wrapper -->
+                        <div class="file-input-wrapper">
+                            <label class="custom-file-upload">
+                                <input type="file" class="module-file" required>
+                                <i class="bi bi-upload"></i> Choose File
+                            </label>
+                            <span class="file-name module-file-name">No file selected</span>
+                        </div>
+                        <input type="text" class="module-name" placeholder="Module Title" required>
+                        <input type="text" class="module-description" placeholder="Description" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="save-module" type="submit">Upload</button>
+                        <button class="close-modal" type="button">Cancel</button>
+                    </div>
+                </form>                                
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="deleteConfirmModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Confirm Delete</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this package?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="confirm-delete" type="button">Delete</button>
+                    <button class="cancel-delete-modal" type="button">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-logout" id="confirmLogoutBtn">Logout</button>
+                    <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

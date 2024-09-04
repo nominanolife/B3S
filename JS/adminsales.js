@@ -41,18 +41,20 @@ function formatDateToMDY(dateString) {
     return date.toLocaleDateString('en-US', options);
 }
 
-// Auto-detect current month and year and set them in the dropdowns
+/// Auto-detect current month and year and set them in the dropdowns
 document.addEventListener('DOMContentLoaded', () => {
     const currentMonthDisplay = document.getElementById('currentMonthDisplay');
-    currentMonthDisplay.textContent = currentMonth;
+    
+    // Display both month and year in the currentMonthDisplay element
+    currentMonthDisplay.textContent = `${currentMonth} ${currentYear}`;
 
     const monthSelector = document.getElementById('monthSelector');
     const yearSelector = document.getElementById('yearSelector');
     const yearFilter = document.getElementById('yearFilter');
     const yearlySalesYear = document.getElementById('yearlySalesYear');
 
-    // Populate the year selector with a range of years
-    for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+    // Ensure the year selector starts at 2024 and goes up to the current year + 5
+    for (let i = 2024; i <= currentYear + 5; i++) {
         const option = document.createElement('option');
         option.value = i;
         option.textContent = i;
@@ -77,12 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listeners for month and year change
     monthSelector.addEventListener('change', (event) => {
         currentMonth = event.target.value;
-        document.getElementById('currentMonthDisplay').textContent = currentMonth; // Update the displayed month
+        document.getElementById('currentMonthDisplay').textContent = `${currentMonth} ${currentYear}`; // Update both month and year
         filterStudents(); // Re-filter students based on current month and year selection
     });
 
     yearSelector.addEventListener('change', (event) => {
         currentYear = event.target.value;
+        document.getElementById('currentMonthDisplay').textContent = `${currentMonth} ${currentYear}`; // Update both month and year
         filterStudents(); // Re-filter students based on current month and year selection
     });
 
@@ -95,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchStudentData();
     updateTotalSalesForYear(currentYear);  // Initial load of total sales for the current year
 });
-
 
 async function fetchStudentData() {
     try {
