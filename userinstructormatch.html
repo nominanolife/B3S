@@ -50,7 +50,7 @@
                     </div>
                     <div class="container-body">
                         <div class="top-info">
-                            <span id="instructorName" class="name">John D. Guzman</span> <!-- Correct ID -->
+                            <span id="instructorName" class="name"></span> <!-- Correct ID -->
                             <span id="instructorMessage" class="message">Best Match Instructor!</span>
                         </div>
                         <div class="bottom-info">
@@ -60,37 +60,37 @@
                                 </div>
                                 <div class="rating-container">
                                     <div class="ratings">
-                                        <h2 id="ratingValue" class="rating">4.0</h2> <!-- Correct ID -->
+                                        <h2 id="ratingValue" class="rating"></h2> <!-- Correct ID -->
                                         <h2 id ="starContainer" class="stars"><i class="bi bi-star-fill"></i></h2>
                                     </div>
                                     <div>
-                                        <span id="ratingTotal" class="total">Based on 500 ratings</span> <!-- Correct ID -->
+                                        <span id="ratingTotal" class="total"></span> <!-- Correct ID -->
                                     </div>
                                     <div class="rating-bars">
                                         <div class="rating-bar">
                                             <span>5<i class="bi bi-star-fill"></i></span>
-                                            <div id="ratingBar5" class="bar" style="width: 80%;"></div> <!-- Correct ID -->
-                                            <span id="ratingCount5">2.0k</span> <!-- Correct ID -->
+                                            <div id="ratingBar5" class="bar"></div> <!-- Correct ID -->
+                                            <span id="ratingCount5"></span> <!-- Correct ID -->
                                         </div>
                                         <div class="rating-bar">
                                             <span>4<i class="bi bi-star-fill"></i></span>
-                                            <div id="ratingBar4" class="bar" style="width: 60%;"></div> <!-- Correct ID -->
-                                            <span id="ratingCount4">1.0k</span> <!-- Correct ID -->
+                                            <div id="ratingBar4" class="bar"></div> <!-- Correct ID -->
+                                            <span id="ratingCount4"></span> <!-- Correct ID -->
                                         </div>
                                         <div class="rating-bar">
                                             <span>3<i class="bi bi-star-fill"></i></span>
-                                            <div id="ratingBar3" class="bar" style="width: 30%;"></div> <!-- Correct ID -->
-                                            <span id="ratingCount3">500</span> <!-- Correct ID -->
+                                            <div id="ratingBar3" class="bar"></div> <!-- Correct ID -->
+                                            <span id="ratingCount3"></span> <!-- Correct ID -->
                                         </div>
                                         <div class="rating-bar">
                                             <span>2<i class="bi bi-star-fill"></i></span>
-                                            <div id="ratingBar2" class="bar" style="width: 15%;"></div> <!-- Correct ID -->
-                                            <span id="ratingCount2">200</span> <!-- Correct ID -->
+                                            <div id="ratingBar2" class="bar"></div> <!-- Correct ID -->
+                                            <span id="ratingCount2"></span> <!-- Correct ID -->
                                         </div>
                                         <div class="rating-bar">
                                             <span>1<i class="bi bi-star-fill"></i></span>
-                                            <div id="ratingBar1" class="bar" style="width: 0%;"></div> <!-- Correct ID -->
-                                            <span id="ratingCount1">0</span> <!-- Correct ID -->
+                                            <div id="ratingBar1" class="bar"></div> <!-- Correct ID -->
+                                            <span id="ratingCount1"></span> <!-- Correct ID -->
                                         </div>
                                     </div>
                                     <div class="feedback">
@@ -136,11 +136,30 @@
                     </div>
                 </div>
             </div>
-                <!-- New section for comments -->
-                <div class="comments-section" id="commentsSection">
-                    <h3>Comments</h3>
-                    <!-- Comments will be appended here dynamically -->
+            <div class="comments-section" id="commentsSection">
+                <h3>Comments</h3>
+                <!-- Comments will be appended here dynamically -->
+            </div>
         </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body" id="notificationMessage">
+                    <!-- Dynamic message will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Logout Confirmation Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">

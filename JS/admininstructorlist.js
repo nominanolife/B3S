@@ -60,10 +60,10 @@ function renderInstructors() {
       <td>${instructor.course}</td>
       <td class="table-row-content">
         <div class="dropdown">
-          <button class="three-dots-button" type="button"><i class="bi bi-three-dots"></i></button>
+          <i class="bi bi-three-dots"></i>
           <div class="dropdown-content">
-            <button class="dropdown-item" data-id="${instructor.id}">Edit</button>
-            <button class="dropdown-item" data-id="${instructor.id}">Delete</button>
+            <i class="dropdown-item" data-id="${instructor.id}">Edit</i>
+            <i class="dropdown-item" data-id="${instructor.id}">Delete</i>
           </div>
         </div>
       </td>
@@ -86,20 +86,22 @@ function renderInstructors() {
 
 // Handle dropdown functionality
 function handleDropdowns() {
-  document.querySelectorAll('.three-dots-button').forEach(button => {
+  document.querySelectorAll('.dropdown').forEach(dropdown => {
+    const button = dropdown.querySelector('.bi-three-dots');
+    const content = dropdown.querySelector('.dropdown-content');
+
     button.addEventListener('click', function(e) {
       e.stopPropagation(); // Prevent event from bubbling up
 
-      const dropdown = this.nextElementSibling;
-      const isDropdownOpen = dropdown.classList.contains('show');
+      const isDropdownOpen = content.classList.contains('show');
 
       closeAllDropdowns(); // Close any other open dropdowns
 
       // Toggle the clicked dropdown
       if (!isDropdownOpen) {
-        dropdown.classList.add('show');
+        content.classList.add('show');
       } else {
-        dropdown.classList.remove('show');
+        content.classList.remove('show');
       }
     });
   });

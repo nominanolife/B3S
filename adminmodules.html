@@ -48,25 +48,7 @@
                     <button class="upload-module" type="button">Upload Module</button>
                 </div>
                 <div class="module-list">
-                    <div class="module-container">
-                        <div class="module-preview">
-                            <img src="" alt="Module 1" class="preview-image">
-                            <i class="bi bi-folder2 default-icon"></i>
-                        </div>
-                        <div class="module-details">
-                            <div class="description">
-                                <h3>Module 1</h3>
-                                <p>Module Description</p>
-                            </div>
-                            <div class="module-options">
-                                <i class="bi bi-three-dots-vertical"></i>
-                                <div class="triple-dot-options">
-                                    <i class="option-dropdown">Edit</i>
-                                    <i class="option-dropdown">Delete</i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -87,7 +69,7 @@
                         <!-- Custom image input -->
                         <div class="file-input-wrapper">
                             <label class="custom-file-upload">
-                                <input type="file" class="edit-module-image" accept="image/*" required>
+                                <input type="file" class="edit-module-image" accept="image/*">
                                 <i class="bi bi-upload"></i> Choose Preview Image
                             </label>
                             <span class="file-name image-file-name">No image selected</span>
@@ -95,13 +77,13 @@
                         <!-- Custom file input -->
                         <div class="file-input-wrapper">
                             <label class="custom-file-upload">
-                                <input type="file" class="edit-module-file" required>
+                                <input type="file" class="edit-module-file">
                                 <i class="bi bi-upload"></i> Choose File
                             </label>
                             <span class="file-name file-file-name">No file selected</span>
                         </div>
-                        <input type="text" class="edit-module-name" placeholder="Module Name" required>
-                        <input type="text" class="edit-module-description" placeholder="Description" required>
+                        <input type="text" class="edit-module-name" placeholder="Module Name">
+                        <input type="text" class="edit-module-description" placeholder="Description">
                     </div>
                     <div class="modal-footer">
                         <button class="update-module" type="submit">Update</button>
@@ -121,7 +103,7 @@
                 <form class="modal-body">
                     <div class="preview">
                         <img src="" alt="Module Preview" class="preview-image">
-                        <i class="bi bi-folder2 default-icon" style="display:none;"></i>
+                        <i class="bi bi-folder2 default-icon"></i>
                     </div>
                     <div class="input-body">
                         <!-- Updated file input wrapper -->
@@ -160,6 +142,22 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Notification message will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>    
 
     <!-- Logout Confirmation Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">

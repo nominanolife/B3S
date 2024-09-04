@@ -147,9 +147,9 @@ document.addEventListener("DOMContentLoaded", async function() {
         });
 
         // Hide edit buttons
-        const editButtons = document.querySelectorAll(".edit-button");
+        const editButtons = document.querySelectorAll(".bi-three-dots-vertical");
         editButtons.forEach(button => {
-            button.classList.add("hide-edit-button"); // Hide edit button
+            button.classList.add("hide-bi-three-dots-vertical"); // Hide edit button
         });
     }
 
@@ -170,9 +170,9 @@ document.addEventListener("DOMContentLoaded", async function() {
         });
 
         // Show edit buttons
-        const editButtons = document.querySelectorAll(".edit-button");
+        const editButtons = document.querySelectorAll(".bi-three-dots-vertical");
         editButtons.forEach(button => {
-            button.classList.remove("hide-edit-button"); // Show edit button
+            button.classList.remove("hide-bi-three-dots-vertical"); // Show edit button
         });
     }
 
@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             <h2>${packageName}</h2>
             <span>Price: &#8369;${packagePrice}</span>
             <h4>${packageDescription}</h4>
-            <button class="edit-button"><i class="bi bi-three-dots-vertical"></i></button>
+            <i class="bi bi-three-dots-vertical"></i>
             <button class="delete-button">&times;</button>
         `;
 
@@ -260,7 +260,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         });
 
         // Attach edit event to the edit button
-        const editButton = packageElement.querySelector(".edit-button");
+        const editButton = packageElement.querySelector(".bi-three-dots-vertical");
         editButton.addEventListener("click", function() {
             showEditModal(packageElement);
         });

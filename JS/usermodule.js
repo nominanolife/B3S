@@ -34,6 +34,7 @@ async function fetchAndDisplayModules() {
         const moduleElement = document.createElement('div');
         moduleElement.classList.add('module-container');
 
+        // Create HTML content for the module element
         moduleElement.innerHTML = `
             <div class="module-preview">
                 <i class="bi bi-folder2 default-icon"></i>
@@ -43,19 +44,25 @@ async function fetchAndDisplayModules() {
                     <h3>${module.title}</h3>
                     <p>${module.description}</p>
                 </div>
-                <div class="module-options">
-                    <i class="bi bi-three-dots-vertical"></i>
-                    <div class="triple-dot-options">
-                        <i class="option-dropdown">Edit</i>
-                        <i class="option-dropdown">Delete</i>
-                    </div>
-                </div>
-                <a href="${module.fileUrl}" target="_blank" class="btn btn-primary mt-2">Download ${module.fileName}</a>
+                <button class="btn download-btn">Download</button>
             </div>
         `;
 
+        // Append the module element to the container
         moduleContainer.appendChild(moduleElement);
+
+        // Add event listener to open the file in a new tab when the button is clicked
+        const downloadButton = moduleElement.querySelector('.download-btn');
+        downloadButton.addEventListener('click', () => {
+            openFileInNewTab(module.fileUrl);
+        });
     });
+}
+
+// Function to open the file in a new tab
+function openFileInNewTab(fileUrl) {
+    // Open the file URL in a new tab
+    window.open(fileUrl, '_blank');
 }
 
 document.addEventListener('DOMContentLoaded', function() {

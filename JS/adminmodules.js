@@ -50,7 +50,6 @@ async function fetchAndDisplayModules() {
                         <i class="option-dropdown">Delete</i>
                     </div>
                 </div>
-                <a href="${module.fileUrl}" target="_blank" class="btn btn-primary mt-2">Download ${module.fileName}</a>
             </div>
         `;
 
@@ -84,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!target.contains(e.target) && !optionsMenu.contains(e.target)) {
                     optionsMenu.style.display = 'none';
                 }
-            }, { once: true });
+            }, {});
         } else if (target.classList.contains('option-dropdown')) {
             const action = target.textContent.trim();
             if (action === 'Edit') {
@@ -93,6 +92,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleModal(document.getElementById('deleteConfirmModal'), 'show');
             }
         }
+    });
+
+    // Cancel buttons to close modals
+    document.querySelector('.cancel-delete-modal').addEventListener('click', function() {
+        toggleModal(document.getElementById('deleteConfirmModal'), 'hide');
     });
 
     // Close modals on Cancel buttons
@@ -122,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const moduleDescription = document.querySelector('.module-description').value;
 
         if (!fileInput.files[0] || !moduleName || !moduleDescription) {
-            alert('Please fill in all fields and select a file.');
+            showNotificationModal('Please fill in all fields and select a file.');
             return;
         }
 
@@ -143,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 fileName: fileName
             });
 
-            alert('Module uploaded successfully!');
+            showNotificationModal('Module uploaded successfully!');
             toggleModal(document.getElementById('moduleModal'), 'hide');
 
             // Reset the form after successful upload
@@ -158,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         } catch (error) {
             console.error('Error uploading module:', error);
-            alert('Error uploading module. Please try again.');
+            showNotificationModal('Error uploading module. Please try again.');
         }
     });
 
@@ -209,16 +213,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Close modals when clicking outside of them
-    document.querySelectorAll('.modal').forEach(function(modal) {
-        modal.addEventListener('click', function(event) {
-            const modalDialog = this.querySelector('.modal-dialog');
-            if (!modalDialog.contains(event.target)) {
-                toggleModal(this, 'hide');
-            }
-        });
-    });
-
     // Fetch and display modules on page load
     fetchAndDisplayModules();
 });
+
+// Function to display the notification modal
+function showNotificationModal(message) {
+    // Get modal elements
+    const notificationModal = document.getElementById('notificationModal');
+    const notificationModalBody = document.getElementById('notificationModalBody');
+
+    // Set the message inside the modal
+    notificationModalBody.textContent = message;
+
+    // Show the modal
+    $(notificationModal).modal('show');
+}

@@ -61,7 +61,7 @@ async function fetchMatchAndInstructorData(studentId) {
         document.getElementById('instructorName').textContent = instructorData.name || 'Instructor Name';
         
         const totalRatings = instructorData.totalRatings || 0;
-        const rating = instructorData.rating || 0.0;
+        const rating = instructorData.rating || 0.0;z
 
         // Update overall rating and total ratings count
         document.getElementById('ratingValue').textContent = rating.toFixed(1);
@@ -87,7 +87,7 @@ async function fetchMatchAndInstructorData(studentId) {
 
     } catch (error) {
         console.error('Error fetching data:', error);
-        alert('An error occurred while fetching data.');
+        showNotification('An error occurred while fetching data.');
     }
 }
 
@@ -170,7 +170,7 @@ document.querySelector('.feedback-form').addEventListener('submit', async functi
     
     // Ensure a rating is selected
     if (rating === 0) {
-        alert("Please select a star rating.");
+        showNotification("Please select a star rating.");
         return;
     }
 
@@ -211,6 +211,7 @@ document.querySelector('.feedback-form').addEventListener('submit', async functi
         console.error("Instructor not found.");
     }
 });
+
 
 // Ensure the 'Give Feedback' button is linked to the correct element in the DOM
 document.getElementById('giveFeedbackBtn').addEventListener('click', function () {
@@ -273,7 +274,7 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
         }
     } catch (error) {
         console.error('Error submitting feedback:', error);
-        alert('Error submitting feedback. Please try again later.');
+        showNotification('Error submitting feedback. Please try again later.');
     }
 }
 

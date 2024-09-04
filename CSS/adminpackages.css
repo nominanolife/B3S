@@ -177,7 +177,7 @@ body {
     width: calc(100% - 300px);
     height: calc(100vh - 120px);
     margin-left: 300px;
-    margin-top: 90px;
+    margin-top: 120px;
 }
 
 .header {
@@ -319,7 +319,7 @@ h2 {
     transition: transform 0.2s ease-in-out;
 }
 
-.edit-button {
+.bi-three-dots-vertical {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -330,7 +330,7 @@ h2 {
     cursor: pointer;
 }
 
-.hide-edit-button {
+.hide-bi-three-dots-vertical {
     display: none;
 }
 

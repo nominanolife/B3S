@@ -177,7 +177,7 @@ body {
     width: calc(100% - 300px);
     height: calc(100vh - 120px);
     margin-left: 300px;
-    margin-top: 90px;
+    margin-top: 120px;
 }
 
 .header {
@@ -186,7 +186,7 @@ body {
     display: flex;
     flex-direction: row;
     width: calc(100% - 300px);
-    padding: 30px 30px;
+    padding: 40px 30px;
     background-color: #ffffff;
     justify-content: center;
     z-index: 1000;
@@ -216,7 +216,6 @@ h2 {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin-top: 30px;
 }
 
 .dashboard-bttns {
