@@ -24,7 +24,7 @@
                 </div>
                 <div class="sidebar-dashboard">
                     <a href="userdashboard.html"><i class="bi bi-columns-gap"></i>Dashboard</a>
-                    <a href="userinstructor.html"><i class="bi bi-people"></i>Instructors</a>
+                    <a id="sidebarInstructorButton" href="userinstructor.html"><i class="bi bi-people"></i>Instructors</a>
                 </div>
                 <div class="sidebar-menu">
                     <a href="userpackages.html"><i class="bi bi-mortarboard"></i>Packages</a>
@@ -43,8 +43,8 @@
                 <h2>Modules</h2>
             </div>
             <div class="page-content">
-                <h2></h2> <!-- This will be dynamically updated -->
-            </div>  
+                <div class="module-list"></div> <!-- Container for the modules -->
+            </div>
         </div>
     </div>
 
@@ -70,6 +70,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="module" src="JS/common.js"></script>
+    <script type="module" src="JS/sidebar.js"></script>
     <script type="module" src="JS/usermodule.js"></script>
 </body>
 </html>

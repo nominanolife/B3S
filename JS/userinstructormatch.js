@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Firebase configuration
@@ -163,40 +163,53 @@ function updateStars(rating) {
 }
 
 // Handle form submission and store feedback in Firestore
-document.querySelector('.feedback-form').addEventListener('submit', function (e) {
+document.querySelector('.feedback-form').addEventListener('submit', async function (e) {
     e.preventDefault(); // Prevent page reload
 
     const comment = document.getElementById('comments').value;
+    
+    // Ensure a rating is selected
     if (rating === 0) {
         alert("Please select a star rating.");
         return;
     }
 
-    if (!instructorId) {
-        alert("Instructor ID not available.");
+    // Ensure a comment is provided
+    if (comment.trim() === "") {
+        alert("Please enter a comment.");
         return;
     }
 
-    if (!studentId) {
-        alert("Student ID not available.");
+    // Ensure instructorId and studentId are available
+    if (!instructorId || !studentId) {
+        alert("Instructor or Student ID not available.");
         return;
     }
 
-    // Store feedback in Firestore
-    storeFeedbackInFirestore(studentId, instructorId, rating, comment);
+    // Check if this student has already submitted feedback
+    const instructorRef = doc(db, 'instructors', instructorId);
+    const docSnap = await getDoc(instructorRef);
+    
+    if (docSnap.exists()) {
+        const data = docSnap.data();
+        const existingComments = data.comments || [];
 
-    // Reset form
-    document.querySelector('.feedback-form').reset();
-    updateStars(0); // Reset stars
+        // Check if the student already has a comment
+        const hasCommented = existingComments.some(comment => comment.studentId === studentId);
 
-    // Hide feedback form and show rating container again
-    document.querySelector('.feedback-form').style.display = 'none';
-    document.querySelector('.rating-container').style.display = 'flex';
-    document.querySelector('.left-info-header').style.display = 'block';
+        if (hasCommented) {
+            alert("You have already submitted feedback for this instructor.");
+            return;  // Prevent multiple submissions
+        }
 
-    // Alert user and refresh the ratings UI
-    alert('Thank you for your feedback!');
-    updateRatingUI(instructorId); // Refresh the ratings after feedback
+        // Store feedback if not already submitted
+        storeFeedbackInFirestore(studentId, instructorId, rating, comment);
+        
+        // Show success modal
+        showFeedbackModal();
+    } else {
+        console.error("Instructor not found.");
+    }
 });
 
 // Ensure the 'Give Feedback' button is linked to the correct element in the DOM
@@ -213,18 +226,17 @@ document.getElementById('closeFeedbackBtn').addEventListener('click', function (
     document.querySelector('.left-info-header').style.display = 'block'; // Show the header section again
 });
 
+// Store feedback in Firestore
 async function storeFeedbackInFirestore(studentId, instructorId, rating, comment) {
     try {
         const instructorRef = doc(db, 'instructors', instructorId);
-
-        // Get current ratings and comments
         const docSnap = await getDoc(instructorRef);
+        
         if (docSnap.exists()) {
             const data = docSnap.data();
             let ratingsArray = data.ratings || [0, 0, 0, 0, 0]; // Store counts for 1-5 stars
             let commentsArray = data.comments || []; // Array to store comments
             let totalRatings = data.totalRatings || 0;
-            let currentAverage = data.rating || 0;
 
             // Update the corresponding rating index
             ratingsArray[rating - 1] += 1;  // Increment the selected rating
@@ -245,7 +257,7 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
             }
             let newAverageRating = totalScore / totalRatings;
 
-            // Update the instructor document
+            // Update the instructor document with the new ratings and comments
             await updateDoc(instructorRef, {
                 ratings: ratingsArray,
                 comments: commentsArray,
@@ -263,6 +275,26 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
         console.error('Error submitting feedback:', error);
         alert('Error submitting feedback. Please try again later.');
     }
+}
+
+// Prevent new instructor search if appointment progress is "Completed"
+async function checkAppointmentProgress(studentId) {
+    const appointmentsRef = collection(db, 'appointments');
+    const querySnapshot = await getDocs(appointmentsRef);
+
+    querySnapshot.forEach((doc) => {
+        const appointmentData = doc.data();
+        
+        // Check if the booking belongs to the current student and if progress is "Completed"
+        if (appointmentData.bookings && Array.isArray(appointmentData.bookings)) {
+            appointmentData.bookings.forEach(booking => {
+                if (booking.userId === studentId && booking.progress === "Completed") {
+                    alert("You cannot find another instructor because your appointment is marked as completed.");
+                    window.location.href = 'firstpage.html'; // Redirect to the first page
+                }
+            });
+        }
+    });
 }
 
 // Fetch and update the UI with the latest rating distribution
@@ -324,3 +356,12 @@ async function updateRatingUI(instructorId) {
         console.log('Instructor data not found');
     }
 }
+
+// Call checkAppointmentProgress on page load or when attempting to find a new instructor
+document.addEventListener('DOMContentLoaded', () => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            checkAppointmentProgress(user.uid);
+        }
+    });
+});

@@ -1,3 +1,63 @@
+// Import Firebase modules
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+    authDomain: "authentication-d6496.firebaseapp.com",
+    projectId: "authentication-d6496",
+    storageBucket: "authentication-d6496.appspot.com",
+    messagingSenderId: "195867894399",
+    appId: "1:195867894399:web:596fb109d308aea8b6154a"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app); // Firestore
+const storage = getStorage(app); // Firebase Storage
+
+// Function to fetch and display modules
+async function fetchAndDisplayModules() {
+    const modulesCollection = collection(db, 'modules');
+    const moduleSnapshot = await getDocs(modulesCollection);
+    const modules = moduleSnapshot.docs.map(doc => doc.data());
+
+    const moduleContainer = document.querySelector('.module-list'); // The container for the modules
+
+    // Clear existing content
+    moduleContainer.innerHTML = '';
+
+    // Iterate through the retrieved modules and create elements
+    modules.forEach(module => {
+        const moduleElement = document.createElement('div');
+        moduleElement.classList.add('module-container');
+
+        moduleElement.innerHTML = `
+            <div class="module-preview">
+                <i class="bi bi-folder2 default-icon"></i>
+            </div>
+            <div class="module-details">
+                <div class="description">
+                    <h3>${module.title}</h3>
+                    <p>${module.description}</p>
+                </div>
+                <div class="module-options">
+                    <i class="bi bi-three-dots-vertical"></i>
+                    <div class="triple-dot-options">
+                        <i class="option-dropdown">Edit</i>
+                        <i class="option-dropdown">Delete</i>
+                    </div>
+                </div>
+                <a href="${module.fileUrl}" target="_blank" class="btn btn-primary mt-2">Download ${module.fileName}</a>
+            </div>
+        `;
+
+        moduleContainer.appendChild(moduleElement);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
 
     // Function to handle showing/hiding modals
@@ -57,13 +117,56 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleModal(document.getElementById('moduleModal'), 'hide');
     });
 
-    document.querySelector('.save-module').addEventListener('click', function(event) {
+    // Handle module upload to Firebase
+    document.querySelector('.save-module').addEventListener('click', async function(event) {
         event.preventDefault();
-        alert('Module uploaded successfully!');
-        toggleModal(document.getElementById('moduleModal'), 'hide');
+
+        const fileInput = document.querySelector('.module-file');
+        const moduleName = document.querySelector('.module-name').value;
+        const moduleDescription = document.querySelector('.module-description').value;
+
+        if (!fileInput.files[0] || !moduleName || !moduleDescription) {
+            alert('Please fill in all fields and select a file.');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const fileName = file.name;
+        const storageRef = ref(storage, `modules/${fileName}`);
+
+        try {
+            // Upload the file to Firebase Storage
+            const uploadTask = await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(uploadTask.ref);
+
+            // Store module info in Firestore
+            await addDoc(collection(db, 'modules'), {
+                title: moduleName,
+                description: moduleDescription,
+                fileUrl: downloadURL,
+                fileName: fileName
+            });
+
+            alert('Module uploaded successfully!');
+            toggleModal(document.getElementById('moduleModal'), 'hide');
+
+            // Reset the form after successful upload
+            document.querySelector('.module-file-name').textContent = 'No file selected';
+            document.querySelector('.module-name').value = '';
+            document.querySelector('.module-description').value = '';
+            document.querySelector('.preview-image').style.display = 'none';
+            document.querySelector('.default-icon').style.display = 'block';
+            
+            // Fetch and display updated modules
+            fetchAndDisplayModules();
+
+        } catch (error) {
+            console.error('Error uploading module:', error);
+            alert('Error uploading module. Please try again.');
+        }
     });
 
-    // Image preview handling for Edit Modal
+    // Handle image preview for Edit Modal
     const editModuleImageInput = document.querySelector('.edit-module-image');
     const editModulePreviewImage = document.querySelector('#editModuleModal .preview-image');
     const defaultIcon = document.querySelector('#editModuleModal .default-icon');
@@ -117,4 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleModal(this, 'hide');
         }
     });
+
+    // Fetch and display modules on page load
+    fetchAndDisplayModules();
 });

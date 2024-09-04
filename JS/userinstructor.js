@@ -17,61 +17,73 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app); // Initialize authentication
 
+let userId = '';  // Variable to hold user ID
+
+// Early authentication check (Solution 5)
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        userId = user.uid;  // Store user ID once authenticated
+    } else {
+        // If user is not logged in, show alert and redirect to login page
+        alert("You must be logged in to select traits.");
+        window.location.href = 'login.html';  // Redirect to login page
+    }
+});
+
 // Function to handle the saving of traits
-document.getElementById('saveButton').addEventListener('click', function() {
+document.getElementById('saveButton').addEventListener('click', async function() {
+  // Disable save button to prevent multiple submissions (Solution 2)
+  const saveButton = document.getElementById('saveButton');
+  saveButton.disabled = true;
+
   // Show loader
   document.getElementById('loader').style.display = 'flex';
 
-  // Listen for authentication state changes
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      // User is signed in, retrieve the user ID
-      const userId = user.uid;
-
-      // Collect the selected traits
-      const selectedTraits = [];
-      document.querySelectorAll('input[name="traits"]:checked').forEach((checkbox) => {
-        selectedTraits.push(checkbox.nextElementSibling.innerText);
-      });
-
-      // Reference to the Firestore document
-      const userDocRef = doc(db, 'applicants', userId);
-
-      // Update the Firestore document with the selected traits
-      try {
-        await setDoc(userDocRef, {
-          traits: selectedTraits
-        }, { merge: true });
-
-        // Display success notification
-        document.getElementById('notificationModalBody').innerText = "Traits saved successfully!";
-        $('#notificationModal').modal('show');
-
-        // Hide loader
-        document.getElementById('loader').style.display = 'none';
-
-        // Redirect to the userinstructormatch.html page after saving
-        $('#notificationModal').on('hidden.bs.modal', function () {
-          window.location.href = 'userinstructorreminder.html';
-        });
-
-      } catch (error) {
-        console.error("Error saving traits: ", error);
-
-        // Display error notification
-        document.getElementById('notificationModalBody').innerText = "An error occurred while saving traits.";
-        $('#notificationModal').modal('show');
-
-        // Hide loader
-        document.getElementById('loader').style.display = 'none';
-      }
-    } else {
-      // User is not signed in
-      document.getElementById('notificationModalBody').innerText = "You must be logged in to save traits.";
-      $('#notificationModal').modal('show');
-
-      // Hide loader
-      document.getElementById('loader').style.display = 'none';
-    }
+  // Collect the selected traits
+  const selectedTraits = [];
+  document.querySelectorAll('input[name="traits"]:checked').forEach((checkbox) => {
+    selectedTraits.push(checkbox.nextElementSibling.innerText);
   });
+
+  // Validation: Ensure at least one trait is selected (Solution 1)
+  if (selectedTraits.length === 0) {
+    // Hide loader and re-enable save button if no traits are selected
+    document.getElementById('loader').style.display = 'none';
+    saveButton.disabled = false;
+    alert("Please select at least one trait before saving.");
+    return;
+  }
+
+  // Reference to the Firestore document
+  const userDocRef = doc(db, 'applicants', userId);
+
+  // Update the Firestore document with the selected traits
+  try {
+    await setDoc(userDocRef, {
+      traits: selectedTraits
+    }, { merge: true });
+
+    // Display success notification
+    document.getElementById('notificationModalBody').innerText = "Traits saved successfully!";
+    $('#notificationModal').modal('show');
+
+    // Hide loader
+    document.getElementById('loader').style.display = 'none';
+
+    // Redirect to the userinstructormatch.html page after saving
+    $('#notificationModal').on('hidden.bs.modal', function () {
+      window.location.href = 'userinstructorreminder.html';
+    });
+
+  } catch (error) {
+    console.error("Error saving traits: ", error);
+
+    // Provide clearer error feedback (Solution 3)
+    document.getElementById('notificationModalBody').innerText = "An error occurred while saving traits. Please check your internet connection and try again.";
+    $('#notificationModal').modal('show');
+
+    // Hide loader and re-enable save button
+    document.getElementById('loader').style.display = 'none';
+    saveButton.disabled = false;  // Re-enable button in case of error
+  }
 });
