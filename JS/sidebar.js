@@ -17,21 +17,21 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-let studentId = ''; // To store the logged-in user's student ID
-
-// Listen for authentication state
+// Listen for authentication state and handle sidebar button click
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        studentId = user.uid; // Assign the logged-in user's ID as the studentId
+        const studentId = user.uid;  // Get the logged-in user's ID
+        
+        // Add event listener to the "Instructors" button
+        document.getElementById('sidebarInstructorButton').addEventListener('click', async function(event) {
+            event.preventDefault();  // Prevent the default navigation action
+            await checkMatch(studentId);  // Run the checkMatch function when the button is clicked
+        });
     } else {
         console.error('No user is logged in.');
+        // Optionally redirect to a login page or show an error message
+        window.location.href = 'login.html'; // Redirect to login if no user is logged in
     }
-});
-
-// Add event listener to the "Instructors" button
-document.getElementById('sidebarInstructorButton').addEventListener('click', function(event) {
-    event.preventDefault();  // Prevent the default navigation action
-    checkMatch(studentId);    // Run the checkMatch function when the button is clicked
 });
 
 // Function to check if the student is already matched with an instructor
@@ -47,16 +47,16 @@ async function checkMatch(studentId) {
             if (instructorId) {
                 // If a match exists, check if the student has already given feedback
                 console.log('Match found. Checking for feedback...');
-                await checkForExistingComment(studentId, instructorId); // Only run after button click
+                await checkForExistingComment(studentId, instructorId); // Run after button click
             } else {
                 // If no match exists, redirect to the first page
                 console.log('No match found, redirecting to the first page...');
-                window.location.href = 'firstpage.html'; // Adjust URL accordingly
+                window.location.href = 'userinstructor.html'; // Adjust URL accordingly
             }
         } else {
             // If no match document exists, redirect to the first page
             console.log('No match document found, redirecting to the first page...');
-            window.location.href = 'firstpage.html'; // Adjust URL accordingly
+            window.location.href = 'userinstructor.html'; // Adjust URL accordingly
         }
     } catch (error) {
         console.error('Error checking match status:', error);
@@ -71,7 +71,7 @@ async function checkForExistingComment(studentId, instructorId) {
 
         if (instructorDoc.exists()) {
             const instructorData = instructorDoc.data();
-            const comments = instructorData.comments || [];
+            const comments = instructorData.comments || []; // Ensure comments is an array
 
             // Check if the student has already commented
             const hasCommented = comments.some(comment => comment.studentId === studentId);
@@ -82,11 +82,12 @@ async function checkForExistingComment(studentId, instructorId) {
                 window.location.href = 'userinstructor.html'; // Adjust URL accordingly
             } else {
                 // If the student has not commented yet, redirect to the matched instructor's page
-                console.log('Redirecting to matched instructor page...');
+                console.log('No feedback submitted. Redirecting to matched instructor page...');
                 window.location.href = 'userinstructormatch.html'; // Adjust URL accordingly
             }
         } else {
             console.error("Instructor document not found.");
+            // If the instructor document is not found, handle it accordingly (e.g., log an error, show a message)
         }
     } catch (error) {
         console.error('Error checking for existing comment:', error);
