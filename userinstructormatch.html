@@ -43,15 +43,15 @@
             <div class="header">
                 <h2>Instructors</h2>
             </div>
-            <div class="page-content">
+            <div class="page-content"> 
                 <div class="personality-container">
                     <div class="container-header">
-                        <img class="profile-pic" src="Assets/default-profile.png" alt="profile picture">
+                        <img class="profile-pic" id="profilePic" src="Assets/default-profile.png" alt="profile picture"> <!-- Correct ID -->
                     </div>
                     <div class="container-body">
                         <div class="top-info">
-                            <span class="name">John D. Guzman</span>
-                            <span class="message">Best Match Instructor!</span>
+                            <span id="instructorName" class="name">John D. Guzman</span> <!-- Correct ID -->
+                            <span id="instructorMessage" class="message">Best Match Instructor!</span>
                         </div>
                         <div class="bottom-info">
                             <div class="left-info">
@@ -60,48 +60,45 @@
                                 </div>
                                 <div class="rating-container">
                                     <div class="ratings">
-                                        <h2 class="rating">4.0</h2>
-                                        <h2 class="stars"><i class="bi bi-star-fill"></i></h2>
-                                        <h2 class="stars"><i class="bi bi-star-fill"></i></h2>
-                                        <h2 class="stars"><i class="bi bi-star-fill"></i></h2>
-                                        <h2 class="stars"><i class="bi bi-star-fill"></i></h2>
+                                        <h2 id="ratingValue" class="rating">4.0</h2> <!-- Correct ID -->
+                                        <h2 id ="starContainer" class="stars"><i class="bi bi-star-fill"></i></h2>
                                     </div>
                                     <div>
-                                        <span class="total">Based on 500 ratings</span>
+                                        <span id="ratingTotal" class="total">Based on 500 ratings</span> <!-- Correct ID -->
                                     </div>
                                     <div class="rating-bars">
                                         <div class="rating-bar">
                                             <span>5<i class="bi bi-star-fill"></i></span>
-                                            <div class="bar" style="width: 80%;"></div>
-                                            <span>2.0k</span>
+                                            <div id="ratingBar5" class="bar" style="width: 80%;"></div> <!-- Correct ID -->
+                                            <span id="ratingCount5">2.0k</span> <!-- Correct ID -->
                                         </div>
                                         <div class="rating-bar">
                                             <span>4<i class="bi bi-star-fill"></i></span>
-                                            <div class="bar" style="width: 60%;"></div>
-                                            <span>1.0k</span>
+                                            <div id="ratingBar4" class="bar" style="width: 60%;"></div> <!-- Correct ID -->
+                                            <span id="ratingCount4">1.0k</span> <!-- Correct ID -->
                                         </div>
                                         <div class="rating-bar">
                                             <span>3<i class="bi bi-star-fill"></i></span>
-                                            <div class="bar" style="width: 30%;"></div>
-                                            <span>500</span>
+                                            <div id="ratingBar3" class="bar" style="width: 30%;"></div> <!-- Correct ID -->
+                                            <span id="ratingCount3">500</span> <!-- Correct ID -->
                                         </div>
                                         <div class="rating-bar">
                                             <span>2<i class="bi bi-star-fill"></i></span>
-                                            <div class="bar" style="width: 15%;"></div>
-                                            <span>200</span>
+                                            <div id="ratingBar2" class="bar" style="width: 15%;"></div> <!-- Correct ID -->
+                                            <span id="ratingCount2">200</span> <!-- Correct ID -->
                                         </div>
                                         <div class="rating-bar">
                                             <span>1<i class="bi bi-star-fill"></i></span>
-                                            <div class="bar" style="width: 0%;"></div>
-                                            <span>0</span>
+                                            <div id="ratingBar1" class="bar" style="width: 0%;"></div> <!-- Correct ID -->
+                                            <span id="ratingCount1">0</span> <!-- Correct ID -->
                                         </div>
                                     </div>
                                     <div class="feedback">
-                                        <button type="button" class="feedback-btn" id="giveFeedbackBtn">Give Feedback</button>
+                                        <button type="button" class="feedback-btn" id="giveFeedbackBtn">Give Feedback</button> <!-- Correct ID -->
                                     </div>
                                 </div>
                                 <form class="feedback-form">
-                                    <i class="bi bi-x-lg" id="closeFeedbackBtn"></i>
+                                    <i class="bi bi-x-lg" id="closeFeedbackBtn"></i> <!-- Correct ID -->
                                     <h3>Give Feedback</h3>
                                     <span>How do you think of your instructor?</span>
                                     <div class="stars-rating">
@@ -114,7 +111,7 @@
                                     <div class="form-group">
                                         <label for="comments">Comments and Suggestions</label>
                                         <div class="input-group">
-                                            <textarea id="comments" class="form-control" placeholder="Please input your insights about your assigned instructor."></textarea>
+                                            <textarea id="comments" class="form-control" placeholder="Please input your insights about your assigned instructor."></textarea> <!-- Correct ID -->
                                         </div>
                                     </div>
                                     <div class="submit-button">
@@ -127,18 +124,23 @@
                                     <span>About</span>
                                 </div>
                                 <div class="about-container">
-                                    <span class="traits"><i class="bi bi-check-circle"></i>Patient</span>
-                                    <span class="traits"><i class="bi bi-check-circle"></i>Communicative</span>
-                                    <span class="traits"><i class="bi bi-check-circle"></i>Knowlegable</span>
+                                    <span id="instructorTraits1" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
+                                    <span id="instructorTraits2" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
+                                    <span id="instructorTraits3" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
+                                    <span id="instructorTraits4" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
+                                    <span id="instructorTraits5" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
+                                    <span id="instructorTraits6" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
                                 </div>
                             </div>
                         </div>     
                     </div>
                 </div>
             </div>
+                <!-- New section for comments -->
+                <div class="comments-section" id="commentsSection">
+                    <h3>Comments</h3>
+                    <!-- Comments will be appended here dynamically -->
         </div>
-    </div>
-
     <!-- Logout Confirmation Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
