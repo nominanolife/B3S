@@ -59,7 +59,6 @@ async function fetchAndDisplayModules() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-
     // Function to handle showing/hiding modals
     function toggleModal(modal, action) {
         modal.style.display = action === 'show' ? 'block' : 'none';
@@ -74,28 +73,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Handle showing triple-dot options
-    const tripleDotIcons = document.querySelectorAll('.bi-three-dots-vertical');
-    tripleDotIcons.forEach(function(icon) {
-        icon.addEventListener('click', function(event) {
-            const optionsMenu = this.nextElementSibling;
+    document.querySelector('.module-list').addEventListener('click', function(event) {
+        const target = event.target;
+        if (target.classList.contains('bi-three-dots-vertical')) {
+            const optionsMenu = target.nextElementSibling;
             optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
             
+            // Hide options menu if clicking outside
             document.addEventListener('click', function(e) {
-                if (!icon.contains(e.target) && !optionsMenu.contains(e.target)) {
+                if (!target.contains(e.target) && !optionsMenu.contains(e.target)) {
                     optionsMenu.style.display = 'none';
                 }
-            });
-        });
-    });
-
-    // Add event listener to dynamically handle Edit/Delete buttons
-    document.querySelector('.module-list').addEventListener('click', function(event) {
-        const target = event.target.textContent.trim();
-
-        if (target === 'Edit') {
-            toggleModal(document.getElementById('editModuleModal'), 'show');
-        } else if (target === 'Delete') {
-            toggleModal(document.getElementById('deleteConfirmModal'), 'show');
+            }, { once: true });
+        } else if (target.classList.contains('option-dropdown')) {
+            const action = target.textContent.trim();
+            if (action === 'Edit') {
+                toggleModal(document.getElementById('editModuleModal'), 'show');
+            } else if (action === 'Delete') {
+                toggleModal(document.getElementById('deleteConfirmModal'), 'show');
+            }
         }
     });
 
@@ -214,11 +210,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Close modals when clicking outside of them
-    document.getElementById('moduleModal').addEventListener('click', function(event) {
-        const modalDialog = this.querySelector('.modal-dialog');
-        if (!modalDialog.contains(event.target)) {
-            toggleModal(this, 'hide');
-        }
+    document.querySelectorAll('.modal').forEach(function(modal) {
+        modal.addEventListener('click', function(event) {
+            const modalDialog = this.querySelector('.modal-dialog');
+            if (!modalDialog.contains(event.target)) {
+                toggleModal(this, 'hide');
+            }
+        });
     });
 
     // Fetch and display modules on page load
