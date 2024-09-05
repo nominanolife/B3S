@@ -19,13 +19,22 @@ const auth = getAuth(app);
 
 let studentId = '';  // Variable to store student ID
 
+// Helper function to display notification modal
+function showNotification(message) {
+    document.getElementById('notificationModalBody').innerText = message;
+    $('#notificationModal').modal('show');
+}
+
 // Authentication check to store the user ID
 onAuthStateChanged(auth, (user) => {
     if (user) {
         studentId = user.uid;  // Set the logged-in user ID
     } else {
-        alert("You must be logged in to continue.");
-        window.location.href = 'login.html';  // Redirect if not logged in
+        // Use notification modal instead of alert
+        showNotification("You must be logged in to continue.");
+        $('#notificationModal').on('hidden.bs.modal', function () {
+            window.location.href = 'login.html';  // Redirect after modal is closed
+        });
     }
 });
 
@@ -44,7 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const hasPDCAppointment = await checkPDCAppointment(studentId);
 
         if (!hasPDCAppointment) {
-            alert("You must have a confirmed PDC appointment (4Wheels or Motors) before matching with an instructor.");
+            // Use notification modal instead of alert
+            showNotification("You must have a confirmed PDC appointment (4Wheels or Motors) before matching with an instructor.");
             return;  // Stop further execution
         }
 
@@ -92,12 +102,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             // Redirect to matched instructor page
                             window.location.href = 'userinstructormatch.html';
                         } else {
-                            alert('An error occurred: ' + data.message);
+                            // Use notification modal instead of alert
+                            showNotification('An error occurred: ' + data.message);
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('An error occurred while contacting the server: ' + error.message);
+                        // Use notification modal instead of alert
+                        showNotification('An error occurred while contacting the server: ' + error.message);
                     });
                 }, 100);
             }
@@ -170,5 +182,3 @@ async function checkPDCAppointment(studentId) {
         return false;  // Treat as no appointment in case of error
     }
 }
-
-

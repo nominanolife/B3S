@@ -16,7 +16,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app); // Firestore
-const storage = getStorage(app); // Firebase Storage
 
 // Function to fetch and display modules
 async function fetchAndDisplayModules() {
@@ -44,25 +43,13 @@ async function fetchAndDisplayModules() {
                     <h3>${module.title}</h3>
                     <p>${module.description}</p>
                 </div>
-                <button class="btn download-btn">Download</button>
+                <a href="${module.fileUrl}" target="_blank" class="btn download-btn">Open File</a>
             </div>
         `;
 
         // Append the module element to the container
         moduleContainer.appendChild(moduleElement);
-
-        // Add event listener to open the file in a new tab when the button is clicked
-        const downloadButton = moduleElement.querySelector('.download-btn');
-        downloadButton.addEventListener('click', () => {
-            openFileInNewTab(module.fileUrl);
-        });
     });
-}
-
-// Function to open the file in a new tab
-function openFileInNewTab(fileUrl) {
-    // Open the file URL in a new tab
-    window.open(fileUrl, '_blank');
 }
 
 document.addEventListener('DOMContentLoaded', function() {

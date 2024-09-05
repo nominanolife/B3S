@@ -25,7 +25,7 @@
                 </div>
                 <div class="sidebar-dashboard">
                     <a href="userdashboard.html"><i class="bi bi-columns-gap"></i>Dashboard</a>
-                    <a id="sidebarInstructorButton" href="userinstructor.html"><i class="bi bi-people"></i>Instructors</a>
+                    <a id="sidebarInstructorButton" class="active" href="userinstructor.html"><i class="bi bi-people"></i>Instructors</a>
                 </div>
                 <div class="sidebar-menu">
                     <a href="userpackages.html"><i class="bi bi-mortarboard"></i>Packages</a>
@@ -60,7 +60,7 @@
                                 </div>
                                 <div class="rating-container">
                                     <div class="ratings">
-                                        <h2 id="ratingValue" class="rating"></h2> <!-- Correct ID -->
+                                        <h2 id="ratingValue" class="rating"></h2><span class="out-of-five">/5</span> <!-- Correct ID -->
                                         <h2 id ="starContainer" class="stars"><i class="bi bi-star-fill"></i></h2>
                                     </div>
                                     <div>
@@ -123,22 +123,24 @@
                                 <div class="right-info-header">
                                     <span>About</span>
                                 </div>
-                                <div class="about-container">
-                                    <span id="instructorTraits1" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
-                                    <span id="instructorTraits2" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
-                                    <span id="instructorTraits3" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
-                                    <span id="instructorTraits4" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
-                                    <span id="instructorTraits5" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
-                                    <span id="instructorTraits6" class="traits"><i class="bi bi-check-circle"></i></span> <!-- Correct ID -->
+                                <div class="right-info-body">
+                                    <div class="about-container">
+                                        <h5>Traits</h5>
+                                        <div class="about-item">
+
+                                        </div>
+                                    </div>
+                                    <div class="comments-section">
+                                        <h5>Feedbacks</h5>
+                                        <div class="comments-header" id="commentsSection">
+                                        <!-- Comments will be appended here dynamically -->
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>     
                     </div>
                 </div>
-            </div>
-            <div class="comments-section" id="commentsSection">
-                <h3>Comments</h3>
-                <!-- Comments will be appended here dynamically -->
             </div>
         </div>
     </div>

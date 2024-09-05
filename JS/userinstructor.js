@@ -19,20 +19,28 @@ const auth = getAuth(app); // Initialize authentication
 
 let userId = '';  // Variable to hold user ID
 
-// Early authentication check (Solution 5)
+// Helper function to display notification modal
+function showNotification(message) {
+    document.getElementById('notificationModalBody').innerText = message;
+    $('#notificationModal').modal('show');
+}
+
+// Early authentication check
 onAuthStateChanged(auth, (user) => {
     if (user) {
         userId = user.uid;  // Store user ID once authenticated
     } else {
-        // If user is not logged in, show alert and redirect to login page
-        alert("You must be logged in to select traits.");
-        window.location.href = 'login.html';  // Redirect to login page
+        // Use notification modal instead of alert
+        showNotification("You must be logged in to select traits.");
+        $('#notificationModal').on('hidden.bs.modal', function () {
+            window.location.href = 'login.html';  // Redirect to login page after modal is closed
+        });
     }
 });
 
 // Function to handle the saving of traits
 document.getElementById('saveButton').addEventListener('click', async function() {
-  // Disable save button to prevent multiple submissions (Solution 2)
+  // Disable save button to prevent multiple submissions
   const saveButton = document.getElementById('saveButton');
   saveButton.disabled = true;
 
@@ -45,12 +53,14 @@ document.getElementById('saveButton').addEventListener('click', async function()
     selectedTraits.push(checkbox.nextElementSibling.innerText);
   });
 
-  // Validation: Ensure at least one trait is selected (Solution 1)
+  // Validation: Ensure at least one trait is selected
   if (selectedTraits.length === 0) {
     // Hide loader and re-enable save button if no traits are selected
     document.getElementById('loader').style.display = 'none';
     saveButton.disabled = false;
-    alert("Please select at least one trait before saving.");
+
+    // Use notification modal instead of alert
+    showNotification("Please select at least one trait before saving.");
     return;
   }
 
@@ -64,8 +74,7 @@ document.getElementById('saveButton').addEventListener('click', async function()
     }, { merge: true });
 
     // Display success notification
-    document.getElementById('notificationModalBody').innerText = "Traits saved successfully!";
-    $('#notificationModal').modal('show');
+    showNotification("Traits saved successfully!");
 
     // Hide loader
     document.getElementById('loader').style.display = 'none';
@@ -78,9 +87,8 @@ document.getElementById('saveButton').addEventListener('click', async function()
   } catch (error) {
     console.error("Error saving traits: ", error);
 
-    // Provide clearer error feedback (Solution 3)
-    document.getElementById('notificationModalBody').innerText = "An error occurred while saving traits. Please check your internet connection and try again.";
-    $('#notificationModal').modal('show');
+    // Provide clearer error feedback
+    showNotification("An error occurred while saving traits. Please check your internet connection and try again.");
 
     // Hide loader and re-enable save button
     document.getElementById('loader').style.display = 'none';

@@ -33,7 +33,7 @@ async function fetchAndDisplayModules() {
     modules.forEach(module => {
         const moduleElement = document.createElement('div');
         moduleElement.classList.add('module-container');
-
+    
         moduleElement.innerHTML = `
             <div class="module-preview">
                 <i class="bi bi-folder2 default-icon"></i>
@@ -45,7 +45,7 @@ async function fetchAndDisplayModules() {
                 </div>
                 <div class="module-options">
                     <i class="bi bi-three-dots-vertical"></i>
-                    <div class="triple-dot-options">
+                    <div class="triple-dot-options" style="display: none;">
                         <i class="option-dropdown">Edit</i>
                         <i class="option-dropdown">Delete</i>
                     </div>
@@ -53,8 +53,19 @@ async function fetchAndDisplayModules() {
             </div>
         `;
 
+        // Add event listener to open the module when clicked, but not on triple-dot click
+        moduleElement.addEventListener('click', function(event) {
+            // Check if the click is on the triple dots
+            const isTripleDotClick = event.target.classList.contains('bi-three-dots-vertical');
+            const isOptionDropdownClick = event.target.classList.contains('option-dropdown');
+
+            if (!isTripleDotClick && !isOptionDropdownClick) {
+                window.open(module.fileUrl, '_blank'); // Open the module file in a new tab
+            }
+        });
+
         moduleContainer.appendChild(moduleElement);
-    });
+    });    
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -74,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle showing triple-dot options
     document.querySelector('.module-list').addEventListener('click', function(event) {
         const target = event.target;
+    
         if (target.classList.contains('bi-three-dots-vertical')) {
             const optionsMenu = target.nextElementSibling;
             optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
@@ -83,16 +95,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!target.contains(e.target) && !optionsMenu.contains(e.target)) {
                     optionsMenu.style.display = 'none';
                 }
-            }, {});
+            }, { once: false });
+            
         } else if (target.classList.contains('option-dropdown')) {
             const action = target.textContent.trim();
+            const optionsMenu = target.closest('.triple-dot-options'); // Get the options menu
+    
             if (action === 'Edit') {
                 toggleModal(document.getElementById('editModuleModal'), 'show');
             } else if (action === 'Delete') {
                 toggleModal(document.getElementById('deleteConfirmModal'), 'show');
             }
+    
+            // Close the triple dot options menu after selecting an option
+            optionsMenu.style.display = 'none';
         }
-    });
+    });    
 
     // Cancel buttons to close modals
     document.querySelector('.cancel-delete-modal').addEventListener('click', function() {

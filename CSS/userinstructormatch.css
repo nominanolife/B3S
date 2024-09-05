@@ -297,6 +297,16 @@ h2 {
     font-size: 48px;
     font-weight: bold;
     color: #142A74;
+    display: inline-block;
+}
+
+.out-of-five {
+    font-size: 24px;
+    color: #142A74;
+    vertical-align: top;
+    font-style: oblique;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .stars {
@@ -326,9 +336,7 @@ h2 {
 }
 
 .rating-bar span:first-child {
-    width: 20px;
     display: flex;
-    flex-direction: row;
 }
 
 .rating-bar i {
@@ -368,9 +376,18 @@ h2 {
 .right-info {
     display: flex;
     flex-direction: column;
-    align-items: center;
     width: 100%;
-    padding-left: 50px;
+    padding-left: 40px;
+}
+
+.right-info-header {
+    text-align: center;
+}
+
+.right-info-body {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
 }
 
 .about-container {
@@ -379,10 +396,115 @@ h2 {
     width: 100%;
 }
 
-.about-container span {
+.about-container h5 {
     font-size: 18px;
+    font-weight: bold;
+    color: #142A74;
+    text-align: center
+}
+
+.about-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 20px;
+    min-height: 240px;
+    max-height: 240px;
+    border: 1px solid #D9D9D9;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+.traits-column {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    gap: 5px;
+}
+
+.traits {
+    font-size: 14px;
     font-weight: normal;
     color: #2F2E2E;
+}
+
+.comments-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.comments-section h5 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #142A74;
+    text-align: center
+}
+
+.comments-header {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    min-height: 240px;
+    max-height: 240px;
+    overflow-y: auto;
+    border: 1px solid #D9D9D9;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+.no-comments {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90%;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.comment {
+    min-height: 90px;
+    max-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1px solid #D9D9D9;
+    padding: 10px;
+}
+
+.comment p {
+    font-size: 11px;
+    color: #2F2E2E;
+}
+
+.comment span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2F2E2E;
+    margin-left: 30px;
+}
+
+.feedback-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.feedback-date {
+    display: flex;
+    align-items: flex-end;
+    font-size: 11px;
+    color: #2F2E2E;
+}
+
+.comment i.bi-star-fill {
+    color: #FFD700;
+    font-size: 14px;
+}
+
+.comment i.bi-star {
+    color: #ccc;
+    font-size: 14px;
 }
 
 .bi-check-circle {

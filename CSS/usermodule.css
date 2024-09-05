@@ -286,11 +286,13 @@ h2 {
     padding: 10px 30px;
     margin-top: 20px;
     width: 50%;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .download-btn:hover {
     background-color: #142a74ec;
     color: #ffffff;
+    transform: scale(1.1); /* Slightly enlarges the button */
 }
 
 .modal-header, .modal-body, .modal-footer {

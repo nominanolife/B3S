@@ -61,7 +61,7 @@ async function fetchMatchAndInstructorData(studentId) {
         document.getElementById('instructorName').textContent = instructorData.name || 'Instructor Name';
         
         const totalRatings = instructorData.totalRatings || 0;
-        const rating = instructorData.rating || 0.0;z
+        const rating = instructorData.rating || 0.0;
 
         // Update overall rating and total ratings count
         document.getElementById('ratingValue').textContent = rating.toFixed(1);
@@ -76,14 +76,102 @@ async function fetchMatchAndInstructorData(studentId) {
             document.getElementById(`ratingCount${i}`).textContent = count;
         }
 
-        // Update traits, with a fallback to an empty array if traits are not found
+        // Dynamically update the traits section, splitting the traits into two columns if more than 7
+        const traitsContainer = document.querySelector('.about-item');
+        traitsContainer.innerHTML = ''; // Clear existing content
+
         const traits = instructorData.traits || [];
-        traits.forEach((trait, index) => {
-            document.getElementById(`instructorTraits${index + 1}`).textContent = trait;
-        });
+
+        if (traits.length > 0) {
+            const column1 = document.createElement('div');
+            const column2 = document.createElement('div');
+
+            column1.classList.add('traits-column');
+            column2.classList.add('traits-column');
+
+            // Split the traits into two columns
+            const firstSevenTraits = traits.slice(0, 7); // First 7 traits
+            const remainingTraits = traits.slice(7); // Remaining traits
+
+            firstSevenTraits.forEach((trait) => {
+                const traitElement = document.createElement('span');
+                traitElement.classList.add('traits');
+                traitElement.innerHTML = `<i class="bi bi-check-circle"></i> ${trait}`;
+                column1.appendChild(traitElement);
+            });
+
+            remainingTraits.forEach((trait) => {
+                const traitElement = document.createElement('span');
+                traitElement.classList.add('traits');
+                traitElement.innerHTML = `<i class="bi bi-check-circle"></i> ${trait}`;
+                column2.appendChild(traitElement);
+            });
+
+            // Append both columns to the traits container
+            traitsContainer.appendChild(column1);
+            if (remainingTraits.length > 0) {
+                traitsContainer.appendChild(column2);
+            }
+        }
 
         // Update stars dynamically based on the average rating
         updateStarsUI(rating);
+
+        // Display comments section (showing comments without needing to provide feedback)
+        const commentsSection = document.getElementById('commentsSection');
+        commentsSection.innerHTML = ''; // Clear existing comments
+        const comments = instructorData.comments || []; // Ensure comments are an array
+
+        let hasGivenFeedback = false;
+
+        // Check if there are any comments
+        if (comments.length === 0) {
+            // No comments, show a placeholder message
+            const noCommentsElement = document.createElement('div');
+            noCommentsElement.classList.add('no-comments');
+            noCommentsElement.textContent = "No feedbacks yet";
+            commentsSection.appendChild(noCommentsElement);
+        } else {
+            // Display each comment with its star rating, student number, and feedback date
+            comments.forEach((commentObj, index) => {
+                const commentElement = document.createElement('div');
+                commentElement.classList.add('comment');
+                
+                // Add the rating stars next to the comment
+                let starsHtml = '';
+                for (let i = 0; i < commentObj.rating; i++) {
+                    starsHtml += '<i class="bi bi-star-fill"></i>';
+                }
+                for (let i = commentObj.rating; i < 5; i++) {
+                    starsHtml += '<i class="bi bi-star"></i>';
+                }
+
+                // Format the date from the timestamp
+                const commentDate = new Date(commentObj.timestamp).toLocaleDateString();
+
+                // Replace studentId with "Student X" and add the date
+                commentElement.innerHTML = `
+                    <div class="feedback-section">
+                        <p>by Student ${index + 1} ${starsHtml}</p> 
+                        <p class="feedback-date">(${commentDate})</p>
+                    </div>
+                    <span>${commentObj.comment}</span>
+                    <hr>
+                `;
+
+                commentsSection.appendChild(commentElement);
+
+                // Check if the logged-in user has already given feedback
+                if (commentObj.studentId === studentId) {
+                    hasGivenFeedback = true;
+                }
+            });
+        }
+
+        // Hide the "Give Feedback" button if the student has already given feedback
+        if (hasGivenFeedback) {
+            document.getElementById('giveFeedbackBtn').style.display = 'none';
+        }
 
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -103,6 +191,16 @@ function updateStarsUI(averageRating) {
 
     // Clear the existing stars (if any)
     starContainer.innerHTML = '';
+
+    // Handle the case when the rating is 0
+    if (averageRating === 0) {
+        for (let i = 0; i < 5; i++) {
+            const emptyStar = document.createElement('i');
+            emptyStar.classList.add('bi', 'bi-star'); // Empty star icon
+            starContainer.appendChild(emptyStar);
+        }
+        return; // Exit the function since the rating is 0
+    }
 
     // Convert the average rating to an integer part and a decimal part
     const fullStars = Math.floor(averageRating); // Full stars
@@ -167,29 +265,23 @@ document.querySelector('.feedback-form').addEventListener('submit', async functi
     e.preventDefault(); // Prevent page reload
 
     const comment = document.getElementById('comments').value;
-    
+
     // Ensure a rating is selected
     if (rating === 0) {
         showNotification("Please select a star rating.");
         return;
     }
 
-    // Ensure a comment is provided
-    if (comment.trim() === "") {
-        alert("Please enter a comment.");
-        return;
-    }
-
     // Ensure instructorId and studentId are available
     if (!instructorId || !studentId) {
-        alert("Instructor or Student ID not available.");
+        showNotification("Instructor or Student ID not available.");
         return;
     }
 
     // Check if this student has already submitted feedback
     const instructorRef = doc(db, 'instructors', instructorId);
     const docSnap = await getDoc(instructorRef);
-    
+
     if (docSnap.exists()) {
         const data = docSnap.data();
         const existingComments = data.comments || [];
@@ -198,20 +290,33 @@ document.querySelector('.feedback-form').addEventListener('submit', async functi
         const hasCommented = existingComments.some(comment => comment.studentId === studentId);
 
         if (hasCommented) {
-            alert("You have already submitted feedback for this instructor.");
+            showNotification("You have already submitted feedback for this instructor.");
             return;  // Prevent multiple submissions
         }
 
         // Store feedback if not already submitted
-        storeFeedbackInFirestore(studentId, instructorId, rating, comment);
-        
+        await storeFeedbackInFirestore(studentId, instructorId, rating, comment);
+
+        // Clear the form inputs
+        document.getElementById('comments').value = '';
+        rating = 0;
+        updateStars(0); // Reset the stars UI
+
+        // Hide feedback form and return to the ratings section
+        document.querySelector('.feedback-form').style.display = 'none'; 
+        document.querySelector('.rating-container').style.display = 'flex';
+        document.querySelector('.left-info-header').style.display = 'block';
+
         // Show success modal
-        showFeedbackModal();
+        showNotification("Feedback successfully added");
+
+        // Fetch updated instructor data and refresh the UI
+        await updateRatingUI(instructorId);
+
     } else {
         console.error("Instructor not found.");
     }
 });
-
 
 // Ensure the 'Give Feedback' button is linked to the correct element in the DOM
 document.getElementById('giveFeedbackBtn').addEventListener('click', function () {
@@ -227,7 +332,7 @@ document.getElementById('closeFeedbackBtn').addEventListener('click', function (
     document.querySelector('.left-info-header').style.display = 'block'; // Show the header section again
 });
 
-// Store feedback in Firestore
+// Store feedback in Firestore and update UI instantly
 async function storeFeedbackInFirestore(studentId, instructorId, rating, comment) {
     try {
         const instructorRef = doc(db, 'instructors', instructorId);
@@ -242,10 +347,11 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
             // Update the corresponding rating index
             ratingsArray[rating - 1] += 1;  // Increment the selected rating
 
-            // Add the new comment as an object
+            // Add the new comment as an object including the rating and timestamp
             const newComment = {
                 studentId: studentId,
                 comment: comment,
+                rating: rating,
                 timestamp: new Date().toISOString()  // Correct timestamp
             };
             commentsArray.push(newComment);
@@ -266,8 +372,14 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
                 rating: newAverageRating
             });
 
-            // Refresh the UI with the updated ratings
-            updateRatingUI(instructorId);
+            // Instantly reflect the new comment in the comments section
+            addCommentToUI(newComment, commentsArray.length);
+
+            // Instantly update the rating UI with new data
+            updateRatingBarsUI(ratingsArray, totalRatings, newAverageRating);
+
+            // Show success notification
+            showNotification("Feedback successfully added");
 
         } else {
             console.error("Instructor not found.");
@@ -276,6 +388,46 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
         console.error('Error submitting feedback:', error);
         showNotification('Error submitting feedback. Please try again later.');
     }
+}
+
+// Function to add the new comment directly to the UI
+function addCommentToUI(commentObj, commentIndex) {
+    const commentsSection = document.getElementById('commentsSection');
+    
+    // Remove "No feedbacks yet" if present
+    const noCommentsElement = commentsSection.querySelector('.no-comments');
+    if (noCommentsElement) {
+        noCommentsElement.remove();
+    }
+
+    // Create a new comment element
+    const commentElement = document.createElement('div');
+    commentElement.classList.add('comment');
+    
+    // Add the rating stars next to the comment
+    let starsHtml = '';
+    for (let i = 0; i < commentObj.rating; i++) {
+        starsHtml += '<i class="bi bi-star-fill"></i>';
+    }
+    for (let i = commentObj.rating; i < 5; i++) {
+        starsHtml += '<i class="bi bi-star"></i>';
+    }
+
+    // Format the date from the timestamp
+    const commentDate = new Date(commentObj.timestamp).toLocaleDateString();
+
+    // Replace studentId with "Student X" and add the date
+    commentElement.innerHTML = `
+        <div class="feedback-section">
+            <p>by Student ${commentIndex} ${starsHtml}</p> 
+            <p class="feedback-date">(${commentDate})</p>
+        </div>
+        <span>${commentObj.comment}</span>
+        <hr>
+    `;
+
+    // Append the new comment to the comments section
+    commentsSection.appendChild(commentElement);
 }
 
 // Prevent new instructor search if appointment progress is "Completed"
@@ -290,7 +442,7 @@ async function checkAppointmentProgress(studentId) {
         if (appointmentData.bookings && Array.isArray(appointmentData.bookings)) {
             appointmentData.bookings.forEach(booking => {
                 if (booking.userId === studentId && booking.progress === "Completed") {
-                    alert("You cannot find another instructor because your appointment is marked as completed.");
+                    showNotification("You cannot find another instructor because your appointment is marked as completed.");
                     window.location.href = 'firstpage.html'; // Redirect to the first page
                 }
             });
@@ -300,25 +452,27 @@ async function checkAppointmentProgress(studentId) {
 
 // Fetch and update the UI with the latest rating distribution
 async function updateRatingUI(instructorId) {
-    const instructorRef = doc(db, 'instructors', instructorId); // Use the correct instructor ID
+    const instructorRef = doc(db, 'instructors', instructorId);
     const docSnap = await getDoc(instructorRef);
 
     if (docSnap.exists()) {
-        const data = docSnap.data();
-        const ratingsData = data.ratings || [0, 0, 0, 0, 0]; // Array for 1-star to 5-stars
-        const totalRatings = data.totalRatings || 0;
+        const instructorData = docSnap.data(); // Fetching the data
+        const ratingsData = instructorData.ratings || [0, 0, 0, 0, 0]; // Using instructorData
+
+        const totalRatings = instructorData.totalRatings || 0;
 
         document.getElementById('ratingTotal').textContent = `Based on ${totalRatings} ratings`;
 
+        // Star mapping logic
         const starMapping = {
-            1: ratingsData[0] || 0, // 1 star is stored at index 0
-            2: ratingsData[1] || 0, // 2 stars are stored at index 1
-            3: ratingsData[2] || 0, // 3 stars at index 2
-            4: ratingsData[3] || 0, // 4 stars at index 3
-            5: ratingsData[4] || 0  // 5 stars at index 4
+            1: ratingsData[0] || 0,
+            2: ratingsData[1] || 0,
+            3: ratingsData[2] || 0,
+            4: ratingsData[3] || 0,
+            5: ratingsData[4] || 0
         };
 
-        // Display counts and percentages for each rating bar
+        // Update rating bars and counts
         for (let i = 1; i <= 5; i++) {
             const count = starMapping[i];
             const percentage = totalRatings > 0 ? (count / totalRatings) * 100 : 0;
@@ -326,35 +480,18 @@ async function updateRatingUI(instructorId) {
             document.getElementById(`ratingCount${i}`).textContent = count;
         }
 
-        // Calculate the average rating using the hardcoded star mapping
+        // Update stars dynamically
         let weightedSum = 0;
         for (let i = 1; i <= 5; i++) {
-            weightedSum += starMapping[i] * i; // Multiply stars by their corresponding index (1-5 stars)
+            weightedSum += starMapping[i] * i;
         }
-
         const newAverageRating = totalRatings > 0 ? (weightedSum / totalRatings).toFixed(1) : '0.0';
-
-        // Display the new average rating
         document.getElementById('ratingValue').textContent = newAverageRating;
 
-        // Dynamically update the stars based on the new average rating
+        // Update stars UI
         updateStarsUI(newAverageRating);
-
-        // Display comments section
-        const commentsSection = document.getElementById('commentsSection');
-        commentsSection.innerHTML = ''; // Clear existing comments
-        const comments = data.comments || [];
-        comments.forEach(commentObj => {
-            const commentElement = document.createElement('div');
-            commentElement.innerHTML = `
-                <p><strong>Comment:</strong> ${commentObj.comment}</p>
-                <p><em>Student ID:</em> ${commentObj.studentId}</p>
-                <hr>`;
-            commentsSection.appendChild(commentElement);
-        });
-
     } else {
-        console.log('Instructor data not found');
+        console.error('Instructor data not found');
     }
 }
 
@@ -366,3 +503,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+function showNotification(message) {
+    const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'), {});
+    document.getElementById('notificationMessage').textContent = message;
+    notificationModal.show();
+}
