@@ -172,9 +172,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Display the current file
         document.querySelector('.file-file-name').textContent = moduleData.fileName || 'No file selected';
         
-        // Display the preview image if there is one (if file is an image, or use a default icon for non-images)
-        document.querySelector('.preview-image').src = moduleData.fileUrl || '';
-        
         // Update the module on form submission
         document.querySelector('.update-module').addEventListener('click', async function(event) {
             event.preventDefault();
