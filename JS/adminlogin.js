@@ -13,8 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
 
+    // Add event listener to the login button
     document.getElementById('loginBtn').addEventListener('click', function(event) {
         event.preventDefault();
+        
+        // Show the loader when login starts
+        document.getElementById('loader1').style.display = 'flex';
+
         var name = document.getElementById('name').value;
         var password = document.getElementById('password').value;
 
@@ -24,24 +29,35 @@ document.addEventListener('DOMContentLoaded', function() {
                     var adminData = doc.data();
 
                     if (adminData.name !== name) {
+                        hideLoader();  // Hide the loader
                         showModal("Email is incorrect");
                     } else if (adminData.password !== password) {
+                        hideLoader();  // Hide the loader
                         showModal("Password is incorrect");
                     } else {
                         // Redirect to admin dashboard
+                        hideLoader();  // Hide the loader before redirect
                         window.location.href = "admindashboard.html";
                     }
                 } else {
+                    hideLoader();  // Hide the loader
                     showModal("No such document!");
                 }
             }).catch((error) => {
                 console.error("Error getting document: ", error);
+                hideLoader();  // Hide the loader
                 showModal("Error logging in");
             });
         } else {
+            hideLoader();  // Hide the loader
             showModal("Please fill in both fields");
         }
     });
+
+    // Function to hide the loader
+    function hideLoader() {
+        document.getElementById('loader1').style.display = 'none';
+    }
 
     // Function to set up password toggle
     function setupPasswordToggle(toggleId, passwordId) {

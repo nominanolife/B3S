@@ -65,18 +65,18 @@ function showTiles(index) {
     tile.style.display = i >= index && i < index + tilesPerPage ? 'block' : 'none';
   });
 
-  document.querySelector('.left-arrow').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
-  document.querySelector('.right-arrow').style.visibility = currentIndex + tilesPerPage >= packages.length ? 'hidden' : 'visible';
+  document.querySelector('.fa-chevron-left').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+  document.querySelector('.fa-chevron-right').style.visibility = currentIndex + tilesPerPage >= packages.length ? 'hidden' : 'visible';
 }
 
-document.querySelector('.right-arrow').addEventListener('click', () => {
+document.querySelector('.fa-chevron-right').addEventListener('click', () => {
   if (currentIndex + tilesPerPage < packages.length) {
     currentIndex += tilesPerPage;
     showTiles(currentIndex);
   }
 });
 
-document.querySelector('.left-arrow').addEventListener('click', () => {
+document.querySelector('.fa-chevron-left').addEventListener('click', () => {
   if (currentIndex - tilesPerPage >= 0) {
     currentIndex -= tilesPerPage;
     showTiles(currentIndex);

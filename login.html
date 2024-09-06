@@ -53,6 +53,11 @@
         </div>
     </main>
 
+    <div id="loader1" class="loader1">
+        <div class="car-loader"></div>
+        <p>Logging In<span class="dots"></span></p>
+    </div>
+
     <!-- Notification Modal -->
     <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -102,6 +107,9 @@
         // Sign-in event listener
         document.getElementById('signIn').addEventListener('click', async (event) => {
             event.preventDefault(); // Prevent the default form submission
+            
+            // Show the loader when logging in starts
+            document.getElementById('loader1').style.display = 'flex';
         
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
@@ -109,18 +117,22 @@
             // Validate input
             if (!email && !password) {
                 showModal('Please fill in both fields.');
+                hideLoader();  // Hide loader
                 return;
             }
             if (!email) {
                 showModal('Please enter your email address.');
+                hideLoader();  // Hide loader
                 return;
             }
             if (!password) {
                 showModal('Please enter your password.');
+                hideLoader();  // Hide loader
                 return;
             }
             if (!isValidEmail(email)) {
                 showModal('Please enter a valid email address.');
+                hideLoader();  // Hide loader
                 return;
             }
         
@@ -135,8 +147,12 @@
                     last_login: dt
                 });
         
-                window.location.href = 'userdashboard.html';
+                hideLoader();  // Hide loader on success
+        
+                window.location.href = 'userdashboard.html'; // Redirect on successful login
             } catch (error) {
+                hideLoader();  // Hide loader on error
+        
                 // Handle specific error code
                 if (error.code === "auth/invalid-credential") {
                     showModal('Invalid credentials. Please check your email and password.');
@@ -146,11 +162,16 @@
             }
         });
         
+        // Function to hide the loader
+        function hideLoader() {
+            document.getElementById('loader1').style.display = 'none';
+        }
+        
         // Function to show the modal with a custom message
         function showModal(message) {
             document.getElementById('notificationMessage').innerText = message;
             $('#notificationModal').modal('show');
-        }                        
+        }                               
     </script>                   
 </body>
 </html>

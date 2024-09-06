@@ -32,6 +32,7 @@ async function fetchAndDisplayModules() {
         const moduleElement = document.createElement('div');
         moduleElement.classList.add('module-container');
         moduleElement.setAttribute('data-module-id', module.id); // Store module ID
+        moduleElement.setAttribute('data-module-url', module.fileUrl); // Store the file URL
 
         moduleElement.innerHTML = `
             <div class="module-preview">
@@ -52,15 +53,32 @@ async function fetchAndDisplayModules() {
             </div>
         `;
 
+        // Add event listener to open the file in a new tab when the module is clicked
+        moduleElement.addEventListener('click', function(event) {
+            // Check if the click is on the triple dots or dropdown options
+            const isTripleDotClick = event.target.classList.contains('bi-three-dots-vertical');
+            const isOptionDropdownClick = event.target.classList.contains('option-dropdown');
+
+            if (!isTripleDotClick && !isOptionDropdownClick) {
+                window.open(module.fileUrl, '_blank'); // Open the module file in a new tab
+            }
+        });
+
         moduleContainer.appendChild(moduleElement);
     });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     // Function to handle showing/hiding modals
-    function toggleModal(modal, action) {
-        modal.style.display = action === 'show' ? 'block' : 'none';
+    function toggleModal(modalId, action) {
+        const modal = $(modalId);
+        if (action === 'show') {
+            modal.modal('show'); // Use Bootstrap's show method
+        } else {
+            modal.modal('hide'); // Use Bootstrap's hide method
+        }
     }
+    
 
     // Function to handle file input changes
     function handleFileInputChange(inputSelector, displaySelector) {
@@ -83,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!target.contains(e.target) && !optionsMenu.contains(e.target)) {
                     optionsMenu.style.display = 'none';
                 }
-            }, { once: true });
+            }, { once: false });
 
         } else if (target.classList.contains('option-dropdown')) {
             const action = target.textContent.trim();

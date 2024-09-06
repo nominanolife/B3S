@@ -92,13 +92,6 @@ document.getElementById('student-list').addEventListener('click', async (event) 
       // Populate modal with current certificate control number
       document.getElementById('certificateControlNumberInput').value = currentCertificate;
 
-      // Show the modal
-      const editModal = new bootstrap.Modal(document.getElementById('editModal'), {
-          backdrop: 'static',
-          keyboard: false 
-      });
-      editModal.show();
-
       document.getElementById('saveChangesBtn').onclick = async (event) => {
         event.preventDefault(); // Prevent page refresh
     

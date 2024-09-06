@@ -246,7 +246,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             <span>Price: &#8369;${packagePrice}</span>
             <h4>${packageDescription}</h4>
             <i class="bi bi-three-dots-vertical"></i>
-            <button class="delete-button">&times;</button>
+            <i class="delete-button">&times;</i>
         `;
 
         // Append the new package to the package list

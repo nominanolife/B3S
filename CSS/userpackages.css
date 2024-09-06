@@ -351,7 +351,7 @@ h2 {
     margin-top: 200px;
 }
 
-.left-arrow, .right-arrow {
+.fa-chevron-left, .fa-chevron-right {
     font-size: 24px;
     width: 50px;
     height: 50px;
@@ -359,6 +359,7 @@ h2 {
     background: none;
     color: #142A74;
     visibility: visible;
+    cursor: pointer;
 }
 
 .enroll-now-button {
@@ -381,6 +382,24 @@ h2 {
   color: #ffffff;
   background-color: #ccc;
   border-color: #ccc;
+}
+
+@keyframes popOut {
+    0% {
+        opacity: 0;
+        transform: scale(0.5); /* Starts smaller */
+    }
+    80% {
+        transform: scale(1.05); /* Slight overshoot for a popping effect */
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1); /* Full size */
+    }
+}
+
+.modal-content {
+    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
 }
 
 .modal-header, .modal-body, .modal-footer {
@@ -412,6 +431,7 @@ h2 {
 .close {
     font-size: 24px;
     color: #142A74;
+    cursor: pointer;
 }
 
 .btn-primary {

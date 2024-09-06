@@ -301,24 +301,6 @@ h2 {
     background-color: #0e1e59;
 }
 
-@keyframes popOut {
-    0% {
-        opacity: 0;
-        transform: scale(0.5); /* Starts smaller */
-    }
-    80% {
-        transform: scale(1.05); /* Slight overshoot for a popping effect */
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1); /* Full size */
-    }
-}
-
-.modal-content {
-    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
-}
-
 .traits {
     display: flex;
     flex-direction: column;
@@ -345,6 +327,7 @@ h2 {
 .form-group-all {
     display: flex;
     flex-direction: column;
+    padding-bottom: 20px;
 }
 
 .custom-checkbox {
@@ -401,6 +384,26 @@ h2 {
     opacity: 1;
 }
 
+#customTraitsInputs {
+    display: none;
+}
+
+.input-line {
+    display: none;
+    border: none;
+    border-bottom: 1px solid #142A74;
+    border-radius: 0;
+    outline: none;
+    width: 50%;
+    padding: 5px 0;
+    margin-left: 30px;
+}
+
+.input-line:focus {
+    border-bottom: 1px solid #142A74;
+    box-shadow: none;
+}
+
 .save-button {
     margin-left: auto;
     margin-top: auto;
@@ -419,6 +422,39 @@ h2 {
 
 .btn-save:hover {
     background-color: #0e1e59;
+}
+
+.btn-cancel {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #B60505;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+}
+
+.btn-cancel:hover {
+    background-color: #b60505ec;
+}
+
+@keyframes popOut {
+    0% {
+        opacity: 0;
+        transform: scale(0.5); /* Starts smaller */
+    }
+    80% {
+        transform: scale(1.05); /* Slight overshoot for a popping effect */
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1); /* Full size */
+    }
+}
+
+.modal-content {
+    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
 }
 
 .modal-header, .modal-body, .modal-footer {

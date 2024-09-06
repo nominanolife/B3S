@@ -205,6 +205,24 @@ h2 {
     cursor: default;  /* Change cursor to default */
 }
 
+@keyframes popOut {
+    0% {
+        opacity: 0;
+        transform: scale(0.5); /* Starts smaller */
+    }
+    80% {
+        transform: scale(1.05); /* Slight overshoot for a popping effect */
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1); /* Full size */
+    }
+}
+
+.modal-content {
+    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
+}
+
 .modal-header, .modal-body, .modal-footer {
     border: none;
 }
