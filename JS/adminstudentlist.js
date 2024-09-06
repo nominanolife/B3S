@@ -40,6 +40,7 @@ function showNotification(message) {
     successModal.show();
 }
 
+// Fetch and store students, including their document ID (UID)
 async function fetchAppointments() {
   try {
     const studentsMap = new Map();
@@ -49,6 +50,9 @@ async function fetchAppointments() {
       applicantsSnapshot.forEach(applicantDoc => {
         const applicantData = applicantDoc.data();
 
+        // Include the document ID (UID) in the student data
+        applicantData.id = applicantDoc.id; // Ensure this is set consistently
+
         // Only process if the role is "student"
         if (applicantData.role === "student") {
           applicantData.bookings = [];
@@ -57,66 +61,17 @@ async function fetchAppointments() {
           if (applicantData.TDCStatus === "Completed" || 
               applicantData["PDC-4WheelsStatus"] === "Completed" || 
               applicantData["PDC-MotorsStatus"] === "Completed") {
-            studentsMap.set(applicantDoc.id, applicantData);
+            studentsMap.set(applicantDoc.id, applicantData); // Use UID as key
           }
         }
       });
 
-      // Listen to appointments changes
-      const unsubscribeAppointments = onSnapshot(collection(db, "appointments"), (appointmentsSnapshot) => {
-        appointmentsSnapshot.forEach(appointment => {
-          const appointmentData = appointment.data();
-          const bookings = Array.isArray(appointmentData.bookings) ? appointmentData.bookings : [];
-
-          bookings.forEach(booking => {
-            if (booking.status === "Cancelled" || booking.status === "Rescheduled") {
-              return;
-            }
-
-            const studentDocRef = doc(db, "applicants", booking.userId);
-            getDoc(studentDocRef).then(studentDoc => {
-              if (studentDoc.exists()) {
-                const studentData = studentDoc.data();
-
-                if (studentData.role === "student") {
-                  if (!studentsMap.has(booking.userId)) {
-                    studentData.bookings = [];
-                    studentsMap.set(booking.userId, studentData);
-                  }
-                  const student = studentsMap.get(booking.userId);
-                  student.bookings.push({ ...booking, appointmentId: appointment.id, course: appointmentData.course });
-                }
-              }
-            });
-          });
-        });
-
-        // Listen to completedBookings changes
-        const unsubscribeCompletedBookings = onSnapshot(collection(db, "completedBookings"), (completedBookingsSnapshot) => {
-          completedBookingsSnapshot.forEach(doc => {
-            const completedBookings = doc.data().completedBookings || [];
-            const userId = doc.id;
-
-            if (studentsMap.has(userId)) {
-              const studentData = studentsMap.get(userId);
-              completedBookings.forEach(booking => {
-                const course = booking.course;
-
-                if (!studentData[`${course}Status`] || studentData[`${course}Status`] !== "Completed") {
-                  studentData[`${course}Status`] = "Completed";
-                }
-              });
-            }
-          });
-
-          // After processing all data, update the global arrays and re-render the UI
-          studentsData = Array.from(studentsMap.values());
-          filteredStudentsData = studentsData;
-          totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
-          renderStudents();
-          updatePaginationControls();
-        });
-      });
+      // Process and update UI
+      studentsData = Array.from(studentsMap.values());
+      filteredStudentsData = studentsData;
+      totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
+      renderStudents();
+      updatePaginationControls();
     });
 
     return {
@@ -127,6 +82,65 @@ async function fetchAppointments() {
   }
 }
 
+// Event listener for edit icons (edit certificate number)
+document.getElementById('student-list').addEventListener('click', async (event) => {
+  if (event.target.classList.contains('edit-icon')) {
+      const studentId = event.target.dataset.index;
+      const studentData = studentsData[studentId];
+      const currentCertificate = studentData.certificateControlNumber || '';
+
+      // Populate modal with current certificate control number
+      document.getElementById('certificateControlNumberInput').value = currentCertificate;
+
+      // Show the modal
+      const editModal = new bootstrap.Modal(document.getElementById('editModal'), {
+          backdrop: 'static',
+          keyboard: false 
+      });
+      editModal.show();
+
+      document.getElementById('saveChangesBtn').onclick = async (event) => {
+        event.preventDefault(); // Prevent page refresh
+    
+        const newCertificateNumber = document.getElementById('certificateControlNumberInput').value;
+    
+        // Debug: Log studentData and ID
+        console.log("Student data:", studentData);
+        console.log("Saving certificate control number for UID:", studentData.id);
+    
+        // Update or add the certificate control number in Firestore
+        try {
+            const studentDocRef = doc(db, "applicants", studentData.id); // Ensure studentData.id is the correct UID
+            console.log("Document reference:", studentDocRef.path);
+    
+            // Use setDoc with merge to update the document or add the field if it doesn't exist
+            await setDoc(studentDocRef, {
+                certificateControlNumber: newCertificateNumber
+            }, { merge: true });
+    
+            // Update the local data structure with the new certificate control number
+            studentData.certificateControlNumber = newCertificateNumber;
+    
+            // Re-render the student list to reflect the changes
+            renderStudents();
+    
+            // Show success notification modal
+            showNotification("Certificate Control Number updated successfully!");
+    
+            // Hide the modal
+            editModal.hide();
+    
+        } catch (error) {
+            console.error("Error updating certificate control number:", error);
+            
+            // Show failure notification modal
+            showNotification("Failed to update certificate control number.");
+        }
+    };
+  }
+});
+
+// Render function to display students in the table, including the certificate control number
 function renderStudents() {
   const studentList = document.getElementById('student-list');
   studentList.innerHTML = '';
@@ -143,27 +157,29 @@ function renderStudents() {
           "PDC-Motors": student['PDC-MotorsStatus'] || null
       };
 
-      // Assuming the certificate control number is stored in a field named `certificateControlNumber`
+      // Certificate Control Number
       const certificateControlNumber = student.certificateControlNumber || '';
 
       const studentHtml = `
-        <tr class="table-row">
-            <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
-            <td class="table-row-content">${student.email}</td>
-            <td class="table-row-content">${student.phoneNumber || ''}</td>
-            <td class="table-row-content">${student.packageName}</td>
-            <td class="table-row-content package-price">&#8369; ${student.packagePrice || ''}</td>
-            ${renderCourseStatus('TDC', statuses.TDC, student.bookings)}
-            ${renderCourseStatus('PDC-4Wheels', statuses["PDC-4Wheels"], student.bookings)}
-            ${renderCourseStatus('PDC-Motors', statuses["PDC-Motors"], student.bookings)}
-            <td class="table-row-content">${certificateControlNumber}</td>
-            <td class="table-row-content">
-                <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
-            </td>
-        </tr>
-    `;
+          <tr class="table-row">
+              <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
+              <td class="table-row-content">${student.email}</td>
+              <td class="table-row-content">${student.phoneNumber || ''}</td>
+              <td class="table-row-content">${student.packageName}</td>
+              <td class="table-row-content package-price">&#8369; ${student.packagePrice || ''}</td>
+              ${renderCourseStatus('TDC', statuses.TDC, student.bookings)}
+              ${renderCourseStatus('PDC-4Wheels', statuses["PDC-4Wheels"], student.bookings)}
+              ${renderCourseStatus('PDC-Motors', statuses["PDC-Motors"], student.bookings)}
+              <td class="table-row-content">${certificateControlNumber}</td>
+              <td class="table-row-content">
+                  <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
+              </td>
+          </tr>
+      `;
       studentList.insertAdjacentHTML('beforeend', studentHtml);
   });
+
+  bindStatusToggles();
 
   function renderCourseStatus(course, status, bookings = []) {
       if (status === "Completed") {
@@ -193,6 +209,36 @@ function renderStudents() {
       }
   }
 
+  document.querySelectorAll('.status-toggle').forEach(toggle => {
+      toggle.addEventListener('change', async (event) => {
+          event.preventDefault(); // Prevent the default checkbox toggle behavior
+
+          const appointmentId = event.target.dataset.bookingId;
+          const userId = event.target.dataset.userId;
+          const course = event.target.dataset.column;
+          const isCompleted = event.target.checked;
+
+          const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {
+              backdrop: 'static',
+              keyboard: false 
+          });
+          confirmationModal.show();
+
+          document.getElementById('confirmButton').onclick = async () => {
+              confirmationModal.hide();
+              await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
+          };
+
+          document.getElementById('confirmationModal').querySelector('.btn-secondary').onclick = () => {
+              event.target.checked = !isCompleted;
+              confirmationModal.hide();
+          };
+      });
+  });
+}
+
+// The bindStatusToggles function remains unchanged
+function bindStatusToggles() {
   document.querySelectorAll('.status-toggle').forEach(toggle => {
       toggle.addEventListener('change', async (event) => {
           event.preventDefault(); // Prevent the default checkbox toggle behavior
