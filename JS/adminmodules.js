@@ -44,7 +44,7 @@ async function fetchAndDisplayModules() {
                 </div>
                 <div class="module-options">
                     <i class="bi bi-three-dots-vertical"></i>
-                    <div class="triple-dot-options" style="display: none;">
+                    <div class="triple-dot-options">
                         <i class="option-dropdown">Edit</i>
                         <i class="option-dropdown">Delete</i>
                     </div>

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, query, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Firebase configuration
@@ -40,13 +40,20 @@ onAuthStateChanged(auth, (user) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     const findMatchBtn = document.getElementById('findMatchBtn');
-    const loader = document.getElementById('loader');
+    const loader = document.getElementById('loader2');
     const loadingBar = document.querySelector('.loading-bar');
     const loadingPercentage = document.querySelector('.loading-percentage');
-    
+    const addTraitsBtn = document.querySelector('.traits-btn'); // Select the Add your Traits button
+    const personalityTraitsModal = new bootstrap.Modal(document.getElementById('personalityTraitsModal')); // Bootstrap modal instance
+
+    // Event listener for Add your Traits button
+    addTraitsBtn.addEventListener('click', () => {
+        personalityTraitsModal.show();  // Show the modal when button is clicked
+    });
+
     // Firestore reference to the 'matches' collection
     const matchesCollectionRef = collection(db, 'matches');
-    
+
     // Event listener for Find Match button
     findMatchBtn.addEventListener('click', async () => {
         // Check if student has a confirmed PDC appointment
@@ -115,17 +122,81 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 100);  // Adjust speed as necessary
     });
-    
+
+    // Function to handle the saving of traits
+    document.getElementById('saveButton').addEventListener('click', async function() {
+        const saveButton = document.getElementById('saveButton');
+        saveButton.disabled = true; // Disable save button to prevent multiple submissions
+
+        // Show loader
+        document.getElementById('loader1').style.display = 'flex';
+
+        // Collect the selected traits
+        const selectedTraits = [];
+        document.querySelectorAll('input[name="traits"]:checked').forEach((checkbox) => {
+            selectedTraits.push(checkbox.nextElementSibling.innerText);
+        });
+
+        // Validation: Ensure at least one trait is selected
+        if (selectedTraits.length === 0) {
+            document.getElementById('loader1').style.display = 'none'; // Hide loader
+            saveButton.disabled = false;  // Re-enable save button
+
+            showNotification("Please select at least one trait before saving."); // Show notification
+            return;
+        }
+
+        // Reference to the Firestore document
+        const userDocRef = doc(db, 'applicants', studentId);
+
+        // Update the Firestore document with the selected traits
+        try {
+            await setDoc(userDocRef, {
+                traits: selectedTraits
+            }, { merge: true });
+
+            showNotification("Traits saved successfully!"); // Success notification
+
+            document.getElementById('loader1').style.display = 'none'; // Hide loader
+
+            // Close the modal after saving the traits successfully
+            personalityTraitsModal.hide(); // Close the modal
+
+        } catch (error) {
+            console.error("Error saving traits: ", error);
+
+            // Show error feedback
+            showNotification("An error occurred while saving traits. Please check your internet connection and try again.");
+
+            // Hide loader and re-enable save button
+            document.getElementById('loader1').style.display = 'none';
+            saveButton.disabled = false;
+        }
+    });
+
     // Function to save the match in Firestore
     async function saveMatchToFirestore(studentId, instructorId) {
         try {
+            // Check if a match already exists for the student
+            const existingMatch = await getDoc(doc(matchesCollectionRef, studentId));
+            
+            if (existingMatch.exists()) {
+                // If match exists, notify the user and prevent saving
+                showNotification("You are already matched with an instructor.");
+                return;  // Stop further execution
+            }
+
+            // If no match exists, proceed with saving
             await setDoc(doc(matchesCollectionRef, studentId), {
                 instructorId: instructorId,
                 matchedAt: new Date()  // Store the timestamp of the match
             });
+
             console.log('Match successfully saved to Firestore');
         } catch (error) {
             console.error('Error saving match to Firestore:', error);
+            // Show error notification
+            showNotification('An error occurred while saving the match. Please try again.');
         }
     }
 });

@@ -25,7 +25,7 @@
                 </div>
                 <div class="sidebar-dashboard">
                     <a href="userdashboard.html"><i class="bi bi-columns-gap"></i>Dashboard</a>
-                    <a id="sidebarInstructorButton" class="active" href="userinstructor.html"><i class="bi bi-people"></i>Instructors</a>
+                    <a id="sidebarInstructorButton" class="active" href="userinstructorreminder.html"><i class="bi bi-people"></i>Instructors</a>
                 </div>
                 <div class="sidebar-menu">
                     <a href="userpackages.html"><i class="bi bi-mortarboard"></i>Packages</a>
@@ -55,14 +55,12 @@
                     <div class="container-body">
                         <div class="personality-check-container">
                             <div class="personality-body-container">
-                                <div class="personality-body-header">
-                                    <i class="bi bi-arrow-left"></i>
-                                </div>
                                 <div class="personality-body">
                                     <img src="Assets/megaphone-icon.png" alt="megaphone icon">
                                     <p>Please note that you must have a confirmed PDC appointment before a matched instructor can be assigned to you.</p>
                                 </div>
                                 <div class="matching-button">
+                                    <button class="traits-btn">Add your Traits</button>
                                     <button id="findMatchBtn" class="btn btn-primary">Find your match</button>
                                 </div>
                             </div>
@@ -73,7 +71,63 @@
         </div>
     </div>
 
-    <div id="loader" class="loader">
+    <!-- Personality Traits Modal -->
+    <div class="modal fade" id="personalityTraitsModal" tabindex="-1" role="dialog" aria-labelledby="personalityTraitsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Personality Traits</h5>
+                </div>
+                <form class="traits">
+                    <h4>This will help us find the best instructor for you!</h4>
+                    <div class="personality-form">
+                        <div class="form-group-all">
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits">
+                                    <span class="checkbox-label">Determined</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits">
+                                    <span class="checkbox-label">Anxious</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits">
+                                    <span class="checkbox-label">Adaptable</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits">
+                                    <span class="checkbox-label">Curious</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits">
+                                    <span class="checkbox-label">Patient</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="save-button">
+                            <button type="button" id="saveButton" class="btn-save">Save</button>
+                        </div>                                
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="loader1" class="loader1">
+        <div class="car-loader"></div>
+        <p>Saving your traits<span class="dots"></span></p>
+    </div> 
+
+    <div id="loader2" class="loader2">
         <img src="Assets/Broom broom.gif" alt="Loading GIF" class="loading-gif">
         <div class="loading-bar-container">
             <div class="loading-bar"></div>
