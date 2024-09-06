@@ -1,7 +1,7 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -18,22 +18,21 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app); // Firestore
 const storage = getStorage(app); // Firebase Storage
 
-// Function to fetch and display modules
+// Fetch and display modules function
 async function fetchAndDisplayModules() {
     const modulesCollection = collection(db, 'modules');
     const moduleSnapshot = await getDocs(modulesCollection);
-    const modules = moduleSnapshot.docs.map(doc => doc.data());
+    const modules = moduleSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     const moduleContainer = document.querySelector('.module-list'); // The container for the modules
+    moduleContainer.innerHTML = ''; // Clear previous content
 
-    // Clear existing content
-    moduleContainer.innerHTML = '';
-
-    // Iterate through the retrieved modules and create elements
+    // Display the modules
     modules.forEach(module => {
         const moduleElement = document.createElement('div');
         moduleElement.classList.add('module-container');
-    
+        moduleElement.setAttribute('data-module-id', module.id); // Store module ID
+
         moduleElement.innerHTML = `
             <div class="module-preview">
                 <i class="bi bi-folder2 default-icon"></i>
@@ -53,19 +52,8 @@ async function fetchAndDisplayModules() {
             </div>
         `;
 
-        // Add event listener to open the module when clicked, but not on triple-dot click
-        moduleElement.addEventListener('click', function(event) {
-            // Check if the click is on the triple dots
-            const isTripleDotClick = event.target.classList.contains('bi-three-dots-vertical');
-            const isOptionDropdownClick = event.target.classList.contains('option-dropdown');
-
-            if (!isTripleDotClick && !isOptionDropdownClick) {
-                window.open(module.fileUrl, '_blank'); // Open the module file in a new tab
-            }
-        });
-
         moduleContainer.appendChild(moduleElement);
-    });    
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -82,60 +70,48 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Handle showing triple-dot options
+    // Handle triple-dot options display and selecting options
     document.querySelector('.module-list').addEventListener('click', function(event) {
         const target = event.target;
-    
+
         if (target.classList.contains('bi-three-dots-vertical')) {
             const optionsMenu = target.nextElementSibling;
             optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
-            
+
             // Hide options menu if clicking outside
             document.addEventListener('click', function(e) {
                 if (!target.contains(e.target) && !optionsMenu.contains(e.target)) {
                     optionsMenu.style.display = 'none';
                 }
-            }, { once: false });
-            
+            }, { once: true });
+
         } else if (target.classList.contains('option-dropdown')) {
             const action = target.textContent.trim();
-            const optionsMenu = target.closest('.triple-dot-options'); // Get the options menu
-    
+            const moduleContainer = target.closest('.module-container');
+            const moduleId = moduleContainer.getAttribute('data-module-id');
+
             if (action === 'Edit') {
                 toggleModal(document.getElementById('editModuleModal'), 'show');
+                editModule(moduleId); // Open the edit modal with current module data
             } else if (action === 'Delete') {
                 toggleModal(document.getElementById('deleteConfirmModal'), 'show');
+                document.querySelector('.confirm-delete').addEventListener('click', function() {
+                    deleteModule(moduleId);
+                    toggleModal(document.getElementById('deleteConfirmModal'), 'hide');
+                });
             }
-    
-            // Close the triple dot options menu after selecting an option
+
+            // Close the options menu after an action is selected
+            const optionsMenu = target.closest('.triple-dot-options');
             optionsMenu.style.display = 'none';
         }
-    });    
-
-    // Cancel buttons to close modals
-    document.querySelector('.cancel-delete-modal').addEventListener('click', function() {
-        toggleModal(document.getElementById('deleteConfirmModal'), 'hide');
     });
 
-    // Close modals on Cancel buttons
-    document.querySelector('.cancel-delete-modal').addEventListener('click', function() {
-        toggleModal(document.getElementById('deleteConfirmModal'), 'hide');
-    });
-    
-    document.querySelector('.close-edit-modal').addEventListener('click', function() {
-        toggleModal(document.getElementById('editModuleModal'), 'hide');
-    });
-
-    // Handle 'Upload Module' button and form submission
+    // Upload Module function (re-added)
     document.querySelector('.upload-module').addEventListener('click', function() {
         toggleModal(document.getElementById('moduleModal'), 'show');
     });
 
-    document.querySelector('.close-modal').addEventListener('click', function() {
-        toggleModal(document.getElementById('moduleModal'), 'hide');
-    });
-
-    // Handle module upload to Firebase
     document.querySelector('.save-module').addEventListener('click', async function(event) {
         event.preventDefault();
 
@@ -172,7 +148,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('.module-file-name').textContent = 'No file selected';
             document.querySelector('.module-name').value = '';
             document.querySelector('.module-description').value = '';
-            document.querySelector('.preview-image').style.display = 'none';
             document.querySelector('.default-icon').style.display = 'block';
             
             // Fetch and display updated modules
@@ -184,31 +159,98 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle image preview for Edit Modal
-    const editModuleImageInput = document.querySelector('.edit-module-image');
-    const editModulePreviewImage = document.querySelector('#editModuleModal .preview-image');
-    const defaultIcon = document.querySelector('#editModuleModal .default-icon');
+    // Edit Module function
+    async function editModule(moduleId) {
+        const moduleDocRef = doc(db, 'modules', moduleId);
+        const moduleDoc = await getDoc(moduleDocRef);
+        const moduleData = moduleDoc.data();
+    
+        // Populate modal fields with current module data
+        document.querySelector('.edit-module-name').value = moduleData.title;
+        document.querySelector('.edit-module-description').value = moduleData.description;
+        
+        // Display the current file
+        document.querySelector('.file-file-name').textContent = moduleData.fileName || 'No file selected';
+        
+        // Display the preview image if there is one (if file is an image, or use a default icon for non-images)
+        document.querySelector('.preview-image').src = moduleData.fileUrl || '';
+        
+        // Update the module on form submission
+        document.querySelector('.update-module').addEventListener('click', async function(event) {
+            event.preventDefault();
+    
+            const newTitle = document.querySelector('.edit-module-name').value;
+            const newDescription = document.querySelector('.edit-module-description').value;
+            const newFileInput = document.querySelector('.edit-module-file');
+            let newFileUrl = moduleData.fileUrl;
+            let newFileName = moduleData.fileName;
+    
+            // Handle file upload if a new file is selected
+            if (newFileInput.files[0]) {
+                const newFile = newFileInput.files[0];
+                const fileName = newFile.name;
+                const storageRef = ref(storage, `modules/${fileName}`);
+    
+                const uploadTask = await uploadBytes(storageRef, newFile);
+                newFileUrl = await getDownloadURL(uploadTask.ref);
+                newFileName = fileName; // Update the file name as well
+            }
+    
+            // Update the existing Firestore document
+            await updateDoc(moduleDocRef, {
+                title: newTitle,
+                description: newDescription,
+                fileUrl: newFileUrl,
+                fileName: newFileName
+            });
+    
+            // Close the modal
+            toggleModal(document.getElementById('editModuleModal'), 'hide');
+    
+            // Refresh the module list
+            fetchAndDisplayModules();
+        });
+    }
 
-    editModuleImageInput.addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                editModulePreviewImage.src = e.target.result;
-                editModulePreviewImage.style.display = 'block';
-                defaultIcon.style.display = 'none';
-            };
-            reader.readAsDataURL(file);
+    // Delete Module function
+    async function deleteModule(moduleId) {
+        // Get the module document to retrieve the file details
+        const moduleDocRef = doc(db, 'modules', moduleId);
+        const moduleDoc = await getDoc(moduleDocRef);
+        
+        if (moduleDoc.exists()) {
+            const moduleData = moduleDoc.data();
+    
+            // Get the file URL or file path (fileName) from the document
+            const fileUrl = moduleData.fileUrl;
+            const fileName = moduleData.fileName;
+    
+            // If the file exists, delete it from Firebase Storage
+            if (fileName) {
+                const storageRef = ref(storage, `modules/${fileName}`); // Assuming files are stored in the 'modules' folder
+                await deleteObject(storageRef)
+                    .then(() => {
+                        console.log(`File ${fileName} deleted successfully.`);
+                    })
+                    .catch((error) => {
+                        console.error("Error deleting file from storage:", error);
+                    });
+            }
+            
+            // Delete the Firestore document
+            await deleteDoc(moduleDocRef);
+            console.log("Module document deleted successfully.");
+    
+            // Refresh the module list
+            fetchAndDisplayModules();
         } else {
-            editModulePreviewImage.style.display = 'none';
-            defaultIcon.style.display = 'block';
+            console.error("Module not found.");
         }
-    });
+    }
 
-    // Handle file inputs
-    handleFileInputChange('.edit-module-image', '.image-file-name');
-    handleFileInputChange('.edit-module-file', '.file-file-name');
+    // Handle file input change
     handleFileInputChange('.module-file', '.module-file-name');
+    handleFileInputChange('.edit-module-file', '.file-file-name');
 
     // Handle image previews
     document.querySelectorAll('.module-preview, .preview').forEach(function(container) {
@@ -231,19 +273,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Fetch and display modules on page load
+    // Cancel buttons to close modals
+    document.querySelector('.close-edit-modal').addEventListener('click', function() {
+        toggleModal(document.getElementById('editModuleModal'), 'hide');
+    });
+
+    document.querySelector('.cancel-delete-modal').addEventListener('click', function() {
+        toggleModal(document.getElementById('deleteConfirmModal'), 'hide');
+    });
+
+    document.querySelector('.close-modal').addEventListener('click', function() {
+        toggleModal(document.getElementById('moduleModal'), 'hide');
+    });
+
+    // Function to display the notification modal
+    function showNotificationModal(message) {
+        // Get modal elements
+        const notificationModal = document.getElementById('notificationModal');
+        const notificationModalBody = document.getElementById('notificationModalBody');
+
+        // Set the message inside the modal
+        notificationModalBody.textContent = message;
+
+        // Show the modal
+        $(notificationModal).modal('show');
+    }
+
+    // Initial fetch of modules
     fetchAndDisplayModules();
 });
-
-// Function to display the notification modal
-function showNotificationModal(message) {
-    // Get modal elements
-    const notificationModal = document.getElementById('notificationModal');
-    const notificationModalBody = document.getElementById('notificationModalBody');
-
-    // Set the message inside the modal
-    notificationModalBody.textContent = message;
-
-    // Show the modal
-    $(notificationModal).modal('show');
-}
