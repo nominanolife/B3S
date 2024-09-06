@@ -45,7 +45,7 @@ async function fetchAndDisplayModules() {
                 </div>
                 <div class="module-options">
                     <i class="bi bi-three-dots-vertical"></i>
-                    <div class="triple-dot-options" style="display: none;">
+                    <div class="triple-dot-options">
                         <i class="option-dropdown">Edit</i>
                         <i class="option-dropdown">Delete</i>
                     </div>
@@ -55,7 +55,7 @@ async function fetchAndDisplayModules() {
 
         // Add event listener to open the module when clicked, but not on triple-dot click
         moduleElement.addEventListener('click', function(event) {
-            // Check if the click is on the triple dots
+            // Check if the click is on the triple dots or dropdown options
             const isTripleDotClick = event.target.classList.contains('bi-three-dots-vertical');
             const isOptionDropdownClick = event.target.classList.contains('option-dropdown');
 
@@ -172,8 +172,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('.module-file-name').textContent = 'No file selected';
             document.querySelector('.module-name').value = '';
             document.querySelector('.module-description').value = '';
-            document.querySelector('.preview-image').style.display = 'none';
-            document.querySelector('.default-icon').style.display = 'block';
             
             // Fetch and display updated modules
             fetchAndDisplayModules();
@@ -184,29 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle image preview for Edit Modal
-    const editModuleImageInput = document.querySelector('.edit-module-image');
-    const editModulePreviewImage = document.querySelector('#editModuleModal .preview-image');
-    const defaultIcon = document.querySelector('#editModuleModal .default-icon');
-
-    editModuleImageInput.addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                editModulePreviewImage.src = e.target.result;
-                editModulePreviewImage.style.display = 'block';
-                defaultIcon.style.display = 'none';
-            };
-            reader.readAsDataURL(file);
-        } else {
-            editModulePreviewImage.style.display = 'none';
-            defaultIcon.style.display = 'block';
-        }
-    });
-
     // Handle file inputs
-    handleFileInputChange('.edit-module-image', '.image-file-name');
     handleFileInputChange('.edit-module-file', '.file-file-name');
     handleFileInputChange('.module-file', '.module-file-name');
 

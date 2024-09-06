@@ -56,7 +56,7 @@ async function checkMatch(studentId) {
         } else {
             // If no match document exists, redirect to the first page
             console.log('No match document found, redirecting to the first page...');
-            window.location.href = 'userinstructor.html'; // Adjust URL accordingly
+            window.location.href = 'userinstructorreminder.html'; // Adjust URL accordingly
         }
     } catch (error) {
         console.error('Error checking match status:', error);
@@ -79,7 +79,7 @@ async function checkForExistingComment(studentId, instructorId) {
             if (hasCommented) {
                 // If the student has already commented, redirect to the first page
                 console.log("User has already submitted feedback. Redirecting to the first page...");
-                window.location.href = 'userinstructor.html'; // Adjust URL accordingly
+                window.location.href = 'userinstructorreminder.html'; // Adjust URL accordingly
             } else {
                 // If the student has not commented yet, redirect to the matched instructor's page
                 console.log('No feedback submitted. Redirecting to matched instructor page...');

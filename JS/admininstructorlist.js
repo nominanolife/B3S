@@ -353,6 +353,12 @@ instructorList.addEventListener('click', function (event) {
     } else if (event.target.textContent.includes('Delete')) {
       deleteInstructor(event); // Trigger the delete modal
     }
+    
+    // Close the dropdown after an option is selected
+    const dropdownContent = event.target.closest('.dropdown-content');
+    if (dropdownContent) {
+      dropdownContent.classList.remove('show');
+    }
   }
 });
 

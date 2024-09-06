@@ -495,13 +495,13 @@ h2 {
 }
 
 #moduleModal .modal-dialog {
-    top: 15%;
+    top: 25%;
     left: 5%;
     border-radius: 20px;
 }
 
 #editModuleModal .modal-dialog {
-    top: 15%;
+    top: 25%;
     left: 5%;
     border-radius: 20px;
 }
@@ -630,7 +630,7 @@ h2 {
     align-items: center;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    width: 55%;
+    min-width: 35%;
 }
 
 .custom-file-upload:hover {
