@@ -151,8 +151,8 @@ async function fetchUserAppointments(userId) {
                     userBookings.forEach(booking => {
                         const bookingKey = `${appointment.date}_${appointment.timeStart}`;
                         const currentDate = new Date();
-                        const bookingStartDate = new Date(appointment.date + 'T' + appointment.timeStart);
-                        const bookingEndDate = new Date(appointment.date + 'T' + appointment.timeEnd);
+                        const bookingStartDate = new Date(`${appointment.date}T${appointment.timeStart}:00.000Z`);
+                        const bookingEndDate = new Date(`${appointment.date}T${appointment.timeEnd}:00.000Z`);
         
                         // Ensure the progress is reflecting the latest status
                         if (booking.progress === 'Completed') {

@@ -291,12 +291,27 @@ async function proceedWithBooking(selectedSlot, appointment) {
 
   try {
     const appointmentRef = doc(db, "appointments", appointment.id);
+
+    // Calculate current time and booking time ranges
+    const currentDate = new Date();
+    const bookingStartDate = new Date(`${appointment.date}T${appointment.timeStart}:00.000Z`);
+    const bookingEndDate = new Date(`${appointment.date}T${appointment.timeEnd}:00.000Z`);
+
+    // Determine the correct progress status based on the current time
+    let progressStatus = "Not yet Started";  // Default
+    if (currentDate >= bookingStartDate && currentDate <= bookingEndDate) {
+      progressStatus = "In Progress";
+    } else if (currentDate > bookingEndDate) {
+      progressStatus = "Completed";
+    }
+
     await updateDoc(appointmentRef, {
-      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "In Progress" }]
+      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: progressStatus }]
     });
 
     const totalSlots = appointment.slots;
-    const updatedBookings = [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "In Progress" }];
+    const updatedBookings = [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: progressStatus }];
+    
     if (updatedBookings.length >= totalSlots) {
       await updateDoc(appointmentRef, { status: 'full' });
       const appointmentElement = document.querySelector(`[data-date="${appointment.date}"]`);

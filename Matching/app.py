@@ -16,34 +16,41 @@ CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET"], "allow_headers"
 @app.route('/match', methods=['GET'])
 def match():
     try:
+        # Call main function to perform matching
         matched_data = main()  # Match logic from your CSP
+        
         if not matched_data:
             return jsonify({"status": "error", "message": "No matches found."}), 404
 
         # Assuming matched_data is a dictionary with student_id -> instructor_id mapping
-        student_id = list(matched_data.keys())[0]
-        instructor_id = matched_data[student_id]
+        student_id = list(matched_data.keys())[0]  # Extract the first student ID
+        instructor_id = matched_data[student_id]   # Get the matched instructor ID
 
-        # Fetch instructor data from Firestore
-        instructor_doc = db.collection('instructors').document(instructor_id).get().to_dict()
+        # Ensure student_id and instructor_id are not None and valid
+        if not student_id or not instructor_id:
+            return jsonify({"status": "error", "message": "Invalid match data."}), 400
 
-        if not instructor_doc:
+        # Fetch instructor to verify its existence in Firestore
+        instructor_doc = db.collection('instructors').document(instructor_id).get()
+        
+        if not instructor_doc.exists:
             return jsonify({"status": "error", "message": "Instructor not found."}), 404
 
-        # Save the match to Firestore "matches" collection
+        # Use student_id as the document ID for the match
         match_ref = db.collection('matches').document(student_id)
+
+        # Save or update the match in Firestore
         match_ref.set({
             'instructorId': instructor_id,
             'studentId': student_id,
-            'matchedAt': firestore.SERVER_TIMESTAMP
-        })
+            'matchedAt': firestore.SERVER_TIMESTAMP  # Firestore-generated timestamp
+        }, merge=True)  # Ensure it merges with existing data
 
-        # Return the raw instructor data to the frontend
+        # Return success response with only necessary data
         return jsonify({
             "status": "success",
             "student_id": student_id,
-            "instructor_id": instructor_id,
-            "instructor": instructor_doc  # Sending raw data without formatting
+            "instructor_id": instructor_id
         }), 200
 
     except Exception as e:

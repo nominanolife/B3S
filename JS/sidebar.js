@@ -42,16 +42,19 @@ async function checkMatch(studentId) {
 
         if (matchDoc.exists()) {
             const matchData = matchDoc.data();
-            const instructorId = matchData.instructorId;
+            const matchStatus = matchData.matchStatus;  // Get the match status
 
-            if (instructorId) {
-                // If a match exists, check if the student has already given feedback
-                console.log('Match found. Checking for feedback...');
-                await checkForExistingComment(studentId, instructorId); // Run after button click
+            if (matchStatus === "In Progress") {
+                // If match is in progress, redirect to the matched instructor page
+                console.log("Match is in progress. Redirecting to matched instructor page...");
+                window.location.href = 'userinstructormatch.html';
+            } else if (matchStatus === "Completed") {
+                // If match is completed, redirect to the reminder page
+                console.log("Match is completed. Redirecting to reminder page...");
+                window.location.href = 'userinstructorreminder.html';
             } else {
-                // If no match exists, redirect to the first page
-                console.log('No match found, redirecting to the first page...');
-                window.location.href = 'userinstructor.html'; // Adjust URL accordingly
+                // Handle unexpected status cases
+                console.error("Unknown match status:", matchStatus);
             }
         } else {
             // If no match document exists, redirect to the first page
@@ -60,36 +63,5 @@ async function checkMatch(studentId) {
         }
     } catch (error) {
         console.error('Error checking match status:', error);
-    }
-}
-
-// Function to check if the user has already commented on the matched instructor
-async function checkForExistingComment(studentId, instructorId) {
-    try {
-        // Fetch the instructor document from Firestore
-        const instructorDoc = await getDoc(doc(db, 'instructors', instructorId));
-
-        if (instructorDoc.exists()) {
-            const instructorData = instructorDoc.data();
-            const comments = instructorData.comments || []; // Ensure comments is an array
-
-            // Check if the student has already commented
-            const hasCommented = comments.some(comment => comment.studentId === studentId);
-
-            if (hasCommented) {
-                // If the student has already commented, redirect to the first page
-                console.log("User has already submitted feedback. Redirecting to the first page...");
-                window.location.href = 'userinstructorreminder.html'; // Adjust URL accordingly
-            } else {
-                // If the student has not commented yet, redirect to the matched instructor's page
-                console.log('No feedback submitted. Redirecting to matched instructor page...');
-                window.location.href = 'userinstructormatch.html'; // Adjust URL accordingly
-            }
-        } else {
-            console.error("Instructor document not found.");
-            // If the instructor document is not found, handle it accordingly (e.g., log an error, show a message)
-        }
-    } catch (error) {
-        console.error('Error checking for existing comment:', error);
     }
 }

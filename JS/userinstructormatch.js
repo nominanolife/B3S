@@ -122,8 +122,6 @@ async function fetchMatchAndInstructorData(studentId) {
         commentsSection.innerHTML = ''; // Clear existing comments
         const comments = instructorData.comments || []; // Ensure comments are an array
 
-        let hasGivenFeedback = false;
-
         // Check if there are any comments
         if (comments.length === 0) {
             // No comments, show a placeholder message
@@ -160,17 +158,7 @@ async function fetchMatchAndInstructorData(studentId) {
                 `;
 
                 commentsSection.appendChild(commentElement);
-
-                // Check if the logged-in user has already given feedback
-                if (commentObj.studentId === studentId) {
-                    hasGivenFeedback = true;
-                }
             });
-        }
-
-        // Hide the "Give Feedback" button if the student has already given feedback
-        if (hasGivenFeedback) {
-            document.getElementById('giveFeedbackBtn').style.display = 'none';
         }
 
     } catch (error) {
@@ -284,15 +272,6 @@ document.querySelector('.feedback-form').addEventListener('submit', async functi
 
     if (docSnap.exists()) {
         const data = docSnap.data();
-        const existingComments = data.comments || [];
-
-        // Check if the student already has a comment
-        const hasCommented = existingComments.some(comment => comment.studentId === studentId);
-
-        if (hasCommented) {
-            showNotification("You have already submitted feedback for this instructor.");
-            return;  // Prevent multiple submissions
-        }
 
         // Store feedback if not already submitted
         await storeFeedbackInFirestore(studentId, instructorId, rating, comment);
@@ -347,7 +326,7 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
             // Update the corresponding rating index
             ratingsArray[rating - 1] += 1;  // Increment the selected rating
 
-            // Add the new comment as an object including the rating and timestamp
+            // Add the new comment with the status 'completed'
             const newComment = {
                 studentId: studentId,
                 comment: comment,
@@ -364,22 +343,25 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
             }
             let newAverageRating = totalScore / totalRatings;
 
-            // Update the instructor document with the new ratings and comments
+            // Update the instructor document with the new ratings, comments, and completed status
             await updateDoc(instructorRef, {
                 ratings: ratingsArray,
                 comments: commentsArray,
                 totalRatings: totalRatings,
-                rating: newAverageRating
+                rating: newAverageRating,
             });
 
             // Instantly reflect the new comment in the comments section
             addCommentToUI(newComment, commentsArray.length);
 
-            // Instantly update the rating UI with new data
-            updateRatingBarsUI(ratingsArray, totalRatings, newAverageRating);
-
             // Show success notification
             showNotification("Feedback successfully added");
+
+            // Update match status to 'Completed' after feedback submission
+            await completeMatch(studentId);  // Call the completeMatch function
+
+            // Redirect after submitting feedback
+            window.location.href = 'userdashboard.html';  // Redirect to dashboard after feedback submission
 
         } else {
             console.error("Instructor not found.");
@@ -389,6 +371,24 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
         showNotification('Error submitting feedback. Please try again later.');
     }
 }
+
+// Function to update match status to 'Completed'
+async function completeMatch(studentId) {
+    try {
+        // Create a reference to the "matches" document for the student
+        const matchRef = doc(db, 'matches', studentId);
+
+        // Update the match status to "Completed"
+        await updateDoc(matchRef, {
+            'matchStatus': 'Completed'
+        });
+
+        console.log('Match status updated to Completed');
+    } catch (error) {
+        console.error('Error updating match status:', error);
+    }
+}
+
 
 // Function to add the new comment directly to the UI
 function addCommentToUI(commentObj, commentIndex) {
@@ -430,24 +430,32 @@ function addCommentToUI(commentObj, commentIndex) {
     commentsSection.appendChild(commentElement);
 }
 
-// Prevent new instructor search if appointment progress is "Completed"
+// Prevent new instructor search if all appointments are "Completed"
 async function checkAppointmentProgress(studentId) {
     const appointmentsRef = collection(db, 'appointments');
     const querySnapshot = await getDocs(appointmentsRef);
 
+    let allAppointmentsCompleted = true;  // Assume all are completed initially
+
     querySnapshot.forEach((doc) => {
         const appointmentData = doc.data();
-        
-        // Check if the booking belongs to the current student and if progress is "Completed"
+
+        // Check if the booking belongs to the current student and if progress is not "Completed"
         if (appointmentData.bookings && Array.isArray(appointmentData.bookings)) {
             appointmentData.bookings.forEach(booking => {
-                if (booking.userId === studentId && booking.progress === "Completed") {
-                    showNotification("You cannot find another instructor because your appointment is marked as completed.");
-                    window.location.href = 'firstpage.html'; // Redirect to the first page
+                if (booking.userId === studentId && booking.progress !== "Completed") {
+                    // If there is at least one incomplete appointment, don't redirect
+                    allAppointmentsCompleted = false;
                 }
             });
         }
     });
+
+    // Only redirect if all appointments are marked as completed
+    if (allAppointmentsCompleted) {
+        showNotification("You cannot find another instructor because all your appointments are marked as completed.");
+        window.location.href = 'userinstructormatch.html'; // Redirect to the first page
+    }
 }
 
 // Fetch and update the UI with the latest rating distribution
