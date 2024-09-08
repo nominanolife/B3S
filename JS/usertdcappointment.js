@@ -38,8 +38,8 @@ let currentMonth = date.getMonth();
 let currentYear = date.getFullYear();
 let appointments = [];
 let currentUserUid = null;
+let hasActiveBooking = false; // Track if the user has an active/incomplete booking
 
-// Fetch appointments from Firestore and filter out past dates
 async function fetchAppointments() {
   try {
     const querySnapshot = await getDocs(collection(db, "appointments"));
@@ -54,8 +54,17 @@ async function fetchAppointments() {
       .filter(app => {
         const appointmentDate = new Date(app.date);
         appointmentDate.setHours(0, 0, 0, 0); // Normalize to the start of the day
-        return appointmentDate >= today; // Include today's and future dates
+        return appointmentDate >= today; // Include today's and future appointments
       });
+
+    // Check if the user has any active bookings (i.e., status is 'Booked' or 'In Progress')
+    hasActiveBooking = appointments.some(app => 
+      app.bookings && 
+      app.bookings.some(booking => 
+        booking.userId === currentUserUid && 
+        (booking.status === 'Booked' || booking.status === 'In Progress') // Only consider these statuses as active
+      )
+    );
 
   } catch (error) {
     console.error("Error fetching appointments:", error);
@@ -242,6 +251,12 @@ function showConfirmationModal(callback) {
 }
 
 async function handleBooking() {
+  // Check if the user has an active booking when they try to book a slot
+  if (hasActiveBooking) {
+    showNotification('You already have an active or incomplete appointment. Please complete or cancel it before booking a new one.');
+    return; // Stop the booking process if an active booking exists
+  }
+
   const selectedSlot = document.querySelector('input[name="time-slot"]:checked');
   if (!selectedSlot) {
     showNotification('Please select a time slot.');
@@ -269,7 +284,6 @@ async function handleBooking() {
   if (appointmentDateObj <= currentDate.setDate(currentDate.getDate() + 1)) {
     // Show the confirmation modal
     showConfirmationModal(async () => {
-      // This is the code that runs after the user confirms
       await proceedWithBooking(selectedSlot, appointment);
     });
     return;

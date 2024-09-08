@@ -310,6 +310,8 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
   try {
     const applicantDocRef = doc(db, "applicants", userId);
     const updateData = {};
+
+    // Update the course status field in the applicant document
     if (isCompleted) {
       updateData[`${course}Status`] = "Completed";
     } else {
@@ -325,13 +327,19 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
         const appointmentData = docSnapshot.data();
 
         if (Array.isArray(appointmentData.bookings)) {
+          // Update both the progress and status for the student's booking
           const updatedBookings = appointmentData.bookings.map(booking => {
             if (booking.userId === userId && booking.status === "Booked") {
-              return { ...booking, progress: isCompleted ? "Completed" : "Not yet Started" };
+              return { 
+                ...booking, 
+                progress: isCompleted ? "Completed" : "Not yet Started",
+                status: isCompleted ? "Completed" : "Booked" // Update status
+              };
             }
             return booking;
           });
 
+          // Save the updated bookings array back to the appointments document
           await updateDoc(docRef, { bookings: updatedBookings });
 
           // Update the completedBookings collection only when status is set to "Completed"

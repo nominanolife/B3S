@@ -38,6 +38,7 @@ let currentMonth = date.getMonth();
 let currentYear = date.getFullYear();
 let appointments = [];
 let currentUserUid = null;
+let hasActiveBooking = false; // Track if the user has an active/incomplete booking
 
 // Listen for real-time updates in the appointments collection
 onSnapshot(collection(db, "appointments"), (snapshot) => {
@@ -52,6 +53,15 @@ onSnapshot(collection(db, "appointments"), (snapshot) => {
     appointmentDate.setHours(0, 0, 0, 0); // Normalize to the start of the day
     return appointmentDate >= today; // Include today's and future appointments only
   });
+
+  // Check if the user has any active bookings (i.e., status is 'Booked' or 'In Progress')
+  hasActiveBooking = appointments.some(app => 
+    app.bookings && 
+    app.bookings.some(booking => 
+      booking.userId === currentUserUid && 
+      (booking.status === 'Booked' || booking.status === 'In Progress') // Only consider these statuses as active
+    )
+  );
 
   renderCalendar(currentMonth, currentYear); // Re-render the calendar to reflect updates
 });
@@ -222,6 +232,12 @@ function showNotification(message) {
 }
 
 async function handleBooking() {
+  // Check if the user has an active booking when they try to book a slot
+  if (hasActiveBooking) {
+    showNotification('You already have an active or incomplete appointment. Please complete or cancel it before booking a new one.');
+    return; // Stop the booking process if an active booking exists
+  }
+
   const selectedSlot = document.querySelector('input[name="time-slot"]:checked');
   if (!selectedSlot) {
     showNotification('Please select a time slot.');

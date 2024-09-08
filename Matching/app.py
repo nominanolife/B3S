@@ -13,28 +13,28 @@ db = firestore.Client()
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET"], "allow_headers": ["Content-Type"]}})
 
-@app.route('/match', methods=['GET'])
-def match():
+@app.route('/match/<student_id>', methods=['GET'])  # Accept student_id in the URL
+def match(student_id):
     try:
-        # Call main function to perform matching
-        matched_data = main()  # Match logic from your CSP
+        # Call main function to perform matching for a specific student
+        matched_data = main(student_id)  # Pass the logged-in student ID
         
-        if not matched_data:
-            return jsonify({"status": "error", "message": "No matches found."}), 404
+        if not matched_data or student_id not in matched_data:
+            return jsonify({"status": "error", "message": "No matches found for student."}), 404
 
-        # Assuming matched_data is a dictionary with student_id -> instructor_id mapping
-        student_id = list(matched_data.keys())[0]  # Extract the first student ID
-        instructor_id = matched_data[student_id]   # Get the matched instructor ID
+        instructor_id = matched_data[student_id]
 
-        # Ensure student_id and instructor_id are not None and valid
+        # Ensure student_id and instructor_id are valid
         if not student_id or not instructor_id:
             return jsonify({"status": "error", "message": "Invalid match data."}), 400
 
         # Fetch instructor to verify its existence in Firestore
-        instructor_doc = db.collection('instructors').document(instructor_id).get()
-        
-        if not instructor_doc.exists:
-            return jsonify({"status": "error", "message": "Instructor not found."}), 404
+        try:
+            instructor_doc = db.collection('instructors').document(instructor_id).get()
+            if not instructor_doc.exists:
+                return jsonify({"status": "error", "message": "Instructor not found."}), 404
+        except Exception as firestore_error:
+            return jsonify({"status": "error", "message": f"Firestore error: {firestore_error}"}), 500
 
         # Use student_id as the document ID for the match
         match_ref = db.collection('matches').document(student_id)
@@ -46,15 +46,15 @@ def match():
             'matchedAt': firestore.SERVER_TIMESTAMP  # Firestore-generated timestamp
         }, merge=True)  # Ensure it merges with existing data
 
-        # Return success response with only necessary data
+        # Return success response with necessary data
         return jsonify({
             "status": "success",
             "student_id": student_id,
-            "instructor_id": instructor_id
+            "instructor_id": instructor_id,
         }), 200
 
     except Exception as e:
-        print(f"Error occurred: {e}")
+        app.logger.error(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':

@@ -90,16 +90,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         personalityTraitsModal.show();  // Show the modal when button is clicked
     });
 
-    // Firestore reference to the 'matches' collection
-    const matchesCollectionRef = collection(db, 'matches');
-
-    // Event listener for Find Match button
     findMatchBtn.addEventListener('click', async () => {
         if (!studentId) {
             showNotification("You must be logged in to find your match.");
             return;
         }
-
+    
         // Check if traits are saved before proceeding
         const userDocRef = doc(db, 'applicants', studentId);
         const userDoc = await getDoc(userDocRef);
@@ -108,76 +104,66 @@ document.addEventListener('DOMContentLoaded', async () => {
             personalityTraitsModal.show();
             return;
         }
-
-        // Check if student has a confirmed PDC appointment (no debounce)
+    
+        // Check if student has a confirmed PDC appointment
         const hasPDCAppointment = await checkPDCAppointment(studentId);
-
+    
         if (!hasPDCAppointment) {
-            // Use notification modal instead of alert
-            showNotification("You must have a confirmed PDC appointment (4Wheels or Motors) before matching with an instructor.");
-            return;  // Stop further execution
+            showNotification("You must have a confirmed PDC appointment before matching with an instructor.");
+            return;
         }
-
-        // Proceed with finding match if PDC appointment exists
+    
+        // Proceed with finding match
         loader.style.display = 'flex';  // Show the loader
         loadingBar.style.width = '0';   // Reset loading bar width
         loadingPercentage.textContent = '0%';  // Reset percentage text
-        loadingPercentage.style.color = '#142A74';  // Dark color for initial text
-
-        // Simulate loading progress dynamically
+    
+        // Start the loader animation
         let progress = 0;
         const interval = setInterval(() => {
-            // Increase the progress randomly between 1% and 5%
             const increment = Math.floor(Math.random() * 5) + 1;
-            progress = Math.min(progress + increment, 99);  // Cap progress at 99% until real match happens
+            progress = Math.min(progress + increment, 99);
             loadingBar.style.width = progress + '%';
             loadingPercentage.textContent = progress + '%';
-
-            // Adjust text color based on progress
-            if (progress > 48.5) {
-                loadingPercentage.style.color = '#ffffff';  // Light color for better contrast
-            } else {
-                loadingPercentage.style.color = '#142A74';  // Dark color
-            }
-
-            // If progress reaches 99%, stop the interval and wait for the real match
+            
             if (progress >= 99) {
                 clearInterval(interval);
             }
-        }, 100);  // Adjust speed as necessary
-
-        fetch('http://127.0.0.1:5000/match', {
+        }, 100);
+    
+        // Pass studentId as part of the request
+        fetch(`http://127.0.0.1:5000/match/${studentId}`, {  // Update URL to include studentId
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
         })
-            .then(response => response.json())
-            .then(async (data) => {
-                console.log('Data received:', data);
-                if (data.status === 'success') {
-                    const studentId = data.student_id;  // Extract student_id from the JSON response
-                    const instructorId = data.instructor_id;  // Extract instructor_id from the JSON response
-        
-                    // Save the match in Firestore
-                    await saveMatchToFirestore(studentId, instructorId);
-        
-                    // Complete the loader
-                    loadingBar.style.width = '100%';
-                    loadingPercentage.textContent = '100%';
-        
-                    setTimeout(() => {
-                        loader.style.display = 'none';  // Hide the loader
-                        window.location.href = 'userinstructormatch.html';  // Redirect to matched instructor page
-                    }, 500);  // Add a slight delay to let the user see the 100% completion
-                } else {
-                    showNotification('An error occurred: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('An error occurred while contacting the server: ' + error.message);
-            });
+        .then(response => response.json())
+        .then(async (data) => {
+            console.log('Data received:', data);
+            if (data.status === 'success') {
+                const studentId = data.student_id;
+                const instructorId = data.instructor_id;
+                
+                // Save the match in Firestore
+                await saveMatchToFirestore(studentId, instructorId);
+    
+                // Complete the loader
+                loadingBar.style.width = '100%';
+                loadingPercentage.textContent = '100%';
+    
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    window.location.href = 'userinstructormatch.html';  // Redirect to matched instructor page
+                }, 500);
+            } else {
+                showNotification('An error occurred: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred while contacting the server: ' + error.message);
+        });
     });
 
     // Function to handle saving the traits

@@ -60,49 +60,60 @@ def get_highest_rated_instructor(instructors, course):
     highest_rated_instructor = max(eligible_instructors, key=lambda x: x[1].get('rating', 0))
     return highest_rated_instructor[0]  # Return the instructor_id
 
-def match_students_instructors(students, instructors, appointments):
+def match_students_instructors(students, instructors, appointments, logged_in_student_id):
+    """
+    Match the logged-in student with the best instructor.
+    """
     matches = {}
     
-    for student_id, student in students.items():
-        best_match = None
-        best_score = 0
-        # Use studentId from students to match the userId in bookings
-        course = get_student_course(student_id, appointments)
-        if not course:
-            continue  # If the student has no course, skip matching
-
-        # Filter instructors based on the student's course
-        eligible_instructors = {
-            instructor_id: instructor 
-            for instructor_id, instructor in instructors.items() 
-            if instructor.get('course') == course and instructor.get('active', False)
-        }
-
-        if not eligible_instructors:
-            continue
-
-        # Perform traits-based matching
-        for instructor_id, instructor in eligible_instructors.items():
-            student_traits = student.get('traits', [])
-            instructor_traits = instructor.get('traits', [])
-            if isinstance(student_traits, list) and isinstance(instructor_traits, list):
-                matching_traits = len(set(student_traits).intersection(instructor_traits))
-                if matching_traits > best_score:
-                    best_score = matching_traits
-                    best_match = instructor_id
-        
-        # Fallback to highest rated instructor
-        if not best_match:
-            best_match = get_highest_rated_instructor(eligible_instructors, course)
-        
-        if best_match:
-            matches[student_id] = best_match
+    # Check if the logged-in student exists in the students data
+    if logged_in_student_id not in students:
+        print(f"Student ID {logged_in_student_id} not found.")
+        return matches
     
+    student = students[logged_in_student_id]
+    best_match = None
+    best_score = 0
+
+    # Get the course of the logged-in student from the appointments
+    course = get_student_course(logged_in_student_id, appointments)
+    if not course:
+        print(f"No course found for student ID {logged_in_student_id}.")
+        return matches  # If the student has no course, return an empty result
+
+    # Filter instructors based on the student's course
+    eligible_instructors = {
+        instructor_id: instructor 
+        for instructor_id, instructor in instructors.items() 
+        if instructor.get('course') == course and instructor.get('active', False)
+    }
+
+    if not eligible_instructors:
+        print(f"No eligible instructors found for course {course}.")
+        return matches
+
+    # Perform traits-based matching
+    student_traits = student.get('traits', [])
+    for instructor_id, instructor in eligible_instructors.items():
+        instructor_traits = instructor.get('traits', [])
+        if isinstance(student_traits, list) and isinstance(instructor_traits, list):
+            matching_traits = len(set(student_traits).intersection(instructor_traits))
+            if matching_traits > best_score:
+                best_score = matching_traits
+                best_match = instructor_id
+
+    # Fallback to highest rated instructor if no trait match is found
+    if not best_match:
+        best_match = get_highest_rated_instructor(eligible_instructors, course)
+
+    if best_match:
+        matches[logged_in_student_id] = best_match
+
     return matches
 
-def main():
+def main(logged_in_student_id):
     """
-    Main function to run the matching process.
+    Main function to run the matching process for a specific logged-in student.
     """
     # Fetch data from Firestore
     students, instructors, appointments = fetch_data()
@@ -112,13 +123,13 @@ def main():
         print("No students or instructors available for matching.")
         return []
 
-    # Run the matching algorithm
-    matches = match_students_instructors(students, instructors, appointments)
+    # Run the matching algorithm for the logged-in student
+    matches = match_students_instructors(students, instructors, appointments, logged_in_student_id)
 
-    # Log the results instead of saving them to Firestore
-    print("Matching results:", matches)
-    
-    # Return the matches so they can be processed further
+    # Log the result for the logged-in student
+    print(f"Matching result for student {logged_in_student_id}:", matches)
+
+    # Return the match so it can be processed further
     return matches
 
 if __name__ == "__main__":
