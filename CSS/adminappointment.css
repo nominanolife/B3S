@@ -692,6 +692,11 @@ body {
     padding: 20px;
 }
 
+.modal-title {
+    font-weight: bold;
+    color: #142A74;
+}
+
 .modal-body {
     display: flex;
     flex-direction: column;

@@ -384,10 +384,6 @@ h2 {
     opacity: 1;
 }
 
-#customTraitsInputs {
-    display: none;
-}
-
 .input-line {
     display: none;
     border: none;
@@ -402,6 +398,11 @@ h2 {
 .input-line:focus {
     border-bottom: 1px solid #142A74;
     box-shadow: none;
+}
+
+.group-form {
+    display: flex;
+    flex-direction: column;
 }
 
 .save-button {

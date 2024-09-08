@@ -112,17 +112,18 @@
                                     <span class="checkbox-label">Patient</span>
                                 </label>
                             </div>
+                            <div id="dynamicTraits">
+                                <!-- Dynamic traits will be added here -->
+                            </div>
                             <div class="form-group">
                                 <label class="custom-checkbox">
                                     <input type="checkbox" name="traits" id="othersCheckbox">
-                                    <span class="checkbox-label">Others:</span>
+                                    <span class="checkbox-label">Other traits:</span>
                                 </label>
                                 <!-- Text input to accept multiple traits -->
                                 <input type="text" id="otherTraitInput" class="form-control input-line" placeholder="Traits 1, Traits 2, Traits 3,...">
                             </div>                                                       
                         </div>
-                        <!-- Add a container for dynamically generated traits -->
-                        <div id="dynamicTraits"></div>
                         <div class="save-button">
                             <button type="button" id="saveButton" class="btn-save">Save</button>
                             <button type="button" class="btn-cancel" data-dismiss="modal">Cancel</button>
