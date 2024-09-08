@@ -40,11 +40,9 @@ function showNotification(message) {
     successModal.show();
 }
 
-// Fetch and store students, including their document ID (UID)
 async function fetchAppointments() {
   try {
     const studentsMap = new Map();
-
     // Real-time listener for applicants
     const unsubscribeApplicants = onSnapshot(collection(db, "applicants"), (applicantsSnapshot) => {
       applicantsSnapshot.forEach(applicantDoc => {
@@ -56,22 +54,70 @@ async function fetchAppointments() {
         // Only process if the role is "student"
         if (applicantData.role === "student") {
           applicantData.bookings = [];
-
           // Check if they have completed any of the courses
           if (applicantData.TDCStatus === "Completed" || 
               applicantData["PDC-4WheelsStatus"] === "Completed" || 
               applicantData["PDC-MotorsStatus"] === "Completed") {
-            studentsMap.set(applicantDoc.id, applicantData); // Use UID as key
+            studentsMap.set(applicantDoc.id, applicantData);
           }
         }
       });
 
-      // Process and update UI
-      studentsData = Array.from(studentsMap.values());
-      filteredStudentsData = studentsData;
-      totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
-      renderStudents();
-      updatePaginationControls();
+      // Listen to appointments changes
+      const unsubscribeAppointments = onSnapshot(collection(db, "appointments"), (appointmentsSnapshot) => {
+        appointmentsSnapshot.forEach(appointment => {
+          const appointmentData = appointment.data();
+          const bookings = Array.isArray(appointmentData.bookings) ? appointmentData.bookings : [];
+
+          bookings.forEach(booking => {
+            if (booking.status === "Cancelled" || booking.status === "Rescheduled") {
+              return;
+            }
+
+            const studentDocRef = doc(db, "applicants", booking.userId);
+            getDoc(studentDocRef).then(studentDoc => {
+              if (studentDoc.exists()) {
+                const studentData = studentDoc.data();
+
+                if (studentData.role === "student") {
+                  if (!studentsMap.has(booking.userId)) {
+                    studentData.bookings = [];
+                    studentsMap.set(booking.userId, studentData);
+                  }
+                  const student = studentsMap.get(booking.userId);
+                  student.bookings.push({ ...booking, appointmentId: appointment.id, course: appointmentData.course });
+                }
+              }
+            });
+          });
+        });
+
+        // Listen to completedBookings changes
+        const unsubscribeCompletedBookings = onSnapshot(collection(db, "completedBookings"), (completedBookingsSnapshot) => {
+          completedBookingsSnapshot.forEach(doc => {
+            const completedBookings = doc.data().completedBookings || [];
+            const userId = doc.id;
+
+            if (studentsMap.has(userId)) {
+              const studentData = studentsMap.get(userId);
+              completedBookings.forEach(booking => {
+                const course = booking.course;
+
+                if (!studentData[`${course}Status`] || studentData[`${course}Status`] !== "Completed") {
+                  studentData[`${course}Status`] = "Completed";
+                }
+              });
+            }
+          });
+
+          // After processing all data, update the global arrays and re-render the UI
+          studentsData = Array.from(studentsMap.values());
+          filteredStudentsData = studentsData;
+          totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
+          renderStudents();
+          updatePaginationControls();
+        });
+      });
     });
 
     return {
