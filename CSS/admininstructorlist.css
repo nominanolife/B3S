@@ -633,9 +633,17 @@ input:checked + .slider .slider-label-on {
 }
 
 #instructorModal .modal-dialog {
-    top: 14%;
+    top: 15%;
     left: 5%;
     border-radius: 20px;
+}
+
+#instructorModal .modal-content {
+    font-family: Poppins;
+    border-radius: 20px;
+    padding: 20px;
+    max-height: 70vh; /* Limits the modal's content height */
+    overflow-y: auto; /* Adds vertical scrolling if content exceeds the height */
 }
 
 #profilePicPreview {
@@ -644,9 +652,6 @@ input:checked + .slider .slider-label-on {
     border-radius: 50%;
     display: block;
     margin: 20px auto;
-}
-
-#profilePicPreview {
     width: 150px;
     height: 150px;
     border-radius: 50%;
@@ -669,7 +674,7 @@ input:checked + .slider .slider-label-on {
     background-color: #57606f;
 }
 
-.instructor-name, .instructor-course {
+.instructor-name {
     width: 100%;
     margin-bottom: 10px;
     padding: 10px;
@@ -677,33 +682,17 @@ input:checked + .slider .slider-label-on {
     border: 1px solid #ced4da;
 }
 
-.personal-traits {
-    margin-top: 10px;
-    margin-bottom: 20px;
-}
-
-.personal-traits h5 {
-    font-family: Poppins;
-    font-size: 18px;
-    font-weight: bold;
-    color: #142A74;
-    margin-bottom: 15px;
-}
-
-.traits {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    align-items: center;
-    justify-content: flex-start;
+.form-group-all {
+    margin-left: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
 }
 
 .custom-checkbox {
     display: flex;
     align-items: center;
     cursor: pointer;
-    width: calc(50% - 20px);
-    box-sizing: border-box;
 }
 
 .custom-checkbox input {
@@ -718,8 +707,7 @@ input:checked + .slider .slider-label-on {
     font-family: Poppins;
     font-size: 14px;
     font-weight: normal;
-    color: #142A74;
-    cursor: pointer;
+    color: #2F2E2E;
 }
 
 .custom-checkbox input + .checkbox-label::before {
@@ -753,6 +741,86 @@ input:checked + .slider .slider-label-on {
 
 .custom-checkbox input:checked + .checkbox-label::after {
     opacity: 1;
+}
+
+.personal-traits {
+    margin-bottom: 20px;
+}
+
+.personal-traits h5 {
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: bold;
+    color: #142A74;
+    margin-bottom: 15px;
+}
+
+.traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.traits-input-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    position: relative;
+}
+
+.traits-input {
+    outline: none;
+    width: 100%;
+    padding: 10px;
+    border: none;
+}
+
+.add-trait {
+    position: absolute;
+    right: 0;
+    background-color: #142A74;
+    color: #ffffff;
+    padding: 10px;
+    border: none;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    cursor: pointer;
+}
+
+.traits-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+}
+
+.trait-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    flex-basis: calc(33.33% - 10px);
+    max-width: calc(33.33% - 10px);
+    padding: 5px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+}
+
+.remove-trait {
+    background: none;
+    border: none;
+}
+
+.remove-trait i {
+    vertical-align: middle;
+    color: #B60505;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
 .save-instructor {

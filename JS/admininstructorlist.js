@@ -27,6 +27,9 @@ const closeModalButton = document.querySelector('.close-modal');
 const instructorNameInput = document.querySelector('.instructor-name');
 const instructorCourseInput = document.querySelector('.instructor-course');
 const paginationControls = document.querySelector('.pagination-controls');
+const traitsInput = document.querySelector('.traits-input');
+const addTraitButton = document.querySelector('.add-trait');
+const traitsList = document.querySelector('.traits-list');
 let instructorIdToDelete = null; // Store the ID of the instructor to delete
 let currentInstructorId = null; // Store the current instructor's ID for editing
 
@@ -198,6 +201,91 @@ async function uploadImage(file, instructorId) {
   }
 }
 
+// Search instructors by name
+function searchInstructors(event) {
+  const query = event.target.value.toLowerCase();
+  filteredInstructors = instructors.filter(instructor =>
+    instructor.name.toLowerCase().startsWith(query)
+  );
+  currentPage = 1; // Reset to first page after search
+  totalPages = Math.ceil(filteredInstructors.length / itemsPerPage);
+  renderInstructors();
+  updatePaginationControls();
+}
+
+// Event Listeners
+addInstructorButton.addEventListener('click', () => {
+  instructorModal.show();
+  instructorNameInput.value = ''; // Clear fields before opening the modal
+  instructorCourseInput.value = '';
+});
+
+closeModalButton.addEventListener('click', () => instructorModal.hide());
+searchInput.addEventListener('input', searchInstructors);
+instructorList.addEventListener('click', function (event) {
+  if (event.target.classList.contains('dropdown-item')) {
+    if (event.target.textContent.includes('Edit')) {
+      editInstructor(event);
+    } else if (event.target.textContent.includes('Delete')) {
+      deleteInstructor(event); // Trigger the delete modal
+    }
+    
+    // Close the dropdown after an option is selected
+    const dropdownContent = event.target.closest('.dropdown-content');
+    if (dropdownContent) {
+      dropdownContent.classList.remove('show');
+    }
+  }
+});
+
+// Handle sidebar button active state
+document.addEventListener('DOMContentLoaded', function () {
+  const buttons = document.querySelectorAll('.button-right');
+
+  buttons.forEach(button => {
+    button.addEventListener('click', function () {
+      buttons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Fetch and display instructors on page load
+  fetchInstructors();
+});
+
+// Add event listener for the Add Trait button
+addTraitButton.addEventListener('click', function(event) {
+  event.preventDefault(); // Prevent the form from submitting
+
+  // Get the value from the traits input
+  const trait = traitsInput.value.trim();
+
+  if (trait) {
+      // Create a new trait element
+      const traitElement = document.createElement('div');
+      traitElement.classList.add('trait-item');
+      traitElement.textContent = trait;
+    
+      // Optionally add a delete button for each trait
+      const deleteButton = document.createElement('i');
+      deleteButton.classList.add('remove-trait');
+      deleteButton.innerHTML = '<i class="bi bi-x"></i>';
+    
+      // Add event listener to remove the trait
+      deleteButton.addEventListener('click', function() {
+          traitsList.removeChild(traitElement);
+      });
+    
+      traitElement.appendChild(deleteButton);
+      traitsList.appendChild(traitElement);
+    
+      // Clear the input after adding
+      traitsInput.value = '';
+  } else {
+      alert("Please enter a trait before adding.");
+  }
+});
+
 // Add or Edit instructor based on the mode
 async function saveInstructor(event) {
   event.preventDefault();
@@ -323,56 +411,4 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', async func
             console.error('Error deleting instructor:', error);
         }
     }
-});
-
-// Search instructors by name
-function searchInstructors(event) {
-  const query = event.target.value.toLowerCase();
-  filteredInstructors = instructors.filter(instructor =>
-    instructor.name.toLowerCase().startsWith(query)
-  );
-  currentPage = 1; // Reset to first page after search
-  totalPages = Math.ceil(filteredInstructors.length / itemsPerPage);
-  renderInstructors();
-  updatePaginationControls();
-}
-
-// Event Listeners
-addInstructorButton.addEventListener('click', () => {
-  instructorModal.show();
-  instructorNameInput.value = ''; // Clear fields before opening the modal
-  instructorCourseInput.value = '';
-});
-
-closeModalButton.addEventListener('click', () => instructorModal.hide());
-searchInput.addEventListener('input', searchInstructors);
-instructorList.addEventListener('click', function (event) {
-  if (event.target.classList.contains('dropdown-item')) {
-    if (event.target.textContent.includes('Edit')) {
-      editInstructor(event);
-    } else if (event.target.textContent.includes('Delete')) {
-      deleteInstructor(event); // Trigger the delete modal
-    }
-    
-    // Close the dropdown after an option is selected
-    const dropdownContent = event.target.closest('.dropdown-content');
-    if (dropdownContent) {
-      dropdownContent.classList.remove('show');
-    }
-  }
-});
-
-// Handle sidebar button active state
-document.addEventListener('DOMContentLoaded', function () {
-  const buttons = document.querySelectorAll('.button-right');
-
-  buttons.forEach(button => {
-    button.addEventListener('click', function () {
-      buttons.forEach(btn => btn.classList.remove('active'));
-      this.classList.add('active');
-    });
-  });
-
-  // Fetch and display instructors on page load
-  fetchInstructors();
 });

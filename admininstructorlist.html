@@ -89,6 +89,62 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
+                    <h4>Add Instructor</h4>
+                </div>
+                <form class="modal-body">
+                    <div class="profile-pic-container">
+                        <img id="profilePicPreview" class="profile-pic-modal" src="Assets/default-profile.png" alt="Profile Picture">
+                        <i id="uploadIcon" class="fa fa-camera"></i>
+                        <input type="file" id="editProfilePic" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="input-body">
+                        <input type="text" class="instructor-name" placeholder="Instructor Name" required>
+                        <div class="form-group-all">
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox">
+                                    <span class="checkbox-label">TDC</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox">
+                                    <span class="checkbox-label">PDC-4Wheels</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox">
+                                    <span class="checkbox-label">PDC-Motorcycle</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="personal-traits">
+                        <h5>Personal Traits</h5>
+                        <div class="traits">
+                            <div class="traits-input-container">
+                                <input type="text" class="traits-input" placeholder="Add personal traits" required>
+                                <button class="add-trait">Add</button>
+                            </div>
+                        </div>
+                        <div class="traits-list">
+
+                        </div>
+                    </div>                  
+                    <div class="modal-footer">
+                        <button class="save-instructor" type="submit">Save</button>
+                        <button class="close-modal" type="button" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editInstructorModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
                     <h4>Edit Instructor</h4>
                 </div>
                 <form class="modal-body">
@@ -99,36 +155,42 @@
                     </div>
                     <div class="input-body">
                         <input type="text" class="instructor-name" placeholder="Instructor Name" required>
-                        <input type="text" class="instructor-course" placeholder="Course" required>
+                        <div class="form-group-all">
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox">
+                                    <span class="checkbox-label">TDC</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox">
+                                    <span class="checkbox-label">PDC-4Wheels</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox">
+                                    <span class="checkbox-label">PDC-Motorcycle</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <div class="personal-traits">
                         <h5>Personal Traits</h5>
                         <div class="traits">
-                          <div class="custom-checkbox trait">
-                            <input type="checkbox" class="trait-checkbox" id="trait1" value="Punctual">
-                            <label for="trait1" class="checkbox-label">Punctual</label>
-                          </div>
-                          <div class="custom-checkbox trait">
-                            <input type="checkbox" class="trait-checkbox" id="trait2" value="Patient">
-                            <label for="trait2" class="checkbox-label">Patient</label>
-                          </div>
-                          <div class="custom-checkbox trait">
-                            <input type="checkbox" class="trait-checkbox" id="trait3" value="Friendly">
-                            <label for="trait3" class="checkbox-label">Friendly</label>
-                          </div>
-                          <div class="custom-checkbox trait">
-                            <input type="checkbox" class="trait-checkbox" id="trait4" value="Professional">
-                            <label for="trait4" class="checkbox-label">Professional</label>
-                          </div>
-                          <div class="custom-checkbox trait">
-                            <input type="checkbox" class="trait-checkbox" id="trait5" value="Experienced">
-                            <label for="trait5" class="checkbox-label">Experienced</label>
-                          </div>
+                            <div class="traits-input-container">
+                                <input type="text" class="traits-input" placeholder="Add personal traits" required>
+                                <button class="add-trait">Add</button>
+                            </div>
                         </div>
-                      </div>                   
+                        <div class="traits-list">
+
+                        </div>
+                    </div>                  
                     <div class="modal-footer">
                         <button class="save-instructor" type="submit">Save</button>
-                        <button class="close-modal" type="button">Cancel</button>
+                        <button class="close-modal" type="button" data-dismiss="modal">Cancel</button>
                     </div>
                 </form>
             </div>

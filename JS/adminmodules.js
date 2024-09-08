@@ -78,7 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.modal('hide'); // Use Bootstrap's hide method
         }
     }
-    
 
     // Function to handle file input changes
     function handleFileInputChange(inputSelector, displaySelector) {
