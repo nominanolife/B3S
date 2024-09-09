@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
     
-        // Show the loader
+        // Show the loader before starting the matching process
         loader.style.display = 'flex';  
         let progress = 0;
     
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             progress = Math.min(progress + increment, 100);
             loadingBar.style.width = `${progress}%`;
             loadingPercentage.textContent = `${progress}%`;
-
+    
             // Change the loading percentage text color to white when progress is 48% or more
             if (progress >= 48) {
                 loadingPercentage.style.color = 'white';
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             // Initial progress update - Fetching match data
             updateLoader(30);
-    
+        
             // Start matching process
             const response = await fetch(`http://127.0.0.1:5000/match/${studentId}`, {
                 method: 'GET',
@@ -142,42 +142,49 @@ document.addEventListener('DOMContentLoaded', async () => {
                     'Content-Type': 'application/json',
                 },
             });
-            
+        
             updateLoader(40); // Increment as data is fetched
-    
+        
             const data = await response.json();
             console.log('Data received:', data);
-    
+        
             if (data.status === 'success') {
                 const studentId = data.student_id;
                 const instructorId = data.instructor_id;
-    
+        
                 // Update loader progress while saving the match
                 updateLoader(20);
-    
+        
                 await saveMatchToFirestore(studentId, instructorId);
-    
+        
                 // Complete the loader progress when everything is done
                 updateLoader(10);
                 loadingBar.style.width = '100%';
                 loadingPercentage.textContent = '100%';
-    
-                // Delay a bit before redirecting to ensure smooth user experience
+        
+                // Add a slight delay before proceeding to hide the loader
                 setTimeout(() => {
+                    // Hide the loader first
                     loader.style.display = 'none';
-                    window.location.href = 'userinstructormatch.html';  // Redirect to matched instructor page
-                }, 500);
+        
+                    // Redirect after completing the matching process
+                    setTimeout(() => {
+                        window.location.href = 'userinstructormatch.html'; // Redirect to matched instructor page
+                    });
+                });
             } else {
+                // Error handling
                 showNotification('An error occurred: ' + data.message);
                 loader.style.display = 'none';
             }
         } catch (error) {
+            // Error handling
             console.error('Error:', error);
             showNotification('An error occurred while contacting the server: ' + error.message);
             loader.style.display = 'none';
-        }
-    });    
-
+        }        
+    });
+    
     // Function to handle saving the traits
     document.getElementById('saveButton').addEventListener('click', async function () {
         const saveButton = document.getElementById('saveButton');
@@ -244,7 +251,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             saveButton.disabled = false;
         }
     });
-      
 
     async function saveMatchToFirestore(studentId, instructorId) {
         try {
@@ -260,7 +266,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, { merge: true }); // Ensure it merges with existing data
     
             console.log('Match successfully saved to Firestore');
-            showNotification('You have been successfully matched with the instructor.');
     
         } catch (error) {
             console.error('Error saving match to Firestore:', error);
