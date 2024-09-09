@@ -1,22 +1,22 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-import { writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { writeBatch } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
-  authDomain: "authentication-d6496.firebaseapp.com",
-  projectId: "authentication-d6496",
-  storageBucket: "authentication-d6496.appspot.com",
-  messagingSenderId: "195867894399",
-  appId: "1:195867894399:web:596fb109d308aea8b6154a"
+    apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+    authDomain: "authentication-d6496.firebaseapp.com",
+    projectId: "authentication-d6496",
+    storageBucket: "authentication-d6496.appspot.com",
+    messagingSenderId: "195867894399",
+    appId: "1:195867894399:web:596fb109d308aea8b6154a"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-document.addEventListener("DOMContentLoaded", async function() {
+document.addEventListener("DOMContentLoaded", async function () {
     // Get elements
     const addButton = document.getElementById("addButton");
     const deleteButton = document.getElementById("deleteButton");
@@ -44,15 +44,15 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     let packageElementToDelete = null;
     let packageIdToEdit = null;
-    let allPackages = [];  // Store all packages to filter them
+    let allPackages = []; // Store all packages to filter them
 
     // Create and style cancel button
-    const cancelButton = document.createElement('button');
+    const cancelButton = document.createElement("button");
     cancelButton.textContent = "Cancel";
     cancelButton.className = "cancel-button";
     cancelButton.style.display = "none"; // Initially hidden
-    cancelButton.style.backgroundColor = "#7B1719"; 
-    cancelButton.style.color = "#ffffff"; 
+    cancelButton.style.backgroundColor = "#7B1719";
+    cancelButton.style.color = "#ffffff";
     cancelButton.style.border = "none";
     cancelButton.style.borderRadius = "10px";
     cancelButton.style.padding = "10px 20px";
@@ -63,9 +63,9 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     // Function to restrict input to numbers only
     function restrictToNumbers(inputElement) {
-        inputElement.addEventListener('input', function(event) {
-            // Remove any non-numeric characters
-            this.value = this.value.replace(/[^0-9.]/g, '');
+        inputElement.addEventListener("input", function () {
+        // Remove any non-numeric characters
+        this.value = this.value.replace(/[^0-9.]/g, "");
         });
     }
 
@@ -74,61 +74,42 @@ document.addEventListener("DOMContentLoaded", async function() {
     restrictToNumbers(editPackagePriceInput);
 
     // Add the cancel button to the buttons container
-    const buttonsContainer = document.querySelector('.buttons');
+    const buttonsContainer = document.querySelector(".buttons");
     buttonsContainer.appendChild(cancelButton);
 
     // Show modal when "Add Package" button is clicked
-    addButton.addEventListener("click", function() {
-        packageModal.style.display = "block";
+    addButton.addEventListener("click", function () {
+        // Use Bootstrap's modal method to show the modal
+        $(packageModal).modal("show");
     });
 
     // Hide modal when "Close" button is clicked
-    closeModal.addEventListener("click", function() {
-        packageModal.style.display = "none";
+    closeModal.addEventListener("click", function () {
+        // Use Bootstrap's modal method to hide the modal
+        $(packageModal).modal("hide");
     });
 
     // Hide delete confirmation modal when "Cancel" button is clicked
-    cancelDeleteModalButton.addEventListener("click", function() {
-        deleteConfirmModal.style.display = "none";
+    cancelDeleteModalButton.addEventListener("click", function () {
+        // Use Bootstrap's modal method to hide the modal
+        $(deleteConfirmModal).modal("hide");
         packageElementToDelete = null;
     });
 
     // Hide edit modal when "Close" button is clicked
-    closeEditModal.addEventListener("click", function() {
-        editPackageModal.style.display = "none";
+    closeEditModal.addEventListener("click", function () {
+        // Use Bootstrap's modal method to hide the modal
+        $(editPackageModal).modal("hide");
     });
 
     // Cancel button functionality
-    cancelButton.addEventListener("click", function() {
-        // Hide cancel button
-        cancelButton.style.display = "none";
-
-        // Show the Add and Delete buttons again
-        addButton.style.display = "inline";
-        deleteButton.style.display = "inline";
-
-        // Hide delete button animations
-        const deleteButtons = document.querySelectorAll(".delete-button");
-        deleteButtons.forEach(button => {
-            button.style.display = "none"; // Hide delete button
-            button.classList.remove("wiggle"); // Remove wiggle animation
-        });
+    cancelButton.addEventListener("click", function () {
+        cancelDeleteMode();
     });
 
     // Show delete buttons when "Delete Package" button is clicked
-    deleteButton.addEventListener("click", function() {
-        // Hide Add and Delete buttons
-        addButton.style.display = "none";
-        deleteButton.style.display = "none";
-
-        // Show the Cancel button
-        cancelButton.style.display = "inline";
-
-        const deleteButtons = document.querySelectorAll(".delete-button");
-        deleteButtons.forEach(button => {
-            button.style.display = "inline"; // Show the delete button
-            button.classList.add("wiggle"); // Add wiggle animation
-        });
+    deleteButton.addEventListener("click", function () {
+        activateDeleteMode();
     });
 
     // Function to show delete mode
@@ -141,15 +122,15 @@ document.addEventListener("DOMContentLoaded", async function() {
         cancelButton.style.display = "inline";
 
         const deleteButtons = document.querySelectorAll(".delete-button");
-        deleteButtons.forEach(button => {
-            button.style.display = "inline"; // Show the delete button
-            button.classList.add("wiggle"); // Add wiggle animation
+        deleteButtons.forEach((button) => {
+        button.style.display = "inline"; // Show the delete button
+        button.classList.add("wiggle"); // Add wiggle animation
         });
 
         // Hide edit buttons
         const editButtons = document.querySelectorAll(".bi-three-dots-vertical");
-        editButtons.forEach(button => {
-            button.classList.add("hide-bi-three-dots-vertical"); // Hide edit button
+        editButtons.forEach((button) => {
+        button.classList.add("hide-bi-three-dots-vertical"); // Hide edit button
         });
     }
 
@@ -164,74 +145,83 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         // Hide delete button animations
         const deleteButtons = document.querySelectorAll(".delete-button");
-        deleteButtons.forEach(button => {
-            button.style.display = "none"; // Hide delete button
-            button.classList.remove("wiggle"); // Remove wiggle animation
+        deleteButtons.forEach((button) => {
+        button.style.display = "none"; // Hide delete button
+        button.classList.remove("wiggle"); // Remove wiggle animation
         });
 
         // Show edit buttons
         const editButtons = document.querySelectorAll(".bi-three-dots-vertical");
-        editButtons.forEach(button => {
-            button.classList.remove("hide-bi-three-dots-vertical"); // Show edit button
+        editButtons.forEach((button) => {
+        button.classList.remove("hide-bi-three-dots-vertical"); // Show edit button
         });
     }
 
-    // Show delete buttons when "Delete Package" button is clicked
-    deleteButton.addEventListener("click", function() {
-        activateDeleteMode();
-    });
+    // Attach delete event to the delete button within the DOM
+    function attachDeleteEvent(packageElement, packageId) {
+        const deleteButton = packageElement.querySelector(".delete-button");
+        deleteButton.addEventListener("click", function () {
+        packageElementToDelete = packageElement; // Set the element to delete
+        $(deleteConfirmModal).modal("show"); // Show the confirmation modal
+        });
+    }
 
-    // Cancel button functionality
-    cancelButton.addEventListener("click", function() {
-        cancelDeleteMode();
-    });
-
-    // Confirm delete button click event
-    confirmDeleteButton.addEventListener("click", async function() {
+    // Confirm delete button click event handler
+    confirmDeleteButton.addEventListener("click", async function () {
         if (packageElementToDelete) {
-            const packageId = packageElementToDelete.getAttribute("data-id");
+        const packageId = packageElementToDelete.getAttribute("data-id");
+        try {
             await deletePackageFromFirestore(packageId);
-            deleteConfirmModal.style.display = "none";
+            $(deleteConfirmModal).modal("hide");
             packageElementToDelete = null;
 
-            // Cancel delete mode after successful deletion
-            cancelButton.style.display = "none"; // Hide cancel button
-            addButton.style.display = "inline"; // Show add button
-            deleteButton.style.display = "inline"; // Show delete button
-
-            // Hide delete button animations
-            const deleteButtons = document.querySelectorAll(".delete-button");
-            deleteButtons.forEach(button => {
-                button.style.display = "none"; // Hide delete button
-                button.classList.remove("wiggle"); // Remove wiggle animation
-            });
+            // Reset the UI after successful deletion
+            cancelDeleteMode();
+        } catch (error) {
+            console.error("Error deleting package: ", error);
+            showNotificationModal("Failed to delete package. Please try again.", "error");
+        }
         }
     });
+
+    // Function to delete package from Firestore
+    async function deletePackageFromFirestore(packageId) {
+        try {
+        await deleteDoc(doc(db, "packages", packageId)); // Delete the package from Firestore
+        if (packageElementToDelete) {
+            packageList.removeChild(packageElementToDelete); // Remove the package from the DOM
+        }
+
+        showNotificationModal("Package deleted successfully!", "success");
+        } catch (e) {
+        console.error("Error deleting document: ", e);
+        showNotificationModal("Failed to delete package. Please try again.", "error");
+        }
+    }
 
     // Function to create a new package
     async function addPackageToFirestore(packageName, packagePrice, packageDescription, packageType) {
         // Validate input fields and checkbox
         if (!packageName || !packagePrice || !packageDescription || !packageType) {
-            showNotificationModal("Please fill in all fields and select at least one package type.", "error");
-            return; // Exit the function if validation fails
+        showNotificationModal("Please fill in all fields and select at least one package type.", "error");
+        return; // Exit the function if validation fails
         }
 
         try {
-            // Save package data to Firestore
-            const docRef = await addDoc(collection(db, "packages"), {
-                name: packageName,
-                price: packagePrice,
-                description: packageDescription,
-                type: packageType  // Include the package type
-            });
+        // Save package data to Firestore
+        const docRef = await addDoc(collection(db, "packages"), {
+            name: packageName,
+            price: packagePrice,
+            description: packageDescription,
+            type: packageType // Include the package type
+        });
 
-            addPackageToDOM(docRef.id, packageName, packagePrice, packageDescription, packageType);
+        addPackageToDOM(docRef.id, packageName, packagePrice, packageDescription, packageType);
 
-            showNotificationModal("Package Added Successfully!", "success");
-
+        showNotificationModal("Package Added Successfully!", "success");
         } catch (e) {
-            console.error("Error adding document: ", e);
-            showNotificationModal("Failed to add package. Please try again.", "error");
+        console.error("Error adding document: ", e);
+        showNotificationModal("Failed to add package. Please try again.", "error");
         }
     }
 
@@ -241,301 +231,280 @@ document.addEventListener("DOMContentLoaded", async function() {
         packageElement.classList.add("package-text");
         packageElement.setAttribute("data-id", id);
         packageElement.innerHTML = `
-            <h1>${packageType.join(' + ')}</h1>
-            <h2>${packageName}</h2>
-            <span>Price: &#8369;${packagePrice}</span>
-            <h4>${packageDescription}</h4>
-            <i class="bi bi-three-dots-vertical"></i>
-            <i class="delete-button">&times;</i>
-        `;
+                <h1>${packageType.join(' + ')}</h1>
+                <h2>${packageName}</h2>
+                <span>Price: &#8369;${packagePrice}</span>
+                <h4>${packageDescription}</h4>
+                <i class="bi bi-three-dots-vertical"></i>
+                <i class="delete-button">&times;</i>
+            `;
 
-        // Append the new package to the package list
         packageList.appendChild(packageElement);
-
-        // Attach delete event to the delete button
-        const deleteButton = packageElement.querySelector(".delete-button");
-        deleteButton.addEventListener("click", function() {
-            packageElementToDelete = packageElement;
-            deleteConfirmModal.style.display = "block";
-        });
+        attachDeleteEvent(packageElement, id); // Attach delete event to the package
 
         // Attach edit event to the edit button
         const editButton = packageElement.querySelector(".bi-three-dots-vertical");
-        editButton.addEventListener("click", function() {
-            showEditModal(packageElement);
+        editButton.addEventListener("click", function () {
+        showEditModal(packageElement);
         });
-    }
-
-    // Function to delete package from Firestore
-    async function deletePackageFromFirestore(packageId) {
-        try {
-            await deleteDoc(doc(db, "packages", packageId));
-            if (packageElementToDelete) {
-                packageList.removeChild(packageElementToDelete);
-            }
-
-            // Show success notification modal
-            showNotificationModal("Package deleted successfully!", "success");
-        } catch (e) {
-            console.error("Error deleting document: ", e);
-
-            // Show error notification modal
-            showNotificationModal("Failed to delete package. Please try again.", "error");
-        }
     }
 
     async function updatePackageInFirestore(packageId, packageName, packagePrice, packageDescription, packageType) {
         // Validate input fields and ensure no duplicate values in packageType
         if (!packageName || !packagePrice || !packageDescription || !packageType || packageType.length === 0) {
-            showNotificationModal("Please fill in all fields and select at least one package type.", "error");
-            return; // Exit the function if validation fails
+        showNotificationModal("Please fill in all fields and select at least one package type.", "error");
+        return; // Exit the function if validation fails
         }
-    
+
         // Ensure there are no duplicate values in packageType
         const uniquePackageTypes = [...new Set(packageType)];
-    
+
         const batch = writeBatch(db);
-    
+
         try {
-            // Update the package document
-            const packageRef = doc(db, "packages", packageId);
-            batch.update(packageRef, {
-                name: packageName,
-                price: packagePrice,
-                description: packageDescription,
-                type: uniquePackageTypes // Use the unique package types
+        // Update the package document
+        const packageRef = doc(db, "packages", packageId);
+        batch.update(packageRef, {
+            name: packageName,
+            price: packagePrice,
+            description: packageDescription,
+            type: uniquePackageTypes // Use the unique package types
+        });
+
+        // Fetch all applicants
+        const applicantsSnapshot = await getDocs(collection(db, "applicants"));
+
+        // Update enrolled package information for relevant applicants
+        let updatedCount = 0;
+        for (const applicantDoc of applicantsSnapshot.docs) {
+            const applicantData = applicantDoc.data();
+
+            // Check if the applicant is enrolled in the package by matching the package ID
+            if (applicantData.packageId === packageId) {
+            // Ensure it updates relevant applicants by package ID
+            const applicantRef = doc(db, "applicants", applicantDoc.id);
+
+            batch.update(applicantRef, {
+                enrolledPackage: packageName, // Update to new package name
+                packagePrice: packagePrice, // Update to new package price
+                packageType: uniquePackageTypes // Update to new package types
             });
-    
-            // Fetch all applicants
-            const applicantsSnapshot = await getDocs(collection(db, "applicants"));
-    
-            // Update enrolled package information for relevant applicants
-            let updatedCount = 0;
-            for (const applicantDoc of applicantsSnapshot.docs) {
-                const applicantData = applicantDoc.data();
-    
-                // Check if the applicant is enrolled in the package by matching the package ID
-                if (applicantData.packageId === packageId) { // Ensure it updates relevant applicants by package ID
-                    const applicantRef = doc(db, "applicants", applicantDoc.id);
-    
-                    batch.update(applicantRef, {
-                        enrolledPackage: packageName,  // Update to new package name
-                        packagePrice: packagePrice,   // Update to new package price
-                        packageType: uniquePackageTypes // Update to new package types
-                    });
-                    updatedCount++;
-                }
+            updatedCount++;
             }
-    
-            await batch.commit(); // Commit the batch operation
-            console.log(`Updated ${updatedCount} applicants.`);
-    
-            // Show success notification modal
-            showNotificationModal("Package updated successfully!", "success");
+        }
+
+        await batch.commit(); // Commit the batch operation
+        console.log(`Updated ${updatedCount} applicants.`);
+
+        // Show success notification modal
+        showNotificationModal("Package updated successfully!", "success");
         } catch (e) {
-            console.error("Error updating document: ", e);
-    
-            // Show error notification modal
-            showNotificationModal("Failed to update package. Please try again.", "error");
+        console.error("Error updating document: ", e);
+
+        // Show error notification modal
+        showNotificationModal("Failed to update package. Please try again.", "error");
         }
     }
 
     function showNotificationModal(message, type) {
         const notificationModal = document.getElementById("notificationModal");
         const notificationModalBody = document.getElementById("notificationModalBody");
-        
+
         notificationModalBody.textContent = message;
-        
+
         if (type === "success") {
-            notificationModalBody.style.color = "green";
+        notificationModalBody.style.color = "green";
         } else if (type === "error") {
-            notificationModalBody.style.color = "red";
+        notificationModalBody.style.color = "red";
         }
-    
-        $(notificationModal).modal('show');
+
+        $(notificationModal).modal("show");
     }
 
     //Function to handle checkbox changes
     function handleCheckboxChange(packageId, checkbox) {
         // Get the current package document reference
         const packageRef = doc(db, "packages", packageId);
-    
+
         // Get the current value of the package type from the database
         getDoc(packageRef).then((docSnap) => {
-            if (docSnap.exists()) {
-                let packageTypes = docSnap.data().type || [];
-    
-                if (checkbox.checked) {
-                    // If checked and not already in the array, add the type
-                    if (!packageTypes.includes(checkbox.value)) {
-                        packageTypes.push(checkbox.value);
-                    }
-                } else {
-                    // If unchecked, remove the type from the array
-                    packageTypes = packageTypes.filter(type => type !== checkbox.value);
-                }
-    
-                // Update the package in Firestore
-                updateDoc(packageRef, { type: packageTypes })
-                    .then(() => {
-                        console.log("Package types updated successfully.");
-                    })
-                    .catch((error) => {
-                        console.error("Error updating package types: ", error);
-                    });
+        if (docSnap.exists()) {
+            let packageTypes = docSnap.data().type || [];
+
+            if (checkbox.checked) {
+            // If checked and not already in the array, add the type
+            if (!packageTypes.includes(checkbox.value)) {
+                packageTypes.push(checkbox.value);
             }
+            } else {
+            // If unchecked, remove the type from the array
+            packageTypes = packageTypes.filter((type) => type !== checkbox.value);
+            }
+
+            // Update the package in Firestore
+            updateDoc(packageRef, { type: packageTypes })
+            .then(() => {
+                console.log("Package types updated successfully.");
+            })
+            .catch((error) => {
+                console.error("Error updating package types: ", error);
+            });
+        }
         });
     }
-    
+
     // Show the edit modal and populate fields
     function showEditModal(packageElement) {
         packageIdToEdit = packageElement.getAttribute("data-id");
         const name = packageElement.querySelector("h2").textContent;
         const priceText = packageElement.querySelector("span").textContent;
-        const price = priceText.replace(/[^0-9.]/g, '');
+        const price = priceText.replace(/[^0-9.]/g, "");
         const description = packageElement.querySelector("h4").textContent;
-    
+
         document.querySelector(".edit-package-name").value = name;
         document.querySelector(".edit-package-price").value = price;
         document.querySelector(".edit-package-description").value = description;
-    
-        document.querySelectorAll('input[name="editCourseType"]').forEach(checkbox => {
-            checkbox.checked = false; // Clear previous selections
+
+        document.querySelectorAll('input[name="editCourseType"]').forEach((checkbox) => {
+        checkbox.checked = false; // Clear previous selections
         });
-    
+
         const packageTypes = packageElement.querySelector("h1").textContent.split(" + ");
-        packageTypes.forEach(type => {
-            const checkbox = document.querySelector(`input[name="editCourseType"][value="${type.trim()}"]`);
-            if (checkbox) {
-                checkbox.checked = true;
-            }
-        });
-    
-        document.querySelectorAll('input[name="editCourseType"]').forEach(checkbox => {
-            // Attach the change event listener to each checkbox
-            checkbox.addEventListener('change', function() {
-                handleCheckboxChange(packageIdToEdit, checkbox);
-            });
-        });
-    
-        const editPackageModal = document.getElementById("editPackageModal");
-        if (editPackageModal) {
-            editPackageModal.style.display = "block";
-        } else {
-            console.error("Edit modal not found in the DOM.");
+        packageTypes.forEach((type) => {
+        const checkbox = document.querySelector(`input[name="editCourseType"][value="${type.trim()}"]`);
+        if (checkbox) {
+            checkbox.checked = true;
         }
+        });
+
+        document.querySelectorAll('input[name="editCourseType"]').forEach((checkbox) => {
+        // Attach the change event listener to each checkbox
+        checkbox.addEventListener("change", function () {
+            handleCheckboxChange(packageIdToEdit, checkbox);
+        });
+        });
+
+        // Use Bootstrap's modal method to show the edit modal
+        $(editPackageModal).modal("show");
     }
-    
+
     // Update package details
-updatePackage.addEventListener("click", async function(event) {
-    event.preventDefault(); // Prevent form submission
+    updatePackage.addEventListener("click", async function (event) {
+        event.preventDefault(); // Prevent form submission
 
-    // Get updated package details from inputs
-    const packageName = editPackageNameInput.value;
-    const packagePrice = editPackagePriceInput.value;
-    const packageDescription = editPackageDescriptionInput.value;
+        // Get updated package details from inputs
+        const packageName = editPackageNameInput.value;
+        const packagePrice = editPackagePriceInput.value;
+        const packageDescription = editPackageDescriptionInput.value;
 
-    // Get selected package types from checkboxes
-    const selectedTypes = document.querySelectorAll('input[name="editCourseType"]:checked');
-    const packageType = Array.from(selectedTypes).map(input => input.value);
+        // Get selected package types from checkboxes
+        const selectedTypes = document.querySelectorAll('input[name="editCourseType"]:checked');
+        const packageType = Array.from(selectedTypes).map((input) => input.value);
 
-    if (packageName && packagePrice && packageDescription) {
-        if (packageIdToEdit) {
-            // Update the package in Firestore
-            await updatePackageInFirestore(packageIdToEdit, packageName, packagePrice, packageDescription, packageType);
-            
-            // Update the package in the DOM
-            const packageElement = document.querySelector(`.package-text[data-id="${packageIdToEdit}"]`);
-            
-            if (packageElement) {
-                const packageNameElement = packageElement.querySelector("h2");
-                const packagePriceElement = packageElement.querySelector("span:nth-child(2)");
-                const packageTypeElement = packageElement.querySelector("h1");
-                const packageDescriptionElement = packageElement.querySelector("h4");
+        if (packageName && packagePrice && packageDescription) {
+            if (packageIdToEdit) {
+                // Update the package in Firestore
+                await updatePackageInFirestore(packageIdToEdit, packageName, packagePrice, packageDescription, packageType);
 
-                if (packageNameElement) {
-                    packageNameElement.textContent = packageName;
-                }
-                if (packagePriceElement) {
-                    packagePriceElement.innerHTML = `Price: &#8369;${packagePrice}`;
-                }
-                if (packageTypeElement) {
-                    packageTypeElement.innerHTML = packageType.join(' + ');
-                }
-                if (packageDescriptionElement) {
-                    packageDescriptionElement.textContent = packageDescription;
-                }
-            } else {
-                console.error(`Package element with ID ${packageIdToEdit} not found.`);
+                // Update the package in the DOM directly without reloading all packages
+                updatePackageInDOM(packageIdToEdit, packageName, packagePrice, packageDescription, packageType);
+
+                // Hide the edit modal properly using Bootstrap's method
+                $(editPackageModal).modal('hide');
+
+                // Clear the input fields
+                editPackageNameInput.value = "";
+                editPackagePriceInput.value = "";
+                editPackageDescriptionInput.value = "";
             }
-
-            // Hide the edit modal
-            editPackageModal.style.display = "none";
-
-            // Clear the input fields
-            editPackageNameInput.value = '';
-            editPackagePriceInput.value = '';
-            editPackageDescriptionInput.value = '';
+        } else {
+            showNotificationModal("Please fill out all fields.", "error");
         }
-    } else {
-        showNotificationModal("Please fill out all fields.", "error");
+    });
+
+    // Function to update the package in the DOM
+    function updatePackageInDOM(id, packageName, packagePrice, packageDescription, packageType) {
+        // Find the package element in the DOM
+        const packageElement = document.querySelector(`.package-text[data-id="${id}"]`);
+
+        if (packageElement) {
+            // Update the corresponding fields
+            const packageNameElement = packageElement.querySelector("h2");
+            const packagePriceElement = packageElement.querySelector("span");
+            const packageTypeElement = packageElement.querySelector("h1");
+            const packageDescriptionElement = packageElement.querySelector("h4");
+
+            if (packageNameElement) {
+                packageNameElement.textContent = packageName;
+            }
+            if (packagePriceElement) {
+                packagePriceElement.innerHTML = `Price: &#8369;${packagePrice}`;
+            }
+            if (packageTypeElement) {
+                packageTypeElement.innerHTML = packageType.join(" + ");
+            }
+            if (packageDescriptionElement) {
+                packageDescriptionElement.textContent = packageDescription;
+            }
+        } else {
+            console.error(`Package element with ID ${id} not found.`);
+        }
     }
-});
 
     // Load existing packages from Firestore and add to DOM
     async function loadPackages() {
         try {
-            const querySnapshot = await getDocs(collection(db, "packages"));
-            allPackages = querySnapshot.docs.map((doc) => {
-                const data = doc.data();
-                return {
-                    id: doc.id,
-                    ...data
-                };
-            });
+        const querySnapshot = await getDocs(collection(db, "packages"));
+        allPackages = querySnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+            id: doc.id,
+            ...data
+            };
+        });
 
-            renderPackages(allPackages);
+        renderPackages(allPackages);
         } catch (e) {
-            console.error("Error loading packages: ", e);
+        console.error("Error loading packages: ", e);
         }
     }
 
     // Function to render packages based on the filter
     function renderPackages(packages) {
-        packageList.innerHTML = ''; // Clear the current package list
-        packages.forEach(pkg => {
-            addPackageToDOM(pkg.id, pkg.name, pkg.price, pkg.description, pkg.type || []);
+        packageList.innerHTML = ""; // Clear the current package list
+        packages.forEach((pkg) => {
+        addPackageToDOM(pkg.id, pkg.name, pkg.price, pkg.description, pkg.type || []);
         });
     }
 
-   // Filter packages when dropdown value changes
-    courseFilter.addEventListener('change', async function() {
+    // Filter packages when dropdown value changes
+    courseFilter.addEventListener("change", async function () {
         const selectedType = this.value;
 
         try {
-            // Re-fetch the packages from Firestore when the filter is changed
-            const querySnapshot = await getDocs(collection(db, "packages"));
-            allPackages = querySnapshot.docs.map((doc) => {
-                const data = doc.data();
-                return {
-                    id: doc.id,
-                    ...data
-                };
-            });
+        // Re-fetch the packages from Firestore when the filter is changed
+        const querySnapshot = await getDocs(collection(db, "packages"));
+        allPackages = querySnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+            id: doc.id,
+            ...data
+            };
+        });
 
-            // Filter packages based on the selected type
-            if (selectedType === "") {
-                // Show all packages if 'All' is selected
-                renderPackages(allPackages);
-            } else {
-                // Filter packages by selected type
-                const filteredPackages = allPackages.filter(pkg => {
-                    return Array.isArray(pkg.type) && pkg.type.includes(selectedType);
-                });
-                renderPackages(filteredPackages);
-            }
+        // Filter packages based on the selected type
+        if (selectedType === "") {
+            // Show all packages if 'All' is selected
+            renderPackages(allPackages);
+        } else {
+            // Filter packages by selected type
+            const filteredPackages = allPackages.filter((pkg) => {
+            return Array.isArray(pkg.type) && pkg.type.includes(selectedType);
+            });
+            renderPackages(filteredPackages);
+        }
         } catch (e) {
-            console.error("Error reloading packages: ", e);
+        console.error("Error reloading packages: ", e);
         }
     });
 
@@ -543,7 +512,7 @@ updatePackage.addEventListener("click", async function(event) {
     loadPackages();
 
     // Save new package
-    savePackage.addEventListener("click", function(event) {
+    savePackage.addEventListener("click", function (event) {
         event.preventDefault(); // Prevent form submission
 
         // Get package details from inputs
@@ -553,23 +522,23 @@ updatePackage.addEventListener("click", async function(event) {
 
         // Get selected package types from checkboxes
         const selectedTypes = document.querySelectorAll('input[name="courseType"]:checked');
-        const packageType = Array.from(selectedTypes).map(input => input.value);
+        const packageType = Array.from(selectedTypes).map((input) => input.value);
 
         // Check if all fields are filled
         if (packageName && packagePrice && packageDescription) {
-            // Add the package to Firestore
-            addPackageToFirestore(packageName, packagePrice, packageDescription, packageType);
+        // Add the package to Firestore
+        addPackageToFirestore(packageName, packagePrice, packageDescription, packageType);
 
-            // Hide the modal
-            packageModal.style.display = "none";
+        // Use Bootstrap's modal method to hide the modal
+        $(packageModal).modal("hide");
 
-            // Clear the input fields
-            packageNameInput.value = '';
-            packagePriceInput.value = '';
-            packageDescriptionInput.value = '';
-            document.querySelectorAll('input[name="courseType"]').forEach(input => input.checked = false); // Clear checkbox selections
+        // Clear the input fields
+        packageNameInput.value = "";
+        packagePriceInput.value = "";
+        packageDescriptionInput.value = "";
+        document.querySelectorAll('input[name="courseType"]').forEach((input) => (input.checked = false)); // Clear checkbox selections
         } else {
-            showNotificationModal("Please fill out all fields.", "error");
+        showNotificationModal("Please fill out all fields.", "error");
         }
     });
 });

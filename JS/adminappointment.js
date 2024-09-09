@@ -301,47 +301,34 @@ async function populateFormForEdit(id) {
     const renderCalendar = () => {
         const firstDay = new Date(currentYear, currentMonth, 1);
         const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const prevLastDayDate = new Date(currentYear, currentMonth, 0).getDate();
         const lastDayIndex = lastDay.getDay();
         const lastDayDate = lastDay.getDate();
-        const prevLastDay = new Date(currentYear, currentMonth, 0);
-        const prevLastDayDate = prevLastDay.getDate();
         const nextDays = 7 - lastDayIndex - 1;
-    
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        month.innerHTML = `${months[currentMonth]} ${currentYear}`;
-    
+
         let days = "";
-    
-        // Previous month's days
+
+        // Add previous month's days
         for (let x = firstDay.getDay(); x > 0; x--) {
             days += `<div class="day prev">${prevLastDayDate - x + 1}</div>`;
         }
-    
-        // Current month's days
+
+        // Add current month's days
         for (let i = 1; i <= lastDayDate; i++) {
             const fullDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-    
-            let dayClass = "day";
-            if (
-                i === new Date().getDate() &&
-                currentMonth === new Date().getMonth() &&
-                currentYear === new Date().getFullYear()
-            ) {
-                dayClass += " today";
-            }
-    
-            days += `<div class="${dayClass}" data-date="${fullDate}">${i}</div>`;
+            const isToday = currentYear === date.getFullYear() && currentMonth === date.getMonth() && i === date.getDate();
+            days += `<div class="day ${isToday ? 'today' : ''}" data-date="${fullDate}">${i}</div>`;
         }
-    
-        // Next month's days
+
+        // Add next month's days
         for (let j = 1; j <= nextDays; j++) {
             days += `<div class="day next">${j}</div>`;
         }
-    
-        const daysContainer = document.getElementById('calendar-days');
-        daysContainer.innerHTML = days;
+
+        document.getElementById('calendar-days').innerHTML = days;
         updateCalendarColors();
     };
+
     
     const updateCalendarColors = () => {
         const dayElements = document.querySelectorAll("#calendar-days .day");

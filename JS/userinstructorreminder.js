@@ -113,58 +113,70 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
     
-        // Proceed with finding match
-        loader.style.display = 'flex';  // Show the loader
-        loadingBar.style.width = '0';   // Reset loading bar width
-        loadingPercentage.textContent = '0%';  // Reset percentage text
-    
-        // Start the loader animation
+        // Show the loader
+        loader.style.display = 'flex';  
         let progress = 0;
-        const interval = setInterval(() => {
-            const increment = Math.floor(Math.random() * 5) + 1;
-            progress = Math.min(progress + increment, 99);
-            loadingBar.style.width = progress + '%';
-            loadingPercentage.textContent = progress + '%';
-            
-            if (progress >= 99) {
-                clearInterval(interval);
-            }
-        }, 100);
     
-        // Pass studentId as part of the request
-        fetch(`http://127.0.0.1:5000/match/${studentId}`, {  // Update URL to include studentId
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(async (data) => {
+        // Function to update loader progress
+        function updateLoader(increment) {
+            progress = Math.min(progress + increment, 100);
+            loadingBar.style.width = `${progress}%`;
+            loadingPercentage.textContent = `${progress}%`;
+
+            // Change the loading percentage text color to white when progress is 48% or more
+            if (progress >= 48) {
+                loadingPercentage.style.color = 'white';
+            } else {
+                loadingPercentage.style.color = ''; // Reset to default color if below 48%
+            }
+        }
+    
+        try {
+            // Initial progress update - Fetching match data
+            updateLoader(30);
+    
+            // Start matching process
+            const response = await fetch(`http://127.0.0.1:5000/match/${studentId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            updateLoader(40); // Increment as data is fetched
+    
+            const data = await response.json();
             console.log('Data received:', data);
+    
             if (data.status === 'success') {
                 const studentId = data.student_id;
                 const instructorId = data.instructor_id;
-                
-                // Save the match in Firestore
+    
+                // Update loader progress while saving the match
+                updateLoader(20);
+    
                 await saveMatchToFirestore(studentId, instructorId);
     
-                // Complete the loader
+                // Complete the loader progress when everything is done
+                updateLoader(10);
                 loadingBar.style.width = '100%';
                 loadingPercentage.textContent = '100%';
     
+                // Delay a bit before redirecting to ensure smooth user experience
                 setTimeout(() => {
                     loader.style.display = 'none';
                     window.location.href = 'userinstructormatch.html';  // Redirect to matched instructor page
                 }, 500);
             } else {
                 showNotification('An error occurred: ' + data.message);
+                loader.style.display = 'none';
             }
-        })
-        .catch(error => {
+        } catch (error) {
             console.error('Error:', error);
             showNotification('An error occurred while contacting the server: ' + error.message);
-        });
-    });
+            loader.style.display = 'none';
+        }
+    });    
 
     // Function to handle saving the traits
     document.getElementById('saveButton').addEventListener('click', async function () {
