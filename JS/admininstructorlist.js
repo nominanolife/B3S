@@ -57,10 +57,13 @@ function renderInstructors() {
   const paginatedInstructors = filteredInstructors.slice(start, end);
 
   paginatedInstructors.forEach(instructor => {
+    // Join courses array into a string, handling cases where it might be undefined or empty
+    const courses = Array.isArray(instructor.courses) ? instructor.courses.join(', ') : 'No courses assigned';
+
     const row = document.createElement('tr');
     row.innerHTML = `
       <td><img src="${instructor.imageUrl || 'Assets/default-profile.png'}">${instructor.name}</td>
-      <td>${instructor.course}</td>
+      <td>${courses}</td>
       <td class="table-row-content">
         <div class="dropdown">
           <i class="bi bi-three-dots"></i>
@@ -213,11 +216,27 @@ function searchInstructors(event) {
   updatePaginationControls();
 }
 
-// Event Listeners
+// Event Listener for Add Instructor Button
 addInstructorButton.addEventListener('click', () => {
   instructorModal.show();
-  instructorNameInput.value = ''; // Clear fields before opening the modal
-  instructorCourseInput.value = '';
+  
+  // Clear instructor name input
+  if (instructorNameInput) {
+    instructorNameInput.value = '';
+  }
+
+  // Uncheck all course-related checkboxes
+  document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(checkbox => {
+    checkbox.checked = false; // Uncheck the checkbox
+  });
+
+  // Reset profile picture to default
+  const profilePicPreview = document.getElementById('profilePicPreview');
+  if (profilePicPreview) {
+    profilePicPreview.src = 'Assets/default-profile.png'; // Reset to default profile picture
+  }
+
+  currentInstructorId = null; // Reset current instructor ID
 });
 
 closeModalButton.addEventListener('click', () => instructorModal.hide());
@@ -253,47 +272,45 @@ document.addEventListener('DOMContentLoaded', function () {
   fetchInstructors();
 });
 
-// Add event listener for the Add Trait button
 addTraitButton.addEventListener('click', function(event) {
-  event.preventDefault(); // Prevent the form from submitting
-
-  // Get the value from the traits input
-  const trait = traitsInput.value.trim();
-
+  event.preventDefault();
+  let trait = traitsInput.value.trim();
   if (trait) {
-      // Create a new trait element
-      const traitElement = document.createElement('div');
-      traitElement.classList.add('trait-item');
-      traitElement.textContent = trait;
+    // Capitalize the first letter
+    trait = trait.charAt(0).toUpperCase() + trait.slice(1).toLowerCase();
+
+    // Create the trait item
+    const traitElement = document.createElement('div');
+    traitElement.classList.add('trait-item');
+    traitElement.textContent = trait;
     
-      // Optionally add a delete button for each trait
-      const deleteButton = document.createElement('i');
-      deleteButton.classList.add('remove-trait');
-      deleteButton.innerHTML = '<i class="bi bi-x"></i>';
-    
-      // Add event listener to remove the trait
-      deleteButton.addEventListener('click', function() {
-          traitsList.removeChild(traitElement);
-      });
-    
-      traitElement.appendChild(deleteButton);
-      traitsList.appendChild(traitElement);
-    
-      // Clear the input after adding
-      traitsInput.value = '';
+    // Add the delete button and append
+    const deleteButton = document.createElement('i');
+    deleteButton.classList.add('remove-trait');
+    deleteButton.innerHTML = '<i class="bi bi-x"></i>';
+    deleteButton.addEventListener('click', function() {
+      traitsList.removeChild(traitElement);
+    });
+    traitElement.appendChild(deleteButton);
+    traitsList.appendChild(traitElement);
+
+    // Clear the input field
+    traitsInput.value = '';
   } else {
-      alert("Please enter a trait before adding.");
+    alert("Please enter a trait before adding.");
   }
 });
 
-// Add or Edit instructor based on the mode
+// Function to save or edit instructor details
 async function saveInstructor(event) {
   event.preventDefault();
-  const name = instructorNameInput.value.trim();
-  const course = instructorCourseInput.value.trim();
-  const file = document.getElementById('editProfilePic').files[0]; // Get the selected file
 
-  if (!name || !course) {
+  const name = instructorNameInput.value.trim();
+  const selectedCourses = Array.from(document.querySelectorAll('.custom-checkbox input[type="checkbox"]:checked')).map(input => input.nextElementSibling.innerText); // Get checked courses
+  const file = document.getElementById('editProfilePic').files[0];
+  const personalTraits = Array.from(document.querySelectorAll('.traits-list .trait-item')).map(item => item.innerText.trim());
+
+  if (!name || selectedCourses.length === 0) {
     alert('Please fill in all the required fields.');
     return;
   }
@@ -304,25 +321,27 @@ async function saveInstructor(event) {
     if (currentInstructorId) {
       // Editing an existing instructor
       if (file) {
-        imageUrl = await uploadImage(file, currentInstructorId); // Upload the new image if there's a new file
+        imageUrl = await uploadImage(file, currentInstructorId);
       }
-      
+
       await updateDoc(doc(db, 'instructors', currentInstructorId), {
         name: name,
-        course: course,
-        ...(imageUrl && { imageUrl: imageUrl }) // Update the image URL only if there's a new image
+        courses: selectedCourses,
+        traits: personalTraits,
+        ...(imageUrl && { imageUrl: imageUrl })
       });
 
     } else {
       // Adding a new instructor
       const docRef = await addDoc(collection(db, 'instructors'), {
         name: name,
-        course: course,
-        active: false, // Default status to inactive (OFF)
+        courses: selectedCourses,
+        traits: personalTraits,
+        active: false, // Default status to inactive
         imageUrl: '' // Placeholder for image URL
       });
 
-      imageUrl = await uploadImage(file, docRef.id); // Upload the image with the instructor's ID
+      imageUrl = await uploadImage(file, docRef.id);
 
       await updateDoc(doc(db, 'instructors', docRef.id), {
         imageUrl: imageUrl
@@ -334,22 +353,84 @@ async function saveInstructor(event) {
     resetForm(); // Clear the form after submission
   } catch (error) {
     console.error('Error saving instructor:', error);
+    alert('An error occurred while saving the instructor. Please try again.');
   }
 }
 
-// Reset form function
+// Add event listener to the Add Trait button
+document.querySelector('.add-trait').addEventListener('click', function (event) {
+  event.preventDefault();
+  const traitInput = document.querySelector('.traits-input');
+  let traitValue = traitInput.value.trim();
+
+  if (traitValue) {
+    // Capitalize the first letter of the trait and ensure rest are lowercase
+    traitValue = traitValue.charAt(0).toUpperCase() + traitValue.slice(1).toLowerCase();
+
+    const traitItem = document.createElement('div');
+    traitItem.classList.add('trait-item');
+    traitItem.innerText = traitValue;
+
+    // Optionally add a delete button for each trait
+    const deleteButton = document.createElement('i');
+    deleteButton.classList.add('remove-trait');
+    deleteButton.innerHTML = '<i class="bi bi-x"></i>';
+
+    // Add event listener to remove the trait
+    deleteButton.addEventListener('click', function() {
+      traitItem.remove();
+    });
+
+    traitItem.appendChild(deleteButton);
+    document.querySelector('.traits-list').appendChild(traitItem);
+    traitInput.value = ''; // Clear input after adding
+  }
+});
+
+// Handle file input display logic
+document.getElementById('uploadIcon').addEventListener('click', () => {
+  document.getElementById('editProfilePic').click();
+});
+
+document.getElementById('editProfilePic').addEventListener('change', function () {
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    document.getElementById('profilePicPreview').src = e.target.result;
+  };
+  reader.readAsDataURL(this.files[0]);
+});
+
+// Function to reset the modal form fields
 function resetForm() {
-  instructorNameInput.value = '';
-  instructorCourseInput.value = '';
-  document.getElementById('profilePicPreview').src = 'Assets/default-profile.png'; // Reset profile pic to default
-  closeModalButton.click(); // Close modal
-  currentInstructorId = null; // Reset current instructor ID
+  // Clear instructor name input
+  if (instructorNameInput) {
+    instructorNameInput.value = '';
+  }
+
+  // Uncheck all course-related checkboxes
+  document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(checkbox => {
+    checkbox.checked = false; // Uncheck all checkboxes
+  });
+
+  // Reset profile picture to default
+  const profilePicPreview = document.getElementById('profilePicPreview');
+  if (profilePicPreview) {
+    profilePicPreview.src = 'Assets/default-profile.png'; // Reset to default profile picture
+  }
+
+  // Clear the traits list
+  if (traitsList) {
+    traitsList.innerHTML = ''; // Remove all previously added traits
+  }
+
+  // Reset the current instructor ID to indicate a new entry
+  currentInstructorId = null;
 }
 
-// Event listener for the add instructor button
+// Event Listener for Add Instructor Button
 addInstructorButton.addEventListener('click', () => {
-  instructorModal.show();
-  resetForm();
+  resetForm(); // Call the reset function to clear previous data
+  instructorModal.show(); // Show the modal
 });
 
 // Event listener for the save button in the modal
@@ -365,17 +446,65 @@ async function editInstructor(event) {
   const instructor = instructors.find(instructor => instructor.id === id);
   if (instructor) {
     currentInstructorId = id; // Set the current instructor ID for editing
-    instructorNameInput.value = instructor.name;
-    instructorCourseInput.value = instructor.course;
-    document.getElementById('profilePicPreview').src = instructor.imageUrl || 'Assets/default-profile.png'; // Set existing image or default
+    
+    // Set the instructor's name
+    if (instructorNameInput) {
+      instructorNameInput.value = instructor.name;
+    }
+
+    // Uncheck all checkboxes before setting values
+    document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(checkbox => {
+      checkbox.checked = false; // Uncheck all checkboxes initially
+    });
+
+    // Check the appropriate checkboxes based on the instructor's courses array
+    if (Array.isArray(instructor.courses)) {
+      instructor.courses.forEach(course => {
+        const checkbox = Array.from(document.querySelectorAll('.custom-checkbox')).find(label => 
+          label.innerText.trim() === course.trim()
+        );
+        if (checkbox) {
+          checkbox.querySelector('input[type="checkbox"]').checked = true; // Check the matching checkbox
+        }
+      });
+    }
+
+    // Set the profile picture or use the default
+    const profilePicPreview = document.getElementById('profilePicPreview');
+    if (profilePicPreview) {
+      profilePicPreview.src = instructor.imageUrl || 'Assets/default-profile.png';
+    }
+
+    // Populate personal traits
+    const traitsList = document.querySelector('.traits-list');
+    if (traitsList) {
+      traitsList.innerHTML = ''; // Clear existing traits
+
+      if (Array.isArray(instructor.traits)) {
+        instructor.traits.forEach(trait => {
+          const traitElement = document.createElement('div');
+          traitElement.classList.add('trait-item');
+          traitElement.textContent = trait;
+
+          // Optionally add a delete button for each trait
+          const deleteButton = document.createElement('i');
+          deleteButton.classList.add('remove-trait');
+          deleteButton.innerHTML = '<i class="bi bi-x"></i>';
+
+          // Add event listener to remove the trait
+          deleteButton.addEventListener('click', function() {
+            traitsList.removeChild(traitElement);
+          });
+
+          traitElement.appendChild(deleteButton);
+          traitsList.appendChild(traitElement);
+        });
+      }
+    }
+
     instructorModal.show();
   }
 }
-
-// Function to trigger file input when camera icon is clicked
-document.getElementById('uploadIcon').addEventListener('click', function() {
-  document.getElementById('editProfilePic').click();
-});
 
 // Function to preview the image when a new image is selected
 document.getElementById('editProfilePic').addEventListener('change', function(event) {

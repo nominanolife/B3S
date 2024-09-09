@@ -185,7 +185,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }        
     });
     
-    // Function to handle saving the traits
     document.getElementById('saveButton').addEventListener('click', async function () {
         const saveButton = document.getElementById('saveButton');
         saveButton.disabled = true; // Disable save button to prevent multiple submissions
@@ -194,10 +193,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('loader1').style.display = 'flex';
     
         // Collect the selected traits
-        const selectedTraits = [];
+        const selectedTraits = new Set();
+        const normalizedTraits = new Set();
+    
         document.querySelectorAll('input[name="traits"]:checked').forEach((checkbox) => {
             if (checkbox.id !== 'othersCheckbox') { // Exclude the "Others" checkbox from saving
-                selectedTraits.push(checkbox.nextElementSibling.innerText);
+                const trait = checkbox.nextElementSibling.innerText;
+                const normalizedTrait = trait.toLowerCase();
+                if (!normalizedTraits.has(normalizedTrait)) {
+                    selectedTraits.add(trait);
+                    normalizedTraits.add(normalizedTrait);
+                }
             }
         });
     
@@ -206,27 +212,56 @@ document.addEventListener('DOMContentLoaded', async () => {
             const otherTraits = document.getElementById('otherTraitInput').value
                 .split(',')
                 .map(trait => trait.trim())
-                .filter(trait => trait) // Remove any empty strings
-                .map(trait => trait.charAt(0).toUpperCase() + trait.slice(1).toLowerCase()); // Capitalize first letter
+                .filter(trait => trait)
+                .map(trait => trait.charAt(0).toUpperCase() + trait.slice(1).toLowerCase());
     
-            // Remove duplicates from otherTraits
-            const uniqueOtherTraits = [...new Set(otherTraits)];
-    
-            // Add only unique traits
-            selectedTraits.push(...uniqueOtherTraits);
+            otherTraits.forEach(trait => {
+                const normalizedTrait = trait.toLowerCase();
+                if (!normalizedTraits.has(normalizedTrait)) {
+                    selectedTraits.add(trait);
+                    normalizedTraits.add(normalizedTrait);
+                }
+            });
         }
     
-        // Remove duplicates from the selectedTraits array
-        const uniqueSelectedTraits = [...new Set(selectedTraits)];
+        // Convert Set back to an array for saving
+        const uniqueSelectedTraits = Array.from(selectedTraits);
     
-        // Save the selected traits to Firestore, removing unchecked ones
+        // Fetch existing traits from Firestore
         try {
             const userDocRef = doc(db, 'applicants', studentId);
+            const docSnap = await getDoc(userDocRef);
     
-            // Overwrite traits with only the selected ones (unchecked ones will be removed)
-            await setDoc(userDocRef, { traits: uniqueSelectedTraits }, { merge: true });
+            if (docSnap.exists()) {
+                const existingTraits = docSnap.data().traits || [];
     
-            showNotification("Traits updated successfully!");
+                // Check if there are any changes between existing and new traits
+                const existingTraitsSet = new Set(existingTraits.map(trait => trait.toLowerCase()));
+                const newTraitsSet = new Set(uniqueSelectedTraits.map(trait => trait.toLowerCase()));
+    
+                const traitsChanged = 
+                    existingTraits.length !== uniqueSelectedTraits.length || 
+                    ![...newTraitsSet].every(trait => existingTraitsSet.has(trait)) || 
+                    ![...existingTraitsSet].every(trait => newTraitsSet.has(trait));
+    
+                if (!traitsChanged) {
+                    // Notify the user and prevent saving if no changes were made
+                    showNotification("Existing traits are the same. No changes were made.");
+                    document.getElementById('loader1').style.display = 'none';
+                    saveButton.disabled = false;
+                    return;
+                }
+    
+                // Save the selected traits if there are changes
+                await setDoc(userDocRef, { traits: uniqueSelectedTraits }, { merge: true });
+    
+                showNotification("Traits updated successfully!");
+            } else {
+                // If the document doesn't exist, save the new traits
+                await setDoc(userDocRef, { traits: uniqueSelectedTraits });
+    
+                showNotification("Traits saved successfully!");
+            }
     
             // Hide loader and re-enable save button
             document.getElementById('loader1').style.display = 'none';
@@ -241,8 +276,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Uncheck the 'Others' checkbox and clear the input field
             const othersCheckbox = document.getElementById('othersCheckbox');
             othersCheckbox.checked = false;
-            document.getElementById('otherTraitInput').style.display = 'none';  // Hide the input field
-            document.getElementById('otherTraitInput').value = '';  // Clear the input field
+            document.getElementById('otherTraitInput').style.display = 'none';
+            document.getElementById('otherTraitInput').value = '';
     
         } catch (error) {
             console.error("Error updating traits: ", error);
@@ -251,6 +286,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             saveButton.disabled = false;
         }
     });
+    
 
     async function saveMatchToFirestore(studentId, instructorId) {
         try {
