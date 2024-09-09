@@ -82,52 +82,54 @@
                     <h4>This will help us find the best instructor for you!</h4>
                     <div class="personality-form">
                         <div class="form-group-all">
+                            <!-- Predefined traits -->
                             <div class="form-group">
                                 <label class="custom-checkbox">
-                                    <input type="checkbox" name="traits">
+                                    <input type="checkbox" name="traits" id="trait-determined">
                                     <span class="checkbox-label">Determined</span>
                                 </label>
                             </div>
                             <div class="form-group">
                                 <label class="custom-checkbox">
-                                    <input type="checkbox" name="traits">
+                                    <input type="checkbox" name="traits" id="trait-anxious">
                                     <span class="checkbox-label">Anxious</span>
                                 </label>
                             </div>
                             <div class="form-group">
                                 <label class="custom-checkbox">
-                                    <input type="checkbox" name="traits">
+                                    <input type="checkbox" name="traits" id="trait-adaptable">
                                     <span class="checkbox-label">Adaptable</span>
                                 </label>
                             </div>
                             <div class="form-group">
                                 <label class="custom-checkbox">
-                                    <input type="checkbox" name="traits">
+                                    <input type="checkbox" name="traits" id="trait-curious">
                                     <span class="checkbox-label">Curious</span>
                                 </label>
                             </div>
                             <div class="form-group">
                                 <label class="custom-checkbox">
-                                    <input type="checkbox" name="traits">
+                                    <input type="checkbox" name="traits" id="trait-patient">
                                     <span class="checkbox-label">Patient</span>
                                 </label>
                             </div>
                             <div id="dynamicTraits">
-                                <!-- Dynamic traits will be added here -->
+                            <!-- Dynamic traits will be added here -->
                             </div>
+                            <!-- Other traits input -->
                             <div class="form-group">
                                 <label class="custom-checkbox">
                                     <input type="checkbox" name="traits" id="othersCheckbox">
-                                    <span class="checkbox-label">Other traits:</span>
+                                    <span class="checkbox-label">Other traits (Specify):</span>
                                 </label>
                                 <!-- Text input to accept multiple traits -->
-                                <input type="text" id="otherTraitInput" class="form-control input-line" placeholder="Traits 1, Traits 2, Traits 3,...">
-                            </div>                                                       
+                                <input type="text" id="otherTraitInput" class="form-control input-line" placeholder="Trait 1, Trait 2, Trait 3,...">
+                            </div>
                         </div>
                         <div class="save-button">
                             <button type="button" id="saveButton" class="btn-save">Save</button>
                             <button type="button" class="btn-cancel" data-dismiss="modal">Cancel</button>
-                        </div>                                
+                        </div>
                     </div>
                 </form>
             </div>

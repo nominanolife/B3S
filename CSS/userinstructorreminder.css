@@ -330,6 +330,11 @@ h2 {
     padding-bottom: 20px;
 }
 
+#dynamicTraits {
+    display: flex;
+    flex-direction: column;
+}
+
 .custom-checkbox {
     display: flex;
     align-items: center;
@@ -398,11 +403,6 @@ h2 {
 .input-line:focus {
     border-bottom: 1px solid #142A74;
     box-shadow: none;
-}
-
-.group-form {
-    display: flex;
-    flex-direction: column;
 }
 
 .save-button {
@@ -488,6 +488,8 @@ h2 {
     top: auto;
     left: 5%;
     border-radius: 20px;
+    max-width: 30%;
+    width: auto;
 }
 
 #personalityTraitsModal .modal-header {

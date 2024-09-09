@@ -170,10 +170,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('saveButton').addEventListener('click', async function () {
         const saveButton = document.getElementById('saveButton');
         saveButton.disabled = true; // Disable save button to prevent multiple submissions
-
+    
         // Show loader
         document.getElementById('loader1').style.display = 'flex';
-
+    
         // Collect the selected traits
         const selectedTraits = [];
         document.querySelectorAll('input[name="traits"]:checked').forEach((checkbox) => {
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 selectedTraits.push(checkbox.nextElementSibling.innerText);
             }
         });
-
+    
         // Handle custom traits from the 'Others' input
         if (document.getElementById('othersCheckbox').checked && document.getElementById('otherTraitInput').value.trim() !== '') {
             const otherTraits = document.getElementById('otherTraitInput').value
@@ -189,28 +189,42 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .map(trait => trait.trim())
                 .filter(trait => trait) // Remove any empty strings
                 .map(trait => trait.charAt(0).toUpperCase() + trait.slice(1).toLowerCase()); // Capitalize first letter
-            selectedTraits.push(...otherTraits);
+    
+            // Remove duplicates from otherTraits
+            const uniqueOtherTraits = [...new Set(otherTraits)];
+    
+            // Add only unique traits
+            selectedTraits.push(...uniqueOtherTraits);
         }
-
+    
+        // Remove duplicates from the selectedTraits array
+        const uniqueSelectedTraits = [...new Set(selectedTraits)];
+    
         // Save the selected traits to Firestore, removing unchecked ones
         try {
             const userDocRef = doc(db, 'applicants', studentId);
-
+    
             // Overwrite traits with only the selected ones (unchecked ones will be removed)
-            await setDoc(userDocRef, { traits: selectedTraits }, { merge: true });
-
+            await setDoc(userDocRef, { traits: uniqueSelectedTraits }, { merge: true });
+    
             showNotification("Traits updated successfully!");
-
+    
             // Hide loader and re-enable save button
             document.getElementById('loader1').style.display = 'none';
             saveButton.disabled = false;
-
+    
             // Close the modal
             personalityTraitsModal.hide();
-
+    
             // Dynamically refresh the traits without reloading
-            loadSavedTraits(selectedTraits);
-
+            loadSavedTraits(uniqueSelectedTraits);
+    
+            // Uncheck the 'Others' checkbox and clear the input field
+            const othersCheckbox = document.getElementById('othersCheckbox');
+            othersCheckbox.checked = false;
+            document.getElementById('otherTraitInput').style.display = 'none';  // Hide the input field
+            document.getElementById('otherTraitInput').value = '';  // Clear the input field
+    
         } catch (error) {
             console.error("Error updating traits: ", error);
             showNotification("An error occurred while updating traits. Please try again.");
@@ -218,6 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             saveButton.disabled = false;
         }
     });
+      
 
     async function saveMatchToFirestore(studentId, instructorId) {
         try {
@@ -245,25 +260,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Function to fetch and display saved traits from Firestore
 function loadSavedTraits(savedTraits) {
     // Clear previous dynamic checkboxes
-    document.getElementById('dynamicTraits').innerHTML = ''; // Make sure this element exists in your HTML
+    const dynamicTraitsContainer = document.getElementById('dynamicTraits');
+    dynamicTraitsContainer.innerHTML = ''; // Make sure this element exists in your HTML
 
-    // Loop through the saved traits and check them
+    // Function to create and add a new checkbox for a trait
+    function addTrait(trait) {
+        // Create form group
+        const formGroup = document.createElement('div');
+        formGroup.className = 'form-group';
+
+        // Create checkbox input
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.name = 'traits';
+        checkbox.id = `trait-${trait}`;
+        checkbox.checked = true;
+
+        // Create label for the checkbox
+        const label = document.createElement('label');
+        label.htmlFor = checkbox.id;
+        label.className = 'custom-checkbox';
+
+        // Create span for the label text
+        const span = document.createElement('span');
+        span.className = 'checkbox-label';
+        span.innerText = trait;
+
+        // Append elements
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        formGroup.appendChild(label);
+
+        // Append to the dynamic traits container
+        dynamicTraitsContainer.appendChild(formGroup);
+    }
+
+    // Iterate over saved traits and add them one by one
     savedTraits.forEach(trait => {
         if (!['Determined', 'Anxious', 'Adaptable', 'Curious', 'Patient'].includes(trait)) {
-            // Add custom traits as checkboxes dynamically
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.name = 'traits';
-            checkbox.id = `trait-${trait}`;
-            checkbox.checked = true;
-
-            const label = document.createElement('label');
-            label.htmlFor = `trait-${trait}`;
-            label.innerText = trait;
-
-            // Append to the dynamic traits container
-            document.getElementById('dynamicTraits').appendChild(checkbox);
-            document.getElementById('dynamicTraits').appendChild(label);
+            addTrait(trait);  // Add custom traits individually
         } else {
             // Check predefined traits if they match saved traits
             document.querySelectorAll('input[name="traits"]').forEach(checkbox => {
