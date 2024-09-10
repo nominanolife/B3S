@@ -92,160 +92,161 @@
     <div class="modal" id="editModal" data-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-content">
-                    <div class="modal-header">
+
+                <div class="modal-body" data-step="1">
+                    <div class="header-modal">
                         <h5 class="modal-title">Edit Certificate Control Number</h5>
-                    </div>
-                    <div class="modal-body">
-                        <div class="input-body">
-                            <input type="text" class="edit-cert-number" id="certificateControlNumberInput" placeholder="Certificate Control Number" required>
+                        <div class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
                         </div>
-                    </div> 
-                </div>     
-                <div class="modal-content">
-                    <div class="modal-header">
+                    </div>
+                    <div class="input-body">
+                        <input type="text" class="edit-cert-number" id="certificateControlNumberInput" placeholder="Certificate Control Number" required>
+                    </div>
+                </div>
+
+                <div class="modal-body" data-step="2" style="display: none;">
+                    <div class="header-modal">
                         <h5 class="modal-title">4-Wheels Course Checklist</h5>
                     </div>
-                    <div class="modal-body">
-                        <div class="input-body">
-                            <div class="student-info">
-                                <p>Student Name: <span>Juan Dela Cruz</span></p>                           
-                                <p>Date and Time: <span>January 1, 2024</span></p>
-                                <p>Assessor Name: <span>Pedro Penduko</span></p>
-                            </div>
-                            <div class="checkbox-checklist">
-                                <h5>Evaluation</h5>
-                                
-                            </div>
+                    <div class="input-body">
+                        <div class="student-info">
+                            <p>Student Name: <span>Juan Dela Cruz</span></p>                           
+                            <p>Date and Time: <span>January 1, 2024</span></p>
+                            <p>Assessor Name: <span>Pedro Penduko</span></p>
                         </div>
-                    </div>                  
+                        <div class="checkbox-checklist">
+                            <h5>Evaluation</h5>
+                            
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-content">
-                    <div class="modal-header">
+                
+                <div class="modal-body" data-step="3" style="display: none;">
+                    <div class="header-modal">
                         <h5 class="modal-title">Motorcycle Course Checklist</h5>
                     </div>
-                    <div class="modal-body">
-                        <div class="input-body">
-                            <div class="student-info">
-                                <p>Student Name: <span>Juan Dela Cruz</span></p>                           
-                                <p>Date and Time: <span>January 1, 2024</span></p>
-                                <p>Assessor Name: <span>Pedro Penduko</span></p>
+                    <div class="input-body">
+                        <div class="student-info">
+                            <p>Student Name: <span>Juan Dela Cruz</span></p>                           
+                            <p>Date and Time: <span>January 1, 2024</span></p>
+                            <p>Assessor Name: <span>Pedro Penduko</span></p>
+                        </div>
+                        <div class="checkbox-checklist">
+                            <h5>Evaluation</h5>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Start the engine</span>
+                                </label>
+                                <div class="form-group2">
+                                    <label class="custom-radio">
+                                        <input type="radio" name="vehicle" id="vehicle-car" value="car">
+                                        <span class="radio-label">Moving off, riding ahead and stopping</span>
+                                    </label>
+                                    <label class="custom-radio">
+                                        <input type="radio" name="vehicle" id="vehicle-motorcycle" value="motorcycle">
+                                        <span class="radio-label">Positioning in different environments</span>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="checkbox-checklist">
-                                <h5>Evaluation</h5>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Start the engine</span>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Choice of speed in different situations (low speed balancing)</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Hill riding</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Riding along a curve or bend (cornering)</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Approaching and passing railway crossings</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Lane shift and choice of lanes</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Turning and lane changing</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Interaction with various road users (riders, cyclists, pedestrians, and other vehicles)</span>
+                                </label>
+                                <div class="form-group2">
+                                    <label class="custom-radio">
+                                        <input type="radio" name="vehicle" id="vehicle-car" value="car">
+                                        <span class="radio-label">Passing stationary vehicles and pedestrians</span>
                                     </label>
-                                    <div class="form-group2">
-                                        <label class="custom-radio">
-                                            <input type="radio" name="vehicle" id="vehicle-car" value="car">
-                                            <span class="radio-label">Moving off, riding ahead and stopping</span>
-                                        </label>
-                                        <label class="custom-radio">
-                                            <input type="radio" name="vehicle" id="vehicle-motorcycle" value="motorcycle">
-                                            <span class="radio-label">Positioning in different environments</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Choice of speed in different situations (low speed balancing)</span>
+                                    <label class="custom-radio">
+                                        <input type="radio" name="vehicle" id="vehicle-motorcycle" value="motorcycle">
+                                        <span class="radio-label">Meeting oncoming traffic</span>
                                     </label>
-                                </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Hill riding</span>
+                                    <label class="custom-radio">
+                                        <input type="radio" name="vehicle" id="vehicle-car" value="car">
+                                        <span class="radio-label">Riding ahead of or behind other road users</span>
                                     </label>
-                                </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Riding along a curve or bend (cornering)</span>
-                                    </label>
-                                </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Approaching and passing railway crossings</span>
-                                    </label>
-                                </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Lane shift and choice of lanes</span>
-                                    </label>
-                                </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Turning and lane changing</span>
-                                    </label>
-                                </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Interaction with various road users (riders, cyclists, pedestrians, and other vehicles)</span>
-                                    </label>
-                                    <div class="form-group2">
-                                        <label class="custom-radio">
-                                            <input type="radio" name="vehicle" id="vehicle-car" value="car">
-                                            <span class="radio-label">Passing stationary vehicles and pedestrians</span>
-                                        </label>
-                                        <label class="custom-radio">
-                                            <input type="radio" name="vehicle" id="vehicle-motorcycle" value="motorcycle">
-                                            <span class="radio-label">Meeting oncoming traffic</span>
-                                        </label>
-                                        <label class="custom-radio">
-                                            <input type="radio" name="vehicle" id="vehicle-car" value="car">
-                                            <span class="radio-label">Riding ahead of or behind other road users</span>
-                                        </label>
-                                        <label class="custom-radio">
-                                            <input type="radio" name="vehicle" id="vehicle-motorcycle" value="motorcycle">
-                                            <span class="radio-label">Riding side by side</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Overtaking</span>
+                                    <label class="custom-radio">
+                                        <input type="radio" name="vehicle" id="vehicle-motorcycle" value="motorcycle">
+                                        <span class="radio-label">Riding side by side</span>
                                     </label>
                                 </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Riding in different kinds of junctions (straight through, turning left or right, with or without obligation to give the right of way, ABC of passing junction)</span>
-                                    </label>
-                                </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Approaching, riding in and leaving roundabouts</span>
-                                    </label>
-                                </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Stopping and parking</span>
-                                    </label>
-                                </div>
-                                <div class="form-group">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="traits" id="trait-determined">
-                                        <span class="checkbox-label">Riding with a back ride</span>
-                                    </label>
-                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Overtaking</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Riding in different kinds of junctions (straight through, turning left or right, with or without obligation to give the right of way, ABC of passing junction)</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Approaching, riding in and leaving roundabouts</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Stopping and parking</span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="traits" id="trait-determined">
+                                    <span class="checkbox-label">Riding with a back ride</span>
+                                </label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="footer">
-                    <button type="button" class="save-btn" id="saveButton">Save</button>
-                    <button type="button" class="cancel-btn" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="back-btn">Back</button>
+                    <button type="button" class="next-btn">Next</button>
+                    <button type="button" class="save-btn">Save</button>
                 </div>
             </div>
         </div>

@@ -58,7 +58,7 @@ function renderInstructors() {
 
   paginatedInstructors.forEach(instructor => {
     // Join courses array into a string, handling cases where it might be undefined or empty
-    const courses = Array.isArray(instructor.courses) ? instructor.courses.join(', ') : 'No courses assigned';
+    const courses = Array.isArray(instructor.courses) ? instructor.courses.join(' || ') : 'No courses assigned';
 
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -297,7 +297,7 @@ addTraitButton.addEventListener('click', function(event) {
     // Clear the input field
     traitsInput.value = '';
   } else {
-    alert("Please enter a trait before adding.");
+    showNotification("Please enter a trait before adding.");
   }
 });
 
@@ -306,12 +306,12 @@ async function saveInstructor(event) {
   event.preventDefault();
 
   const name = instructorNameInput.value.trim();
-  const selectedCourses = Array.from(document.querySelectorAll('.custom-checkbox input[type="checkbox"]:checked')).map(input => input.nextElementSibling.innerText); // Get checked courses
+  const selectedCourses = Array.from(document.querySelectorAll('.custom-checkbox input[type="checkbox"]:checked')).map(input => input.nextElementSibling.innerText);
   const file = document.getElementById('editProfilePic').files[0];
   const personalTraits = Array.from(document.querySelectorAll('.traits-list .trait-item')).map(item => item.innerText.trim());
 
   if (!name || selectedCourses.length === 0) {
-    alert('Please fill in all the required fields.');
+    showNotification('Please fill in all the required fields.');
     return;
   }
 
@@ -331,14 +331,16 @@ async function saveInstructor(event) {
         ...(imageUrl && { imageUrl: imageUrl })
       });
 
+      showNotification('Instructor updated successfully.');
+
     } else {
       // Adding a new instructor
       const docRef = await addDoc(collection(db, 'instructors'), {
         name: name,
         courses: selectedCourses,
         traits: personalTraits,
-        active: false, // Default status to inactive
-        imageUrl: '' // Placeholder for image URL
+        active: false,
+        imageUrl: ''
       });
 
       imageUrl = await uploadImage(file, docRef.id);
@@ -346,14 +348,16 @@ async function saveInstructor(event) {
       await updateDoc(doc(db, 'instructors', docRef.id), {
         imageUrl: imageUrl
       });
+
+      showNotification('Instructor added successfully.');
     }
 
-    instructorModal.hide(); // Close the modal
-    fetchInstructors(); // Refresh the instructor list
-    resetForm(); // Clear the form after submission
+    instructorModal.hide();
+    fetchInstructors();
+    resetForm();
   } catch (error) {
     console.error('Error saving instructor:', error);
-    alert('An error occurred while saving the instructor. Please try again.');
+    showNotification('An error occurred while saving the instructor. Please try again.');
   }
 }
 
@@ -530,14 +534,23 @@ function deleteInstructor(event) {
 
 // Confirm deletion of the instructor
 document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
-    if (instructorIdToDelete) {
-        try {
-            await deleteDoc(doc(db, 'instructors', instructorIdToDelete));
-            fetchInstructors(); // Refresh the list after deletion
-            deleteConfirmationModal.hide(); // Hide the modal after successful deletion
-            instructorIdToDelete = null; // Reset the variable
-        } catch (error) {
-            console.error('Error deleting instructor:', error);
-        }
+  if (instructorIdToDelete) {
+    try {
+      await deleteDoc(doc(db, 'instructors', instructorIdToDelete));
+      fetchInstructors(); // Refresh the list after deletion
+      deleteConfirmationModal.hide(); // Hide the modal after successful deletion
+      instructorIdToDelete = null; // Reset the variable
+      showNotification('Instructor deleted successfully.'); // Show success notification after delete
+    } catch (error) {
+      console.error('Error deleting instructor:', error);
+      showNotification('An error occurred while deleting the instructor. Please try again.');
     }
+  }
 });
+
+function showNotification(message) {
+  const notificationModalBody = document.getElementById('notificationModalBody');
+  notificationModalBody.textContent = message; // Set the message content
+  const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal')); // Initialize the modal
+  notificationModal.show(); // Show the modal
+}

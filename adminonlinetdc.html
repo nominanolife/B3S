@@ -44,7 +44,202 @@
                 <h2>Online TDC</h2>
             </div>
             <div class="page-content">
-                <!-- Add your dashboard content here -->
+                <div class="course-content">
+                    <div class="course-content-list">
+                        <div class="course-image">
+                            <i class="bi bi-image-fill"></i>
+                        </div>
+                        <div class="course-details">
+                            <div class="course-title">
+                                <h3>Road Rules and Regulations</h3>
+                            </div>
+                            <div class="course-options">
+                                <i class="bi bi-three-dots-vertical"></i>
+                                <div class="triple-dot-options">
+                                    <i class="option-dropdown">Edit</i>
+                                    <i class="option-dropdown">Delete</i>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <div class="upload-container" id="uploadContainer">
+                        <div class="upload-box">
+                            <div class="upload-area">
+                                <i class="bi bi-cloud-arrow-up-fill"></i>
+                                <p>Click to Upload</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Add Lesson</h5>
+                    <div class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <!-- Step 1: Upload Video -->
+                    <div class="modal-step" id="step1">
+                        <div class="progress-container">
+                            <div class="step active">
+                                <div class="bullet">1</div>
+                                <div class="title">Upload Video</div>
+                            </div>
+                            <div class="line"></div>
+                            <div class="step">
+                                <div class="bullet">2</div>
+                                <div class="title">Create Quiz</div>
+                            </div>
+                            <div class="line"></div>
+                            <div class="step">
+                                <div class="bullet">3</div>
+                                <div class="title">Review</div>
+                            </div>
+                        </div>
+                        <form>
+                            <div class="form-group1">
+                                <label for="lessonTitle">Title</label>
+                                <input type="text" class="form-control" id="lessonTitle" placeholder="Enter lesson title">
+                            </div>
+                            <div class="form-group1">
+                                <label for="videoThumbnail">Video Thumbnail</label>
+                                <input type="file" class="form-control-file" id="videoThumbnail">
+                            </div>
+                            <div class="form-group1">
+                                <label for="uploadVideo">Upload Video</label>
+                                <input type="file" class="form-control-file" id="uploadVideo">
+                            </div>
+                        </form>
+                    </div> 
+                    <!-- Step 2: Create Quiz -->
+                    <div id="step2" class="modal-step d-none">
+                        <div class="progress-container">
+                            <div class="step active">
+                                <div class="bullet">1</div>
+                                <div class="title">Upload Video</div>
+                            </div>
+                            <div class="line completed"></div>
+                            <div class="step active">
+                                <div class="bullet">2</div>
+                                <div class="title">Create Quiz</div>
+                            </div>
+                            <div class="line"></div>
+                            <div class="step">
+                                <div class="bullet">3</div>
+                                <div class="title">Review</div>
+                            </div>
+                        </div>
+                        <form>
+                            <div class="form-group2">
+                                <label for="question1">Question 1</label>
+                                <input type="text" class="form-control" id="question1" placeholder="Type your question here...">
+                            </div>
+                            <div class="form-group2">
+                                <label for="optionA">Option A</label>
+                                <input type="text" class="form-control" id="optionA" placeholder="Option A">
+                            </div>
+                            <div class="form-group2">
+                                <label for="optionB">Option B</label>
+                                <input type="text" class="form-control" id="optionB" placeholder="Option B">
+                            </div>
+                            <div class="form-group2">
+                                <label for="optionC">Option C</label>
+                                <input type="text" class="form-control" id="optionC" placeholder="Option C">
+                            </div>
+                            <div class="form-group2">
+                                <label for="optionD">Option D</label>
+                                <input type="text" class="form-control" id="optionD" placeholder="Option D">
+                            </div>
+                        </form>
+                        <button type="button" class="btn btn-link">+ Add New Question</button>
+                    </div>
+                    <!-- Step 3: Review -->
+                    <div id="step3" class="modal-step d-none">
+                        <div class="progress-container">
+                            <div class="step active">
+                                <div class="bullet">1</div>
+                                <div class="title">Upload Video</div>
+                            </div>
+                            <div class="line completed"></div>
+                            <div class="step active">
+                                <div class="bullet">2</div>
+                                <div class="title">Create Quiz</div>
+                            </div>
+                            <div class="line completed"></div>
+                            <div class="step active">
+                                <div class="bullet">3</div>
+                                <div class="title">Review</div>
+                            </div>
+                        </div>
+                        <div class="preview">
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="back-btn">Back</button>
+                    <button type="button" class="next-btn">Next</button>
+                    <button type="button" class="save-btn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Lesson</h5>
+                </div>
+                <div class="modal-body">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this instructor?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confirmDeleteBtn">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="modal" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Message will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">OK</button>
+                </div>
             </div>
         </div>
     </div>

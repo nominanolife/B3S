@@ -483,11 +483,8 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('certificateControlNumberInput').value = currentCertificate;
 
           // Show the modal
-          const editModal = new bootstrap.Modal(document.getElementById('editModal'), {
-              backdrop: 'static',
-              keyboard: false 
-          });
-          editModal.show();
+          const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+          editModal.show()
 
           // Handle save changes
           document.getElementById('saveChangesBtn').onclick = async () => {
@@ -555,4 +552,59 @@ document.addEventListener('DOMContentLoaded', function() {
       this.classList.add('active');
     });
   });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  let currentStep = 1;
+  const totalSteps = document.querySelectorAll('.modal-body[data-step]').length;
+  const backButton = document.querySelector('.back-btn');
+  const nextButton = document.querySelector('.next-btn');
+  const saveButton = document.querySelector('.save-btn');
+  const modalDialog = document.querySelector('.modal-dialog');
+
+  function showStep(step) {
+      document.querySelectorAll('.modal-body[data-step]').forEach((stepElement) => {
+          stepElement.style.display = 'none'; // Hide all steps
+      });
+      document.querySelector(`.modal-body[data-step="${step}"]`).style.display = 'block'; // Show current step
+
+      // Adjust modal size based on the step
+      if (step === 1) {
+          modalDialog.classList.remove('modal-dialog-large');
+          modalDialog.classList.add('modal-dialog-small'); // Small size for step 1
+          backButton.style.display = 'none'; // Hide the back button on step 1
+          nextButton.style.display = 'none'; // Hide the next button on step 1
+          saveButton.style.display = 'inline-block'; // Show the save button on step 1
+      } else if (step === 2 || step === 3) {
+          modalDialog.classList.remove('modal-dialog-small');
+          modalDialog.classList.add('modal-dialog-large'); // Large size for steps 2 and 3
+          backButton.style.display = 'inline-block'; // Show the back button on steps 2 and 3
+          nextButton.style.display = 'inline-block'; // Show the next button on steps 2 and 3
+          saveButton.style.display = 'none'; // Hide the save button on steps 2 and 3
+      }
+  }
+
+  saveButton.addEventListener('click', function() {
+      // Perform save operation here
+      console.log("Saving data..."); // Replace with your actual save logic
+      currentStep++;
+      showStep(currentStep);
+  });
+
+  nextButton.addEventListener('click', function() {
+      if (currentStep < totalSteps) {
+          currentStep++;
+          showStep(currentStep);
+      }
+  });
+
+  backButton.addEventListener('click', function() {
+      if (currentStep > 1) {
+          currentStep--;
+          showStep(currentStep);
+      }
+  });
+
+  // Initialize first step
+  showStep(currentStep);
 });

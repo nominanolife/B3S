@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         
         // Re-fetch appointments and re-render the table and calendar
         await fetchAppointments();
-        renderCalendar();
+        renderCalendar(currentMonth, currentYear);
         clearForm();
     }                        
 
@@ -232,7 +232,7 @@ async function populateFormForEdit(id) {
 
             // Re-fetch appointments and re-render the calendar
             await fetchAppointments();
-            renderCalendar();
+            renderCalendar(currentMonth, currentYear);
 
             // Show success modal
             showSuccessModal("Appointment Deleted Successfully!");
@@ -298,6 +298,7 @@ async function populateFormForEdit(id) {
         }
     }
 
+    // Render the calendar
     const renderCalendar = () => {
         const firstDay = new Date(currentYear, currentMonth, 1);
         const lastDay = new Date(currentYear, currentMonth + 1, 0);
@@ -316,7 +317,7 @@ async function populateFormForEdit(id) {
         // Add current month's days
         for (let i = 1; i <= lastDayDate; i++) {
             const fullDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-            const isToday = currentYear === date.getFullYear() && currentMonth === date.getMonth() && i === date.getDate();
+            const isToday = new Date().toDateString() === new Date(currentYear, currentMonth, i).toDateString();
             days += `<div class="day ${isToday ? 'today' : ''}" data-date="${fullDate}">${i}</div>`;
         }
 
@@ -326,9 +327,9 @@ async function populateFormForEdit(id) {
         }
 
         document.getElementById('calendar-days').innerHTML = days;
+        document.querySelector('.month').textContent = `${firstDay.toLocaleString('default', { month: 'long' })} ${currentYear}`;
         updateCalendarColors();
     };
-
     
     const updateCalendarColors = () => {
         const dayElements = document.querySelectorAll("#calendar-days .day");
@@ -362,12 +363,11 @@ async function populateFormForEdit(id) {
     onSnapshot(appointmentsRef, async (snapshot) => {
         appointments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Update global appointments array
         await updateTable(); // Fetch bookings count and update table
-        renderCalendar();
+        renderCalendar(currentMonth, currentYear);
     });
 
     // Initialize the calendar and fetch appointments on load
-    await fetchAppointments();
-    renderCalendar();
+    renderCalendar(currentMonth, currentYear);
 
     nextBtn.addEventListener("click", () => {
         currentMonth++;
@@ -375,7 +375,7 @@ async function populateFormForEdit(id) {
             currentMonth = 0;
             currentYear++;
         }
-        renderCalendar();
+        renderCalendar(currentMonth, currentYear);
     });
 
     prevBtn.addEventListener("click", () => {
@@ -384,13 +384,13 @@ async function populateFormForEdit(id) {
             currentMonth = 11;
             currentYear--;
         }
-        renderCalendar();
+        renderCalendar(currentMonth, currentYear);
     });
 
     todayBtn.addEventListener("click", () => {
         currentMonth = date.getMonth();
         currentYear = date.getFullYear();
-        renderCalendar();
+        renderCalendar(currentMonth, currentYear);
     });
 
     function showSuccessModal(message) {

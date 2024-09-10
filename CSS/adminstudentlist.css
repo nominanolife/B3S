@@ -501,6 +501,18 @@ h2 {
     border-radius: 20px;
 }
 
+.modal-dialog-small {
+    max-width: 500px;
+    top: 30%;
+    left: 5%;
+}
+
+.modal-dialog-large {
+    max-width: 1000px;
+    top: auto;
+    left: 5%;
+}
+
 .modal-content {
     justify-content: space-evenly;
     font-family: Poppins;
@@ -518,38 +530,28 @@ h2 {
     font-size: 14px;
 }
 
-#editModal .modal-dialog {
-    top: auto;
-    left: 5%;
-    border-radius: 20px;
-    max-width: 50%;
-    width: 100%;
-}
-
-#editModal .modal-content {
-    justify-content: space-evenly;
-    font-family: Poppins;
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-#editModal .modal-title {
-    font-size: 20px;
-    font-weight: bold;
+.close {
+    font-size: 24px;
     color: #142A74;
+    cursor: pointer;
 }
 
-#editModal .modal-body {
-    font-size: 14px;
+.header-modal {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .footer {
     display: flex;
     flex-direction: row;
+    justify-content: right;
     align-items: center;
     cursor: pointer;
-    
+    gap: 5px;
+    padding: 10px;
 }
 
 .save-btn {
@@ -558,26 +560,39 @@ h2 {
     color: #ffffff;
     background-color: #142A74;
     border: none;
-    border-radius: 30px;
+    border-radius: 10px;
     padding: 10px 30px;
-    width: 100%;
 }
 
 .save-btn:hover {
     background-color: #142a74ec;
 }
 
-.cancel-btn {
+.next-btn {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+}
+
+.next-btn:hover {
+    background-color: #142a74ec;
+}
+
+.back-btn {
     font-family: Poppins;
     font-size: 14px;
     color: #ffffff;
     background-color: #B60505;
-    border-radius: 30px;
+    border: none;
+    border-radius: 10px;
     padding: 10px 30px;
-    width: 100%;
 }
 
-.cancel-btn:hover {
+.back-btn:hover {
     background-color: #b60505ec;
 }
 
@@ -593,17 +608,17 @@ h2 {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
 
 .student-info p {
     position: relative;
     flex: 0 1 calc(50% - 20px);
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px;
     font-family: Poppins;
     font-size: 14px;
     font-weight: bold;
@@ -755,6 +770,22 @@ h2 {
 
 .custom-radio input:checked + .radio-label::after {
     opacity: 1;
+}
+
+.result {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+}
+
+.result-btn {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
 }
 
 .btn-primary {
