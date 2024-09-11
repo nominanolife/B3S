@@ -463,7 +463,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupUIListeners();
 });
-
 function setupUIListeners() {
   // Event listener for edit icons
   document.getElementById('student-list').addEventListener('click', async (event) => {
@@ -504,7 +503,7 @@ function setupUIListeners() {
           editModal.hide();
 
         } catch (error) {
-          console.error("Error updating certificate control number: ", error);
+          console.error("Error updating certificate control number:", error);
 
           // Show failure notification modal
           showNotification("Failed to update certificate control number.");
@@ -515,18 +514,6 @@ function setupUIListeners() {
 
   // Handle dropdown and modal navigation
   setupModalListeners();
-}
-
-// Search filter function
-function filterStudents(searchTerm) {
-  filteredStudentsData = studentsData.filter(student => {
-    const fullName = `${student.personalInfo.first || ''} ${student.personalInfo.last || ''}`.toLowerCase();
-    return fullName.startsWith(searchTerm);
-  });
-  currentPage = 1;
-  totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
-  renderStudents();
-  updatePaginationControls();
 }
 
 function setupModalListeners() {
@@ -546,7 +533,7 @@ function setupModalListeners() {
       options.style.display = options.style.display === 'block' ? 'none' : 'block';
       currentlyOpenOptions = options.style.display === 'block' ? options : null;
 
-      // Dynamically enable or disable options based on user appointments
+      // Dynamically enable or disable options based on user appointments and completed bookings
       const row = event.target.closest('tr'); // Find the closest row
       const editIcon = row ? row.querySelector('.edit-icon') : null; // Safely find the edit icon in the row
 
@@ -554,9 +541,11 @@ function setupModalListeners() {
         const studentId = editIcon.dataset.index; // Get the student ID
         const studentData = studentsData[studentId]; // Fetch the student's data
 
-        // Check which courses the student has appointments for
-        const has4WheelsCourse = studentData.bookings.some(booking => booking.course === 'PDC-4Wheels' && booking.status !== 'Cancelled');
-        const hasMotorcycleCourse = studentData.bookings.some(booking => booking.course === 'PDC-Motors' && booking.status !== 'Cancelled');
+        // Check which courses the student has appointments for or has completed
+        const has4WheelsCourse = studentData.bookings.some(booking => booking.course === 'PDC-4Wheels' && booking.status !== 'Cancelled') ||
+          (studentData.completedBookings && studentData.completedBookings.some(booking => booking.course === 'PDC-4Wheels'));
+        const hasMotorcycleCourse = studentData.bookings.some(booking => booking.course === 'PDC-Motors' && booking.status !== 'Cancelled') ||
+          (studentData.completedBookings && studentData.completedBookings.some(booking => booking.course === 'PDC-Motors'));
 
         // Enable or disable the options based on the above checks
         row.querySelectorAll('.option-dropdown').forEach(option => {
