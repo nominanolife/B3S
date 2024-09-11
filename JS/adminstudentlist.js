@@ -226,7 +226,7 @@ function renderStudents() {
           return `
               <td class="table-row-content">
                   <label class="status-label">
-                      <input type="checkbox" class="status-toggle" checked disabled>
+                      <input type="checkbox" class="status-toggle" checked>
                   </label>
               </td>
           `;
