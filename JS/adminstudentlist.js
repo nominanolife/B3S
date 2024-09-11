@@ -33,10 +33,6 @@ function showNotification(message) {
     const successModalBody = document.getElementById('successModalBody');
     successModalBody.textContent = message;
     
-    const successModal = new bootstrap.Modal(document.getElementById('successModal'), {
-        backdrop: 'static',
-        keyboard: false 
-    });
     successModal.show();
 }
 
@@ -211,7 +207,12 @@ function renderStudents() {
               ${renderCourseStatus('PDC-Motors', statuses["PDC-Motors"], student.bookings)}
               <td class="table-row-content">${certificateControlNumber}</td>
               <td class="table-row-content">
-                  <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
+                  <i class="bi bi-three-dots"></i>
+                  <div class="triple-dot-options">
+                      <i class="option-dropdown">Certificate Control Number</i>
+                      <i class="option-dropdown">4-Wheels Course Checklist</i>
+                      <i class="option-dropdown">Motorcycle Course Checklist</i>
+                  </div>
               </td>
           </tr>
       `;
@@ -287,10 +288,6 @@ function bindStatusToggles() {
           const course = event.target.dataset.column;
           const isCompleted = event.target.checked;
 
-          const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {
-              backdrop: 'static',
-              keyboard: false 
-          });
           confirmationModal.show();
 
           document.getElementById('confirmButton').onclick = async () => {
@@ -554,57 +551,72 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-  let currentStep = 1;
-  const totalSteps = document.querySelectorAll('.modal-body[data-step]').length;
-  const backButton = document.querySelector('.back-btn');
-  const nextButton = document.querySelector('.next-btn');
-  const saveButton = document.querySelector('.save-btn');
-  const modalDialog = document.querySelector('.modal-dialog');
+document.addEventListener('DOMContentLoaded', () => {
+  const studentList = document.getElementById('student-list');
+  let currentlyOpenOptions = null; // Track the currently open options
 
-  function showStep(step) {
-      document.querySelectorAll('.modal-body[data-step]').forEach((stepElement) => {
-          stepElement.style.display = 'none'; // Hide all steps
-      });
-      document.querySelector(`.modal-body[data-step="${step}"]`).style.display = 'block'; // Show current step
+  // Toggle dropdown options visibility
+  studentList.addEventListener('click', (event) => {
+    if (event.target.classList.contains('bi-three-dots')) {
+      event.stopPropagation();
+      const options = event.target.nextElementSibling;
 
-      // Adjust modal size based on the step
-      if (step === 1) {
-          modalDialog.classList.remove('modal-dialog-large');
-          modalDialog.classList.add('modal-dialog-small'); // Small size for step 1
-          backButton.style.display = 'none'; // Hide the back button on step 1
-          nextButton.style.display = 'none'; // Hide the next button on step 1
-          saveButton.style.display = 'inline-block'; // Show the save button on step 1
-      } else if (step === 2 || step === 3) {
-          modalDialog.classList.remove('modal-dialog-small');
-          modalDialog.classList.add('modal-dialog-large'); // Large size for steps 2 and 3
-          backButton.style.display = 'inline-block'; // Show the back button on steps 2 and 3
-          nextButton.style.display = 'inline-block'; // Show the next button on steps 2 and 3
-          saveButton.style.display = 'none'; // Hide the save button on steps 2 and 3
+      if (currentlyOpenOptions && currentlyOpenOptions !== options) {
+        currentlyOpenOptions.style.display = 'none';
       }
+
+      options.style.display = options.style.display === 'block' ? 'none' : 'block';
+      currentlyOpenOptions = options.style.display === 'block' ? options : null;
+    }
+
+    // Open corresponding modal based on the clicked option
+    if (event.target.classList.contains('option-dropdown')) {
+      const modals = {
+        'Certificate Control Number': 'editCcnModal',
+        '4-Wheels Course Checklist': 'edit4WheelsModal',
+        'Motorcycle Course Checklist': 'editMotorsModal',
+      };
+      const targetText = event.target.textContent.trim();
+      if (modals[targetText]) {
+        new bootstrap.Modal(document.getElementById(modals[targetText])).show();
+      }
+    }
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', () => {
+    if (currentlyOpenOptions) {
+      currentlyOpenOptions.style.display = 'none';
+      currentlyOpenOptions = null;
+    }
+  });
+
+  // Handle modal navigation (Next/Back buttons)
+  ['edit4WheelsModal', 'editMotorsModal'].forEach(setupModalNavigation);
+
+  function setupModalNavigation(modalId) {
+    const modal = document.getElementById(modalId);
+    const [firstSection, secondSection] = modal.querySelectorAll('.modal-body');
+    const [backBtn, nextBtn, saveBtn] = modal.querySelectorAll('.back-btn, .next-btn, .save-btn');
+
+    // Initialize sections and buttons visibility
+    [firstSection, nextBtn].forEach(el => el.classList.remove('d-none'));
+    [secondSection, backBtn, saveBtn].forEach(el => el.classList.add('d-none'));
+
+    nextBtn.addEventListener('click', () => toggleSections(true));
+    backBtn.addEventListener('click', () => toggleSections(false));
+
+    function toggleSections(showSecond) {
+      firstSection.classList.toggle('d-none', showSecond);
+      secondSection.classList.toggle('d-none', !showSecond);
+      [nextBtn, backBtn, saveBtn].forEach(btn => btn.classList.toggle('d-none'));
+    }
   }
+});
 
-  saveButton.addEventListener('click', function() {
-      // Perform save operation here
-      console.log("Saving data..."); // Replace with your actual save logic
-      currentStep++;
-      showStep(currentStep);
-  });
-
-  nextButton.addEventListener('click', function() {
-      if (currentStep < totalSteps) {
-          currentStep++;
-          showStep(currentStep);
-      }
-  });
-
-  backButton.addEventListener('click', function() {
-      if (currentStep > 1) {
-          currentStep--;
-          showStep(currentStep);
-      }
-  });
-
-  // Initialize first step
-  showStep(currentStep);
+document.addEventListener('input', function (event) {
+  if (event.target.classList.contains('comment-input') || event.target.classList.contains('comment-suggestion-input')) {
+      event.target.style.height = 'auto'; // Reset the height
+      event.target.style.height = `${event.target.scrollHeight}px`; // Set the height based on scroll height
+  }
 });

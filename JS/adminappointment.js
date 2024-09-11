@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         
         // Re-fetch appointments and re-render the table and calendar
         await fetchAppointments();
-        renderCalendar(currentMonth, currentYear);
+        renderCalendar();
         clearForm();
     }                        
 
@@ -232,7 +232,7 @@ async function populateFormForEdit(id) {
 
             // Re-fetch appointments and re-render the calendar
             await fetchAppointments();
-            renderCalendar(currentMonth, currentYear);
+            renderCalendar();
 
             // Show success modal
             showSuccessModal("Appointment Deleted Successfully!");
@@ -298,13 +298,13 @@ async function populateFormForEdit(id) {
         }
     }
 
-    // Render the calendar
     const renderCalendar = () => {
         const firstDay = new Date(currentYear, currentMonth, 1);
         const lastDay = new Date(currentYear, currentMonth + 1, 0);
         const prevLastDayDate = new Date(currentYear, currentMonth, 0).getDate();
         const lastDayIndex = lastDay.getDay();
         const lastDayDate = lastDay.getDate();
+
         const nextDays = 7 - lastDayIndex - 1;
 
         let days = "";
@@ -317,7 +317,7 @@ async function populateFormForEdit(id) {
         // Add current month's days
         for (let i = 1; i <= lastDayDate; i++) {
             const fullDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-            const isToday = new Date().toDateString() === new Date(currentYear, currentMonth, i).toDateString();
+            const isToday = currentYear === date.getFullYear() && currentMonth === date.getMonth() && i === date.getDate();
             days += `<div class="day ${isToday ? 'today' : ''}" data-date="${fullDate}">${i}</div>`;
         }
 
@@ -327,10 +327,10 @@ async function populateFormForEdit(id) {
         }
 
         document.getElementById('calendar-days').innerHTML = days;
-        document.querySelector('.month').textContent = `${firstDay.toLocaleString('default', { month: 'long' })} ${currentYear}`;
+
         updateCalendarColors();
     };
-    
+
     const updateCalendarColors = () => {
         const dayElements = document.querySelectorAll("#calendar-days .day");
         dayElements.forEach(dayElement => {
@@ -355,19 +355,29 @@ async function populateFormForEdit(id) {
                 }
             }
         });
-    };  
-
+    };
     
     // Initialize Firestore real-time listener
     const appointmentsRef = collection(db, "appointments");
     onSnapshot(appointmentsRef, async (snapshot) => {
-        appointments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Update global appointments array
-        await updateTable(); // Fetch bookings count and update table
-        renderCalendar(currentMonth, currentYear);
+        // Clear current table rows
+        const tableBody = document.getElementById("slots-table-body");
+        tableBody.innerHTML = ""; 
+        
+        // Update global appointments array
+        appointments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
+
+        // Update the table and calendar
+        for (const appointment of appointments) {
+            addTableRow(appointment); // Add rows to the table directly
+        }
+
+        await updateTable(); // Fetch bookings count if needed
+        renderCalendar();
     });
 
     // Initialize the calendar and fetch appointments on load
-    renderCalendar(currentMonth, currentYear);
+    renderCalendar();
 
     nextBtn.addEventListener("click", () => {
         currentMonth++;
@@ -375,7 +385,7 @@ async function populateFormForEdit(id) {
             currentMonth = 0;
             currentYear++;
         }
-        renderCalendar(currentMonth, currentYear);
+        renderCalendar();
     });
 
     prevBtn.addEventListener("click", () => {
@@ -384,13 +394,13 @@ async function populateFormForEdit(id) {
             currentMonth = 11;
             currentYear--;
         }
-        renderCalendar(currentMonth, currentYear);
+        renderCalendar();
     });
 
     todayBtn.addEventListener("click", () => {
         currentMonth = date.getMonth();
         currentYear = date.getFullYear();
-        renderCalendar(currentMonth, currentYear);
+        renderCalendar();
     });
 
     function showSuccessModal(message) {

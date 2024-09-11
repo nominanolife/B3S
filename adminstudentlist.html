@@ -89,46 +89,461 @@
     </div>
 
     <!-- Edit Certificate Control Number Modal -->
-    <div class="modal" id="editModal" data-backdrop="static">
+    <div class="modal fade" id="editCcnModal">
         <div class="modal-dialog">
             <div class="modal-content">
-
-                <div class="modal-body" data-step="1">
-                    <div class="header-modal">
-                        <h5 class="modal-title">Edit Certificate Control Number</h5>
-                        <div class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </div>
-                    </div>
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Certificate Control Number</h5>
+                </div>
+                <div class="modal-body">
                     <div class="input-body">
                         <input type="text" class="edit-cert-number" id="certificateControlNumberInput" placeholder="Certificate Control Number" required>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="submit" class="save-btn">Save</button>
+                    <button type="button" class="cancel-btn" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="modal-body" data-step="2" style="display: none;">
-                    <div class="header-modal">
-                        <h5 class="modal-title">4-Wheels Course Checklist</h5>
+    <!-- Edit 4-Wheels Checklist Modal -->
+    <div class="modal fade" id="edit4WheelsModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">4-Wheels Course Checklist</h5>
+                    <div class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </div>
+                </div>
+                <div class="modal-body first-section">
                     <div class="input-body">
                         <div class="student-info">
-                            <p>Student Name: <span>Juan Dela Cruz</span></p>                           
+                            <p>Student Name: <span>Juan Dela Cruz</span></p>
                             <p>Date and Time: <span>January 1, 2024</span></p>
                             <p>Assessor Name: <span>Pedro Penduko</span></p>
+                            <div class="vehicle-dropdown">
+                                <p>Vehicle Type:</p>
+                                <select id="vehicleType">
+                                    <option value="manual">Manual</option>
+                                    <option value="automatic">Automatic</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="checkbox-checklist">
                             <h5>Evaluation</h5>
-                            
+                            <table class="evaluation-table">
+                                <thead>
+                                    <tr>
+                                        <th>Observation</th>
+                                        <th>Score</th>
+                                        <th>Comment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Eye lead time</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Left – Right / Scanning / Shoulder checks</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mirrors / tracking traffic</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                </tbody>
+                                <thead>
+                                    <tr>
+                                        <th>Space Management</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Following defensive distance</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Space at Stops</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Path of least resistance</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Right-of-way</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                </tbody>
+                                <thead>
+                                    <tr>
+                                        <th>Speed Control</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Acceleration / Deceleration – Smoothness</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Breaking: Full Stops, smooth</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Speed for Conditions</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Speed and Traffic signs</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                </tbody>
+                                <thead>
+                                    <tr>
+                                        <th>Steering</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Lane / Turn Position / set-up</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Steering: hand position, smoothness</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                </tbody>
+                                <thead>
+                                    <tr>
+                                        <th>Communication</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Signals: timing and use</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Other: i.e horn, eye contact</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                </tbody>
+                                <thead>
+                                    <tr>
+                                        <th>General</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Seating, head rest position, and mirror adjustment: seatbelt use </td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Parking / Backing</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Anticipation: Adjusts</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Judgment: decisions</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Timing: approach, Traffic interactions</td>
+                                        <td><input type="text" class="form-control"></td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                </tbody>
+                                <thead>
+                                    <tr>
+                                        <th>Total Score (out of 100)</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                            </table>
                         </div>
                     </div>
                 </div>
-                
-                <div class="modal-body" data-step="3" style="display: none;">
-                    <div class="header-modal">
-                        <h5 class="modal-title">Motorcycle Course Checklist</h5>
-                    </div>
+                <div class="modal-body second-section">
                     <div class="input-body">
                         <div class="student-info">
-                            <p>Student Name: <span>Juan Dela Cruz</span></p>                           
+                            <p>Student Name: <span>Juan Dela Cruz</span></p>
+                            <p>Student Permit: <input type="text" class="student-permit"></p>
+                        </div>
+                        <div class="checkbox-checklist">
+                            <h5>Comments / Suggestions</h5>
+                            <table class="instructor-comments-table">
+                                <thead>
+                                    <tr>
+                                        <th>Lesson</th>
+                                        <th>Topics</th>
+                                        <th>Comments/Suggestions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="5"><b>Lesson 1: Start and Stop</b></td>
+                                        <td>
+                                            a. Pre-driving checks outside and inside the vehicle
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            b. Starting Procedure
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            c. Establishing a path
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            d. Gear changing
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            e. Stopping the vehicle
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="2"><b>Lesson 2: Backing ang Turning</b></td>
+                                        <td>
+                                            a. Turning right and left at an intersection
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            b. Backing in and out of side street
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="2"><b>Lesson 3: Road Crossing and Light Traffic</b></td>
+                                        <td>
+                                            a. Road crossing
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            b. Driving at light traffic
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 4: Manuevering</b></td>
+                                        <td>
+                                            a. The “Y” turn and turnabout maneuvering style
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 5: Hanging</b></td>
+                                        <td>
+                                            a. Driving on an uphill and downhill on 3% grade
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td  rowspan="3"><b>Lesson 6: Garage Driving</b></td>
+                                        <td>
+                                            a. Driving into a garage
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            b. Driving out of the garage
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            c. Driving into the garage using the backing procedure
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td  rowspan="3"><b>Lesson 7: Parking</b></td>
+                                        <td>
+                                            a. Entering and Leaving angle parking space
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            b. Perpendicular parking
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            c. Parallel parking
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 8: Highway Driving</td>
+                                        <td>
+                                            a. Driving at highways to encounter different traffic situations
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 9: Heavy Traffic</b></td>
+                                        <td>
+                                            a. Acquaints student to actual driving condition in heavy traffic and develops correct driving attitudes
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 10: Night Driving</b></td>
+                                        <td>
+                                            a. Student must familiarize with the actual driving at night
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 11: Review</b></td>
+                                        <td>
+                                            a. Students shall be tested on different traffic situations to observe their driving abilities
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="back-btn d-none">Back</button>
+                    <button type="button" class="next-btn">Next</button>
+                    <button type="submit" class="save-btn d-none">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Motorcycle Checklist Modal -->
+    <div class="modal fade" id="editMotorsModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Motorcycle Course Checklist</h5>
+                    <div class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </div>
+                </div>
+                <div class="modal-body first-section">
+                    <div class="input-body">
+                        <div class="student-info">
+                            <p>Student Name: <span>Juan Dela Cruz</span></p>
                             <p>Date and Time: <span>January 1, 2024</span></p>
                             <p>Assessor Name: <span>Pedro Penduko</span></p>
                         </div>
@@ -243,17 +658,238 @@
                         </div>
                     </div>
                 </div>
-                <div class="footer">
-                    <button type="button" class="back-btn">Back</button>
+                <div class="modal-body second-section">
+                    <div class="input-body">
+                        <div class="student-info">
+                            <p>Student Name: <span>Juan Dela Cruz</span></p>
+                            <p>Student Permit: <input type="text" class="student-permit"></p>
+                        </div>
+                        <div class="checkbox-checklist">
+                            <h5>Comments / Suggestions</h5>
+                            <table class="instructor-comments-table">
+                                <thead>
+                                    <tr>
+                                        <th>Lesson</th>
+                                        <th>Topics</th>
+                                        <th>Comments/Suggestions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="5"><b>Lesson 1: Start and Stop</b></td>
+                                        <td>
+                                            a. Pre-driving checks outside and inside the vehicle
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            b. Starting Procedure
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            c. Establishing a path
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            d. Gear changing
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            e. Stopping the vehicle
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="2"><b>Lesson 2: Backing ang Turning</b></td>
+                                        <td>
+                                            a. Turning right and left at an intersection
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            b. Backing in and out of side street
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="2"><b>Lesson 3: Road Crossing and Light Traffic</b></td>
+                                        <td>
+                                            a. Road crossing
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            b. Driving at light traffic
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 4: Manuevering</b></td>
+                                        <td>
+                                            a. The “Y” turn and turnabout maneuvering style
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 5: Hanging</b></td>
+                                        <td>
+                                            a. Driving on an uphill and downhill on 3% grade
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td  rowspan="3"><b>Lesson 6: Garage Driving</b></td>
+                                        <td>
+                                            a. Driving into a garage
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            b. Driving out of the garage
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            c. Driving into the garage using the backing procedure
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td  rowspan="3"><b>Lesson 7: Parking</b></td>
+                                        <td>
+                                            a. Entering and Leaving angle parking space
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            b. Perpendicular parking
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            c. Parallel parking
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 8: Highway Driving</td>
+                                        <td>
+                                            a. Driving at highways to encounter different traffic situations
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 9: Heavy Traffic</b></td>
+                                        <td>
+                                            a. Acquaints student to actual driving condition in heavy traffic and develops correct driving attitudes
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 10: Night Driving</b></td>
+                                        <td>
+                                            a. Student must familiarize with the actual driving at night
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Lesson 11: Review</b></td>
+                                        <td>
+                                            a. Students shall be tested on different traffic situations to observe their driving abilities
+                                        </td>
+                                        <td>
+                                            <textarea class="form-control comment-suggestion-input" rows="1"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="back-btn d-none">Back</button>
                     <button type="button" class="next-btn">Next</button>
-                    <button type="button" class="save-btn">Save</button>
+                    <button type="submit" class="save-btn d-none">Save</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Notification Modal -->
-    <div class="modal" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -270,7 +906,7 @@
     </div>
 
     <!-- Confirmation Modal -->
-    <div class="modal" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -288,7 +924,7 @@
     </div>
 
     <!-- Logout Confirmation Modal -->
-    <div class="modal" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
