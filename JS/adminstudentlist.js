@@ -250,30 +250,39 @@ function renderStudents() {
   }
 
   document.querySelectorAll('.status-toggle').forEach(toggle => {
-      toggle.addEventListener('change', async (event) => {
-          event.preventDefault(); // Prevent the default checkbox toggle behavior
+    toggle.addEventListener('change', async (event) => {
+        event.preventDefault(); // Prevent the default checkbox toggle behavior
 
-          const appointmentId = event.target.dataset.bookingId;
-          const userId = event.target.dataset.userId;
-          const course = event.target.dataset.column;
-          const isCompleted = event.target.checked;
+        const appointmentId = event.target.dataset.bookingId;
+        const userId = event.target.dataset.userId;
+        const course = event.target.dataset.column;
+        const isCompleted = event.target.checked;
 
-          const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {
-              backdrop: 'static',
-              keyboard: false 
-          });
-          confirmationModal.show();
+        const confirmationMessage = document.getElementById('confirmationMessage');
 
-          document.getElementById('confirmButton').onclick = async () => {
-              confirmationModal.hide();
-              await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
-          };
+        // Update the modal message dynamically based on the action (check or uncheck)
+        if (isCompleted) {
+            confirmationMessage.textContent = `Are you sure you want to complete the status of the appointment of this student?`;
+        } else {
+            confirmationMessage.textContent = `Are you sure you want to revert the status of the appointment of this student?`;
+        }
 
-          document.getElementById('confirmationModal').querySelector('.btn-secondary').onclick = () => {
-              event.target.checked = !isCompleted;
-              confirmationModal.hide();
-          };
-      });
+        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {
+            backdrop: 'static',
+            keyboard: false 
+        });
+        confirmationModal.show();
+
+        document.getElementById('confirmButton').onclick = async () => {
+            confirmationModal.hide();
+            await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
+        };
+
+        document.getElementById('confirmationModal').querySelector('.btn-secondary').onclick = () => {
+            event.target.checked = !isCompleted; // Revert the checkbox state on cancel
+            confirmationModal.hide();
+        };
+    });
   });
 }
 

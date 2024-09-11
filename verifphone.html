@@ -68,7 +68,9 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="promptModalLabel">Notification</h5>
                 </div>
-                <div class="modal-body" id="modalMessage"></div>
+                <div class="modal-body" id="modalMessage">
+
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
@@ -125,27 +127,30 @@
     
         function resendCode(event) {
             event.preventDefault(); // Prevent default link behavior
-    
+        
             const encryptedPhoneNumber = sessionStorage.getItem('phoneNumber');
             const phoneNumber = CryptoJS.AES.decrypt(encryptedPhoneNumber, 'your-secret-key').toString(CryptoJS.enc.Utf8);
-    
+        
             if (!/^\+[1-9]\d{1,14}$/.test(phoneNumber)) {
                 showModal('Invalid phone number format. Please try again.');
                 return;
             }
-    
+        
             const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                 'size': 'invisible',
                 'callback': (response) => {
                     // Invisible reCAPTCHA will automatically trigger sendCode
                 }
             });
-    
+        
             signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
                 .then((newConfirmationResult) => {
                     sessionStorage.setItem('confirmationResult', CryptoJS.AES.encrypt(JSON.stringify(newConfirmationResult), 'your-secret-key').toString());
                     sessionStorage.setItem('codeSentTime', Date.now());
                     startResendCooldown(); // Restart the cooldown
+        
+                    // Show success message
+                    showModal('Verification code has been successfully resent.');
                 }).catch((error) => {
                     console.error("Error during signInWithPhoneNumber", error);
                     if (error.code === 'auth/too-many-requests') {
@@ -154,7 +159,7 @@
                         showModal('Error sending verification code. Please try again.');
                     }
                 });
-        }
+        }        
     
         window.addEventListener('load', () => {
             const confirmationResultData = sessionStorage.getItem('confirmationResult');
