@@ -134,12 +134,12 @@
                 return;
             }
     
-            const recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+            const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                 'size': 'invisible',
                 'callback': (response) => {
                     // Invisible reCAPTCHA will automatically trigger sendCode
                 }
-            }, auth);
+            });
     
             signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
                 .then((newConfirmationResult) => {
