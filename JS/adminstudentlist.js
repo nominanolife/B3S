@@ -28,15 +28,14 @@ let currentPage = 1; // Tracks the current page for pagination
 const itemsPerPage = 10; // Number of items to display per page
 let totalPages = 1; // Total number of pages
 
-// Function to show the notification modal
 function showNotification(message) {
   const successModalBody = document.getElementById('successModalBody');
   successModalBody.textContent = message;
 
-  successModal.show();
+  // Show the modal using jQuery for Bootstrap 4
+  $('#successModal').modal('show'); // Show the modal
 }
 
-// Fetch appointments and update students data
 async function fetchAppointments() {
   try {
     const studentsMap = new Map();
@@ -50,6 +49,9 @@ async function fetchAppointments() {
         // Only process if the role is "student"
         if (applicantData.role === "student") {
           applicantData.bookings = [];
+          applicantData.has4WheelsCourse = false; // Initialize flag for 4-Wheels
+          applicantData.hasMotorsCourse = false; // Initialize flag for Motors
+
           if (applicantData.TDCStatus === "Completed" ||
             applicantData["PDC-4WheelsStatus"] === "Completed" ||
             applicantData["PDC-MotorsStatus"] === "Completed") {
@@ -58,7 +60,7 @@ async function fetchAppointments() {
         }
       }
 
-      // Wait for appointments to load
+      // Process appointments
       const appointmentsSnapshot = await getDocs(collection(db, "appointments"));
       for (const appointment of appointmentsSnapshot.docs) {
         const appointmentData = appointment.data();
@@ -77,16 +79,34 @@ async function fetchAppointments() {
             if (studentData.role === "student") {
               if (!studentsMap.has(booking.userId)) {
                 studentData.bookings = [];
+                studentData.has4WheelsCourse = false; // Initialize flag for 4-Wheels
+                studentData.hasMotorsCourse = false; // Initialize flag for Motors
                 studentsMap.set(booking.userId, studentData);
               }
+
               const student = studentsMap.get(booking.userId);
-              student.bookings.push({ ...booking, appointmentId: appointment.id, course: appointmentData.course });
+              student.bookings.push({
+                ...booking,
+                appointmentId: appointment.id,
+                course: appointmentData.course,
+                date: appointmentData.date,
+                timeStart: appointmentData.timeStart,
+                timeEnd: appointmentData.timeEnd,
+              });
+
+              // Check course type and set flags
+              if (appointmentData.course === "PDC-4Wheels") {
+                student.has4WheelsCourse = true;
+              }
+              if (appointmentData.course === "PDC-Motors") {
+                student.hasMotorsCourse = true;
+              }
             }
           }
         }
       }
 
-      // Wait for completedBookings to load
+      // Process completedBookings
       const completedBookingsSnapshot = await getDocs(collection(db, "completedBookings"));
       for (const doc of completedBookingsSnapshot.docs) {
         const completedBookings = doc.data().completedBookings || [];
@@ -104,10 +124,37 @@ async function fetchAppointments() {
         }
       }
 
-      // After processing all data, update the global arrays and re-render the UI
+      // Now, fetch instructor information from matches collection
+      const matchesSnapshot = await getDocs(collection(db, "matches"));
+      const instructorMap = new Map();
+
+      for (const matchDoc of matchesSnapshot.docs) {
+        const matchData = matchDoc.data();
+        const studentId = matchData.studentId;
+        const instructorId = matchData.instructorId;
+
+        if (studentsMap.has(studentId)) {
+          // Fetch instructor data
+          if (!instructorMap.has(instructorId)) {
+            const instructorDocRef = doc(db, "instructors", instructorId);
+            const instructorDoc = await getDoc(instructorDocRef);
+            if (instructorDoc.exists()) {
+              instructorMap.set(instructorId, instructorDoc.data());
+            }
+          }
+          const student = studentsMap.get(studentId);
+          student.instructorName = instructorMap.get(instructorId)?.name || "N/A"; // Add instructor name to student
+        }
+      }
+
+      // Update the global arrays
       studentsData = Array.from(studentsMap.values());
       filteredStudentsData = studentsData;
       totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
+
+      // Debugging: Ensure data is populated correctly
+      console.log("Populated studentsData:", studentsData);
+
       renderStudents();
       updatePaginationControls();
     });
@@ -120,62 +167,56 @@ async function fetchAppointments() {
   }
 }
 
-// Event listener for edit icons (edit certificate number)
-document.getElementById('student-list').addEventListener('click', async (event) => {
-  if (event.target.classList.contains('edit-icon')) {
-    const studentId = event.target.dataset.index;
-    const studentData = studentsData[studentId];
-    const currentCertificate = studentData.certificateControlNumber || '';
+document.getElementById('saveChangesBtn').onclick = async (event) => {
+  event.preventDefault(); // Prevent page refresh
 
-    // Populate modal with current certificate control number
-    document.getElementById('certificateControlNumberInput').value = currentCertificate;
+  const newCertificateNumber = document.getElementById('certificateControlNumberInput').value;
 
-    document.getElementById('saveChangesBtn').onclick = async (event) => {
-      event.preventDefault(); // Prevent page refresh
+  // Retrieve the student index from the button's data attribute
+  const studentIndex = event.target.getAttribute('data-student-index');
+  console.log("Retrieved student index from data attribute:", studentIndex); // Debugging output
 
-      const newCertificateNumber = document.getElementById('certificateControlNumberInput').value;
-
-      // Debug: Log studentData and ID
-      console.log("Student data:", studentData);
-      console.log("Saving certificate control number for UID:", studentData.id);
-
-      // Update or add the certificate control number in Firestore
-      try {
-        const studentDocRef = doc(db, "applicants", studentData.id); // Ensure studentData.id is the correct UID
-        console.log("Document reference:", studentDocRef.path);
-
-        // Use setDoc with merge to update the document or add the field if it doesn't exist
-        await setDoc(studentDocRef, {
-          certificateControlNumber: newCertificateNumber
-        }, { merge: true });
-
-        // Update the local data structure with the new certificate control number
-        studentData.certificateControlNumber = newCertificateNumber;
-
-        // Re-render the student list to reflect the changes
-        renderStudents();
-        setupStatusToggleListeners(); // Re-setup listeners after rendering
-
-        // Show success notification modal
-        showNotification("Certificate Control Number updated successfully!");
-
-        // Hide the modal
-        editModal.hide();
-
-      } catch (error) {
-        console.error("Error updating certificate control number:", error);
-
-        // Show failure notification modal
-        showNotification("Failed to update certificate control number.");
-      }
-    };
+  if (studentIndex === null || studentIndex === undefined) {
+    console.error("Student index is null or undefined.");
+    showNotification("Failed to update certificate control number.");
+    return;
   }
-});
+
+  const studentData = studentsData[studentIndex]; // Retrieve the correct student data
+
+  if (!studentData || !studentData.id) {
+    console.error("Student data is invalid or ID is missing:", studentData);
+    showNotification("Failed to update certificate control number.");
+    return;
+  }
+
+  console.log("Student Data:", studentData); // Debugging output to see if the student data is correctly fetched
+
+  try {
+    const studentDocRef = doc(db, "applicants", studentData.id); // Ensure studentData.id is correct
+    console.log("Updating student with ID:", studentData.id); // Debugging output to confirm the correct student ID
+
+    await setDoc(studentDocRef, { certificateControlNumber: newCertificateNumber }, { merge: true });
+
+    studentData.certificateControlNumber = newCertificateNumber;
+
+    renderStudents();
+    setupStatusToggleListeners();
+
+    showNotification("Certificate Control Number updated successfully!");
+
+    // Close the modal using jQuery for Bootstrap 4
+    $('#editCcnModal').modal('hide');
+
+  } catch (error) {
+    console.error("Error updating certificate control number:", error);
+    showNotification("Failed to update certificate control number.");
+  }
+};
 
 function renderStudents() {
   const studentList = document.getElementById('student-list');
   studentList.innerHTML = '';
-
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   const paginatedStudents = filteredStudentsData.slice(start, end);
@@ -188,7 +229,6 @@ function renderStudents() {
       "PDC-Motors": student['PDC-MotorsStatus'] || null
     };
 
-    // Certificate Control Number
     const certificateControlNumber = student.certificateControlNumber || '';
 
     const studentHtml = `
@@ -203,20 +243,18 @@ function renderStudents() {
             ${renderCourseStatus('PDC-Motors', statuses["PDC-Motors"], student.bookings)}
             <td class="table-row-content">${certificateControlNumber}</td>
             <td class="table-row-content">
-                <i class="bi bi-three-dots"></i>
-                <div class="triple-dot-options">
-                    <i class="option-dropdown">Certificate Control Number</i>
-                    <i class="option-dropdown">4-Wheels Course Checklist</i>
-                    <i class="option-dropdown">Motorcycle Course Checklist</i>
+                <!-- Only one icon to trigger the dropdown options -->
+                <i class="bi bi-three-dots" data-toggle="options" data-index="${index}"></i>
+                <div class="triple-dot-options" style="display: none;">
+                    <i class="option-dropdown" data-modal="editCcnModal" data-index="${index}">Certificate Control Number</i>
+                    <i class="option-dropdown" data-modal="edit4WheelsModal" data-index="${index}">4-Wheels Course Checklist</i>
+                    <i class="option-dropdown" data-modal="editMotorsModal" data-index="${index}">Motorcycle Course Checklist</i>
                 </div>
-                <!-- Add an edit icon with the correct data attribute -->
-                <i class="edit-icon" data-index="${index}"></i>
             </td>
         </tr>
     `;
     studentList.insertAdjacentHTML('beforeend', studentHtml);
   });
-
   setupStatusToggleListeners(); // Set up listeners for toggles after rendering
 }
 
@@ -453,129 +491,114 @@ function updatePaginationControls() {
 // Fetch students on DOM load
 document.addEventListener('DOMContentLoaded', () => {
   fetchAppointments();
-
+  setupModalListeners();
   // Add search functionality
   const searchInput = document.querySelector('.search');
   searchInput.addEventListener('input', (event) => {
     const searchTerm = event.target.value.toLowerCase();
     filterStudents(searchTerm);
   });
-
-  setupUIListeners();
 });
-function setupUIListeners() {
-  // Event listener for edit icons
-  document.getElementById('student-list').addEventListener('click', async (event) => {
-    if (event.target.classList.contains('edit-icon')) {
-      const studentId = event.target.dataset.index;
-      const studentData = studentsData[studentId];
-      const currentCertificate = studentData.certificateControlNumber || '';
 
-      // Populate modal with current certificate control number
-      document.getElementById('certificateControlNumberInput').value = currentCertificate;
+function openEditModal(index, modalId = 'editCcnModal') {
+  const studentData = studentsData[index]; // Retrieve student data using the correct index
 
-      // Show the modal
-      const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-      editModal.show();
+   // Populate student and instructor names, and date/time in the modal
+   if (modalId === 'edit4WheelsModal') {
+    document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(1) span').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
+    document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(2) span').textContent = `${studentData.bookings[0].date} ${studentData.bookings[0].timeStart} - ${studentData.bookings[0].timeEnd}`;
+    document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(3) span').textContent = studentData.instructorName || "N/A";
+  
+    document.querySelector('#edit4WheelsModal .modal-body.second-section .student-info #studentName').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
+  }
 
-      // Handle save changes
-      document.getElementById('saveChangesBtn').onclick = async () => {
-        const newCertificateNumber = document.getElementById('certificateControlNumberInput').value;
-
-        // Update the certificate control number in Firestore
-        try {
-          const studentDocRef = doc(db, "applicants", studentData.id);
-          await updateDoc(studentDocRef, {
-            certificateControlNumber: newCertificateNumber
-          });
-
-          // Update the local data structure with the new certificate control number
-          studentData.certificateControlNumber = newCertificateNumber;
-
-          // Re-render the student list to reflect the changes
-          renderStudents();
-          setupStatusToggleListeners(); // Re-setup listeners after rendering
-
-          // Show success notification modal
-          showNotification("Certificate Control Number updated successfully!");
-
-          // Hide the modal
-          editModal.hide();
-
-        } catch (error) {
-          console.error("Error updating certificate control number:", error);
-
-          // Show failure notification modal
-          showNotification("Failed to update certificate control number.");
-        }
-      };
+  // Validate TDC status only for the certificate control number modal
+  if (modalId === 'editCcnModal') {
+    if (!studentData.TDCStatus || studentData.TDCStatus !== "Completed") {
+      console.warn("Student has not yet completed their TDC appointment.");
+      showNotification("This student has not yet finished their TDC appointment.");
+      return;
     }
-  });
+  }
 
-  // Handle dropdown and modal navigation
-  setupModalListeners();
+  // Check if "4 Wheels" checkbox is unchecked
+  if (modalId === 'edit4WheelsModal') {
+    if (!studentData.has4WheelsCourse) { // Use a key that represents the 4-Wheels checkbox status
+      console.warn("Student does not have a 4-Wheels appointment.");
+      showNotification("This student does not have a 4-Wheels appointment.");
+      return;
+    }
+  }
+
+  // Check if "Motors" checkbox is unchecked
+  if (modalId === 'editMotorsModal') {
+    if (!studentData.hasMotorsCourse) { // Use a key that represents the Motors checkbox status
+      console.warn("Student does not have a Motorcycle appointment.");
+      showNotification("This student does not have a Motorcycle appointment.");
+      return;
+    }
+  }
+
+  // Set the input value and data attribute for the default modal
+  if (modalId === 'editCcnModal') {
+    document.getElementById('certificateControlNumberInput').value = studentData.certificateControlNumber || '';
+  }
+
+  // Set the index as a data attribute on the save button to retrieve it later
+  const saveButton = document.getElementById('saveChangesBtn');
+  saveButton.setAttribute('data-student-index', index);
+
+  console.log("Setting data-student-index to:", index); // Debugging output
+
+  // Show the correct modal
+  const modalToOpen = new bootstrap.Modal(document.getElementById(modalId));
+  modalToOpen.show();
 }
 
 function setupModalListeners() {
   const studentList = document.getElementById('student-list');
   let currentlyOpenOptions = null; // Track the currently open options
 
-  // Toggle dropdown options visibility
   studentList.addEventListener('click', (event) => {
     if (event.target.classList.contains('bi-three-dots')) {
       event.stopPropagation();
-      const options = event.target.nextElementSibling;
+      const options = event.target.nextElementSibling; // Get the options container
+
+      const index = event.target.getAttribute('data-index');
+      const studentData = studentsData[index]; // Retrieve student data using the correct index
+
+      // Hide options based on student data
+      const edit4WheelsOption = options.querySelector('[data-modal="edit4WheelsModal"]');
+      const editMotorsOption = options.querySelector('[data-modal="editMotorsModal"]');
+
+      // Show "4-Wheels Course Checklist" if the student has a 4-Wheels appointment
+      edit4WheelsOption.style.display = studentData.has4WheelsCourse ? 'block' : 'none';
+
+      // Show "Motorcycle Course Checklist" if the student has a Motors appointment
+      editMotorsOption.style.display = studentData.hasMotorsCourse ? 'block' : 'none';
 
       if (currentlyOpenOptions && currentlyOpenOptions !== options) {
-        currentlyOpenOptions.style.display = 'none';
+        currentlyOpenOptions.style.display = 'none'; // Hide any other open options
       }
 
-      options.style.display = options.style.display === 'block' ? 'none' : 'block';
+      options.style.display = options.style.display === 'block' ? 'none' : 'block'; // Toggle visibility
       currentlyOpenOptions = options.style.display === 'block' ? options : null;
-
-      // Dynamically enable or disable options based on user appointments and completed bookings
-      const row = event.target.closest('tr'); // Find the closest row
-      const editIcon = row ? row.querySelector('.edit-icon') : null; // Safely find the edit icon in the row
-
-      if (editIcon) {
-        const studentId = editIcon.dataset.index; // Get the student ID
-        const studentData = studentsData[studentId]; // Fetch the student's data
-
-        // Check which courses the student has appointments for or has completed
-        const has4WheelsCourse = studentData.bookings.some(booking => booking.course === 'PDC-4Wheels' && booking.status !== 'Cancelled') ||
-          (studentData.completedBookings && studentData.completedBookings.some(booking => booking.course === 'PDC-4Wheels'));
-        const hasMotorcycleCourse = studentData.bookings.some(booking => booking.course === 'PDC-Motors' && booking.status !== 'Cancelled') ||
-          (studentData.completedBookings && studentData.completedBookings.some(booking => booking.course === 'PDC-Motors'));
-
-        // Enable or disable the options based on the above checks
-        row.querySelectorAll('.option-dropdown').forEach(option => {
-          if (option.textContent.trim() === '4-Wheels Course Checklist') {
-            option.style.display = has4WheelsCourse ? 'block' : 'none';
-          }
-          if (option.textContent.trim() === 'Motorcycle Course Checklist') {
-            option.style.display = hasMotorcycleCourse ? 'block' : 'none';
-          }
-        });
-      } else {
-        console.error("Edit icon not found in the row.");
-      }
+      return; // Exit function to avoid further processing
     }
 
-    // Open the corresponding modal if the option is clicked and enabled
+    if (event.target.classList.contains('edit-icon')) {
+      const index = event.target.getAttribute('data-index');
+      openEditModal(index); // Open the edit modal directly
+      return;
+    }
+
     if (event.target.classList.contains('option-dropdown')) {
-      const modals = {
-        'Certificate Control Number': 'editCcnModal',
-        '4-Wheels Course Checklist': 'edit4WheelsModal',
-        'Motorcycle Course Checklist': 'editMotorsModal',
-      };
-      const targetText = event.target.textContent.trim();
-      if (modals[targetText]) {
-        new bootstrap.Modal(document.getElementById(modals[targetText])).show();
-      }
+      const modalId = event.target.getAttribute('data-modal'); // Get the modal ID from the clicked option
+      const index = event.target.closest('td').querySelector('.bi-three-dots').getAttribute('data-index'); // Get the student index
+      openEditModal(index, modalId); // Open the corresponding modal
     }
   });
 
-  // Close dropdown when clicking outside
   document.addEventListener('click', () => {
     if (currentlyOpenOptions) {
       currentlyOpenOptions.style.display = 'none';
@@ -583,7 +606,6 @@ function setupModalListeners() {
     }
   });
 
-  // Handle modal navigation (Next/Back buttons)
   ['edit4WheelsModal', 'editMotorsModal'].forEach(setupModalNavigation);
 }
 
@@ -613,3 +635,15 @@ document.addEventListener('input', function (event) {
     event.target.style.height = `${event.target.scrollHeight}px`; // Set the height based on scroll height
   }
 });
+
+function filterStudents(searchTerm) {
+  filteredStudentsData = studentsData.filter(student => {
+    const fullName = `${student.personalInfo.first || ''} ${student.personalInfo.last || ''}`.toLowerCase();
+    return fullName.startsWith(searchTerm);
+  });
+  currentPage = 1;
+  totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
+  renderStudents();
+  updatePaginationControls();
+}
+
