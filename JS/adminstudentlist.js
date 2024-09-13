@@ -258,36 +258,39 @@ function renderStudents() {
   setupStatusToggleListeners(); // Set up listeners for toggles after rendering
 }
 
-// Function to render course status checkboxes
 function renderCourseStatus(course, status, bookings = []) {
-  if (status === "Completed") {
-    const booking = bookings.find(b => b.course === course);
-    return `
-        <td class="table-row-content">
-            <label class="status-label">
-                <input type="checkbox" class="status-toggle" checked 
-                       data-booking-id="${booking ? booking.appointmentId : ''}" 
-                       data-user-id="${booking ? booking.userId : ''}" 
-                       data-column="${course}"> 
-            </label>
-        </td>
-    `;
-  } else {
-    const booking = bookings.find(b => b.course === course && b.status === "Booked");
-    if (booking) {
+  const today = new Date(); // Current date
+  const booking = bookings.find(b => b.course === course);
+  
+  if (booking) {
+    const appointmentDate = new Date(booking.date);
+    const isPastDate = appointmentDate < today;
+
+    if (status === "Completed" || isPastDate) {
       return `
-          <td class="table-row-content">
-              <label class="status-label">
-                  <input type="checkbox" class="status-toggle" 
-                         data-booking-id="${booking.appointmentId}" 
-                         data-user-id="${booking.userId}" 
-                         data-column="${course}">
-              </label>
-          </td>
+        <td class="table-row-content">
+          <label class="status-label">
+            <input type="checkbox" class="status-toggle" checked
+                   data-booking-id="${booking.appointmentId}"
+                   data-user-id="${booking.userId}"
+                   data-column="${course}">
+          </label>
+        </td>
       `;
     } else {
-      return '<td class="table-row-content"></td>';
+      return `
+        <td class="table-row-content">
+          <label class="status-label">
+            <input type="checkbox" class="status-toggle"
+                   data-booking-id="${booking.appointmentId}"
+                   data-user-id="${booking.userId}"
+                   data-column="${course}">
+          </label>
+        </td>
+      `;
     }
+  } else {
+    return '<td class="table-row-content"></td>';
   }
 }
 
