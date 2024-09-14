@@ -47,12 +47,13 @@
             <div class="page-content">
                 <div class="package-header">
                     <div class="filter-container">
-                        <select class="form-control course-filter" id="courseFilter">
-                            <option value="">All</option>
-                            <option value="TDC">TDC</option>
-                            <option value="PDC">PDC</option>
-                        </select>
-                    </div>
+                        <div class="selected" id="courseFilter">All</div>
+                        <ul class="dropdown-options">
+                            <li class="option" data-value="">All</li>
+                            <li class="option" data-value="TDC">TDC</li>
+                            <li class="option" data-value="PDC">PDC</li>
+                        </ul>
+                    </div>                    
                     <div class="buttons">
                         <button class="add-package" type="button" id="addButton">Add Package</button>
                         <button class="delete-package" type="button" id="deleteButton">Delete Package</button>

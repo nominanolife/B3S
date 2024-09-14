@@ -229,12 +229,6 @@ h2 {
     justify-content: space-between;
 }
 
-.dashboard-bttns {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
 .button-right {
     font-family: Poppins;
     font-size: 12px;
@@ -244,6 +238,7 @@ h2 {
     border-radius: 10px;
     padding: 20px 60px;
     margin: 10px;
+    text-decoration: none;
 }
 
 .button-right:hover {
@@ -261,7 +256,7 @@ h2 {
 .page-body {
     display: flex;
     flex-direction: column;
-    margin-top: 40px;
+    margin-top: 50px;
 }
 
 .page-body h2 {
@@ -293,6 +288,7 @@ h2 {
     text-align: left;
     vertical-align: middle;
     border-bottom: 1px solid #D9D9D9;
+    background: none;
 }
 
 .table th.package-price, .table td.package-price {
@@ -337,6 +333,7 @@ h2 {
 .status-toggle {
     margin: 0 auto;
     display: flex;
+    cursor: pointer;
 }
 
 .action-button {
@@ -670,29 +667,75 @@ h2 {
 .vehicle-dropdown {
     display: flex;
     flex-direction: row;
-    gap: 5px;
 }
 
-#vehicleType {
-    font-family: Poppins;
-    font-size: 14px;
-    color: #585353;
+.custom-dropdown {
+    position: relative;
     width: 50%;
-    margin-left: 20px;
-    border-radius: 5px;
-    border: 1px solid #D9D9D9;
-    background-color: #F4F4F4;
     cursor: pointer;
-}
-
-#vehicleType:hover {
-    background-color: #f5f5f5;
-}
-
-#vehicleType option {
     font-family: Poppins;
     font-size: 14px;
-    color: #585353;
+    margin-left: 10px;
+}
+
+.selected {
+    border: 1px solid #D9D9D9;
+    padding: 10px 20px;
+    height: 30px;
+    border-radius: 10px;
+    color: #2F2E2E;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.selected:after {
+    content: '\25BC'; /* Down arrow */
+    font-size: 12px;
+    color: #142A74;
+    margin-left: 10px;
+    position: absolute;
+    right: 10px;
+}
+
+.dropdown-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background-color: #FFFFFF;
+    border: 1px solid #D9D9D9;
+    border-radius: 8px;
+    position: absolute;
+    width: 100%;
+    top: calc(100% + 5px);
+    left: 0;
+    z-index: 10;
+    display: none;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.option {
+    padding: 20px;
+    color: #2F2E2E;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.option:hover {
+    background-color: #142A74;
+    color: #ffffff;
+}
+
+.custom-dropdown.open .dropdown-options {
+    display: block;
+}
+
+.selected:hover, .selected:focus {
+    border-color: #142A74;
+    box-shadow: 0px 0px 4px 2px rgba(20, 42, 116, 0.5);
 }
 
 .evaluation-table {
@@ -767,23 +810,56 @@ h2 {
     text-align: center;
 }
 
-.instructor-comments-table td:nth-child(1) {
+.instructor-comments-table td:nth-child(1), .instructor-comments-table td:nth-child(2) {
     vertical-align: top;
 }
 
-.instructor-comments-table td {
-    vertical-align: top;
+.comment-suggestion-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
 }
 
-.instructor-comments-table td textarea {
-    padding: 5px;
-    border: none;
-    font-weight: 500;
-    font-size: 13px;
-    border: none;
-    resize: none;
-    overflow: hidden;
-    outline: none;
+.custom-checkbox {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    vertical-align: top;
+    cursor: pointer;
+    margin: 0;
+}
+
+.custom-checkbox span {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border: 2px solid #2F2E2E;
+    border-radius: 4px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.custom-checkbox span::after {
+    content: '\2714';
+    position: relative;
+    left: 3px;
+    top: -2px;
+    font-size: 14px;
+    color: #ffffff;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.comment-suggestion-checkbox:checked + span {
+    background-color: #142A74;
+    border-color: #142A74;
+}
+
+.comment-suggestion-checkbox:checked + span::after {
+    opacity: 1;
 }
 
 .checkbox-checklist {

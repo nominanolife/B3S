@@ -15,7 +15,7 @@ const auth = firebase.auth();
 
 let tempProfileData = {};
 
-// Function to get user data and populate profile page
+// Function to get user data and populate profile page (existing code)
 async function getUserData() {
     const user = auth.currentUser;
     if (user) {
@@ -55,62 +55,55 @@ async function getUserData() {
             document.getElementById('editSuffix').value = tempProfileData.suffix;
             document.getElementById('editBirthdate').value = tempProfileData.birthdate;
             document.getElementById('editAge').value = tempProfileData.age;
-            document.getElementById('editStatus').value = tempProfileData.status;
+            document.getElementById('editStatus').textContent = tempProfileData.status;
+
             document.getElementById('editContactNumber').value = tempProfileData.contactNumber;
             document.getElementById('editAddress').value = tempProfileData.address;
         }
     }
 }
 
-// Function to calculate age based on birthdate
-function calculateAge(birthdate) {
-    const birthDate = new Date(birthdate);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
+// Custom dropdown functionality
+document.querySelector('.custom-dropdown').addEventListener('click', function (e) {
+    const dropdown = e.currentTarget;
+    dropdown.classList.toggle('open');
+    e.stopPropagation(); // Prevent event from bubbling to the document level
+});
 
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
+// Close dropdown on selecting an option and update the selected value
+document.querySelectorAll('.option').forEach(option => {
+    option.addEventListener('click', function (e) {
+        const selectedOption = e.currentTarget;
+        const dropdown = selectedOption.closest('.custom-dropdown');
+        dropdown.querySelector('.selected').textContent = selectedOption.textContent;
+        dropdown.classList.remove('open'); // Close the dropdown after selecting an option
+        e.stopPropagation(); // Prevent the event from bubbling up and causing unintended behavior
+    });
+});
+
+// Close dropdown when clicking outside of it
+document.addEventListener('click', function (event) {
+    const dropdown = document.querySelector('.custom-dropdown');
+    if (!dropdown.contains(event.target)) {
+        dropdown.classList.remove('open');
     }
+});
 
-    return age;
-}
-
-// Function to show notification modal with a custom message
-function showNotificationModal(message, type) {
-    const modalBody = document.getElementById("notificationModalBody");
-    modalBody.textContent = message;
-
-    // Change the color of the text based on the type
-    if (type === "success") {
-        modalBody.style.color = "green";
-    } else if (type === "error") {
-        modalBody.style.color = "red";
-    } else if (type === "warning") {
-        modalBody.style.color = "orange";
-    }
-
-    $('#notificationModal').modal('show');
-}
-
-// Function to save profile changes with validation
+// Function to save profile changes with validation (update the code)
 async function saveProfileChanges() {
     const user = auth.currentUser;
     if (user) {
-        // Get the existing data for comparison
         const originalData = tempProfileData;
 
-        // Get the input values
         const firstName = document.getElementById('editFirstName').value.trim();
         const middleName = document.getElementById('editMiddleName').value.trim();
         const lastName = document.getElementById('editLastName').value.trim();
         const suffix = document.getElementById('editSuffix').value.trim();
         const birthdate = document.getElementById('editBirthdate').value.trim();
         const age = document.getElementById('editAge').value.trim();
-        const status = document.getElementById('editStatus').value.trim();
+        const status = document.getElementById('editStatus').textContent.trim(); // Update to get text content
         const contactNumber = document.getElementById('editContactNumber').value.trim();
         const address = document.getElementById('editAddress').value.trim();
-
         const profilePicFile = document.getElementById('editProfilePic').files[0];
 
         // Validate birthdate
@@ -138,14 +131,12 @@ async function saveProfileChanges() {
             address === originalData.address &&
             !profilePicFile
         ) {
-            // Show validation message
             showNotificationModal("Please edit at least one field before saving.", "warning");
-            return; // Exit the function
+            return;
         }
 
         const updatedData = {};
 
-        // Only update fields that have been changed
         if (firstName !== originalData.firstName) updatedData['personalInfo.first'] = firstName;
         if (middleName !== originalData.middleName) updatedData['personalInfo.middle'] = middleName;
         if (lastName !== originalData.lastName) updatedData['personalInfo.last'] = lastName;
@@ -157,7 +148,6 @@ async function saveProfileChanges() {
         if (address !== originalData.address) updatedData['personalInfo.address'] = address;
 
         try {
-            // Update only if there are changes
             if (Object.keys(updatedData).length > 0) {
                 await db.collection('applicants').doc(user.uid).update(updatedData);
             }
@@ -172,19 +162,15 @@ async function saveProfileChanges() {
 
             $('#editProfileModal').modal('hide');
             getUserData();
-
-            // Show success notification modal
             showNotificationModal("Profile Updated Successfully!", "success");
 
         } catch (error) {
-            // Show error notification modal
             showNotificationModal(`Error updating profile: ${error.message}`, "error");
         }
     }
 }
 
-
-// Function to reset the edit profile form to the existing data
+// Function to reset the edit profile form to the existing data (existing code)
 function resetEditProfileForm() {
     document.getElementById('editFirstName').value = tempProfileData.firstName;
     document.getElementById('editMiddleName').value = tempProfileData.middleName;
@@ -192,13 +178,14 @@ function resetEditProfileForm() {
     document.getElementById('editSuffix').value = tempProfileData.suffix;
     document.getElementById('editBirthdate').value = tempProfileData.birthdate;
     document.getElementById('editAge').value = tempProfileData.age;
-    document.getElementById('editStatus').value = tempProfileData.status;
+    document.getElementById('editStatus').textContent = tempProfileData.status; // Update to set text content
+
     document.getElementById('editContactNumber').value = tempProfileData.contactNumber;
     document.getElementById('editAddress').value = tempProfileData.address;
     document.getElementById('profilePicPreview').src = tempProfileData.profilePicUrl || 'Assets/default-profile.png';
 }
 
-// Event listeners
+// Event listeners (update/add)
 document.getElementById('profileBtn').addEventListener('click', getUserData);
 document.getElementById('saveProfileChanges').addEventListener('click', saveProfileChanges);
 document.getElementById('cancelProfileChanges').addEventListener('click', resetEditProfileForm);
@@ -223,7 +210,6 @@ document.getElementById('editBirthdate').addEventListener('change', function() {
     document.getElementById('editAge').value = age;
 });
 
-// Load user data on page load
 auth.onAuthStateChanged((user) => {
     if (user) {
         getUserData();
@@ -231,3 +217,20 @@ auth.onAuthStateChanged((user) => {
         window.location.href = 'login.html';
     }
 });
+
+// Function to show notification modal with a custom message
+function showNotificationModal(message, type) {
+    const modalBody = document.getElementById("notificationModalBody");
+    modalBody.textContent = message;
+
+    // Change the color of the text based on the type
+    if (type === "success") {
+        modalBody.style.color = "green";
+    } else if (type === "error") {
+        modalBody.style.color = "red";
+    } else if (type === "warning") {
+        modalBody.style.color = "orange";
+    }
+
+    $('#notificationModal').modal('show'); // Use jQuery to show the modal
+}

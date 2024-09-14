@@ -261,6 +261,13 @@ h2 {
     margin-bottom: 10px;
 }
 
+.custom-radio {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+}
+
 .custom-radio input {
     position: absolute;
     opacity: 0;
@@ -269,7 +276,7 @@ h2 {
 
 .custom-radio input + .radio-label {
     position: relative;
-    margin-left: 20px;
+    margin-left: 30px;
     padding-left: 30px;
     font-family: Poppins;
     font-size: 18px;
@@ -299,18 +306,18 @@ h2 {
 .custom-radio input + .radio-label::after {
     content: '';
     position: absolute;
-    left: 5px;
-    top: 8px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+    left: 10px;
+    top: 50%;
+    width: 12px;
+    height: 12px;
     background-color: #ffffff;
-    opacity: 0;
-    transition: all 0.3s ease;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.2s ease-in-out;
 }
 
 .custom-radio input:checked + .radio-label::after {
-    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
 }
 
 .slots-section {

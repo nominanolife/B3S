@@ -59,10 +59,10 @@
                                     <i class="option-dropdown">Edit</i>
                                     <i class="option-dropdown">Delete</i>
                                 </div>
-                            </div>                            
+                            </div>
                         </div>
                     </div>
-                    <div class="upload-container" id="uploadContainer">
+                    <div class="upload-container">
                         <div class="upload-box">
                             <div class="upload-area">
                                 <i class="bi bi-cloud-arrow-up-fill"></i>
@@ -103,20 +103,41 @@
                                 <div class="title">Preview</div>
                             </div>
                         </div>
-                        <form>
-                            <div class="form-group1">
-                                <label for="lessonTitle">Title</label>
-                                <input type="text" class="form-control" id="lessonTitle" placeholder="Enter lesson title">
+                        <div class="upload-video">
+                            <div class="category">
+                                <h5>Category</h5>
+                                <div class="selected">Select a category</div>
+                                <ul class="dropdown-options">
+                                    <li class="options" data-value="1">Road Rules and Regulations</li>
+                                    <li class="options" data-value="2">Defensive Driving</li>
+                                    <li class="options" data-value="3">Basic Driving</li>
+                                </ul>
                             </div>
-                            <div class="form-group1">
-                                <label for="videoThumbnail">Video Thumbnail</label>
-                                <input type="file" class="form-control-file" id="videoThumbnail">
+                            <div class="video-title">
+                                <h5>Title</h5>
+                                <input type="text" id="videoTitleInput" placeholder="Enter video title">
+                            </div>                            
+                            <div class="video-thumbnail">
+                                <h5>Upload Video Thumbnail</h5>
+                                <div class="video-thumbnail-box">
+                                    <div class="video-thumbnail-area">
+                                        <i class="bi bi-image-fill"></i>
+                                        <p>Add Image</p>
+                                    </div>
+                                    <input type="file" id="thumbnailUpload" accept="image/*">
+                                </div>
                             </div>
-                            <div class="form-group1">
-                                <label for="uploadVideo">Upload Video</label>
-                                <input type="file" class="form-control-file" id="uploadVideo">
+                            <div class="video-upload">
+                                <h5>Upload Video</h5>
+                                <div class="video-upload-box">
+                                    <div class="video-upload-area">
+                                        <i class="bi bi-file-earmark-play-fill"></i>
+                                        <p>Add Video</p>
+                                    </div>
+                                    <input type="file" id="videoUpload" accept="video/*">
+                                </div>
                             </div>
-                        </form>
+                        </div>
                     </div> 
                     <!-- Step 2: Create Quiz -->
                     <div id="step2" class="modal-step d-none">
@@ -136,29 +157,14 @@
                                 <div class="title">Preview</div>
                             </div>
                         </div>
-                        <form>
-                            <div class="form-group2">
-                                <label for="question1">Question 1</label>
-                                <input type="text" class="form-control" id="question1" placeholder="Type your question here...">
+                        <div class="upload-quiz-container">
+                            <div class="quiz-content">
+                                <h5>Quiz</h5>
                             </div>
-                            <div class="form-group2">
-                                <label for="optionA">Option A</label>
-                                <input type="text" class="form-control" id="optionA" placeholder="Option A">
+                            <div class="add-question-container">
+                                <button type="button" class="add-question">Add Question</button>
                             </div>
-                            <div class="form-group2">
-                                <label for="optionB">Option B</label>
-                                <input type="text" class="form-control" id="optionB" placeholder="Option B">
-                            </div>
-                            <div class="form-group2">
-                                <label for="optionC">Option C</label>
-                                <input type="text" class="form-control" id="optionC" placeholder="Option C">
-                            </div>
-                            <div class="form-group2">
-                                <label for="optionD">Option D</label>
-                                <input type="text" class="form-control" id="optionD" placeholder="Option D">
-                            </div>
-                        </form>
-                        <button type="button" class="btn btn-link">+ Add New Question</button>
+                        </div>
                     </div>
                     <!-- Step 3: Preview -->
                     <div id="step3" class="modal-step d-none">
@@ -179,7 +185,31 @@
                             </div>
                         </div>
                         <div class="preview">
-                            
+                            <h5>Preview</h5>
+                            <div class="preview-container">
+                                <div class="video-preview">
+                                    <h5>Video</h5>
+                                    <div id="videoPreviewContainer">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="preview-container">
+                                <div class="thumbnail-preview">
+                                    <h5>Video Display</h5>
+                                    <div id="thumbnailPreviewContainer">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="preview-container">
+                                <div class="quiz-preview">
+                                    <h5>Quiz</h5>
+                                    <div id="quizPreviewContainer">
+                                        
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -220,7 +250,7 @@
                     Are you sure you want to delete this instructor?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="confirmDeleteBtn">Delete</button>
+                    <button type="button" class="btn btn-primary">Delete</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 </div>
             </div>

@@ -203,10 +203,11 @@ document.getElementById('saveChangesBtn').onclick = async (event) => {
     renderStudents();
     setupStatusToggleListeners();
 
-    showNotification("Certificate Control Number updated successfully!");
+    // Close the editCcnModal immediately
+    $('#editCcnModal').modal('hide'); // Close the modal using jQuery
 
-    // Close the modal using jQuery for Bootstrap 4
-    $('#editCcnModal').modal('hide');
+    // Show success notification
+    showNotification("Certificate control number updated successfully!");
 
   } catch (error) {
     console.error("Error updating certificate control number:", error);
@@ -311,28 +312,34 @@ async function handleStatusToggle(event) {
   const course = event.target.dataset.column;
   const isCompleted = event.target.checked;
 
+  // Show confirmation message dynamically based on the checkbox state
+  const confirmationMessage = isCompleted ? 
+      "Are you sure you want to complete the appointment of this student?" : 
+      "Are you sure you want to revert the appointment of this student?";
+      
+  document.getElementById('confirmationModalBody').textContent = confirmationMessage;
+
   const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {
-    backdrop: 'static',
-    keyboard: false
+      backdrop: 'static',
+      keyboard: false
   });
   confirmationModal.show();
 
   const confirmButton = document.getElementById('confirmButton');
   confirmButton.onclick = null; // Clear previous listener
   confirmButton.onclick = async () => {
-    confirmationModal.hide();
-    await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
-    renderStudents(); // Re-render students to update UI
-    setupStatusToggleListeners(); // Re-setup listeners after rendering
+      confirmationModal.hide();
+      await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
+      renderStudents(); // Re-render students to update UI
+      setupStatusToggleListeners(); // Re-setup listeners after rendering
   };
 
   document.getElementById('confirmationModal').querySelector('.btn-secondary').onclick = () => {
-    event.target.checked = !isCompleted; // Revert the checkbox state if canceled
-    confirmationModal.hide();
+      event.target.checked = !isCompleted; // Revert the checkbox state if canceled
+      confirmationModal.hide();
   };
 }
 
-// Function to toggle the completion status in Firestore
 async function toggleCompletionStatus(userId, course, isCompleted, appointmentId) {
   try {
     if (!userId || !course) {
@@ -395,6 +402,28 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
     } else {
       console.error("Appointment ID is undefined.");
     }
+
+    // Update the local studentsData array
+    const studentIndex = studentsData.findIndex(s => s.id === userId);
+    if (studentIndex !== -1) {
+      const student = studentsData[studentIndex];
+      if (isCompleted) {
+        student[`${course}Status`] = "Completed";
+      } else {
+        delete student[`${course}Status`];
+      }
+
+      // Also update the bookings
+      if (student.bookings) {
+        const bookingIndex = student.bookings.findIndex(b => b.appointmentId === appointmentId);
+        if (bookingIndex !== -1) {
+          const booking = student.bookings[bookingIndex];
+          booking.progress = isCompleted ? "Completed" : "Not yet Started";
+          booking.status = isCompleted ? "Completed" : "Booked";
+        }
+      }
+    }
+
   } catch (error) {
     console.error("Error updating completion status:", error);
   }
@@ -506,12 +535,34 @@ document.addEventListener('DOMContentLoaded', () => {
 function openEditModal(index, modalId = 'editCcnModal') {
   const studentData = studentsData[index]; // Retrieve student data using the correct index
 
-   // Populate student and instructor names, and date/time in the modal
-   if (modalId === 'edit4WheelsModal') {
+  // Function to convert 24-hour time to 12-hour format
+  function convertTo12HourFormat(time24) {
+    let [hours, minutes] = time24.split(':');
+    hours = parseInt(hours);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+    return `${hours}:${minutes} ${period}`;
+  }
+
+  // Convert date to "Month Day, Year" format
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  // Populate student and instructor names, and date/time in the modal
+  if (modalId === 'edit4WheelsModal') {
+    const booking = studentData.bookings[0];
+
+    // Format date and time
+    const formattedDate = formatDate(booking.date);
+    const formattedStartTime = convertTo12HourFormat(booking.timeStart);
+    const formattedEndTime = convertTo12HourFormat(booking.timeEnd);
+
+    // Populate modal
     document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(1) span').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
-    document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(2) span').textContent = `${studentData.bookings[0].date} ${studentData.bookings[0].timeStart} - ${studentData.bookings[0].timeEnd}`;
+    document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(2) span').textContent = `${formattedDate} || ${formattedStartTime} - ${formattedEndTime}`;
     document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(3) span').textContent = studentData.instructorName || "N/A";
-  
     document.querySelector('#edit4WheelsModal .modal-body.second-section .student-info #studentName').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
   }
 
@@ -553,8 +604,11 @@ function openEditModal(index, modalId = 'editCcnModal') {
 
   console.log("Setting data-student-index to:", index); // Debugging output
 
-  // Show the correct modal
-  const modalToOpen = new bootstrap.Modal(document.getElementById(modalId));
+  // Show the correct modal with options to prevent closing
+  const modalToOpen = new bootstrap.Modal(document.getElementById(modalId), {
+    backdrop: 'static',
+    keyboard: false
+  });
   modalToOpen.show();
 }
 
@@ -587,12 +641,6 @@ function setupModalListeners() {
       options.style.display = options.style.display === 'block' ? 'none' : 'block'; // Toggle visibility
       currentlyOpenOptions = options.style.display === 'block' ? options : null;
       return; // Exit function to avoid further processing
-    }
-
-    if (event.target.classList.contains('edit-icon')) {
-      const index = event.target.getAttribute('data-index');
-      openEditModal(index); // Open the edit modal directly
-      return;
     }
 
     if (event.target.classList.contains('option-dropdown')) {
@@ -650,3 +698,28 @@ function filterStudents(searchTerm) {
   updatePaginationControls();
 }
 
+// Custom dropdown functionality for Vehicle Type
+document.getElementById('vehicleDropdown').addEventListener('click', function (e) {
+  const dropdown = e.currentTarget;
+  dropdown.classList.toggle('open');
+  e.stopPropagation(); // Prevent event from bubbling to the document level
+});
+
+// Close Vehicle Type dropdown on selecting an option and update the selected value
+document.querySelectorAll('#vehicleTypeOptions .option').forEach(option => {
+  option.addEventListener('click', function (e) {
+      const selectedOption = e.currentTarget;
+      const dropdown = selectedOption.closest('.custom-dropdown');
+      dropdown.querySelector('.selected').textContent = selectedOption.textContent;
+      dropdown.classList.remove('open'); // Close the dropdown after selecting an option
+      e.stopPropagation(); // Prevent the event from bubbling up and causing unintended behavior
+  });
+});
+
+// Close Vehicle Type dropdown when clicking outside of it
+document.addEventListener('click', function (event) {
+  const vehicleDropdown = document.getElementById('vehicleDropdown');
+  if (!vehicleDropdown.contains(event.target)) {
+      vehicleDropdown.classList.remove('open');
+  }
+});
