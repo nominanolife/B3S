@@ -313,30 +313,27 @@ async function handleStatusToggle(event) {
   const isCompleted = event.target.checked;
 
   // Show confirmation message dynamically based on the checkbox state
-  const confirmationMessage = isCompleted ? 
-      "Are you sure you want to complete the appointment of this student?" : 
-      "Are you sure you want to revert the appointment of this student?";
-      
+  const confirmationMessage = isCompleted
+    ? "Are you sure you want to complete the appointment of this student?"
+    : "Are you sure you want to revert the appointment of this student?";
+
   document.getElementById('confirmationModalBody').textContent = confirmationMessage;
 
-  const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {
-      backdrop: 'static',
-      keyboard: false
-  });
+  const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
   confirmationModal.show();
 
   const confirmButton = document.getElementById('confirmButton');
   confirmButton.onclick = null; // Clear previous listener
   confirmButton.onclick = async () => {
-      confirmationModal.hide();
-      await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
-      renderStudents(); // Re-render students to update UI
-      setupStatusToggleListeners(); // Re-setup listeners after rendering
+    confirmationModal.hide();
+    await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
+    renderStudents(); // Re-render students to update UI
+    setupStatusToggleListeners(); // Re-setup listeners after rendering
   };
 
   document.getElementById('confirmationModal').querySelector('.btn-secondary').onclick = () => {
-      event.target.checked = !isCompleted; // Revert the checkbox state if canceled
-      confirmationModal.hide();
+    event.target.checked = !isCompleted; // Revert the checkbox state if canceled
+    confirmationModal.hide();
   };
 }
 

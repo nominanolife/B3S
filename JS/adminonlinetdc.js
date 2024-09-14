@@ -3,6 +3,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const nextButton = document.querySelector('.modal-footer .next-btn');
     const backButton = document.querySelector('.modal-footer .back-btn');
     const saveButton = document.querySelector('.modal-footer .save-btn');
+    const tripleDotIcons = document.querySelectorAll('.bi-three-dots-vertical');
+    const editButtons = document.querySelectorAll('.option-dropdown');
+    const editModal = $('#editModal');
+    const deleteButtons = document.querySelectorAll('.option-dropdown'); 
+    const deleteConfirmationModal = $('#deleteConfirmationModal'); 
+    const courseImage = document.querySelector('.course-image');
+    const editCategorySelectElement = document.querySelector('#editModal .category');
+    const editSelected = editCategorySelectElement.querySelector('.selected');
+    const editOptionsContainer = editCategorySelectElement.querySelector('.dropdown-options');
+    const editOptionsList = editOptionsContainer.querySelectorAll('.options');
     const steps = ['step1', 'step2', 'step3'];
     let currentStep = 0;
     let questionCount = 0;
@@ -31,12 +41,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const file = thumbnailUpload.files[0];
                 const imageUrl = URL.createObjectURL(file);
                 thumbnailBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail">`;
-
-                // Delay scroll to ensure image is loaded
-                setTimeout(() => {
-                    thumbnailBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                    window.scrollTo(0, document.body.scrollHeight);
-                }, 100);
             }
         });
     }
@@ -51,12 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                         <source src="${videoUrl}" type="${file.type}">
                                         Your browser does not support the video tag.
                                     </video>`;
-
-                // Delay scroll to ensure video is loaded
-                setTimeout(() => {
-                    videoBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                    window.scrollTo(0, document.body.scrollHeight);
-                }, 100);
             }
         });
     }
@@ -94,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (currentStep < steps.length - 1) {
                 currentStep++;
                 showStep(currentStep);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
     }
@@ -110,10 +107,111 @@ document.addEventListener('DOMContentLoaded', function () {
 
     showStep(currentStep);
 
+    // Add functionality for editModal
+    // Toggle the dropdown options display for editModal
+    editSelected.addEventListener('click', () => {
+        editOptionsContainer.style.display = editOptionsContainer.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Update the selected category text and close the dropdown for editModal
+    editOptionsList.forEach(option => {
+        option.addEventListener('click', () => {
+            editSelected.innerHTML = option.innerHTML;
+            editOptionsContainer.style.display = 'none';
+        });
+    });
+
+    // Close the dropdown when clicking outside of the category select for editModal
+    document.addEventListener('click', (e) => {
+        if (!editCategorySelectElement.contains(e.target)) {
+            editOptionsContainer.style.display = 'none';
+        }
+    });
+
+    const editModalSteps = ['editstep1', 'editstep2', 'editstep3'];
+    let currentEditStep = 0;
+
+    const editBackButton = document.querySelector('#editModal .back-btn');
+    const editNextButton = document.querySelector('#editModal .next-btn');
+    const editSaveButton = document.querySelector('#editModal .save-btn');
+
+    function showEditStep(stepIndex) {
+        editModalSteps.forEach(step => {
+            const stepElement = document.getElementById(step);
+            if (stepElement) stepElement.classList.add('d-none');
+        });
+        const currentStepElement = document.getElementById(editModalSteps[stepIndex]);
+        if (currentStepElement) currentStepElement.classList.remove('d-none');
+        updateEditButtonVisibility(stepIndex);
+
+        if (stepIndex === 2) {
+            updateEditPreview();
+        }
+    }
+
+    function updateEditButtonVisibility(stepIndex) {
+        if (editBackButton) editBackButton.style.display = stepIndex > 0 ? 'inline-block' : 'none';
+        if (editNextButton) editNextButton.style.display = stepIndex < editModalSteps.length - 1 ? 'inline-block' : 'none';
+        if (editSaveButton) editSaveButton.style.display = stepIndex === editModalSteps.length - 1 ? 'inline-block' : 'none';
+    }
+
+    if (editNextButton) {
+        editNextButton.addEventListener('click', function () {
+            if (currentEditStep < editModalSteps.length - 1) {
+                currentEditStep++;
+                showEditStep(currentEditStep);
+            }
+        });
+    }
+
+    if (editBackButton) {
+        editBackButton.addEventListener('click', function () {
+            if (currentEditStep > 0) {
+                currentEditStep--;
+                showEditStep(currentEditStep);
+            }
+        });
+    }
+
+    // Initialize the steps for editModal
+    showEditStep(currentEditStep);
+
+    editButtons.forEach(button => {
+        if (button.textContent === 'Edit') {
+            button.addEventListener('click', function () {
+                editModal.modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                currentEditStep = 0;
+                showEditStep(currentEditStep);
+            });
+        }
+    });
+
+    // Update the course image dynamically when a video thumbnail is uploaded
+    if (thumbnailUpload) {
+        // Preview the uploaded image (Thumbnail)
+        thumbnailUpload.addEventListener('change', function () {
+            if (thumbnailUpload.files.length > 0) {
+                const file = thumbnailUpload.files[0];
+                const imageUrl = URL.createObjectURL(file);
+                thumbnailBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail">`;
+
+                // Update course image dynamically
+                if (courseImage) {
+                    courseImage.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="Course Image">`;
+                }
+            } else {
+                // Reset to default icon if no image is selected
+                if (courseImage) {
+                    courseImage.innerHTML = `<i class="bi bi-image-fill"></i>`;
+                }
+            }
+        });
+    }
+
     // Handle Delete Confirmation Modal
-    const deleteButtons = document.querySelectorAll('.option-dropdown'); 
-    const deleteConfirmationModal = $('#deleteConfirmationModal'); 
- 
     deleteButtons.forEach(button => {
         if (button.textContent === 'Delete') {
             button.addEventListener('click', function () {
@@ -121,8 +219,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
-
-    const tripleDotIcons = document.querySelectorAll('.bi-three-dots-vertical');
 
     tripleDotIcons.forEach(icon => {
         icon.addEventListener('click', function () {
@@ -215,11 +311,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const file = imageUploadInput.files[0];
                 const imageUrl = URL.createObjectURL(file);
                 imageUploadBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="${file.name}">`;
-
-                // Delay scroll to ensure image is loaded
-                setTimeout(() => {
-                    imageUploadBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                }, 100);
             }
         });
 
