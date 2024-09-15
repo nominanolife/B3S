@@ -529,85 +529,380 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+
+// Function to open the edit modal
 function openEditModal(index, modalId = 'editCcnModal') {
-  const studentData = studentsData[index]; // Retrieve student data using the correct index
+    selectedStudentIndex = index; // Store the selected student's index or ID
+    const studentData = studentsData[index]; // Retrieve student data using the index
 
-  // Function to convert 24-hour time to 12-hour format
-  function convertTo12HourFormat(time24) {
-    let [hours, minutes] = time24.split(':');
-    hours = parseInt(hours);
-    const period = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
-    return `${hours}:${minutes} ${period}`;
-  }
-
-  // Convert date to "Month Day, Year" format
-  function formatDate(dateStr) {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  }
-
-  // Populate student and instructor names, and date/time in the modal
-  if (modalId === 'edit4WheelsModal') {
-    const booking = studentData.bookings[0];
-
-    // Format date and time
-    const formattedDate = formatDate(booking.date);
-    const formattedStartTime = convertTo12HourFormat(booking.timeStart);
-    const formattedEndTime = convertTo12HourFormat(booking.timeEnd);
-
-    // Populate modal
-    document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(1) span').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
-    document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(2) span').textContent = `${formattedDate} || ${formattedStartTime} - ${formattedEndTime}`;
-    document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(3) span').textContent = studentData.instructorName || "N/A";
-    document.querySelector('#edit4WheelsModal .modal-body.second-section .student-info #studentName').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
-  }
-
-  // Validate TDC status only for the certificate control number modal
-  if (modalId === 'editCcnModal') {
-    if (!studentData.TDCStatus || studentData.TDCStatus !== "Completed") {
-      console.warn("Student has not yet completed their TDC appointment.");
-      showNotification("This student has not yet finished their TDC appointment.");
-      return;
+    // Function to convert 24-hour time to 12-hour format
+    function convertTo12HourFormat(time24) {
+        let [hours, minutes] = time24.split(':');
+        hours = parseInt(hours);
+        const period = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+        return `${hours}:${minutes} ${period}`;
     }
-  }
 
-  // Check if "4 Wheels" checkbox is unchecked
-  if (modalId === 'edit4WheelsModal') {
-    if (!studentData.has4WheelsCourse) { // Use a key that represents the 4-Wheels checkbox status
-      console.warn("Student does not have a 4-Wheels appointment.");
-      showNotification("This student does not have a 4-Wheels appointment.");
-      return;
+    // Convert date to "Month Day, Year" format
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     }
-  }
 
-  // Check if "Motors" checkbox is unchecked
-  if (modalId === 'editMotorsModal') {
-    if (!studentData.hasMotorsCourse) { // Use a key that represents the Motors checkbox status
-      console.warn("Student does not have a Motorcycle appointment.");
-      showNotification("This student does not have a Motorcycle appointment.");
-      return;
+    if (modalId === 'edit4WheelsModal') {
+        const booking = studentData.bookings[0];
+
+        // Format date and time
+        const formattedDate = formatDate(booking.date);
+        const formattedStartTime = convertTo12HourFormat(booking.timeStart);
+        const formattedEndTime = convertTo12HourFormat(booking.timeEnd);
+
+        // Populate modal
+        document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(1) span').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
+        document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(2) span').textContent = `${formattedDate} || ${formattedStartTime} - ${formattedEndTime}`;
+        document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(3) span').textContent = studentData.instructorName || "N/A";
+        document.querySelector('#edit4WheelsModal .modal-body.second-section .student-info #studentName').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
     }
-  }
 
-  // Set the input value and data attribute for the default modal
-  if (modalId === 'editCcnModal') {
-    document.getElementById('certificateControlNumberInput').value = studentData.certificateControlNumber || '';
-  }
+    // Check conditions for different modals
+    if (modalId === 'editCcnModal') {
+        if (!studentData.TDCStatus || studentData.TDCStatus !== "Completed") {
+            showNotification("This student has not yet finished their TDC appointment.");
+            return;
+        }
+    }
 
-  // Set the index as a data attribute on the save button to retrieve it later
-  const saveButton = document.getElementById('saveChangesBtn');
-  saveButton.setAttribute('data-student-index', index);
+    if (modalId === 'edit4WheelsModal' && !studentData.has4WheelsCourse) {
+        showNotification("This student does not have a 4-Wheels appointment.");
+        return;
+    }
 
-  console.log("Setting data-student-index to:", index); // Debugging output
+    if (modalId === 'editMotorsModal' && !studentData.hasMotorsCourse) {
+        showNotification("This student does not have a Motorcycle appointment.");
+        return;
+    }
 
-  // Show the correct modal with options to prevent closing
-  const modalToOpen = new bootstrap.Modal(document.getElementById(modalId), {
-    backdrop: 'static',
-    keyboard: false
-  });
-  modalToOpen.show();
+    if (modalId === 'editCcnModal') {
+        document.getElementById('certificateControlNumberInput').value = studentData.certificateControlNumber || '';
+    }
+
+    // Set the index as a data attribute on the save button
+    const saveButton = document.getElementById('saveChangesBtn');
+    saveButton.setAttribute('data-student-index', index);
+
+    console.log("Setting data-student-index to:", index); // Debugging output
+
+    // Show the correct modal with options to prevent closing
+    const modalToOpen = new bootstrap.Modal(document.getElementById(modalId), {
+        backdrop: 'static',
+        keyboard: false
+    });
+    modalToOpen.show();
 }
+
+let selectedStudentIndex = null; // Global variable to store the selected student's index or ID
+
+// Define the fields and their respective weights for scoring
+const fields = [
+  { id: 'eyeLeadTime', weight: 6 },
+  { id: 'leftRightScanning', weight: 6 },
+  { id: 'mirrorsTracking', weight: 6 },
+  { id: 'defensiveDistance', weight: 6 },
+  { id: 'spaceAtStops', weight: 6 },
+  { id: 'leastResistance', weight: 6 },
+  { id: 'rightOfWay', weight: 6 },
+  { id: 'acceleration', weight: 6 },
+  { id: 'braking', weight: 6 },
+  { id: 'speedForConditions', weight: 6 },
+  { id: 'trafficSigns', weight: 6 },
+  { id: 'lanePosition', weight: 6 },
+  { id: 'steering', weight: 6 },
+  { id: 'signals', weight: 6 },
+  { id: 'eyeContact', weight: 6 },
+  { id: 'seating', weight: 6 },
+  { id: 'parking', weight: 6 },
+  { id: 'anticipation', weight: 6 },
+  { id: 'judgment', weight: 6 },
+  { id: 'timing', weight: 4 }
+];
+
+// Define the maximum scores for each category
+const maxScores = {
+  "Observation": 20,
+  "Space Management": 20,
+  "Speed Control": 20,
+  "Steering": 15,
+  "Communication": 15,
+  "General": 10
+};
+
+// Function to calculate the total score for the assessment form
+function calculateTotalScore() {
+    let totalScore = 0;
+
+    // Loop through each field to calculate the total score
+    fields.forEach(field => {
+        const fieldValue = parseFloat(document.getElementById(field.id).value) || 0;
+        totalScore += fieldValue;
+    });
+
+    // Display the total score
+    document.getElementById('totalScore').textContent = `Total Score: ${totalScore} / 100`;
+
+    // Validate and display a warning if the total score exceeds 100
+    if (totalScore > 100) {
+        alert('Total score exceeds 100. Please adjust the scores.');
+    }
+
+    return totalScore; // Return the total score for use in other functions
+}
+
+// Function to save assessment data to session storage
+function saveAssessmentDataToSession() {
+    if (selectedStudentIndex === null) {
+        alert('No student selected. Please select a student to save data.');
+        return;
+    }
+
+    const studentData = studentsData[selectedStudentIndex]; // Use the stored index to retrieve the correct student
+
+    // Create an object to store the assessment data
+    const assessmentData = {
+        studentName: `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`,
+        instructorName: studentData.instructorName || "N/A",
+        dateAndTime: document.getElementById('dateAndTime') ? document.getElementById('dateAndTime').textContent : "N/A",
+        vehicleType: document.getElementById('vehicleTypeSelected') ? document.getElementById('vehicleTypeSelected').textContent : "N/A",
+        categories: [
+            {
+                category: "Observation",
+                items: [
+                    { sentence: "Eye lead time", score: parseFloat(document.getElementById('eyeLeadTime')?.value) || 0, comment: document.querySelector('#commentEyeLeadTime')?.value || "" },
+                    { sentence: "Left – Right / Scanning / Shoulder checks", score: parseFloat(document.getElementById('leftRightScanning')?.value) || 0, comment: document.querySelector('#commentLeftRightScanning')?.value || "" },
+                    { sentence: "Mirrors / tracking traffic", score: parseFloat(document.getElementById('mirrorsTracking')?.value) || 0, comment: document.querySelector('#commentMirrorsTracking')?.value || "" }
+                ]
+            },
+            {
+                category: "Space Management",
+                items: [
+                    { sentence: "Following defensive distance", score: parseFloat(document.getElementById('defensiveDistance')?.value) || 0, comment: document.querySelector('#commentDefensiveDistance')?.value || "" },
+                    { sentence: "Space at Stops", score: parseFloat(document.getElementById('spaceAtStops')?.value) || 0, comment: document.querySelector('#commentSpaceAtStops')?.value || "" },
+                    { sentence: "Path of least resistance", score: parseFloat(document.getElementById('leastResistance')?.value) || 0, comment: document.querySelector('#commentLeastResistance')?.value || "" },
+                    { sentence: "Right-of-way", score: parseFloat(document.getElementById('rightOfWay')?.value) || 0, comment: document.querySelector('#commentRightOfWay')?.value || "" }
+                ]
+            },
+            {
+                category: "Speed Control",
+                items: [
+                    { sentence: "Acceleration / Deceleration – Smoothness", score: parseFloat(document.getElementById('acceleration')?.value) || 0, comment: document.querySelector('#commentAcceleration')?.value || "" },
+                    { sentence: "Braking: Full Stops, smooth", score: parseFloat(document.getElementById('braking')?.value) || 0, comment: document.querySelector('#commentBraking')?.value || "" },
+                    { sentence: "Speed for Conditions", score: parseFloat(document.getElementById('speedForConditions')?.value) || 0, comment: document.querySelector('#commentSpeedForConditions')?.value || "" },
+                    { sentence: "Speed and Traffic signs", score: parseFloat(document.getElementById('trafficSigns')?.value) || 0, comment: document.querySelector('#commentTrafficSigns')?.value || "" }
+                ]
+            },
+            {
+                category: "Steering",
+                items: [
+                    { sentence: "Lane / Turn Position / set-up", score: parseFloat(document.getElementById('lanePosition')?.value) || 0, comment: document.querySelector('#commentLanePosition')?.value || "" },
+                    { sentence: "Steering: hand position, smoothness", score: parseFloat(document.getElementById('steering')?.value) || 0, comment: document.querySelector('#commentSteering')?.value || "" }
+                ]
+            },
+            {
+                category: "Communication",
+                items: [
+                    { sentence: "Signals: timing and use", score: parseFloat(document.getElementById('signals')?.value) || 0, comment: document.querySelector('#commentSignals')?.value || "" },
+                    { sentence: "Other: i.e horn, eye contact", score: parseFloat(document.getElementById('eyeContact')?.value) || 0, comment: document.querySelector('#commentEyeContact')?.value || "" }
+                ]
+            },
+            {
+                category: "General",
+                items: [
+                    { sentence: "Seating, head rest position, and mirror adjustment: seatbelt use", score: parseFloat(document.getElementById('seating')?.value) || 0, comment: document.querySelector('#commentSeating')?.value || "" },
+                    { sentence: "Parking / Backing", score: parseFloat(document.getElementById('parking')?.value) || 0, comment: document.querySelector('#commentParking')?.value || "" },
+                    { sentence: "Anticipation: Adjusts", score: parseFloat(document.getElementById('anticipation')?.value) || 0, comment: document.querySelector('#commentAnticipation')?.value || "" },
+                    { sentence: "Judgment: decisions", score: parseFloat(document.getElementById('judgment')?.value) || 0, comment: document.querySelector('#commentJudgment')?.value || "" },
+                    { sentence: "Timing: approach, Traffic interactions", score: parseFloat(document.getElementById('timing')?.value) || 0, comment: document.querySelector('#commentTiming')?.value || "" }
+                ]
+            }
+        ]
+    };
+
+    // Save the assessment data in session storage with a key based on the student index
+    sessionStorage.setItem(`4WheelsAssess_${selectedStudentIndex}`, JSON.stringify(assessmentData));
+
+    alert(`Assessment data has been saved successfully for ${assessmentData.studentName}`);
+}
+
+async function sendAssessmentDataToFlask() {
+  if (selectedStudentIndex === null) {
+      alert('No student selected. Please select a student to send data.');
+      return;
+  }
+
+  const assessmentData = JSON.parse(sessionStorage.getItem(`4WheelsAssess_${selectedStudentIndex}`)) || {};
+
+  // Prepare data to send: Aggregate the raw scores by category
+  const dataToSend = {
+      "Observation": 0,
+      "Space Management": 0,
+      "Speed Control": 0,
+      "Steering": 0,
+      "Communication": 0,
+      "General": 0
+  };
+
+  // Sum the raw scores for each category
+  assessmentData.categories.forEach(category => {
+      const categoryName = category.category;
+      category.items.forEach(item => {
+          const score = parseFloat(item.score); // Ensure the score is a number
+          if (isNaN(score)) {
+              console.error(`Invalid score for ${categoryName}:`, item.score);
+          } else {
+              dataToSend[categoryName] += score;
+          }
+      });
+  });
+
+  console.log('Raw Data to send:', dataToSend); // Log the raw data
+
+  try {
+      const response = await fetch('http://127.0.0.1:5000/predict', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              categories: [dataToSend], // Send raw aggregated scores
+              maxScores: maxScores      // Send maximum scores for reference
+          })
+      });
+
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      console.log('Prediction results:', result);
+
+      // Use the predictions directly from the AI
+      const interpretedResults = result.predictions;
+
+      // Store the interpreted results in session storage
+      sessionStorage.setItem(`ProcessedData_${selectedStudentIndex}`, JSON.stringify(interpretedResults));
+
+  } catch (error) {
+      console.error('Error sending data to Flask API:', error);
+      alert('Failed to send data. Please try again.');
+  }
+}
+
+async function saveAllDataToFirestore() {
+  if (selectedStudentIndex === null) {
+      alert('No student selected. Please select a student to save data.');
+      return;
+  }
+
+  // Retrieve assessment data from session storage
+  const assessmentData = JSON.parse(sessionStorage.getItem(`4WheelsAssess_${selectedStudentIndex}`)) || {};
+  const processedData = JSON.parse(sessionStorage.getItem(`ProcessedData_${selectedStudentIndex}`)) || {};
+
+  // Get data from the checklist
+  const checklistData = {
+      studentName: document.getElementById('studentName').textContent,
+      studentPermit: document.getElementById('studentPermit').value,
+      checklist: {
+          lesson1TopicA: document.getElementById('lesson1TopicA').checked,
+          lesson1TopicB: document.getElementById('lesson1TopicB').checked,
+          lesson1TopicC: document.getElementById('lesson1TopicC').checked,
+          lesson1TopicD: document.getElementById('lesson1TopicD').checked,
+          lesson1TopicE: document.getElementById('lesson1TopicE').checked,
+          lesson2TopicA: document.getElementById('lesson2TopicA').checked,
+          lesson2TopicB: document.getElementById('lesson2TopicB').checked,
+          lesson3TopicA: document.getElementById('lesson3TopicA').checked,
+          lesson3TopicB: document.getElementById('lesson3TopicB').checked,
+          lesson4TopicA: document.getElementById('lesson4TopicA').checked,
+          lesson5TopicA: document.getElementById('lesson5TopicA').checked,
+          lesson6TopicA: document.getElementById('lesson6TopicA').checked,
+          lesson6TopicB: document.getElementById('lesson6TopicB').checked,
+          lesson6TopicC: document.getElementById('lesson6TopicC').checked,
+          lesson7TopicA: document.getElementById('lesson7TopicA').checked,
+          lesson7TopicB: document.getElementById('lesson7TopicB').checked,
+          lesson7TopicC: document.getElementById('lesson7TopicC').checked,
+          lesson8TopicA: document.getElementById('lesson8TopicA').checked,
+          lesson9TopicA: document.getElementById('lesson9TopicA').checked,
+          lesson10TopicA: document.getElementById('lesson10TopicA').checked,
+          lesson11TopicA: document.getElementById('lesson11TopicA').checked
+      }
+  };
+
+  // Remove the bookings property from student data
+  const { bookings, ...studentDataWithoutBookings } = studentsData[selectedStudentIndex];
+
+  // Combine assessment, processed, and checklist data
+  const combinedData = {
+      ...studentDataWithoutBookings, // Include existing student data without bookings
+      assessmentData, // Add the assessment data
+      processedData, // Add the processed data
+      ...checklistData // Add the checklist data
+  };
+
+  try {
+      await setDoc(doc(db, "applicants", studentsData[selectedStudentIndex].id), combinedData, { merge: true });
+      console.log('Saving combined data:', combinedData);
+      alert(`All data has been saved successfully for ${checklistData.studentName}`);
+  } catch (e) {
+      console.error("Error saving combined data: ", e);
+      alert('Failed to save all data. Please try again.');
+  }
+}
+// Attach event listeners to input fields for real-time calculation
+document.querySelectorAll('input[type="text"]').forEach(input => {
+    input.addEventListener('input', calculateTotalScore);
+});
+
+document.getElementById('nextBtn').addEventListener('click', async function () {
+    // Calculate total score before saving
+    const totalScore = calculateTotalScore(); 
+
+    // Save raw assessment data to session storage
+    saveAssessmentDataToSession(); 
+
+    // Wait for AI processing and store the processed data
+    await sendAssessmentDataToFlask(); // Send data to Flask API and wait for response
+
+    // After processing, show the next modal
+    const currentModal = document.querySelector('.modal.show');
+    const nextModal = document.getElementById('editChecklistModal');
+
+    if (currentModal) {
+        const modalInstance = bootstrap.Modal.getInstance(currentModal);
+        if (modalInstance) {
+            modalInstance.hide(); // Hide the current modal
+        }
+    }
+
+    if (nextModal) {
+        const nextModalInstance = new bootstrap.Modal(nextModal, {
+            backdrop: 'static',
+            keyboard: false
+        });
+        nextModalInstance.show(); // Show the next modal
+    }
+
+    // Show alert if needed but after transitioning to the next modal
+    if (totalScore > 100) {
+        setTimeout(() => {
+            alert('Total score exceeds 100. Please adjust the scores.');
+        }, 100); // Slight delay to ensure modal transition completes first
+    }
+});
+
+// Attach event listener to "Save" button on the checklist modal
+document.getElementById('saveBtn').addEventListener('click', function() {
+    saveAllDataToFirestore(); // Save all data to Firestore
+});
+
 
 function setupModalListeners() {
   const studentList = document.getElementById('student-list');
@@ -720,3 +1015,4 @@ document.addEventListener('click', function (event) {
       vehicleDropdown.classList.remove('open');
   }
 });
+

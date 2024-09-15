@@ -308,11 +308,11 @@ async function proceedWithBooking(selectedSlot, appointment) {
   try {
     const appointmentRef = doc(db, "appointments", appointment.id);
     await updateDoc(appointmentRef, {
-      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "In Progress" }]
+      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "Not yet Started"}]
     });
 
     const totalSlots = appointment.slots;
-    const updatedBookings = [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "In Progress" }];
+    const updatedBookings = [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: "Not yet Started"}];
     if (updatedBookings.length >= totalSlots) {
       await updateDoc(appointmentRef, { status: 'full' });
       const appointmentElement = document.querySelector(`[data-date="${appointment.date}"]`);

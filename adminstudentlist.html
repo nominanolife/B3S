@@ -123,9 +123,9 @@
                 <div class="modal-body first-section">
                     <div class="input-body">
                         <div class="student-info">
-                            <p>Student Name: <span>Juan Dela Cruz</span></p>
-                            <p>Date and Time: <span>January 1, 2024</span></p>
-                            <p>Assessor Name: <span>Pedro Penduko</span></p>
+                            <p>Student Name: <span id="studentName">Juan Dela Cruz</span></p>
+                            <p>Date and Time: <span id="dateAndTime">January 1, 2024</span></p>
+                            <p>Assessor Name: <span id="instructorName">Pedro Penduko</span></p>
                             <div class="vehicle-dropdown">
                                 <p>Vehicle Type:</p>
                                 <div class="custom-dropdown" id="vehicleDropdown">
@@ -150,17 +150,17 @@
                                 <tbody>
                                     <tr>
                                         <td>Eye lead time</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="eyeLeadTime"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Left – Right / Scanning / Shoulder checks</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="leftRightScanning"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Mirrors / tracking traffic</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="mirrorsTracking"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
@@ -174,22 +174,22 @@
                                 <tbody>
                                     <tr>
                                         <td>Following defensive distance</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="defensiveDistance"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Space at Stops</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="spaceAtStops"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Path of least resistance</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="leastResistance"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Right-of-way</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="rightOfWay"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
@@ -203,22 +203,22 @@
                                 <tbody>
                                     <tr>
                                         <td>Acceleration / Deceleration – Smoothness</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="acceleration"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Breaking: Full Stops, smooth</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td>Braking: Full Stops, smooth</td>
+                                        <td><input type="text" class="form-control" id="braking"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Speed for Conditions</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="speedForConditions"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Speed and Traffic signs</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="trafficSigns"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
@@ -232,12 +232,12 @@
                                 <tbody>
                                     <tr>
                                         <td>Lane / Turn Position / set-up</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="lanePosition"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Steering: hand position, smoothness</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="steering"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
@@ -251,12 +251,12 @@
                                 <tbody>
                                     <tr>
                                         <td>Signals: timing and use</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="signals"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Other: i.e horn, eye contact</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="eyeContact"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
@@ -269,35 +269,35 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Seating, head rest position, and mirror adjustment: seatbelt use </td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td>Seating, head rest position, and mirror adjustment: seatbelt use</td>
+                                        <td><input type="text" class="form-control" id="seating"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Parking / Backing</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="parking"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Anticipation: Adjusts</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="anticipation"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Judgment: decisions</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="judgment"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>Timing: approach, Traffic interactions</td>
-                                        <td><input type="text" class="form-control"></td>
+                                        <td><input type="text" class="form-control" id="timing"></td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
                                 <thead>
                                     <tr>
                                         <th>Total Score (out of 100)</th>
-                                        <th></th>
+                                        <th><span id="totalScore">0 / 100</span></th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -305,11 +305,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-body second-section">
+                <div class="modal-body second-section"> 
                     <div class="input-body">
                         <div class="student-info">
                             <p>Student Name: <span id="studentName">Juan Dela Cruz</span></p>
-                            <p>Student Permit: <input type="text" class="student-permit"></p>
+                            <p>Student Permit: <input type="text" class="student-permit" id="studentPermit"></p>
                         </div>
                         <div class="checkbox-checklist">
                             <h5>Comments / Suggestions</h5>
@@ -329,7 +329,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicA">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -340,7 +340,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicB">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -351,7 +351,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicC"> 
                                                 <span></span>
                                             </label>
                                         </td>
@@ -362,7 +362,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicD">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -373,7 +373,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicE">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -387,7 +387,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson2TopicA">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -398,7 +398,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson2TopicB">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -412,7 +412,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson3TopicA">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -423,7 +423,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson3TopicB">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -437,7 +437,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson4TopicA">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -451,7 +451,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson5TopicA">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -465,7 +465,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicA">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -476,7 +476,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicB">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -487,7 +487,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicC">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -501,7 +501,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicA">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -512,7 +512,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicB">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -523,7 +523,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicC">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -537,7 +537,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson8TopicA">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -551,7 +551,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson9TopicA">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -565,7 +565,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson10TopicA">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -579,7 +579,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson11TopicA">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -591,8 +591,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="back-btn d-none">Back</button>
-                    <button type="button" class="next-btn">Next</button>
-                    <button type="submit" class="save-btn d-none">Save</button>
+                    <button type="button" class="next-btn" id="nextBtn">Next</button>
+                    <button type="submit" class="save-btn d-none" id="saveBtn">Save</button>
                 </div>
             </div>
         </div>
