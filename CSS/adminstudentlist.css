@@ -822,7 +822,7 @@ h2 {
     margin: 0;
 }
 
-.custom-checkbox {
+.custom-checkbox1 {
     position: relative;
     display: flex;
     justify-content: center;
@@ -831,7 +831,7 @@ h2 {
     margin: 0;
 }
 
-.custom-checkbox span {
+.custom-checkbox1 span {
     position: relative;
     display: inline-block;
     width: 20px;
@@ -842,10 +842,10 @@ h2 {
     transition: background-color 0.3s, border-color 0.3s;
 }
 
-.custom-checkbox span::after {
+.custom-checkbox1 span::after {
     content: '\2714';
     position: relative;
-    left: 3px;
+    left: 2px;
     top: -2px;
     font-size: 14px;
     color: #ffffff;
