@@ -1,0 +1,240 @@
+student_id,traits,instructor_id,instructor_traits,Match Result,Instructor Experience,Instructor Style,Notes
+1,Anxious,1,Patient,1,High,Calm,Patient instructors are effective for Anxious students.
+2,Calm,2,Supportive,1,Moderate,Flexible,Supportive instructors are effective for Calm students.
+3,Organized,3,Structured,1,High,Structured,Structured instructors are effective for Organized students.
+4,Curious,4,Knowledgeable,1,High,Interactive,Knowledgeable instructors are effective for Curious students.
+5,Reserved,5,Encouraging,1,Moderate,Empathetic,Encouraging instructors are effective for Reserved students.
+6,Outgoing,6,Sociable,1,High,Dynamic,Sociable instructors are effective for Outgoing students.
+7,Empathetic,7,Understanding,1,High,Direct,Understanding instructors are effective for Empathetic students.
+8,Analytical,8,Detailed,1,High,Adaptable,Detailed instructors are effective for Analytical students.
+9,Patient,9,Calm,1,Moderate,Advisory,Calm instructors are effective for Patient students.
+10,Confident,10,Assertive,1,High,Structured,Assertive instructors are effective for Confident students.
+11,Ambitious,11,Goal-Oriented,1,Moderate,Engaging,Goal-Oriented instructors are effective for Ambitious students.
+12,Introverted,12,Friendly,1,High,Understanding,Friendly instructors are effective for Introverted students.
+13,Extroverted,13,Outgoing,1,High,Adventurous,Outgoing instructors are effective for Extroverted students.
+14,Detail-oriented,14,Meticulous,1,Moderate,Supportive,Meticulous instructors are effective for Detail-oriented students.
+15,Flexible,15,Adaptable,1,High,Creative,Adaptable instructors are effective for Flexible students.
+16,Realistic,16,Pragmatic,1,High,Gentle,Pragmatic instructors are effective for Realistic students.
+17,Cheerful,17,Positive,1,Moderate,Encouraging,Positive instructors are effective for Cheerful students.
+18,Independent,18,Autonomous,1,High,Versatile,Autonomous instructors are effective for Independent students.
+19,Collaborative,19,Team-oriented,1,Moderate,Reliable,Team-oriented instructors are effective for Collaborative students.
+20,Disciplined,20,Structured,1,High,Perceptive,Structured instructors are effective for Disciplined students.
+21,Pragmatic,21,Realistic,1,High,Thought-provoking,Realistic instructors are effective for Pragmatic students.
+22,Trusting,22,Reliable,1,Moderate,Direct,Reliable instructors are effective for Trusting students.
+23,Loyal,23,Committed,1,High,Calm,Committed instructors are effective for Loyal students.
+24,Friendly,24,Approachable,1,Moderate,Structured,Approachable instructors are effective for Friendly students.
+25,Adaptable,25,Flexible,1,High,Dynamic,Flexible instructors are effective for Adaptable students.
+26,Sensitive,26,Compassionate,1,Moderate,Flexible,Compassionate instructors are effective for Sensitive students.
+27,Goal-oriented,27,Visionary,1,High,Calm,Visionary instructors are effective for Goal-oriented students.
+28,Supportive,28,Empathetic,1,High,Interactive,Empathetic instructors are effective for Supportive students.
+29,Thoughtful,29,Considerate,1,High,Supportive,Considerate instructors are effective for Thoughtful students.
+30,Perceptive,30,Insightful,1,Moderate,Reassuring,Insightful instructors are effective for Perceptive students.
+31,Conscientious,31,Organized,1,Moderate,Advisory,Organized instructors are effective for Conscientious students.
+32,Inquisitive,32,Informative,1,High,Advisory,Informative instructors are effective for Inquisitive students.
+33,Tactful,33,Diplomatic,1,High,Supportive,Diplomatic instructors are effective for Tactful students.
+34,Reflective,34,Thoughtful,1,Low,Flexible,Thoughtful instructors are effective for Reflective students.
+35,Open-minded,35,Accepting,1,High,Calm,Accepting instructors are effective for Open-minded students.
+36,Determined,36,Focused,1,High,Flexible,Focused instructors are effective for Determined students.
+37,Anxious,37,Patient,1,Low,Structured,Patient instructors are effective for Anxious students.
+38,Calm,38,Supportive,1,High,Advisory,Supportive instructors are effective for Calm students.
+39,Organized,39,Structured,1,High,Advisory,Structured instructors are effective for Organized students.
+40,Curious,40,Knowledgeable,1,Moderate,Calm,Knowledgeable instructors are effective for Curious students.
+41,Reserved,41,Encouraging,1,Low,Flexible,Encouraging instructors are effective for Reserved students.
+42,Outgoing,42,Sociable,1,High,Interactive,Sociable instructors are effective for Outgoing students.
+43,Empathetic,43,Understanding,1,Low,Flexible,Understanding instructors are effective for Empathetic students.
+44,Analytical,44,Detailed,1,Low,Gentle,Detailed instructors are effective for Analytical students.
+45,Patient,45,Calm,1,High,Encouraging,Calm instructors are effective for Patient students.
+46,Confident,46,Assertive,1,Moderate,Calm,Assertive instructors are effective for Confident students.
+47,Ambitious,47,Goal-Oriented,1,Low,Dynamic,Goal-Oriented instructors are effective for Ambitious students.
+48,Introverted,48,Friendly,1,High,Flexible,Friendly instructors are effective for Introverted students.
+49,Extroverted,49,Outgoing,1,Moderate,Structured,Outgoing instructors are effective for Extroverted students.
+50,Detail-oriented,50,Meticulous,1,Low,Advisory,Meticulous instructors are effective for Detail-oriented students.
+51,Flexible,51,Adaptable,1,Low,Supportive,Adaptable instructors are effective for Flexible students.
+52,Realistic,52,Pragmatic,1,High,Dynamic,Pragmatic instructors are effective for Realistic students.
+53,Cheerful,53,Positive,1,Moderate,Empathetic,Positive instructors are effective for Cheerful students.
+54,Independent,54,Autonomous,1,Moderate,Gentle,Autonomous instructors are effective for Independent students.
+55,Collaborative,55,Team-oriented,1,Low,Calm,Team-oriented instructors are effective for Collaborative students.
+56,Disciplined,56,Structured,1,High,Advisory,Structured instructors are effective for Disciplined students.
+57,Pragmatic,57,Realistic,1,Low,Advisory,Realistic instructors are effective for Pragmatic students.
+58,Trusting,58,Reliable,1,Low,Calm,Reliable instructors are effective for Trusting students.
+59,Loyal,59,Committed,1,High,Gentle,Committed instructors are effective for Loyal students.
+60,Friendly,60,Approachable,1,High,Advisory,Approachable instructors are effective for Friendly students.
+61,Adaptable,61,Flexible,1,High,Interactive,Flexible instructors are effective for Adaptable students.
+62,Sensitive,62,Compassionate,1,Low,Supportive,Compassionate instructors are effective for Sensitive students.
+63,Goal-oriented,63,Visionary,1,Moderate,Dynamic,Visionary instructors are effective for Goal-oriented students.
+64,Supportive,64,Empathetic,1,Moderate,Flexible,Empathetic instructors are effective for Supportive students.
+65,Thoughtful,65,Considerate,1,Moderate,Flexible,Considerate instructors are effective for Thoughtful students.
+66,Perceptive,66,Insightful,1,Low,Advisory,Insightful instructors are effective for Perceptive students.
+67,Conscientious,67,Organized,1,Low,Empathetic,Organized instructors are effective for Conscientious students.
+68,Inquisitive,68,Informative,1,Low,Advisory,Informative instructors are effective for Inquisitive students.
+69,Tactful,69,Diplomatic,1,High,Flexible,Diplomatic instructors are effective for Tactful students.
+70,Reflective,70,Thoughtful,1,Low,Flexible,Thoughtful instructors are effective for Reflective students.
+71,Open-minded,71,Accepting,1,Low,Structured,Accepting instructors are effective for Open-minded students.
+72,Determined,72,Focused,1,Low,Interactive,Focused instructors are effective for Determined students.
+73,Patient,73,Calm,1,Low,Flexible,Calm instructors are effective for Patient students.
+74,Supportive,74,Encouraging,1,Moderate,Calm,Encouraging instructors are effective for Supportive students.
+75,Organized,75,Structured,1,Moderate,Structured,Structured instructors are effective for Organized students.
+76,Curious,76,Knowledgeable,1,Low,Flexible,Knowledgeable instructors are effective for Curious students.
+77,Reserved,77,Encouraging,1,Low,Calm,Encouraging instructors are effective for Reserved students.
+78,Outgoing,78,Sociable,1,Moderate,Flexible,Sociable instructors are effective for Outgoing students.
+79,Empathetic,79,Understanding,1,Low,Gentle,Understanding instructors are effective for Empathetic students.
+80,Analytical,80,Detailed,1,Moderate,Flexible,Detailed instructors are effective for Analytical students.
+81,Patient,81,Calm,1,Moderate,Calm,Calm instructors are effective for Patient students.
+82,Confident,82,Assertive,1,Low,Gentle,Assertive instructors are effective for Confident students.
+83,Ambitious,83,Goal-Oriented,1,Low,Flexible,Goal-Oriented instructors are effective for Ambitious students.
+84,Introverted,84,Friendly,1,Low,Encouraging,Friendly instructors are effective for Introverted students.
+85,Extroverted,85,Outgoing,1,High,Interactive,Outgoing instructors are effective for Extroverted students.
+86,Detail-oriented,86,Meticulous,1,Moderate,Empathetic,Meticulous instructors are effective for Detail-oriented students.
+87,Flexible,87,Adaptable,1,High,Encouraging,Adaptable instructors are effective for Flexible students.
+88,Realistic,88,Pragmatic,1,Moderate,Flexible,Pragmatic instructors are effective for Realistic students.
+89,Cheerful,89,Positive,1,Moderate,Dynamic,Positive instructors are effective for Cheerful students.
+90,Independent,90,Autonomous,1,High,Empathetic,Autonomous instructors are effective for Independent students.
+91,Collaborative,91,Team-oriented,1,Moderate,Interactive,Team-oriented instructors are effective for Collaborative students.
+92,Disciplined,92,Structured,1,Moderate,Supportive,Structured instructors are effective for Disciplined students.
+93,Pragmatic,93,Realistic,1,Low,Gentle,Realistic instructors are effective for Pragmatic students.
+94,Trusting,94,Reliable,1,High,Empathetic,Reliable instructors are effective for Trusting students.
+95,Loyal,95,Committed,1,Moderate,Interactive,Committed instructors are effective for Loyal students.
+96,Friendly,96,Approachable,1,High,Interactive,Approachable instructors are effective for Friendly students.
+97,Adaptable,97,Flexible,1,Moderate,Flexible,Flexible instructors are effective for Adaptable students.
+98,Sensitive,98,Compassionate,1,Low,Encouraging,Compassionate instructors are effective for Sensitive students.
+99,Goal-oriented,99,Visionary,1,Low,Encouraging,Visionary instructors are effective for Goal-oriented students.
+100,Supportive,100,Empathetic,1,Low,Structured,Empathetic instructors are effective for Supportive students.
+101,Thoughtful,101,Considerate,1,Moderate,Interactive,Considerate instructors are effective for Thoughtful students.
+102,Perceptive,102,Insightful,1,Moderate,Advisory,Insightful instructors are effective for Perceptive students.
+103,Conscientious,103,Organized,1,Moderate,Dynamic,Organized instructors are effective for Conscientious students.
+104,Inquisitive,104,Informative,1,Moderate,Flexible,Informative instructors are effective for Inquisitive students.
+105,Tactful,105,Diplomatic,1,Low,Gentle,Diplomatic instructors are effective for Tactful students.
+106,Reflective,106,Thoughtful,1,Low,Flexible,Thoughtful instructors are effective for Reflective students.
+107,Open-minded,107,Accepting,1,High,Flexible,Accepting instructors are effective for Open-minded students.
+108,Determined,108,Focused,1,Low,Interactive,Focused instructors are effective for Determined students.
+109,Impulsive,109,Disciplined,0,High,Flexible,Disciplined instructors may not align well with Impulsive students.
+110,Adventurous,110,Cautious,0,Low,Dynamic,Cautious instructors may not align well with Adventurous students.
+111,Optimistic,111,Realistic,0,High,Empathetic,Realistic instructors may not align well with Optimistic students.
+112,Moody,112,Consistent,0,Moderate,Dynamic,Consistent instructors may not align well with Moody students.
+113,Spontaneous,113,Organized,0,Low,Dynamic,Organized instructors may not align well with Spontaneous students.
+114,Creative,114,Methodical,0,Low,Calm,Methodical instructors may not align well with Creative students.
+115,Skeptical,115,Open-minded,0,Low,Gentle,Open-minded instructors may not align well with Skeptical students.
+116,Imaginative,116,Grounded,0,Low,Structured,Grounded instructors may not align well with Imaginative students.
+117,Carefree,117,Responsible,0,High,Empathetic,Responsible instructors may not align well with Carefree students.
+118,Energetic,118,Calm,0,Low,Calm,Calm instructors may not align well with Energetic students.
+119,Assertive,119,Calm,0,Moderate,Calm,Calm instructors may not align well with Assertive students.
+120,Perfectionist,120,Flexible,0,High,Empathetic,Flexible instructors may not align well with Perfectionist students.
+121,Cautious,121,Confident,0,High,Supportive,Confident instructors may not align well with Cautious students.
+122,Hesitant,122,Motivational,0,High,Empathetic,Motivational instructors may not align well with Hesitant students.
+123,Goal-oriented,123,Visionary,0,Moderate,Empathetic,Visionary instructors may not align well with Goal-oriented students.
+124,Analytical,124,Disciplined,0,Moderate,Encouraging,Disciplined instructors may not align well with Analytical students.
+125,Introverted,125,Sociable,0,Moderate,Advisory,Sociable instructors may not align well with Introverted students.
+126,Ambitious,126,Visionary,0,Low,Interactive,Visionary instructors may not align well with Ambitious students.
+127,Outgoing,127,Reserved,0,Low,Calm,Reserved instructors may not align well with Outgoing students.
+128,Reserved,128,Outgoing,0,High,Empathetic,Outgoing instructors may not align well with Reserved students.
+129,Empathetic,129,Skeptical,0,Moderate,Encouraging,Skeptical instructors may not align well with Empathetic students.
+130,Sensitive,130,Carefree,0,High,Structured,Carefree instructors may not align well with Sensitive students.
+131,Imaginative,131,Analytical,0,Low,Flexible,Analytical instructors may not align well with Imaginative students.
+132,Creative,132,Structured,0,High,Calm,Structured instructors may not align well with Creative students.
+133,Energetic,133,Disciplined,0,Moderate,Empathetic,Disciplined instructors may not align well with Energetic students.
+134,Moody,134,Cheerful,0,High,Supportive,Cheerful instructors may not align well with Moody students.
+135,Supportive,135,Disorganized,0,Moderate,Dynamic,Disorganized instructors may not align well with Supportive students.
+136,Adventurous,136,Conscientious,0,Moderate,Advisory,Conscientious instructors may not align well with Adventurous students.
+137,Flexible,137,Inflexible,0,Low,Flexible,Inflexible instructors may not align well with Flexible students.
+138,Trusting,138,Skeptical,0,Moderate,Encouraging,Skeptical instructors may not align well with Trusting students.
+139,Optimistic,139,Pessimistic,0,High,Calm,Pessimistic instructors may not align well with Optimistic students.
+140,Goal-oriented,140,Carefree,0,Moderate,Flexible,Carefree instructors may not align well with Goal-oriented students.
+141,Perceptive,141,Unobservant,0,High,Supportive,Unobservant instructors may not align well with Perceptive students.
+142,Outgoing,142,Reserved,0,Moderate,Flexible,Reserved instructors may not align well with Outgoing students.
+143,Introverted,143,Outgoing,0,Moderate,Supportive,Outgoing instructors may not align well with Introverted students.
+144,Independent,144,Dependent,0,Moderate,Encouraging,Dependent instructors may not align well with Independent students.
+145,Spontaneous,145,Structured,0,High,Empathetic,Structured instructors may not align well with Spontaneous students.
+146,Conscientious,146,Carefree,0,Low,Interactive,Carefree instructors may not align well with Conscientious students.
+147,Supportive,147,Critical,0,Low,Interactive,Critical instructors may not align well with Supportive students.
+148,Inquisitive,148,Disinterested,0,Low,Structured,Disinterested instructors may not align well with Inquisitive students.
+149,Creative,149,Routine,0,Low,Gentle,Routine instructors may not align well with Creative students.
+150,Thoughtful,150,Rash,0,High,Flexible,Rash instructors may not align well with Thoughtful students.
+151,Cautious,151,Impulsive,0,Moderate,Empathetic,Impulsive instructors may not align well with Cautious students.
+152,Confident,152,Anxious,0,High,Dynamic,Anxious instructors may not align well with Confident students.
+153,Skeptical,153,Trusting,0,High,Calm,Trusting instructors may not align well with Skeptical students.
+154,Carefree,154,Organized,0,Low,Advisory,Organized instructors may not align well with Carefree students.
+155,Empathetic,155,Cold,0,High,Gentle,Cold instructors may not align well with Empathetic students.
+156,Friendly,156,Aloof,0,Low,Calm,Aloof instructors may not align well with Friendly students.
+157,Reflective,157,Unreflective,0,Moderate,Supportive,Unreflective instructors may not align well with Reflective students.
+158,Energetic,158,Reserved,0,Low,Flexible,Reserved instructors may not align well with Energetic students.
+159,Analytical,159,Spontaneous,0,High,Dynamic,Spontaneous instructors may not align well with Analytical students.
+160,Conscientious,160,Disorganized,0,Moderate,Encouraging,Disorganized instructors may not align well with Conscientious students.
+161,Enthusiastic,161,Lethargic,0,Moderate,Calm,Lethargic instructors may not align well with Enthusiastic students.
+162,Trusting,162,Distrustful,0,Low,Empathetic,Distrustful instructors may not align well with Trusting students.
+163,Adventurous,163,Cautious,0,High,Calm,Cautious instructors may not align well with Adventurous students.
+164,Assertive,164,Hesitant,0,Moderate,Supportive,Hesitant instructors may not align well with Assertive students.
+165,Outgoing,165,Introverted,0,High,Structured,Introverted instructors may not align well with Outgoing students.
+166,Analytical,166,Intuitive,0,Low,Dynamic,Intuitive instructors may not align well with Analytical students.
+167,Detail-oriented,167,General,0,Low,Structured,General instructors may not align well with Detail-oriented students.
+168,Enthusiastic,168,Unmotivated,0,High,Interactive,Unmotivated instructors may not align well with Enthusiastic students.
+169,Empathetic,169,Unfeeling,0,High,Advisory,Unfeeling instructors may not align well with Empathetic students.
+170,Open-minded,170,Close-minded,0,Low,Encouraging,Close-minded instructors may not align well with Open-minded students.
+171,Skeptical,171,Naive,0,Moderate,Dynamic,Naive instructors may not align well with Skeptical students.
+172,Reserved,172,Extroverted,0,Low,Advisory,Extroverted instructors may not align well with Reserved students.
+173,Inquisitive,173,Uninquisitive,0,Moderate,Structured,Uninquisitive instructors may not align well with Inquisitive students.
+174,Sensitive,174,Insensitive,0,Moderate,Interactive,Insensitive instructors may not align well with Sensitive students.
+175,Imaginative,175,Realistic,0,Moderate,Gentle,Realistic instructors may not align well with Imaginative students.
+176,Energetic,176,Low-energy,0,Low,Empathetic,Low-energy instructors may not align well with Energetic students.
+177,Reflective,177,Impulsive,0,Low,Dynamic,Impulsive instructors may not align well with Reflective students.
+178,Methodical,178,Disorganized,0,High,Empathetic,Disorganized instructors may not align well with Methodical students.
+179,Collaborative,179,Solo,0,Low,Gentle,Solo instructors may not align well with Collaborative students.
+180,Goal-oriented,180,Aimless,0,Moderate,Empathetic,Aimless instructors may not align well with Goal-oriented students.
+181,Tactful,181,Blunt,0,High,Interactive,Blunt instructors may not align well with Tactful students.
+182,Inquisitive,182,Indifferent,0,High,Interactive,Indifferent instructors may not align well with Inquisitive students.
+183,Empathetic,183,Unconcerned,0,Low,Supportive,Unconcerned instructors may not align well with Empathetic students.
+184,Reflective,184,Hasty,0,High,Empathetic,Hasty instructors may not align well with Reflective students.
+185,Perceptive,185,Oblivious,0,High,Flexible,Oblivious instructors may not align well with Perceptive students.
+186,Supportive,186,Critical,0,Moderate,Empathetic,Critical instructors may not align well with Supportive students.
+187,Curious,187,Uninterested,0,High,Calm,Uninterested instructors may not align well with Curious students.
+188,Friendly,188,Unapproachable,0,High,Encouraging,Unapproachable instructors may not align well with Friendly students.
+189,Independent,189,Collaboratiive,0,High,Dynamic,Collaboratiive instructors may not align well with Independent students.
+190,Spontaneous,190,Rigid,0,Moderate,Advisory,Rigid instructors may not align well with Spontaneous students.
+191,Adventurous,191,Cautious,0,High,Structured,Cautious instructors may not align well with Adventurous students.
+192,Confident,192,Doubtful,0,Low,Calm,Doubtful instructors may not align well with Confident students.
+193,Creative,193,Conventional,0,High,Interactive,Conventional instructors may not align well with Creative students.
+194,Discerning,194,Naive,0,Low,Gentle,Naive instructors may not align well with Discerning students.
+195,Optimistic,195,Pessimistic,0,Low,Calm,Pessimistic instructors may not align well with Optimistic students.
+196,Empathetic,196,Unresponsive,0,High,Encouraging,Unresponsive instructors may not align well with Empathetic students.
+197,Goal-oriented,197,Unfocused,0,Low,Supportive,Unfocused instructors may not align well with Goal-oriented students.
+198,Spontaneous,198,Structured,0,High,Interactive,Structured instructors may not align well with Spontaneous students.
+199,Carefree,199,Perfectionist,0,Moderate,Interactive,Perfectionist instructors may not align well with Carefree students.
+200,Competitive,200,Collaboratiive,0,Low,Structured,Collaboratiive instructors may not align well with Competitive students.
+201,Shy,201,Assertive,0,High,Structured,Assertive instructors may not align well with Shy students.
+202,Bold,202,Reserved,0,Moderate,Encouraging,Reserved instructors may not align well with Bold students.
+203,Impatient,203,Calm,0,High,Empathetic,Calm instructors may not align well with Impatient students.
+204,Thoughtful,204,Rash,0,High,Empathetic,Rash instructors may not align well with Thoughtful students.
+205,Distracted,205,Focused,0,Moderate,Structured,Focused instructors may not align well with Distracted students.
+206,Emotional,206,Stoicf,0,Moderate,Advisory,Stoicf instructors may not align well with Emotional students.
+207,Submissive,207,Dominant,0,High,Gentle,Dominant instructors may not align well with Submissive students.
+208,Cautious,208,Spontaneous,0,Moderate,Dynamic,Spontaneous instructors may not align well with Cautious students.
+209,Overconfident,209,Humble,0,Moderate,Gentle,Humble instructors may not align well with Overconfident students.
+210,Motivated,210,Inspirational,1,High,Structured,Inspirational instructors are effective for Motivated students.
+211,Impatient,211,Efficient,1,High,Empathetic,Efficient instructors are effective for Impatient students.
+212,Creative,212,Flexible,1,High,Interactive,Flexible instructors are effective for Creative students.
+213,Independent,213,Guiding,1,Low,Structured,Guiding instructors are effective for Independent students.
+214,Distracted,214,Focused,1,High,Calm,Focused instructors are effective for Distracted students.
+215,Confident,215,Encouraging,1,Low,Dynamic,Encouraging instructors are effective for Confident students.
+216,Shy,216,Patient,1,Low,Encouraging,Patient instructors are effective for Shy students.
+217,Analytical,217,Knowledgeable,1,Moderate,Advisory,Knowledgeable instructors are effective for Analytical students.
+218,Empathetic,218,Supportive,1,Low,Structured,Supportive instructors are effective for Empathetic students.
+219,Skeptical,219,Reassuring,1,Moderate,Structured,Reassuring instructors are effective for Skeptical students.
+220,Reflective,220,Thought-provoking,1,High,Dynamic,Thought-provoking instructors are effective for Reflective students.
+221,Assertive,221,Direct,1,Moderate,Interactive,Direct instructors are effective for Assertive students.
+222,Flexible,222,Adaptable,1,Low,Interactive,Adaptable instructors are effective for Flexible students.
+223,Impulsive,223,Structured,1,Low,Advisory,Structured instructors are effective for Impulsive students.
+224,Meticulous,224,Detailed,1,Low,Structured,Detailed instructors are effective for Meticulous students.
+225,Eager,225,Mentoring,1,Moderate,Interactive,Mentoring instructors are effective for Eager students.
+226,Playful,226,Fun-loving,1,Low,Structured,Fun-loving instructors are effective for Playful students.
+227,Ambitious,227,Driven,1,Moderate,Dynamic,Driven instructors are effective for Ambitious students.
+228,Calm,228,Reassuring,1,Moderate,Calm,Reassuring instructors are effective for Calm students.
+229,Anxious,229,Calm,1,Moderate,Advisory,Calm instructors are effective for Anxious students.
+230,Social,230,Engaging,1,High,Calm,Engaging instructors are effective for Social students.
+231,Introverted,231,Understanding,1,Low,Empathetic,Understanding instructors are effective for Introverted students.
+232,Adventurous,232,Adventurous,1,Moderate,Empathetic,Adventurous instructors are effective for Adventurous students.
+233,Reserved,233,Supportive,1,High,Supportive,Supportive instructors are effective for Reserved students.
+234,Innovative,234,Creative,1,High,Structured,Creative instructors are effective for Innovative students.
+235,Timid,235,Gentle,1,High,Interactive,Gentle instructors are effective for Timid students.
+236,Persistent,236,Encouraging,1,Low,Encouraging,Encouraging instructors are effective for Persistent students.
+237,Adaptable,237,Versatile,1,Low,Calm,Versatile instructors are effective for Adaptable students.
+238,Dependable,238,Reliable,1,Moderate,Interactive,Reliable instructors are effective for Dependable students.
+239,Thoughtful,239,Perceptive,1,Moderate,Structured,Perceptive instructors are effective for Thoughtful students.

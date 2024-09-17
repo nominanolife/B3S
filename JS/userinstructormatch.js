@@ -80,7 +80,7 @@ async function fetchMatchAndInstructorData(studentId) {
         const traitsContainer = document.querySelector('.about-item');
         traitsContainer.innerHTML = ''; // Clear existing content
 
-        const traits = instructorData.traits || [];
+        const traits = instructorData.instructor_traits || [];
 
         if (traits.length > 0) {
             const column1 = document.createElement('div');

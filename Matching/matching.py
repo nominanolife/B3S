@@ -1,5 +1,7 @@
 import os
+import pandas as pd
 from google.cloud import firestore
+from ortools.sat.python import cp_model
 
 # Set up Firestore authentication
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "authentication-d6496-firebase-adminsdk-zoywr-32ecaa91eb.json"
@@ -8,9 +10,6 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "authentication-d6496-firebase-ad
 db = firestore.Client()
 
 def fetch_data():
-    """
-    Fetch students, instructors, and appointments data from Firestore.
-    """
     # Fetch all applicants (students), instructors, and appointments
     applicants_ref = db.collection('applicants').stream()
     instructors_ref = db.collection('instructors').stream()
@@ -21,116 +20,118 @@ def fetch_data():
     instructors = {
         doc.id: doc.to_dict() 
         for doc in instructors_ref 
-        if doc.to_dict().get('active', False)  # Only include active instructors
+        if doc.to_dict().get('active', False)
     }
     appointments = {doc.id: doc.to_dict() for doc in appointments_ref}
 
     return students, instructors, appointments
 
 def get_student_course(student_id, appointments):
-    """
-    Get the course of the student based on their studentId in the appointments collection.
-    """
+    preferred_courses = ["PDC-4Wheels", "PDC-Motorcycle"]
+    
     for appointment_id, appointment in appointments.items():
-        bookings = appointment.get('bookings', [])
-        # Iterate over each booking inside the appointment
-        for booking in bookings:
-            if booking.get('userId') == student_id:
-                print(f"Found matching userId (studentId): {student_id} in appointment: {appointment_id}")
-                print(f"Returning course: {appointment.get('course')}")
-                return appointment.get('course')  # Return the course from the appointment
-    print(f"No course found for studentId: {student_id}")
+        course = appointment.get('course', '')
+        if course in preferred_courses:
+            print(f"Found preferred course '{course}' for studentId: {student_id} in appointment: {appointment_id}")
+            return course
+    
+    print(f"No preferred course found for studentId: {student_id}")
     return None
 
 def get_highest_rated_instructor(instructors, course):
-    """
-    Find the highest rated instructor who teaches the given course.
-    """
-    # Filter instructors who teach the given course
     eligible_instructors = [
         (instructor_id, instructor) 
         for instructor_id, instructor in instructors.items() 
-        if instructor.get('course') == course
+        if course in instructor.get('courses', [])
     ]
     
     if not eligible_instructors:
         return None
     
-    # Sort by rating, then return the highest rated instructor
     highest_rated_instructor = max(eligible_instructors, key=lambda x: x[1].get('rating', 0))
     return highest_rated_instructor[0]  # Return the instructor_id
 
-def match_students_instructors(students, instructors, appointments, logged_in_student_id):
-    """
-    Match the logged-in student with the best instructor.
-    """
-    matches = {}
-    
-    # Check if the logged-in student exists in the students data
-    if logged_in_student_id not in students:
-        print(f"Student ID {logged_in_student_id} not found.")
-        return matches
-    
-    student = students[logged_in_student_id]
-    best_match = None
-    best_score = 0
+def load_complementary_traits(file_path):
+    traits_data = pd.read_csv(file_path)
+    complementary_traits = {
+        (str(row['traits']).strip().lower(), str(row['instructor_traits']).strip().lower()): row['Match Result']
+        for _, row in traits_data.iterrows()
+    }
 
-    # Get the course of the logged-in student from the appointments
+    return complementary_traits
+
+def calculate_match_score(student_traits, instructor_traits, complementary_traits):
+    total_score = 0
+    weight_per_match = 1
+
+    for student_trait in student_traits:
+        for instructor_trait in instructor_traits:
+            normalized_student_trait = student_trait.lower().strip()
+            normalized_instructor_trait = instructor_trait.lower().strip()
+
+            match_key = (normalized_student_trait, normalized_instructor_trait)
+            match_result = complementary_traits.get(match_key, 0)
+
+            print(f"Checking match for normalized student trait '{normalized_student_trait}' "
+                  f"and instructor trait '{normalized_instructor_trait}': Match result = {match_result}")
+
+            total_score += match_result * weight_per_match
+
+    return total_score
+
+def match_students_instructors(students, instructors, appointments, logged_in_student_id, complementary_traits):
+    student = students.get(logged_in_student_id)
+    if not student:
+        return {"status": "error", "message": f"Student ID {logged_in_student_id} not found."}
+
     course = get_student_course(logged_in_student_id, appointments)
     if not course:
-        print(f"No course found for student ID {logged_in_student_id}.")
-        return matches  # If the student has no course, return an empty result
+        return {"status": "error", "message": "No course found for student."}
 
-    # Filter instructors based on the student's course
     eligible_instructors = {
-        instructor_id: instructor 
-        for instructor_id, instructor in instructors.items() 
-        if instructor.get('course') == course and instructor.get('active', False)
+        instructor_id: instructor
+        for instructor_id, instructor in instructors.items()
+        if (course in instructor.get('courses', [])) and instructor.get('active', False)
     }
 
     if not eligible_instructors:
-        print(f"No eligible instructors found for course {course}.")
-        return matches
+        return {"status": "error", "message": f"No eligible instructors found for course {course}."}
 
-    # Perform traits-based matching
-    student_traits = student.get('traits', [])
+    match_scores = {}
     for instructor_id, instructor in eligible_instructors.items():
-        instructor_traits = instructor.get('traits', [])
-        if isinstance(student_traits, list) and isinstance(instructor_traits, list):
-            matching_traits = len(set(student_traits).intersection(instructor_traits))
-            if matching_traits > best_score:
-                best_score = matching_traits
-                best_match = instructor_id
+        student_traits = student.get('traits', [])
+        instructor_traits = instructor.get('instructor_traits', [])
+        match_score = calculate_match_score(student_traits, instructor_traits, complementary_traits)
+        match_scores[instructor_id] = match_score
 
-    # Fallback to highest rated instructor if no trait match is found
-    if not best_match:
-        best_match = get_highest_rated_instructor(eligible_instructors, course)
+    # 1. Select the instructor with the highest match score.
+    sorted_instructors = sorted(match_scores.items(), key=lambda x: (-x[1], list(eligible_instructors.keys()).index(x[0])))
+    best_match_id, best_score = sorted_instructors[0]
 
-    if best_match:
-        matches[logged_in_student_id] = best_match
+    if best_score > 0:
+        print(f"Best match found: Student {logged_in_student_id} with Instructor {best_match_id} (Score: {best_score})")
+        return {"status": "success", "student_id": logged_in_student_id, "instructor_id": best_match_id}
 
-    return matches
+    # 2. Fallback to the highest-rated instructor.
+    highest_rated_instructor = get_highest_rated_instructor(instructors, course)
+    if highest_rated_instructor:
+        print(f"Highest rated instructor assigned: {highest_rated_instructor}")
+        return {"status": "success", "student_id": logged_in_student_id, "instructor_id": highest_rated_instructor}
+
+    return {"status": "error", "message": "No suitable instructor found."}
 
 def main(logged_in_student_id):
-    """
-    Main function to run the matching process for a specific logged-in student.
-    """
-    # Fetch data from Firestore
+    file_path = r'Matching/traits.csv'
+    complementary_traits = load_complementary_traits(file_path)
     students, instructors, appointments = fetch_data()
 
-    # If there are no students or instructors, return an empty result
     if not students or not instructors:
-        print("No students or instructors available for matching.")
-        return []
+        return {"status": "error", "message": "No students or instructors available for matching."}
 
-    # Run the matching algorithm for the logged-in student
-    matches = match_students_instructors(students, instructors, appointments, logged_in_student_id)
-
-    # Log the result for the logged-in student
-    print(f"Matching result for student {logged_in_student_id}:", matches)
-
-    # Return the match so it can be processed further
-    return matches
+    result = match_students_instructors(students, instructors, appointments, logged_in_student_id, complementary_traits)
+    print(f"Matching result for student {logged_in_student_id}: {result}")
+    return result
 
 if __name__ == "__main__":
-    main()
+    result = main()
+    print(f"Final result: {result}")

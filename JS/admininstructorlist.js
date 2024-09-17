@@ -327,7 +327,7 @@ async function saveInstructor(event) {
       await updateDoc(doc(db, 'instructors', currentInstructorId), {
         name: name,
         courses: selectedCourses,
-        traits: personalTraits,
+        instructor_traits: personalTraits,
         ...(imageUrl && { imageUrl: imageUrl })
       });
 
@@ -338,7 +338,7 @@ async function saveInstructor(event) {
       const docRef = await addDoc(collection(db, 'instructors'), {
         name: name,
         courses: selectedCourses,
-        traits: personalTraits,
+        instructor_traits: personalTraits,
         active: false,
         imageUrl: ''
       });

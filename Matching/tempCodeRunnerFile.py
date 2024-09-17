@@ -13,16 +13,18 @@ db = firestore.Client()
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET"], "allow_headers": ["Content-Type"]}})
 
-@app.route('/match/<student_id>', methods=['GET'])
+@app.route('/match/<student_id>', methods=['GET'])  # Accept student_id in the URL
 def match(student_id):
     try:
-        matched_data = main(student_id)  # Pass the dynamically provided student ID
+        # Call main function to perform matching for a specific student
+        matched_data = main(student_id)  # Pass the logged-in student ID
         
-        if not matched_data or matched_data.get("status") == "error":
-            return jsonify(matched_data), 404  # Return 404 if there's an error message
-        
-        instructor_id = matched_data.get('instructor_id')
+        if not matched_data or student_id not in matched_data:
+            return jsonify({"status": "error", "message": "No matches found for student."}), 404
 
+        instructor_id = matched_data[student_id]
+
+        # Ensure student_id and instructor_id are valid
         if not student_id or not instructor_id:
             return jsonify({"status": "error", "message": "Invalid match data."}), 400
 
@@ -34,16 +36,22 @@ def match(student_id):
         except Exception as firestore_error:
             return jsonify({"status": "error", "message": f"Firestore error: {firestore_error}"}), 500
 
-        # Save or update the match in Firestore
+        # Use student_id as the document ID for the match
         match_ref = db.collection('matches').document(student_id)
+
+        # Save or update the match in Firestore
         match_ref.set({
             'instructorId': instructor_id,
             'studentId': student_id,
-            'matchedAt': firestore.SERVER_TIMESTAMP
-        }, merge=True)
+            'matchedAt': firestore.SERVER_TIMESTAMP  # Firestore-generated timestamp
+        }, merge=True)  # Ensure it merges with existing data
 
         # Return success response with necessary data
-        return jsonify(matched_data), 200
+        return jsonify({
+            "status": "success",
+            "student_id": student_id,
+            "instructor_id": instructor_id,
+        }), 200
 
     except Exception as e:
         app.logger.error(f"Error occurred: {e}")
