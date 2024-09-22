@@ -46,25 +46,49 @@
                 <div class="video-grid">
                     <!-- Unlocked Video -->
                     <div class="video-card unlocked">
-                        <img src="Assets/video.png" alt="Lesson 1">
-                        <div class="video-title">Theoretical Driving Course<br>Lesson 1: LTO Laws</div>
+                        <div class="video-card-preview">
+                            <img src="Assets/video.png" alt="Lesson 1">
+                        </div>
+                        <div class="video-details">
+                            <div class="video-title">
+                                <h3>Lesson 1: LTO Laws</h3>
+                                <p>Theoretical Driving Course</p>
+                            </div>
+                        </div>
                     </div>
-                    
                     <!-- Locked Videos -->
                     <div class="video-card locked">
-                        <img src="Assets/lesson2.png" alt="Lesson 2">
-                        <div class="video-title">Theoretical Driving Course<br>Lesson 2: Road Signs</div>
-                        <div class="locked-overlay">
-                            <i class="fas fa-lock"></i> 
+                        <div class="lock-overlay">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="video-card-preview">
+                            <img src="Assets/lesson2.png" alt="Lesson 2">
+                        </div>
+                        <div class="video-details">
+                            <div class="video-title">
+                                <h3>Lesson 2: Road Signs</h3>
+                                <p>Theoretical Driving Course</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="video-card locked">
-                        <img src="Assets/lesson3.png" alt="Lesson 3">
-                        <div class="video-title">Theoretical Driving Course<br>Lesson 3: Traffic Rules</div>
-                        <div class="locked-overlay">
-                            <i class="fas fa-lock"></i> 
-                        </div>
-                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="confirmLogoutBtn">Logout</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>

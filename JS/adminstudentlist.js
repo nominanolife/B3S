@@ -648,11 +648,11 @@ function calculateTotalScore() {
     });
 
     // Display the total score
-    document.getElementById('totalScore').textContent = `Total Score: ${totalScore} / 100`;
+    document.getElementById('totalScore').textContent = `${totalScore} / 100`;
 
     // Validate and display a warning if the total score exceeds 100
     if (totalScore > 100) {
-        alert('Total score exceeds 100. Please adjust the scores.');
+        showNotification('Total score exceeds 100. Please adjust the scores.');
     }
 
     return totalScore; // Return the total score for use in other functions
@@ -661,7 +661,7 @@ function calculateTotalScore() {
 // Function to save assessment data to session storage
 function saveAssessmentDataToSession() {
     if (selectedStudentIndex === null) {
-        alert('No student selected. Please select a student to save data.');
+        showNotification('No student selected. Please select a student to save data.');
         return;
     }
 
@@ -730,12 +730,12 @@ function saveAssessmentDataToSession() {
     // Save the assessment data in session storage with a key based on the student index
     sessionStorage.setItem(`4WheelsAssess_${selectedStudentIndex}`, JSON.stringify(assessmentData));
 
-    alert(`Assessment data has been saved successfully for ${assessmentData.studentName}`);
+    showNotification(`Assessment data has been saved successfully for ${assessmentData.studentName}`);
 }
 
 async function sendAssessmentDataToFlask() {
   if (selectedStudentIndex === null) {
-      alert('No student selected. Please select a student to send data.');
+      showNotification('No student selected. Please select a student to send data.');
       return;
   }
 
@@ -793,13 +793,13 @@ async function sendAssessmentDataToFlask() {
 
   } catch (error) {
       console.error('Error sending data to Flask API:', error);
-      alert('Failed to send data. Please try again.');
+      showNotification('Failed to send data. Please try again.');
   }
 }
 
 async function saveAllDataToFirestore() {
   if (selectedStudentIndex === null) {
-      alert('No student selected. Please select a student to save data.');
+      showNotification('No student selected. Please select a student to save data.');
       return;
   }
 
@@ -850,15 +850,32 @@ async function saveAllDataToFirestore() {
   try {
       await setDoc(doc(db, "applicants", studentsData[selectedStudentIndex].id), combinedData, { merge: true });
       console.log('Saving combined data:', combinedData);
-      alert(`All data has been saved successfully for ${checklistData.studentName}`);
+      showNotification(`All data has been saved successfully for ${checklistData.studentName}`);
   } catch (e) {
       console.error("Error saving combined data: ", e);
-      alert('Failed to save all data. Please try again.');
+      showNotification('Failed to save all data. Please try again.');
   }
 }
+
 // Attach event listeners to input fields for real-time calculation
-document.querySelectorAll('input[type="text"]').forEach(input => {
-    input.addEventListener('input', calculateTotalScore);
+document.querySelectorAll('input.numeric-input').forEach(input => {
+  input.addEventListener('input', function (event) {
+    // Allow only digits and one decimal point
+    this.value = this.value.replace(/[^0-9.]/g, ''); 
+
+    // Ensure there's only one decimal point in the input
+    if ((this.value.match(/\./g) || []).length > 1) {
+      this.value = this.value.slice(0, -1);
+    }
+
+    // Optional: Ensure the score is between 0 and 100
+    if (parseFloat(this.value) > 100) {
+      this.value = '100';
+    }
+
+    // Recalculate the total score after filtering
+    calculateTotalScore();
+  });
 });
 
 document.getElementById('nextBtn').addEventListener('click', async function () {
@@ -890,10 +907,10 @@ document.getElementById('nextBtn').addEventListener('click', async function () {
         nextModalInstance.show(); // Show the next modal
     }
 
-    // Show alert if needed but after transitioning to the next modal
+    // Show showNotification if needed but after transitioning to the next modal
     if (totalScore > 100) {
         setTimeout(() => {
-            alert('Total score exceeds 100. Please adjust the scores.');
+            showNotification('Total score exceeds 100. Please adjust the scores.');
         }, 100); // Slight delay to ensure modal transition completes first
     }
 });
@@ -1015,4 +1032,3 @@ document.addEventListener('click', function (event) {
       vehicleDropdown.classList.remove('open');
   }
 });
-

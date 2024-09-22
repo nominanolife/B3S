@@ -222,52 +222,75 @@ function searchBookings() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const selectedElement = document.getElementById('courseFilterSelected');
-    const optionsContainer = document.getElementById('courseFilterOptions');
-    const optionsList = optionsContainer.querySelectorAll('.option');
+    const upcomingSelectedElement = document.getElementById('courseFilterSelected');
+    const upcomingOptionsContainer = document.getElementById('courseFilterOptions');
+    const upcomingOptionsList = upcomingOptionsContainer.querySelectorAll('.option');
 
-    // Toggle dropdown on click
-    selectedElement.addEventListener('click', () => {
-        optionsContainer.style.display = optionsContainer.style.display === 'block' ? 'none' : 'block';
+    const cancelledSelectedElement = document.getElementById('cancelledCourseFilterSelected');
+    const cancelledOptionsContainer = document.getElementById('cancelledCourseFilterOptions');
+    const cancelledOptionsList = cancelledOptionsContainer.querySelectorAll('.option');
+
+    // Toggle dropdown for upcoming appointments
+    upcomingSelectedElement.addEventListener('click', () => {
+        upcomingOptionsContainer.style.display = upcomingOptionsContainer.style.display === 'block' ? 'none' : 'block';
     });
 
-    // Handle option selection
-    optionsList.forEach(option => {
+    // Handle option selection for upcoming appointments
+    upcomingOptionsList.forEach(option => {
         option.addEventListener('click', () => {
-            selectedElement.textContent = option.textContent; // Update the selected text
-            selectedElement.setAttribute('data-value', option.getAttribute('data-value')); // Update selected value
-            optionsContainer.style.display = 'none'; // Close dropdown
-            filterByCourse(option.getAttribute('data-value')); // Trigger filter function
+            upcomingSelectedElement.textContent = option.textContent;
+            upcomingSelectedElement.setAttribute('data-value', option.getAttribute('data-value'));
+            upcomingOptionsContainer.style.display = 'none';
+            filterByCourse(option.getAttribute('data-value'));
+        });
+    });
+
+    // Toggle dropdown for cancelled/rescheduled appointments
+    cancelledSelectedElement.addEventListener('click', () => {
+        cancelledOptionsContainer.style.display = cancelledOptionsContainer.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Handle option selection for cancelled/rescheduled appointments
+    cancelledOptionsList.forEach(option => {
+        option.addEventListener('click', () => {
+            cancelledSelectedElement.textContent = option.textContent;
+            cancelledSelectedElement.setAttribute('data-value', option.getAttribute('data-value'));
+            cancelledOptionsContainer.style.display = 'none';
+            filterByCourse(option.getAttribute('data-value'), 'cancelled');
         });
     });
 
     // Close dropdown if clicked outside
     document.addEventListener('click', (e) => {
-        if (!selectedElement.contains(e.target) && !optionsContainer.contains(e.target)) {
-            optionsContainer.style.display = 'none';
+        if (!upcomingSelectedElement.contains(e.target) && !upcomingOptionsContainer.contains(e.target)) {
+            upcomingOptionsContainer.style.display = 'none';
+        }
+        if (!cancelledSelectedElement.contains(e.target) && !cancelledOptionsContainer.contains(e.target)) {
+            cancelledOptionsContainer.style.display = 'none';
         }
     });
 });
 
-// Updated filterByCourse function
-function filterByCourse(selectedCourse) {
-    // Filter the entire dataset based on the selected course
-    filteredBookingsUpcoming = allBookingsUpcoming.filter(rowHtml => {
-        const course = rowHtml.split('<td>')[2].split('</td>')[0]; // Extract course from the rowHtml
-        return selectedCourse === '' || course === selectedCourse;
-    });
-    filteredBookingsCancelled = allBookingsCancelled.filter(rowHtml => {
-        const course = rowHtml.split('<td>')[2].split('</td>')[0]; // Extract course from the rowHtml
+function filterByCourse(selectedCourse, type = 'upcoming') {
+    const isUpcoming = type === 'upcoming';
+
+    const allBookings = isUpcoming ? allBookingsUpcoming : allBookingsCancelled;
+    const filteredBookings = allBookings.filter(rowHtml => {
+        const course = rowHtml.split('<td>')[2].split('</td>')[0];
         return selectedCourse === '' || course === selectedCourse;
     });
 
-    // Reset pagination and display the filtered results
-    currentPageUpcoming = 1;
-    currentPageCancelled = 1;
-    displayBookings('upcoming', true);
-    displayBookings('cancelled', true);
-    updatePaginationControls('upcoming');
-    updatePaginationControls('cancelled');
+    if (isUpcoming) {
+        filteredBookingsUpcoming = filteredBookings;
+        currentPageUpcoming = 1;
+        displayBookings('upcoming', true);
+        updatePaginationControls('upcoming');
+    } else {
+        filteredBookingsCancelled = filteredBookings;
+        currentPageCancelled = 1;
+        displayBookings('cancelled', true);
+        updatePaginationControls('cancelled');
+    }
 }
 
 // Initialize event listeners and fetch data

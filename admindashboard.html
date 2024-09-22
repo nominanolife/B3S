@@ -94,12 +94,13 @@
                                 <input type="text" class="search" placeholder="Search">
                             </div>
                             <div class="filter-container">
-                                <select class="form-control course-filter" id="courseFilter">
-                                    <option value="">All</option>
-                                    <option value="TDC">TDC</option>
-                                    <option value="PDC-4Wheels">PDC-4Wheels</option>
-                                    <option value="PDC-Motors">PDC-Motors</option>
-                                </select>
+                                <div class="selected" id="cancelledCourseFilterSelected">All</div>
+                                <ul class="dropdown-options" id="cancelledCourseFilterOptions">
+                                    <li class="option" data-value="">All</li>
+                                    <li class="option" data-value="TDC">TDC</li>
+                                    <li class="option" data-value="PDC-4Wheels">PDC-4Wheels</li>
+                                    <li class="option" data-value="PDC-Motors">PDC-Motors</li>
+                                </ul>
                             </div>
                         </div>
                         <table class="table">
