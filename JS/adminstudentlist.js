@@ -629,12 +629,12 @@ const fields = [
 
 // Define the maximum scores for each category
 const maxScores = {
-  "Observation": 20,
+  "Observation": 15,
   "Space Management": 20,
   "Speed Control": 20,
-  "Steering": 15,
-  "Communication": 15,
-  "General": 10
+  "Steering": 10,
+  "Communication": 10,
+  "General": 25
 };
 
 // Function to calculate the total score for the assessment form

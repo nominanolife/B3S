@@ -676,7 +676,7 @@ input:checked + .slider .slider-label-on {
 
 .instructor-name {
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ced4da;

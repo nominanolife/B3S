@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DriveHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="CSS/uservideos.css">
+    <link rel="stylesheet" href="CSS/uservideolist.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -43,28 +43,34 @@
                 <h2>Online TDC</h2>
             </div>
             <div class="page-content">
-                <div class="video-container">
-                    <h3>Lesson 1: LTO Laws</h3>
-                    <video id="lesson-video" controls>
-                        <source src="#" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-                <div class="lesson-list hidden">
-                    <i id="toggle-button" class="bi bi-chevron-left"></i>
-                    <div class="lessons">
-                        <ul>
-                            <li><a href="#">Lesson 1: Introduction to LTO</a></li>
-                            <li><a href="#">Lesson 2: LTO Registration Process</a></li>
-                            <li class="locked"><a href="#"><i class="bi bi-lock-fill"></i> Lesson 3: LTO Compliance and Regulations</a></li>
-                            <li class="locked"><a href="#"><i class="bi bi-lock-fill"></i> Lesson 4: Common Violations and Penalties</a></li>
-                            <li class="locked"><a href="#"><i class="bi bi-lock-fill"></i> Lesson 5: LTO Policies and Procedures</a></li>
-                            <li class="locked"><a href="#"><i class="bi bi-lock-fill"></i> Lesson 6: Case Studies on LTO Laws</a></li>
-                            <li class="locked"><a href="#"><i class="bi bi-lock-fill"></i> Lesson 7: Future of LTO Laws</a></li>
-                        </ul>
+                <div class="video-grid">
+                    <!-- Unlocked Video -->
+                    <div class="video-card">
+                        <div class="video-card-preview">
+                            <img src="Assets/video.png" alt="Lesson 1">
+                        </div>
+                        <div class="video-details">
+                            <div class="video-title">
+                                <h3>Lesson 1: LTO Laws</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Locked Videos -->
+                    <div class="video-card locked">
+                        <div class="lock-overlay">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="video-card-preview">
+                            <img src="Assets/video.png" alt="Lesson 2">
+                        </div>
+                        <div class="video-details">
+                            <div class="video-title">
+                                <h3>Lesson 2: Road Signs</h3>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>            
+            </div>
         </div>
     </div>
     
@@ -91,6 +97,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="module" src="JS/common.js"></script>
     <script type="module" src="JS/sidebar.js"></script>
-    <script type="module" src="JS/uservideos.js"></script> 
+    <script type="module" src="JS/uservideolist.js"></script> 
 </body>
 </html>
