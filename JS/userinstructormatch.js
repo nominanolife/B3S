@@ -430,33 +430,46 @@ function addCommentToUI(commentObj, commentIndex) {
     commentsSection.appendChild(commentElement);
 }
 
-// Prevent new instructor search if all appointments are "Completed"
 async function checkAppointmentProgress(studentId) {
     const appointmentsRef = collection(db, 'appointments');
     const querySnapshot = await getDocs(appointmentsRef);
 
-    let allAppointmentsCompleted = true;  // Assume all are completed initially
+    let feedbackButtonEnabled = false;  // Assume the button will be disabled initially
 
     querySnapshot.forEach((doc) => {
         const appointmentData = doc.data();
 
-        // Check if the booking belongs to the current student and if progress is not "Completed"
+        // Check if the booking belongs to the current student and is "Completed"
         if (appointmentData.bookings && Array.isArray(appointmentData.bookings)) {
             appointmentData.bookings.forEach(booking => {
-                if (booking.userId === studentId && booking.progress !== "Completed") {
-                    // If there is at least one incomplete appointment, don't redirect
-                    allAppointmentsCompleted = false;
+                if (booking.userId === studentId && booking.progress === "Completed") {
+                    const appointmentDate = new Date(booking.date);  // Assuming booking.date is a valid date string
+                    const currentDate = new Date();
+
+                    // Check if the appointment is within 1 day (24 hours)
+                    const timeDifference = currentDate.getTime() - appointmentDate.getTime();
+                    const daysDifference = timeDifference / (1000 * 3600 * 24);
+
+                    if (daysDifference <= 1) {
+                        // Enable the button if the appointment was completed within the last 24 hours
+                        feedbackButtonEnabled = true;
+                    }
                 }
             });
         }
     });
 
-    // Only redirect if all appointments are marked as completed
-    if (allAppointmentsCompleted) {
-        showNotification("You cannot find another instructor because all your appointments are marked as completed.");
-        window.location.href = 'userinstructormatch.html'; // Redirect to the first page
+    // Enable or disable the "Give Feedback" button based on the conditions
+    const feedbackButton = document.getElementById('giveFeedbackBtn');
+    if (feedbackButtonEnabled) {
+        feedbackButton.disabled = false;  // Enable the button
+    } else {
+        feedbackButton.disabled = true;  // Disable the button
     }
 }
+
+// Call this function when the page loads or when you need to update the button state
+checkAppointmentProgress(studentId);
 
 // Fetch and update the UI with the latest rating distribution
 async function updateRatingUI(instructorId) {
