@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DriveHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="CSS/useronlinetdc.css">
+    <link rel="stylesheet" href="CSS/uservideos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
     <link rel="icon" href="Assets/logo.png" type="image/x-icon">
 </head>
 <body>
@@ -43,21 +43,31 @@
                 <h2>Online TDC</h2>
             </div>
             <div class="page-content">
-                <div class="left-content">
-                    <img src="Assets/tdcpic.png" alt="TDC" class="tdc-img">
+                <div class="video-container">
+                    <h3>Lesson 1: LTO Laws</h3>
+                    <video id="lesson-video" controls>
+                        <source src="#" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                 </div>
-                <div class="right-content">
-                    <div class="tdc-content">
-                        <h3>Ready to take your Online TDC exam?</h3>
-                        <p>Online TDC is a platform where you can learn and practice the Traffic Discipline Course (TDC) online. The course is designed to help you understand the rules and regulations of the road and to help you become a better driver. The course is divided into several modules, each covering a different aspect of driving. You can take the course at your own pace and complete it in your own time. Once you have completed the course, you will be awarded a certificate of completion which you can use to show that you have successfully completed the course.</p>
-                        <p>Click on the button below to start the course.</p>
-                        <a href="uservideolist.html" class="btn btn-primary">Start Course</a>
+                <div class="lesson-list hidden">
+                    <i id="toggle-button" class="bi bi-chevron-left"></i>
+                    <div class="lessons">
+                        <ul>
+                            <li><a href="#">Lesson 1: Introduction to LTO</a></li>
+                            <li><a href="#">Lesson 2: LTO Registration Process</a></li>
+                            <li class="locked"><a href="#"><i class="bi bi-lock-fill"></i> Lesson 3: LTO Compliance and Regulations</a></li>
+                            <li class="locked"><a href="#"><i class="bi bi-lock-fill"></i> Lesson 4: Common Violations and Penalties</a></li>
+                            <li class="locked"><a href="#"><i class="bi bi-lock-fill"></i> Lesson 5: LTO Policies and Procedures</a></li>
+                            <li class="locked"><a href="#"><i class="bi bi-lock-fill"></i> Lesson 6: Case Studies on LTO Laws</a></li>
+                            <li class="locked"><a href="#"><i class="bi bi-lock-fill"></i> Lesson 7: Future of LTO Laws</a></li>
+                        </ul>
                     </div>
                 </div>
-            </div> 
+            </div>            
         </div>
     </div>
-
+    
     <!-- Logout Confirmation Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -81,6 +91,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="module" src="JS/common.js"></script>
     <script type="module" src="JS/sidebar.js"></script>
-    <script type="module" src="JS/useronlinetdc.js"></script>
+    <script type="module" src="JS/uservideos.js"></script> 
 </body>
 </html>

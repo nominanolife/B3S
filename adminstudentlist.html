@@ -123,9 +123,9 @@
                 <div class="modal-body first-section">
                     <div class="input-body">
                         <div class="student-info">
-                            <p>Student Name: <span id="studentName">Juan Dela Cruz</span></p>
-                            <p>Date and Time: <span id="dateAndTime">January 1, 2024</span></p>
-                            <p>Assessor Name: <span id="instructorName">Pedro Penduko</span></p>
+                            <p>Student Name:<span id="studentName"></span></p>
+                            <p>Date and Time:<span id="dateAndTime"></span></p>
+                            <p>Assessor Name:<span id="instructorName"></span></p>
                             <div class="vehicle-dropdown">
                                 <p>Vehicle Type:</p>
                                 <div class="custom-dropdown" id="vehicleDropdown">
@@ -142,155 +142,282 @@
                             <table class="evaluation-table">
                                 <thead>
                                     <tr>
-                                        <th>Observation</th>
+                                        <th></th>
                                         <th>Score</th>
                                         <th>Comment</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Eye lead time</td>
-                                        <td><input type="text" class="form-control" id="eyeLeadTime"></td>
+                                        <td class="main">Observation</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main-text">Eye lead time</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="eyeLeadTime">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>                                    
+                                    <tr>
+                                        <td class="main-text">Left – Right / Scanning / Shoulder checks</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="leftRightScanning">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Left – Right / Scanning / Shoulder checks</td>
-                                        <td><input type="text" class="form-control" id="leftRightScanning"></td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Mirrors / tracking traffic</td>
-                                        <td><input type="text" class="form-control" id="mirrorsTracking"></td>
+                                        <td class="main-text">Mirrors / tracking traffic</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="mirrorsTracking">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
-                                <thead>
-                                    <tr>
-                                        <th>Space Management</th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Following defensive distance</td>
-                                        <td><input type="text" class="form-control" id="defensiveDistance"></td>
+                                        <td class="main">Space Management</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main-text">Following defensive distance</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="followingDistance">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Space at Stops</td>
-                                        <td><input type="text" class="form-control" id="spaceAtStops"></td>
+                                        <td class="main-text">Space at Stops</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="spaceAtStops">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Path of least resistance</td>
-                                        <td><input type="text" class="form-control" id="leastResistance"></td>
+                                        <td class="main-text">Path of least resistance</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="leastResistance">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Right-of-way</td>
-                                        <td><input type="text" class="form-control" id="rightOfWay"></td>
+                                        <td class="main-text">Right-of-way</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="rightOfWay">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
-                                <thead>
-                                    <tr>
-                                        <th>Speed Control</th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Acceleration / Deceleration – Smoothness</td>
-                                        <td><input type="text" class="form-control" id="acceleration"></td>
+                                        <td class="main">Speed Control</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main-text">Acceleration / Deceleration – Smoothness</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="acceleration">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Braking: Full Stops, smooth</td>
-                                        <td><input type="text" class="form-control" id="braking"></td>
+                                        <td class="main-text">Braking: Full Stops, smooth</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="braking">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Speed for Conditions</td>
-                                        <td><input type="text" class="form-control" id="speedForConditions"></td>
+                                        <td class="main-text">Speed for Conditions</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="speedForConditions">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Speed and Traffic signs</td>
-                                        <td><input type="text" class="form-control" id="trafficSigns"></td>
+                                        <td class="main-text">Speed and Traffic signs</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="speedAndTrafficSigns">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
-                                <thead>
-                                    <tr>
-                                        <th>Steering</th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Lane / Turn Position / set-up</td>
-                                        <td><input type="text" class="form-control" id="lanePosition"></td>
+                                        <td class="main">Steering</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main-text">Lane / Turn Position / set-up</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="lanePosition">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Steering: hand position, smoothness</td>
-                                        <td><input type="text" class="form-control" id="steering"></td>
+                                        <td class="main-text">Steering: hand position, smoothness</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="steering">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
-                                <thead>
-                                    <tr>
-                                        <th>Communication</th>
-                                        <th></th>
-                                        <th></th>
+                                <tbody>
+                                    <tr class="main">
+                                        <td>Communication</td>
+                                        <td></td>
+                                        <td></td>
                                     </tr>
-                                </thead>
+                                </tbody>
                                 <tbody>
                                     <tr>
-                                        <td>Signals: timing and use</td>
-                                        <td><input type="text" class="form-control" id="signals"></td>
+                                        <td class="main-text">Signals: timing and use</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="signals">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Other: i.e horn, eye contact</td>
-                                        <td><input type="text" class="form-control" id="eyeContact"></td>
+                                        <td class="main-text">Other: i.e horn, eye contact</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="eyeContact">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
-                                <thead>
-                                    <tr>
-                                        <th>General</th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Seating, head rest position, and mirror adjustment: seatbelt use</td>
-                                        <td><input type="text" class="form-control" id="seating"></td>
+                                        <td class="main">General</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main-text">Seating, head rest position, and mirror adjustment: seatbelt use</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="seating">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Parking / Backing</td>
-                                        <td><input type="text" class="form-control" id="parking"></td>
+                                        <td class="main-text">Parking / Backing</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="parking">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Anticipation: Adjusts</td>
-                                        <td><input type="text" class="form-control" id="anticipation"></td>
+                                        <td class="main-text">Anticipation: Adjusts</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="anticipation">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Judgment: decisions</td>
-                                        <td><input type="text" class="form-control" id="judgment"></td>
+                                        <td class="main-text">Judgment: decisions</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="judgment">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
-                                        <td>Timing: approach, Traffic interactions</td>
-                                        <td><input type="text" class="form-control" id="timing"></td>
+                                        <td class="main-text">Timing: approach, Traffic interactions</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input" id="timing">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
                                         <td><textarea class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
@@ -339,7 +466,7 @@
                                             b. Starting Procedure
                                         </td>
                                         <td>
-                                            <label class="custom-checkbox">
+                                            <label class="custom-checkbox1">
                                                 <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicB">
                                                 <span></span>
                                             </label>
@@ -617,112 +744,319 @@
                         </div>
                         <div class="checkbox-checklist">
                             <h5>Evaluation</h5>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Start the engine</span>
-                                </label>
-                                <div class="form-group2">
-                                    <label class="custom-radio">
-                                        <input type="radio" name="vehicle" id="vehicle-car" value="car">
-                                        <span class="radio-label">Moving off, riding ahead and stopping</span>
-                                    </label>
-                                    <label class="custom-radio">
-                                        <input type="radio" name="vehicle" id="vehicle-motorcycle" value="motorcycle">
-                                        <span class="radio-label">Positioning in different environments</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Choice of speed in different situations (low speed balancing)</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Hill riding</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Riding along a curve or bend (cornering)</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Approaching and passing railway crossings</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Lane shift and choice of lanes</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Turning and lane changing</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Interaction with various road users (riders, cyclists, pedestrians, and other vehicles)</span>
-                                </label>
-                                <div class="form-group2">
-                                    <label class="custom-radio">
-                                        <input type="radio" name="vehicle" id="vehicle-car" value="car">
-                                        <span class="radio-label">Passing stationary vehicles and pedestrians</span>
-                                    </label>
-                                    <label class="custom-radio">
-                                        <input type="radio" name="vehicle" id="vehicle-motorcycle" value="motorcycle">
-                                        <span class="radio-label">Meeting oncoming traffic</span>
-                                    </label>
-                                    <label class="custom-radio">
-                                        <input type="radio" name="vehicle" id="vehicle-car" value="car">
-                                        <span class="radio-label">Riding ahead of or behind other road users</span>
-                                    </label>
-                                    <label class="custom-radio">
-                                        <input type="radio" name="vehicle" id="vehicle-motorcycle" value="motorcycle">
-                                        <span class="radio-label">Riding side by side</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Overtaking</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Riding in different kinds of junctions (straight through, turning left or right, with or without obligation to give the right of way, ABC of passing junction)</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Approaching, riding in and leaving roundabouts</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Stopping and parking</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">Riding with a back ride</span>
-                                </label>
-                            </div>
+                            <table class="evaluation-table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Score</th>
+                                        <th>Comment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="main">Start the engine</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Moving off, riding ahead and stopping</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Positioning in different environments</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Choice of speed in different situations (low speed balancing)</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">10</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Hill riding</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">8</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Riding along a curve or bend (cornering)</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">8</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Approaching and passing railway crossings</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">6</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Lane shift and choice of lanes</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">6</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Turning and lane changing</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">6</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Interaction with various road users</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Passing stationary vehicles and pedestrians</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">2</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Meeting oncoming traffic</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">3</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Riding ahead of or behind other road users</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">2</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Riding side by side</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">3</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Overtaking</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">6</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Riding in different kinds of junctions</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Straight through</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">2</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Turning Left or Right</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">3</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">With or Without obligation to give the right of way</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">2</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">ABC of passing junction</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">3</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Approaching, riding in and leaving roundabouts</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">8</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Stopping and parking</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">6</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Riding with a back ride</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <input type="text" class="form-control numeric-input">
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">6</span>
+                                            </div>
+                                        </td>
+                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                    </tr>
+                                </tbody>
+                                <thead>
+                                    <tr>
+                                        <th>Total Score (out of 100)</th>
+                                        <th><span>0 / 100</span></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -1044,7 +1378,7 @@
                     <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
                 </div>
                 <div class="modal-body" id="confirmationModalBody">
-                    <p>Are you sure you want to complete the appointment of this student?</p>
+                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" id="confirmButton">Confirm</button>
