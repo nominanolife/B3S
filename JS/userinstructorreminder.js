@@ -350,7 +350,7 @@ function loadSavedTraits(savedTraits) {
 
     // Iterate over saved traits and add them one by one
     savedTraits.forEach(trait => {
-        if (!['Determined', 'Anxious', 'Adaptable', 'Curious', 'Patient'].includes(trait)) {
+        if (!['Shy', 'Bold', 'Timid', 'Outgoing', 'Quiet', 'Impulsive'].includes(trait)) {
             addTrait(trait);  // Add custom traits individually
         } else {
             // Check predefined traits if they match saved traits

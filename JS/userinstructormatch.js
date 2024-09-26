@@ -359,10 +359,6 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
 
             // Update match status to 'Completed' after feedback submission
             await completeMatch(studentId);  // Call the completeMatch function
-
-            // Redirect after submitting feedback
-            window.location.href = 'userdashboard.html';  // Redirect to dashboard after feedback submission
-
         } else {
             console.error("Instructor not found.");
         }
@@ -526,7 +522,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function showNotification(message) {
-    const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'), {});
     document.getElementById('notificationMessage').textContent = message;
-    notificationModal.show();
+    $('#notificationModal').modal('show');
 }

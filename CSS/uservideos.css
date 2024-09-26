@@ -190,24 +190,17 @@ h2 {
     overflow: hidden;
 }
 
-.video-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex-grow: 1;
-}
-
 .video-container h3 {
     font-family: Poppins;
     font-size: 20px;
     font-weight: bold;
     color: #142A74;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .video-container video {
     width: 100%;
-    height: 95%;
+    height: 85%;
 }
 
 #toggle-button {
@@ -219,86 +212,79 @@ h2 {
     background-color: #ffffff;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
+    border-top: 1px solid #D9D9D9;
+    border-bottom: 1px solid #D9D9D9;
+    border-left: 1px solid #D9D9D9;
     cursor: pointer;
     padding: 10px;
     transition: color 0.3s ease, transform 0.3s ease;
 }
 
-#toggle-button:hover {
-    color: #142A74;
-}
-
 .lesson-list {
+    top: 5%;
+    right: -300px;
     width: 300px;
+    height: 90%;
+    max-height: 800px;
     background-color: #ffffff;
     color: #142A74;
-    padding: 20px;
+    padding: 20px 0px 20px 20px;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 5%;
-    right: -300px;
-    height: 90%;
     transition: right 0.7s ease-in-out;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 1;
 }
 
 .lesson-list.show {
     right: 0;
 }
 
-.lessons {
-    font-family: Poppins, sans-serif;
-    font-size: 16px;
-    color: #142A74;
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+.lessons, .exams {
     display: flex;
     flex-direction: column;
-}
-
-.lessons {
-    font-family: Poppins, sans-serif;
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: 600;
     color: #142A74;
     list-style-type: none;
     padding: 0;
     margin: 0;
+    overflow-y: auto;
+    max-height: 100%;
 }
 
-.lessons ul {
+.lessons ul, .exams ul {
     padding: 0;
     margin: 0;
     list-style: none;
 }
 
-.lessons li {
+.lessons li, .exams li {
     display: block;
+    display: flex;
+    flex-direction: row;
     padding: 10px 15px;
     color: #142A74;
     border-radius: 8px;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
-.lessons li:hover {
+.lessons li:hover, .exams li:hover {
     background-color: #f5f5f5;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
     cursor: pointer;
 }
 
-.lessons li a {
+.lessons li a, .exams li a {
     text-decoration: none;
     color: #142A74;
-    font-weight: 500;
+    font-weight: 600;
     display: block;
 }
 
-.lessons li a:hover {
+.lessons li a:hover, .exams li a:hover {
     color: #142A74;
 }
 
@@ -306,19 +292,195 @@ h2 {
     font-size: 14px;
     opacity: 0.6;
     pointer-events: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
 }
 
 .locked a {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    cursor: not-allowed;
 }
 
 .locked i {
-    margin-right: 10px;
-    color: #2F2E2E;
+    font-size: 18px;
+    color: #142A74;
 }
 
+.lessons::-webkit-scrollbar {
+    width: 8px;
+}
+
+.lessons::-webkit-scrollbar-thumb {
+    background-color: #babbbd;
+    border-radius: 10px;
+}
+
+.lessons::-webkit-scrollbar-thumb:hover {
+    background-color: #2F2E2E;
+}
+
+.chat-content {
+    top: 94%;
+    right: 100px;
+    width: 350px;
+    height: 55%;
+    max-height: 800px;
+    background-color: #ffffff;
+    color: #142A74;
+    border-radius: 10px 10px 0px 0px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    transition: top 0.7s ease-in-out;
+}
+
+.chat-content.show {
+    top: 45%;
+}
+
+.chat-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #334992;
+    border-radius: 10px 10px 0px 0px;
+}
+
+.chat-header h3 {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 0;
+}
+
+.chat-header i {
+    font-size: 20px;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.chat-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    flex: 1;
+    padding: 20px;
+    gap: 10px;
+    overflow-y: auto;
+}
+
+.chat-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-body::-webkit-scrollbar-thumb {
+    background-color: #babbbd;
+    border-radius: 10px;
+}
+
+.chat-body::-webkit-scrollbar-thumb:hover {
+    background-color: #2F2E2E;
+}
+
+.chat-body-message {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-body-message img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background-color: #dfe4ea;
+}
+
+.chat-body-message {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.chat-body-message.user-message {
+    justify-content: flex-end;
+}
+
+.chat-body-message-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 75%;
+}
+
+.chat-body-message.user-message .chat-body-message-content {
+    background-color: #e0f7fa;
+    margin-left: 10px;
+}
+
+.chat-body-message img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background-color: #dfe4ea;
+}
+
+.chat-body-message-content p {
+    font-family: Poppins;
+    font-size: 12px;
+    color: #142A74;
+    margin: 0;
+}
+
+.message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.message-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+}
+
+.message-container input {
+    background-color: #f5f5f5;
+    color: #142A74;
+    outline: none;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.send {
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: #334992;
+}
 
 @keyframes popOut {
     0% {
