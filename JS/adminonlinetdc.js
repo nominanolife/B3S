@@ -291,7 +291,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div class="delete-question">
                     <button class="delete-question-btn">Delete</button>
-                </div>`;
+                </div>
+            </div>`;
 
         quizContent.appendChild(newQuestion);
 
