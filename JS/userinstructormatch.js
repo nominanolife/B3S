@@ -359,10 +359,6 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
 
             // Update match status to 'Completed' after feedback submission
             await completeMatch(studentId);  // Call the completeMatch function
-
-            // Redirect after submitting feedback
-            window.location.href = 'userdashboard.html';  // Redirect to dashboard after feedback submission
-
         } else {
             console.error("Instructor not found.");
         }
@@ -434,7 +430,7 @@ async function checkAppointmentProgress(studentId) {
     const appointmentsRef = collection(db, 'appointments');
     const querySnapshot = await getDocs(appointmentsRef);
 
-    let feedbackButtonEnabled = false;  // Assume the button will be disabled initially
+    let feedbackButtonVisible = false;  // Assume the button will be hidden initially
 
     querySnapshot.forEach((doc) => {
         const appointmentData = doc.data();
@@ -451,20 +447,20 @@ async function checkAppointmentProgress(studentId) {
                     const daysDifference = timeDifference / (1000 * 3600 * 24);
 
                     if (daysDifference <= 1) {
-                        // Enable the button if the appointment was completed within the last 24 hours
-                        feedbackButtonEnabled = true;
+                        // Show the button if the appointment was completed within the last 24 hours
+                        feedbackButtonVisible = true;
                     }
                 }
             });
         }
     });
 
-    // Enable or disable the "Give Feedback" button based on the conditions
+    // Show or hide the "Give Feedback" button based on the conditions
     const feedbackButton = document.getElementById('giveFeedbackBtn');
-    if (feedbackButtonEnabled) {
-        feedbackButton.disabled = false;  // Enable the button
+    if (feedbackButtonVisible) {
+        feedbackButton.style.display = 'block';  // Show the button
     } else {
-        feedbackButton.disabled = true;  // Disable the button
+        feedbackButton.style.display = 'none';  // Hide the button
     }
 }
 
@@ -526,7 +522,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function showNotification(message) {
-    const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'), {});
     document.getElementById('notificationMessage').textContent = message;
-    notificationModal.show();
+    $('#notificationModal').modal('show');
 }

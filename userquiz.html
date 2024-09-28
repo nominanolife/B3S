@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DriveHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="CSS/uservideos.css">
+    <link rel="stylesheet" href="CSS/userquiz.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -43,58 +43,72 @@
                 <h2>Online TDC</h2>
             </div>
             <div class="page-content">
-                <div class="video-container">
-                    <h3>Lesson 1: LTO Laws</h3>
-                    <video id="lesson-video" controls>
-                        <source src="#" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill"></div>
                 </div>
-                <div class="lesson-list show">
-                    <i id="toggle-button" class="bi bi-chevron-right"></i>
-                    <div class="lessons">
-                        <ul>
-                            <li><a href="#">Lesson 1: Introduction to LTO</a></li>
-                            <li><a href="#">Lesson 2: LTO Registration Process</a></li>
-                            <li class="locked"><a href="#">Lesson 3: LTO Compliance and Regulations</a><i class="bi bi-lock"></i></li>
-                            <li class="locked"><a href="#">Lesson 4: Common Violations and Penalties</a><i class="bi bi-lock"></i></li>
-                            <li class="locked"><a href="#">Lesson 5: LTO Policies and Procedures</a><i class="bi bi-lock"></i></li>
-                            <li class="locked"><a href="#">Lesson 6: Case Studies on LTO Laws</a><i class="bi bi-lock"></i></li>
-                            <li class="locked"><a href="#">Lesson 7: Future of LTO Laws</a><i class="bi bi-lock"></i></li>
-                        </ul>
+                <div class="quiz-container">
+                    <div class="quiz-container-header">
+                        <h5>Question 1</h5>
+                        <div class="quiz-progress">
+                            <span></span>
+                        </div>
                     </div>
-                    <div class="exams">
-                        <ul>
-                            <li class="locked"><a href="#">Written Exam</a><i class="bi bi-lock"></i></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="chat-content hidden">
-                    <div class="chat-header">
-                        <h3>DriveHub Chatbot</h3>
-                        <i id="toggle-chat" class="bi bi-chevron-up"></i>
-                    </div>
-                    <div class="chat-body">
-                        <div class="chat-body-message bot-message">
-                            <img src="Assets/logo.png" alt="DriveHub Logo">
-                            <div class="chat-body-message-content">
-                                <p>Hi! I'm DriveHub Chatbot. What questions would you like to ask?</p>
+                    <div class="quiz-question">
+                        <form class="quiz-question-body">
+                            <div class="quiz-image">
+                                <img src="Assets/b3s team.png" alt="Quiz Image">
+                            </div>
+                            <div class="questions-and-answer">
+                                <h4>1. What is the legal blood alcohol concentration (BAC) limit for driving in most states?</h4>
+                                <div class="question-options">
+                                    <div class="option">
+                                        <input type="radio" name="questionanswer">
+                                        <span class="option-answer">A.</span>
+                                        <p>0.05%</p>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="questionanswer">
+                                        <span class="option-answer">B.</span>
+                                        <p>0.08%</p>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="questionanswer">
+                                        <span class="option-answer">C.</span>
+                                        <p>0.10%</p>
+                                    </div>
+                                    <div class="option">
+                                        <input type="radio" name="questionanswer">
+                                        <span class="option-answer">D.</span>
+                                        <p>0.02%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="buttons">
+                            <button type="button" class="back-btn">Back</button>
+                            <div class="right-buttons">
+                                <button type="button" class="next-btn">Next</button>
+                                <button type="button" class="save-btn">Submit</button>
                             </div>
                         </div>
-                        <div class="chat-body-message user-message">
-                            <div class="chat-body-message-content">
-                                <p>Hello! I need help with my account.</p>
-                            </div>
-                        </div>
                     </div>
-                    <form class="message">
-                        <div class="message-container">
-                            <input type="text" id="chat-message" placeholder="Type a message...">
-                            <button type="submit" class="send">
-                                <i class="bi bi-send-fill"></i>
-                            </button>
-                        </div>
-                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Dynamic notification message will go here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
                 </div>
             </div>
         </div>
@@ -123,6 +137,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="module" src="JS/common.js"></script>
     <script type="module" src="JS/sidebar.js"></script>
-    <script type="module" src="JS/uservideos.js"></script> 
+    <script type="module" src="JS/userquiz.js"></script> 
 </body>
 </html>

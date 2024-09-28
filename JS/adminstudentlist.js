@@ -639,23 +639,28 @@ const maxScores = {
 
 // Function to calculate the total score for the assessment form
 function calculateTotalScore() {
-    let totalScore = 0;
+  let totalScore = 0;
+  
+  // Iterate over each field and sum their values
+  fields.forEach(field => {
+      const fieldValue = parseFloat(document.getElementById(field.id)?.value) || 0;
+      
+      // Ensure that the value is a valid number within the allowed range
+      if (fieldValue >= 0 && fieldValue <= 5) {
+          totalScore += fieldValue;
+      }
+  });
 
-    // Loop through each field to calculate the total score
-    fields.forEach(field => {
-        const fieldValue = parseFloat(document.getElementById(field.id).value) || 0;
-        totalScore += fieldValue;
-    });
+  // Display the total score out of 100
+  const totalScoreOutOf100 = totalScore; // Adjust this if you want scaling
+  document.getElementById('totalScore').textContent = `${totalScoreOutOf100} / 100`;
 
-    // Display the total score
-    document.getElementById('totalScore').textContent = `${totalScore} / 100`;
+  // Validate and display a warning if the total score exceeds 100
+  if (totalScoreOutOf100 > 100) {
+      showNotification('Total score exceeds 100. Please adjust the scores.');
+  }
 
-    // Validate and display a warning if the total score exceeds 100
-    if (totalScore > 100) {
-        showNotification('Total score exceeds 100. Please adjust the scores.');
-    }
-
-    return totalScore; // Return the total score for use in other functions
+  return totalScoreOutOf100; // Return the total score
 }
 
 // Function to save assessment data to session storage
@@ -857,24 +862,29 @@ async function saveAllDataToFirestore() {
   }
 }
 
-// Attach event listeners to input fields for real-time calculation
+// Attach event listeners to input fields for real-time calculation and prevent exceeding 5
 document.querySelectorAll('input.numeric-input').forEach(input => {
   input.addEventListener('input', function (event) {
-    // Allow only digits and one decimal point
-    this.value = this.value.replace(/[^0-9.]/g, ''); 
+      // Remove non-numeric characters
+      this.value = this.value.replace(/[^0-9.]/g, '');
 
-    // Ensure there's only one decimal point in the input
-    if ((this.value.match(/\./g) || []).length > 1) {
-      this.value = this.value.slice(0, -1);
-    }
+      // Ensure there's only one decimal point in the input
+      if ((this.value.match(/\./g) || []).length > 1) {
+          this.value = this.value.slice(0, -1);
+      }
 
-    // Optional: Ensure the score is between 0 and 100
-    if (parseFloat(this.value) > 100) {
-      this.value = '100';
-    }
+      // Limit the value to a maximum of 5
+      if (parseFloat(this.value) > 5) {
+          this.value = '5';
+      }
 
-    // Recalculate the total score after filtering
-    calculateTotalScore();
+      // Ensure the value is between 0 and 5
+      if (parseFloat(this.value) < 0) {
+          this.value = '0';
+      }
+
+      // Recalculate the total score after filtering
+      calculateTotalScore();
   });
 });
 
