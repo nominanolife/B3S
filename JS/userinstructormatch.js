@@ -430,7 +430,7 @@ async function checkAppointmentProgress(studentId) {
     const appointmentsRef = collection(db, 'appointments');
     const querySnapshot = await getDocs(appointmentsRef);
 
-    let feedbackButtonEnabled = false;  // Assume the button will be disabled initially
+    let feedbackButtonVisible = false;  // Assume the button will be hidden initially
 
     querySnapshot.forEach((doc) => {
         const appointmentData = doc.data();
@@ -447,20 +447,20 @@ async function checkAppointmentProgress(studentId) {
                     const daysDifference = timeDifference / (1000 * 3600 * 24);
 
                     if (daysDifference <= 1) {
-                        // Enable the button if the appointment was completed within the last 24 hours
-                        feedbackButtonEnabled = true;
+                        // Show the button if the appointment was completed within the last 24 hours
+                        feedbackButtonVisible = true;
                     }
                 }
             });
         }
     });
 
-    // Enable or disable the "Give Feedback" button based on the conditions
+    // Show or hide the "Give Feedback" button based on the conditions
     const feedbackButton = document.getElementById('giveFeedbackBtn');
-    if (feedbackButtonEnabled) {
-        feedbackButton.disabled = false;  // Enable the button
+    if (feedbackButtonVisible) {
+        feedbackButton.style.display = 'block';  // Show the button
     } else {
-        feedbackButton.disabled = true;  // Disable the button
+        feedbackButton.style.display = 'none';  // Hide the button
     }
 }
 

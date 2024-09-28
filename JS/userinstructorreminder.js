@@ -311,16 +311,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Function to fetch and display saved traits from Firestore
+// Function to fetch and display saved traits
 function loadSavedTraits(savedTraits) {
-    // Clear previous dynamic checkboxes
-    const dynamicTraitsContainer = document.getElementById('dynamicTraits');
-    dynamicTraitsContainer.innerHTML = ''; // Make sure this element exists in your HTML
+    // Get the container that holds all the form groups
+    const formGroupAll = document.querySelector('.form-group-all');
+
+    // Remove any previous dynamically added traits
+    formGroupAll.querySelectorAll('.form-group.dynamic-trait').forEach(element => element.remove());
 
     // Function to create and add a new checkbox for a trait
     function addTrait(trait) {
         // Create form group
         const formGroup = document.createElement('div');
-        formGroup.className = 'form-group';
+        formGroup.className = 'form-group dynamic-trait';  // Add class to identify dynamic traits
 
         // Create checkbox input
         const checkbox = document.createElement('input');
@@ -331,7 +334,6 @@ function loadSavedTraits(savedTraits) {
 
         // Create label for the checkbox
         const label = document.createElement('label');
-        label.htmlFor = checkbox.id;
         label.className = 'custom-checkbox';
 
         // Create span for the label text
@@ -339,19 +341,20 @@ function loadSavedTraits(savedTraits) {
         span.className = 'checkbox-label';
         span.innerText = trait;
 
-        // Append elements
+        // Append checkbox and label
         label.appendChild(checkbox);
         label.appendChild(span);
         formGroup.appendChild(label);
 
-        // Append to the dynamic traits container
-        dynamicTraitsContainer.appendChild(formGroup);
+        // Insert before the "Other traits" input
+        const otherTraitsFormGroup = formGroupAll.querySelector('.form-group:last-of-type');
+        formGroupAll.insertBefore(formGroup, otherTraitsFormGroup);
     }
 
-    // Iterate over saved traits and add them one by one
+    // Iterate over saved traits and add them
     savedTraits.forEach(trait => {
         if (!['Shy', 'Bold', 'Timid', 'Outgoing', 'Quiet', 'Impulsive'].includes(trait)) {
-            addTrait(trait);  // Add custom traits individually
+            addTrait(trait);  // Add custom traits
         } else {
             // Check predefined traits if they match saved traits
             document.querySelectorAll('input[name="traits"]').forEach(checkbox => {
