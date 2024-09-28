@@ -46,21 +46,7 @@
             <div class="page-content">
                 <div class="course-content">
                     <div class="course-content-list">
-                        <div class="course-image">
-                            <i class="bi bi-image-fill"></i>
-                        </div>
-                        <div class="course-details">
-                            <div class="course-title">
-                                <h3>Road Rules and Regulations</h3>
-                            </div>
-                            <div class="course-options">
-                                <i class="bi bi-three-dots-vertical"></i>
-                                <div class="triple-dot-options">
-                                    <i class="option-dropdown">Edit</i>
-                                    <i class="option-dropdown">Delete</i>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Course cards will be dynamically generated here -->
                     </div>
                     <div class="upload-container">
                         <div class="upload-box">
@@ -106,7 +92,7 @@
                         <div class="upload-video">
                             <div class="category">
                                 <h5>Category</h5>
-                                <div class="selected">Select a category</div>
+                                <div class="selected" id="selectedCategory">Select a category</div>
                                 <ul class="dropdown-options">
                                     <li class="options" data-value="1">Road Rules and Regulations</li>
                                     <li class="options" data-value="2">Defensive Driving</li>
@@ -187,6 +173,15 @@
                         <div class="preview">
                             <h5>Preview</h5>
                             <div class="preview-container">
+                                <h5>Category</h5>
+                                <div id="categoryPreviewContainer">
+                                    <!-- Selected category will be displayed here -->
+                                </div>
+                            </div>
+                        </div>                            
+                            <div class="preview">
+                            <h5>Preview</h5>
+                            <div class="preview-container">
                                 <div class="video-preview">
                                     <h5>Video</h5>
                                     <div id="videoPreviewContainer">
@@ -253,7 +248,7 @@
                         <div class="upload-video">
                             <div class="category">
                                 <h5>Category</h5>
-                                <div class="selected">Select a category</div>
+                                <div class="selected" id="editSelectedCategory">Select a category</div>
                                 <ul class="dropdown-options">
                                     <li class="options" data-value="1">Road Rules and Regulations</li>
                                     <li class="options" data-value="2">Defensive Driving</li>
@@ -262,7 +257,7 @@
                             </div>
                             <div class="video-title">
                                 <h5>Title</h5>
-                                <input type="text" id="videoTitleInput" placeholder="Enter video title">
+                                <input type="text" id="editVideoTitleInput" placeholder="Enter video title">
                             </div>                            
                             <div class="video-thumbnail">
                                 <h5>Edit Video Thumbnail</h5>
@@ -271,7 +266,7 @@
                                         <i class="bi bi-image-fill"></i>
                                         <p>Add Image</p>
                                     </div>
-                                    <input type="file" id="thumbnailUpload" accept="image/*">
+                                    <input type="file" id="editThumbnailUpload" accept="image/*">
                                 </div>
                             </div>
                             <div class="video-upload">
@@ -281,7 +276,7 @@
                                         <i class="bi bi-file-earmark-play-fill"></i>
                                         <p>Add Video</p>
                                     </div>
-                                    <input type="file" id="videoUpload" accept="video/*">
+                                    <input type="file" id="editVideoUpload" accept="video/*">
                                 </div>
                             </div>
                         </div>
@@ -304,15 +299,18 @@
                                 <div class="title">Edit Preview</div>
                             </div>
                         </div>
-                        <div class="upload-quiz-container">
+                        <!-- Updated class name -->
+                        <div class="edit-quiz-container">
                             <div class="quiz-content">
                                 <h5>Quiz</h5>
+                                <!-- Questions should dynamically load here -->
                             </div>
                             <div class="add-question-container">
                                 <button type="button" class="add-question">Add Question</button>
                             </div>
                         </div>
                     </div>
+
                     <!-- Step 3: Edit Preview -->
                     <div id="editstep3" class="modal-step d-none">
                         <div class="progress-container">
@@ -331,39 +329,60 @@
                                 <div class="title">Edit Preview</div>
                             </div>
                         </div>
+
                         <div class="preview">
                             <h5>Preview</h5>
                             <div class="preview-container">
+                                <!-- Category Preview -->
+                                <h5>Category</h5>
+                                <div id="editCategoryPreviewContainer">
+                                    <!-- Selected category will be displayed here -->
+                                </div>
+                            </div>
+                        </div>  
+
+                        <div class="preview">
+                            <h5>Preview</h5>
+                            
+                            <!-- Add the Video Title Preview -->
+                            <div class="preview-container">
+                                <div class="video-title-preview">
+                                    <h5>Video Title</h5>
+                                    <div id="editVideoTitlePreviewContainer"></div> <!-- Dedicated space for video title -->
+                                </div>
+                            </div>
+
+                            <div class="preview-container">
+                                <!-- Video Preview -->
                                 <div class="video-preview">
                                     <h5>Video</h5>
-                                    <div class="video-preview-container">
-
-                                    </div>
+                                    <div id="editVideoPreviewContainer"></div>
                                 </div>
                             </div>
+                            
                             <div class="preview-container">
+                                <!-- Thumbnail Preview -->
                                 <div class="thumbnail-preview">
                                     <h5>Video Display</h5>
-                                    <div class="thumbnail-preview-container">
-
-                                    </div>
+                                    <div id="editThumbnailPreviewContainer"></div>
                                 </div>
                             </div>
+
                             <div class="preview-container">
+                                <!-- Quiz Preview -->
                                 <div class="quiz-preview">
                                     <h5>Quiz</h5>
-                                    <div class="quiz-preview-container">
-                                        
+                                    <div id="editQuizPreviewContainer">
+                                        <!-- Quiz questions should dynamically load here for preview -->
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 <div class="modal-footer">
                     <button type="button" class="back-btn">Back</button>
                     <button type="button" class="next-btn">Next</button>
-                    <button type="button" class="save-btn">Save</button>
+                    <button type="button" class="editSavebtn">Save</button>
                 </div>
             </div>
         </div>
@@ -377,10 +396,10 @@
                     <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this instructor?
+                    Are you sure you want to delete this lesson?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary">Delete</button>
+                    <button type="button" class="btn btn-primary" id="confirmDeleteBtn">Delete</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -422,11 +441,11 @@
         </div>
     </div>
     
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="JS/adminonlinetdc.js"></script>
+    <script type="module" src="JS/adminonlinetdc.js"></script>
     <script src="JS/admincommon.js"></script>
 
 </body>
