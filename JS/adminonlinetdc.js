@@ -413,86 +413,82 @@ function updateEditPreview() {
     }
 }
 
-function showDeleteModal(videoId) {
-    console.log('Opening delete modal for video:', videoId);
-    
-    // Show the modal using jQuery for Bootstrap 4.x
-    $('#deleteConfirmationModal').modal('show');
-
-    // Attach the delete function to the confirmation button
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    confirmDeleteBtn.onclick = () => {
-        console.log('Confirmed delete for video ID:', videoId);
-        deleteLesson(videoId);
-        $('#deleteConfirmationModal').modal('hide'); // Hide the modal after deletion
-    };
-}
-
-
 async function deleteLesson(videoId) {
     try {
-        console.log('Attempting to delete video with ID:', videoId);
-
-        // Reference to the Firestore document
+        // Step 1: Retrieve the video document to get the video and thumbnail URLs
         const videoDocRef = doc(db, 'videos', videoId);
-
-        // Fetch the video document to get storage URLs for the video and thumbnail
-        const videoDoc = await getDoc(videoDocRef);
-        if (!videoDoc.exists()) {
-            console.error('Video not found in Firestore.');
-            return;
+        const videoDocSnapshot = await getDoc(videoDocRef);
+        if (!videoDocSnapshot.exists()) {
+            throw new Error('Video document not found.');
         }
 
-        const videoData = videoDoc.data();
-        const videoFileName = videoData.videoFileName;  // Assuming video filename is stored in Firestore
-        const thumbnailFileName = videoData.thumbnailFileName;  // Assuming thumbnail filename is stored in Firestore
+        const videoData = videoDocSnapshot.data();
+        const videoURL = videoData.videoURL;
+        const thumbnailURL = videoData.thumbnailURL;
 
-        // Create the correct storage references based on your structure
-
-        // Delete the video file from the /videos/ folder in Firebase Storage
-        const videoRef = ref(storage, `videos/${videoFileName}`);
-        await deleteObject(videoRef);
-        console.log('Video file deleted from Firebase Storage.');
-
-        // Delete the thumbnail image from the /thumbnails/ folder in Firebase Storage
-        const thumbnailRef = ref(storage, `thumbnails/${thumbnailFileName}`);
-        await deleteObject(thumbnailRef);
-        console.log('Thumbnail image deleted from Firebase Storage.');
-
-        // Delete the video document from Firestore
+        // Step 2: Delete the video document from Firestore
         await deleteDoc(videoDocRef);
-        console.log('Video document deleted from Firestore.');
+        console.log('Video document deleted successfully.');
 
-        // Optionally, delete associated quizzes and their images
+        // Step 3: Delete related quiz document from Firestore
         const quizQuery = query(collection(db, 'quizzes'), where('videoId', '==', videoId));
         const quizSnapshot = await getDocs(quizQuery);
-        for (const quizDoc of quizSnapshot.docs) {
-            const quizData = quizDoc.data();
+        quizSnapshot.forEach(async (quizDoc) => {
+            await deleteDoc(doc(db, 'quizzes', quizDoc.id));
+            console.log('Quiz document deleted successfully.');
+        });
 
-            // Check if the quiz has images to delete
-            if (quizData.quizImageFileName) {
-                const quizImageRef = ref(storage, `quiz_images/${quizData.quizImageFileName}`);
-                await deleteObject(quizImageRef);
-                console.log(`Deleted quiz image: ${quizData.quizImageFileName}`);
+        // Step 4: Delete video file from Firebase Storage
+        if (videoURL) {
+            const videoRef = ref(storage, videoURL);
+            await deleteObject(videoRef);
+            console.log('Video file deleted successfully.');
+        }
+
+        // Step 5: Delete thumbnail file from Firebase Storage
+        if (thumbnailURL) {
+            const thumbnailRef = ref(storage, thumbnailURL);
+            await deleteObject(thumbnailRef);
+            console.log('Thumbnail file deleted successfully.');
+        }
+
+        // Step 6: Delete any quiz images associated with the video
+        for (let i = 1; i <= quizSnapshot.docs.length; i++) {
+            // Handle multiple file types (jpg and png)
+            const quizImageExtensions = ['jpg', 'png']; // Add any other supported formats
+            for (const extension of quizImageExtensions) {
+                const quizImageRef = ref(storage, `quiz_images/${videoId}_question_${i}.${extension}`);
+                try {
+                    await deleteObject(quizImageRef);
+                    console.log(`Quiz image ${i} with extension ${extension} deleted successfully.`);
+                } catch (error) {
+                    if (error.code === 'storage/object-not-found') {
+                        console.log(`Quiz image ${i} with extension ${extension} not found (which is okay).`);
+                    } else {
+                        throw error; // Re-throw if it's another error
+                    }
+                }
             }
-
-            // Delete each quiz document associated with the video
-            await deleteDoc(quizDoc.ref);
-            console.log('Deleted associated quiz:', quizDoc.id);
         }
 
-        console.log('All related quizzes and quiz images deleted successfully.');
-
-        // Remove the deleted video card from the UI
-        const videoCard = document.querySelector(`.course-card[data-id="${videoId}"]`);
-        if (videoCard) {
-            videoCard.remove();
-        }
-        console.log('Video card removed from the UI.');
-
+        alert('Lesson and related data deleted successfully.');
+        
     } catch (error) {
-        console.error('Error deleting video:', error);
-        alert('Failed to delete the video. Please try again.');
+        console.error('Error deleting lesson:', error);
+        alert('An error occurred while deleting the lesson. Please try again.');
+    }
+}
+
+function showDeleteModal(videoId) {
+    console.log('Opening delete alert for video:', videoId);
+
+    // Instead of showing the modal, directly use an alert to confirm the delete action
+    if (confirm('Are you sure you want to delete this lesson?')) {
+        // If the user clicks "OK", proceed with the delete function
+        deleteLesson(videoId);
+    } else {
+        // If the user clicks "Cancel", just log the action
+        console.log('Deletion canceled for video ID:', videoId);
     }
 }
 
