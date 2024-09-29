@@ -272,6 +272,7 @@ document.addEventListener('DOMContentLoaded', function () {
   fetchInstructors();
 });
 
+// Function to add custom traits from the input
 addTraitButton.addEventListener('click', function(event) {
   event.preventDefault();
   let trait = traitsInput.value.trim();
@@ -301,14 +302,23 @@ addTraitButton.addEventListener('click', function(event) {
   }
 });
 
-// Function to save or edit instructor details
+// Save instructor logic
 async function saveInstructor(event) {
   event.preventDefault();
 
-  const name = instructorNameInput.value.trim();
-  const selectedCourses = Array.from(document.querySelectorAll('.custom-checkbox input[type="checkbox"]:checked')).map(input => input.nextElementSibling.innerText);
+  const name = document.querySelector('.instructor-name').value.trim();
+  const selectedCourses = Array.from(document.querySelectorAll('input[name="courses"]:checked')).map(input => input.nextElementSibling.innerText);
+  
+  // Get predefined traits (checkbox checked)
+  const predefinedTraits = Array.from(document.querySelectorAll('input[name="traits"]:checked')).map(input => input.nextElementSibling.innerText);
+  
+  // Get custom traits from the list
+  const customTraits = Array.from(document.querySelectorAll('.traits-list .trait-item')).map(item => item.textContent.trim());
+
+  // Combine both predefined and custom traits
+  const allTraits = [...predefinedTraits, ...customTraits];
+  
   const file = document.getElementById('editProfilePic').files[0];
-  const personalTraits = Array.from(document.querySelectorAll('.traits-list .trait-item')).map(item => item.innerText.trim());
 
   if (!name || selectedCourses.length === 0) {
     showNotification('Please fill in all the required fields.');
@@ -327,7 +337,7 @@ async function saveInstructor(event) {
       await updateDoc(doc(db, 'instructors', currentInstructorId), {
         name: name,
         courses: selectedCourses,
-        instructor_traits: personalTraits,
+        instructor_traits: allTraits, // Save all traits
         ...(imageUrl && { imageUrl: imageUrl })
       });
 
@@ -338,7 +348,7 @@ async function saveInstructor(event) {
       const docRef = await addDoc(collection(db, 'instructors'), {
         name: name,
         courses: selectedCourses,
-        instructor_traits: personalTraits,
+        instructor_traits: allTraits, // Save all traits
         active: false,
         imageUrl: ''
       });
@@ -444,13 +454,13 @@ saveInstructorBtn.addEventListener('click', saveInstructor);
 // Fetch instructors on page load
 window.onload = fetchInstructors;
 
-// Edit instructor
+// Edit instructor function
 async function editInstructor(event) {
   const id = event.target.dataset.id;
   const instructor = instructors.find(instructor => instructor.id === id);
   if (instructor) {
     currentInstructorId = id; // Set the current instructor ID for editing
-    
+
     // Set the instructor's name
     if (instructorNameInput) {
       instructorNameInput.value = instructor.name;
@@ -473,37 +483,49 @@ async function editInstructor(event) {
       });
     }
 
-    // Set the profile picture or use the default
-    const profilePicPreview = document.getElementById('profilePicPreview');
-    if (profilePicPreview) {
-      profilePicPreview.src = instructor.imageUrl || 'Assets/default-profile.png';
+    // Check the appropriate predefined traits
+    if (Array.isArray(instructor.instructor_traits)) {
+      instructor.instructor_traits.forEach(trait => {
+        const checkbox = Array.from(document.querySelectorAll('input[name="traits"]')).find(input => 
+          input.nextElementSibling.innerText.trim() === trait.trim()
+        );
+        if (checkbox) {
+          checkbox.checked = true; // Check the matching trait checkbox
+        }
+      });
     }
 
-    // Populate personal traits
+    // Populate the custom traits list
     const traitsList = document.querySelector('.traits-list');
     if (traitsList) {
-      traitsList.innerHTML = ''; // Clear existing traits
+      traitsList.innerHTML = ''; // Clear existing custom traits
 
-      if (Array.isArray(instructor.traits)) {
-        instructor.traits.forEach(trait => {
+      // Populate custom traits that are not part of the predefined ones
+      instructor.instructor_traits.forEach(trait => {
+        const isPredefined = Array.from(document.querySelectorAll('input[name="traits"]')).some(input => input.nextElementSibling.innerText.trim() === trait.trim());
+
+        if (!isPredefined) {
           const traitElement = document.createElement('div');
           traitElement.classList.add('trait-item');
           traitElement.textContent = trait;
 
-          // Optionally add a delete button for each trait
           const deleteButton = document.createElement('i');
           deleteButton.classList.add('remove-trait');
           deleteButton.innerHTML = '<i class="bi bi-x"></i>';
-
-          // Add event listener to remove the trait
           deleteButton.addEventListener('click', function() {
             traitsList.removeChild(traitElement);
           });
 
           traitElement.appendChild(deleteButton);
           traitsList.appendChild(traitElement);
-        });
-      }
+        }
+      });
+    }
+
+    // Set the profile picture or use the default
+    const profilePicPreview = document.getElementById('profilePicPreview');
+    if (profilePicPreview) {
+      profilePicPreview.src = instructor.imageUrl || 'Assets/default-profile.png';
     }
 
     instructorModal.show();
