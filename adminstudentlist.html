@@ -773,9 +773,9 @@
                 <div class="modal-body first-section">
                     <div class="input-body">
                         <div class="student-info">
-                            <p>Student Name: <span>Juan Dela Cruz</span></p>
-                            <p>Date and Time: <span>January 1, 2024</span></p>
-                            <p>Assessor Name: <span>Pedro Penduko</span></p>
+                            <p>Student Name: <span id="motorcycleStudentName">Juan Dela Cruz</span></p>
+                            <p>Date and Time: <span id="motorcycleDateAndTime">January 1, 2024</span></p>
+                            <p>Assessor Name: <span id="motorcycleAssessorName">Pedro Penduko</span></p>
                         </div>
                         <div class="checkbox-checklist">
                             <h5>Evaluation</h5>
@@ -797,119 +797,117 @@
                                         <td class="main-text">Moving off, riding ahead and stopping</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
+                                                <input type="text" id="motorcycleMovingOff" class="form-control numeric-input">
+                                                <span class="static-text">/ 5</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentMovingOff" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td class="main-text">Positioning in different environments</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
+                                                <input type="text" id="motorcyclePositioning" class="form-control numeric-input">
+                                                <span class="static-text">/ 5</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentPositioning" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td></td>
                                         <td></td>
                                     </tr>
+                                     <!-- Choice of speed in different situations (low speed balancing) -->
                                     <tr>
                                         <td class="main">Choice of speed in different situations (low speed balancing)</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">10</span>
+                                                <input type="text" id="motorcycleLowSpeedBalancing" class="form-control numeric-input">
+                                                <span class="static-text">/ 10</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentLowSpeedBalancing" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <!-- Hill riding -->
                                     <tr>
                                         <td class="main">Hill riding</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">8</span>
+                                                <input type="text" id="motorcycleHillRiding" class="form-control numeric-input">
+                                                <span class="static-text">/ 8</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentHillRiding" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td></td>
                                         <td></td>
                                     </tr>
+                                      <!-- Riding along a curve or bend (cornering) -->
                                     <tr>
                                         <td class="main">Riding along a curve or bend (cornering)</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">8</span>
+                                                <input type="text" id="motorcycleCornering" class="form-control numeric-input">
+                                                <span class="static-text">/ 8</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentCornering" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td></td>
                                         <td></td>
                                     </tr>
+                                     <!-- Approaching and passing railway crossings -->
                                     <tr>
                                         <td class="main">Approaching and passing railway crossings</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">6</span>
+                                                <input type="text" id="motorcycleRailwayCrossings" class="form-control numeric-input">
+                                                <span class="static-text">/ 6</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentRailwayCrossings" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td></td>
                                         <td></td>
                                     </tr>
+                                     <!-- Lane shift and choice of lanes -->
                                     <tr>
                                         <td class="main">Lane shift and choice of lanes</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">6</span>
+                                                <input type="text" id="motorcycleLaneShift" class="form-control numeric-input">
+                                                <span class="static-text">/ 6</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentLaneShift" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td></td>
                                         <td></td>
                                         <td></td>
                                     </tr>
+                                     <!-- Turning and lane changing -->
                                     <tr>
                                         <td class="main">Turning and lane changing</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">6</span>
+                                                <input type="text" id="motorcycleTurningLaneChanging" class="form-control numeric-input">
+                                                <span class="static-text">/ 6</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentTurningLaneChanging" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td></td>
@@ -921,49 +919,50 @@
                                         <td></td>
                                         <td></td>
                                     </tr>
+                                    
+                                    <!-- Passing stationary vehicles and pedestrians -->
                                     <tr>
                                         <td class="main-text">Passing stationary vehicles and pedestrians</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">2</span>
+                                                <input type="text" id="motorcyclePassingVehicles" class="form-control numeric-input">
+                                                <span class="static-text">/ 2</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentPassingVehicles" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
+                                     <!-- Meeting oncoming traffic -->
                                     <tr>
                                         <td class="main-text">Meeting oncoming traffic</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">3</span>
+                                                <input type="text" id="motorcycleOncomingTraffic" class="form-control numeric-input">
+                                                <span class="static-text">/ 3</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentOncomingTraffic" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td class="main-text">Riding ahead of or behind other road users</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
+                                                <input type="text" id="ridingAheadorBehind" class="form-control numeric-input">
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">2</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentRidingAheadorBehind" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td class="main-text">Riding side by side</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
+                                                <input type="text" id="ridingSidebySide" class="form-control numeric-input">
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">3</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentRidingSidebySide" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td></td>
@@ -974,12 +973,12 @@
                                         <td class="main">Overtaking</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
+                                                <input type="text" id="overtaking" class="form-control numeric-input">
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">6</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentOvertaking" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td></td>
@@ -995,45 +994,45 @@
                                         <td class="main-text">Straight through</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
+                                                <input type="text" id="straightThrough" class="form-control numeric-input">
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">2</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentStraightThrough" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td class="main-text">Turning Left or Right</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
+                                                <input type="text" id="turningLeftorRight" class="form-control numeric-input">
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">3</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentTurningLeftorRight" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td class="main-text">With or Without obligation to give the right of way</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
+                                                <input type="text" id="obligationsToGiveRightofWay" class="form-control numeric-input">
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">2</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentObligationstoGiveRightofWay" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td class="main-text">ABC of passing junction</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
+                                                <input type="text" id="abcPassingJunction" class="form-control numeric-input">
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">3</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentAbcPassingJunction" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td></td>
@@ -1044,12 +1043,12 @@
                                         <td class="main">Approaching, riding in and leaving roundabouts</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
+                                                <input type="text" id="roundabouts" class="form-control numeric-input">
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">8</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentRoundabouts" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td></td>
@@ -1060,12 +1059,12 @@
                                         <td class="main">Stopping and parking</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
+                                                <input type="text" id="stoppingandParking" class="form-control numeric-input">
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">6</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentStoppingsandParking" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td></td>
@@ -1076,18 +1075,18 @@
                                         <td class="main">Riding with a back ride</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <input type="text" class="form-control numeric-input">
+                                                <input type="text" id="ridingBackRide" class="form-control numeric-input">
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">6</span>
                                             </div>
                                         </td>
-                                        <td><textarea class="form-control comment-input" rows="1"></textarea></td>
+                                        <td><textarea id="motorcycleCommentRidingBackRide" class="form-control comment-input" rows="1"></textarea></td>
                                     </tr>
                                 </tbody>
                                 <thead>
                                     <tr>
                                         <th>Total Score (out of 100)</th>
-                                        <th><span>0 / 100</span></th>
+                                        <th><span id="motorcycleTotalScore">0 / 100</span></th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -1098,8 +1097,8 @@
                 <div class="modal-body second-section">
                     <div class="input-body">
                         <div class="student-info">
-                            <p>Student Name: <span id="studentName">Juan Dela Cruz</span></p>
-                            <p>Student Permit: <input type="text" class="student-permit"></p>
+                            <p>Student Name: <span id="motorcycleStudentName">Juan Dela Cruz</span></p>
+                            <p>Student Permit: <input type="text" id="motorcycleStudentPermit" class="student-permit"></p>
                         </div>
                         <div class="checkbox-checklist">
                             <h5>Comments / Suggestions</h5>
@@ -1119,7 +1118,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox"id="motorcycleLesson1TopicA" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1130,7 +1129,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson1TopicB" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1141,7 +1140,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson1TopicC"  class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1152,7 +1151,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson1TopicD" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1163,7 +1162,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson2TopicA" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1177,7 +1176,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson2TopicB" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1188,7 +1187,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson2TopicC" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1202,7 +1201,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson3TopicA" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1213,7 +1212,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson3TopicB" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1227,7 +1226,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson4TopicA" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1241,7 +1240,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson5TopicA" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1255,7 +1254,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson6TopicA" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1266,7 +1265,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson6TopicB"  class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1277,7 +1276,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson6TopicC" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1291,7 +1290,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson7TopicA" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1302,7 +1301,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson7TopicB" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1313,7 +1312,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson7TopicC" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1327,7 +1326,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson8TopicA" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1341,7 +1340,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson9TopicA" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1355,7 +1354,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson10TopicA" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1369,7 +1368,7 @@
                                         </td>
                                         <td>
                                             <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox">
+                                                <input type="checkbox" id="motorcycleLesson11TopicA" class="comment-suggestion-checkbox">
                                                 <span></span>
                                             </label>
                                         </td>
@@ -1381,8 +1380,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="back-btn d-none">Back</button>
-                    <button type="button" class="next-btn">Next</button>
-                    <button type="submit" class="save-btn d-none">Save</button>
+                    <button type="button" class="next-btn" id="motorcycleNextBtn">Next</button>
+                    <button type="submit" class="save-btn d-none" id="motorcycleSaveBtn">Save</button>
                 </div>
             </div>
         </div>
