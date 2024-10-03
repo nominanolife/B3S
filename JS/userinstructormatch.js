@@ -20,6 +20,16 @@ const auth = getAuth(app);
 let studentId = ''; // To store the logged-in user's student ID
 let instructorId = ''; // To store the matched instructor ID
 
+// Function to show loader
+function showLoader() {
+    document.getElementById('loader1').style.display = 'flex';
+}
+
+// Function to hide loader
+function hideLoader() {
+    document.getElementById('loader1').style.display = 'none';
+}
+
 // Listen to authentication state and fetch the match data once a user is logged in
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -27,11 +37,15 @@ onAuthStateChanged(auth, (user) => {
         fetchMatchAndInstructorData(studentId); // Call the function to fetch data
     } else {
         console.error('No user is logged in.');
+        hideLoader(); // Hide loader if no user is logged in
     }
 });
 
 async function fetchMatchAndInstructorData(studentId) {
     try {
+        // Show loader before starting the fetch operation
+        showLoader();
+
         console.log("Fetching match for studentId:", studentId);
 
         // Fetch the match document from Firestore based on studentId
@@ -39,6 +53,7 @@ async function fetchMatchAndInstructorData(studentId) {
 
         if (!matchDoc.exists()) {
             console.error(`Match not found for the given student ID: ${studentId}`);
+            hideLoader(); // Hide loader if match is not found
             return;
         }
 
@@ -51,6 +66,7 @@ async function fetchMatchAndInstructorData(studentId) {
 
         if (!instructorDoc.exists()) {
             console.error(`Instructor not found for the given instructor ID: ${instructorId}`);
+            hideLoader(); // Hide loader if instructor is not found
             return;
         }
 
@@ -59,7 +75,7 @@ async function fetchMatchAndInstructorData(studentId) {
         // Update the HTML with the instructor data
         document.getElementById('profilePic').src = instructorData.imageUrl || 'Assets/default-profile.png';
         document.getElementById('instructorName').textContent = instructorData.name || 'Instructor Name';
-        
+
         const totalRatings = instructorData.totalRatings || 0;
         const rating = instructorData.rating || 0.0;
 
@@ -134,7 +150,7 @@ async function fetchMatchAndInstructorData(studentId) {
             comments.forEach((commentObj, index) => {
                 const commentElement = document.createElement('div');
                 commentElement.classList.add('comment');
-                
+
                 // Add the rating stars next to the comment
                 let starsHtml = '';
                 for (let i = 0; i < commentObj.rating; i++) {
@@ -161,11 +177,19 @@ async function fetchMatchAndInstructorData(studentId) {
             });
         }
 
+        // Hide the loader once the data has been loaded successfully
+        hideLoader();
+
     } catch (error) {
         console.error('Error fetching data:', error);
         showNotification('An error occurred while fetching data.');
+        // Hide the loader in case of an error
+        hideLoader();
     }
 }
+
+// Show the loader as soon as the page starts loading
+document.addEventListener('DOMContentLoaded', showLoader);
 
 function updateStarsUI(averageRating) {
     // Get the star container element
@@ -430,38 +454,37 @@ async function checkAppointmentProgress(studentId) {
     const appointmentsRef = collection(db, 'appointments');
     const querySnapshot = await getDocs(appointmentsRef);
 
-    let feedbackButtonVisible = false;  // Assume the button will be hidden initially
+    const currentDate = new Date();
+    let feedbackButtonEnabled = false;
 
-    querySnapshot.forEach((doc) => {
+    // Iterate over each document
+    for (const doc of querySnapshot.docs) {
         const appointmentData = doc.data();
 
-        // Check if the booking belongs to the current student and is "Completed"
         if (appointmentData.bookings && Array.isArray(appointmentData.bookings)) {
-            appointmentData.bookings.forEach(booking => {
+            for (const booking of appointmentData.bookings) {
                 if (booking.userId === studentId && booking.progress === "Completed") {
-                    const appointmentDate = new Date(booking.date);  // Assuming booking.date is a valid date string
-                    const currentDate = new Date();
+                    const appointmentDate = new Date(booking.date);
 
-                    // Check if the appointment is within 1 day (24 hours)
+                    // Calculate the difference in time
                     const timeDifference = currentDate.getTime() - appointmentDate.getTime();
                     const daysDifference = timeDifference / (1000 * 3600 * 24);
 
+                    // Enable feedback if appointment was within the last 24 hours
                     if (daysDifference <= 1) {
-                        // Show the button if the appointment was completed within the last 24 hours
-                        feedbackButtonVisible = true;
+                        feedbackButtonEnabled = true;
+                        break; // Stop further iteration once the condition is met
                     }
                 }
-            });
+            }
         }
-    });
 
-    // Show or hide the "Give Feedback" button based on the conditions
-    const feedbackButton = document.getElementById('giveFeedbackBtn');
-    if (feedbackButtonVisible) {
-        feedbackButton.style.display = 'block';  // Show the button
-    } else {
-        feedbackButton.style.display = 'none';  // Hide the button
+        if (feedbackButtonEnabled) break; // Exit outer loop as well if condition is met
     }
+
+    // Update button status based on condition
+    const feedbackButton = document.getElementById('giveFeedbackBtn');
+    feedbackButton.disabled = !feedbackButtonEnabled;
 }
 
 // Call this function when the page loads or when you need to update the button state
@@ -514,12 +537,18 @@ async function updateRatingUI(instructorId) {
 
 // Call checkAppointmentProgress on page load or when attempting to find a new instructor
 document.addEventListener('DOMContentLoaded', () => {
+    // Disable the "Give Feedback" button initially
+    const feedbackButton = document.getElementById('giveFeedbackBtn');
+    feedbackButton.disabled = true;
+
+    // Run auth state check to see if we need to update the button state
     onAuthStateChanged(auth, (user) => {
         if (user) {
             checkAppointmentProgress(user.uid);
         }
     });
 });
+
 
 function showNotification(message) {
     document.getElementById('notificationMessage').textContent = message;

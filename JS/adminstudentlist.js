@@ -157,6 +157,10 @@ async function fetchAppointments() {
 
       renderStudents();
       updatePaginationControls();
+
+      // Hide loader after all data is rendered
+      const loader = document.getElementById('loader1');
+      loader.style.display = 'none';
     });
 
     return {
@@ -215,7 +219,18 @@ document.getElementById('saveChangesBtn').onclick = async (event) => {
   }
 };
 
+// Add this for the edit4WheelsModal save button handler
+document.getElementById('saveBtn').addEventListener('click', async function() {
+  const saveSuccessful = await saveAllDataToFirestore(); // Save all data to Firestore
+
+  if (saveSuccessful) {
+    // Close the modal only if data is successfully saved
+    $('#edit4WheelsModal').modal('hide');
+  }
+});
+
 function renderStudents() {
+  const loader = document.getElementById('loader1');
   const studentList = document.getElementById('student-list');
   studentList.innerHTML = '';
   const start = (currentPage - 1) * itemsPerPage;
@@ -597,6 +612,24 @@ function openEditModal(index, modalId = 'editCcnModal') {
         backdrop: 'static',
         keyboard: false
     });
+
+    if (modalId !== 'editCcnModal') {
+      const modalElement = document.getElementById(modalId);
+      const [firstSection, secondSection] = modalElement.querySelectorAll('.modal-body');
+      const [backBtn, nextBtn, saveBtn] = modalElement.querySelectorAll('.back-btn, .next-btn, .save-btn');
+    
+      // Ensure that all the queried elements exist before trying to access their classList
+      if (firstSection && secondSection && backBtn && nextBtn && saveBtn) {
+        firstSection.classList.remove('d-none');
+        secondSection.classList.add('d-none');
+        backBtn.classList.add('d-none');
+        nextBtn.classList.remove('d-none');
+        saveBtn.classList.add('d-none');
+      } else {
+        console.error('One or more elements are missing in the modal:', { firstSection, secondSection, backBtn, nextBtn, saveBtn });
+      }
+    }
+
     modalToOpen.show();
 }
 
@@ -604,26 +637,26 @@ let selectedStudentIndex = null; // Global variable to store the selected studen
 
 // Define the fields and their respective weights for scoring
 const fields = [
-  { id: 'eyeLeadTime', weight: 6 },
-  { id: 'leftRightScanning', weight: 6 },
-  { id: 'mirrorsTracking', weight: 6 },
-  { id: 'defensiveDistance', weight: 6 },
-  { id: 'spaceAtStops', weight: 6 },
-  { id: 'leastResistance', weight: 6 },
-  { id: 'rightOfWay', weight: 6 },
-  { id: 'acceleration', weight: 6 },
-  { id: 'braking', weight: 6 },
-  { id: 'speedForConditions', weight: 6 },
-  { id: 'trafficSigns', weight: 6 },
-  { id: 'lanePosition', weight: 6 },
-  { id: 'steering', weight: 6 },
-  { id: 'signals', weight: 6 },
-  { id: 'eyeContact', weight: 6 },
-  { id: 'seating', weight: 6 },
-  { id: 'parking', weight: 6 },
-  { id: 'anticipation', weight: 6 },
-  { id: 'judgment', weight: 6 },
-  { id: 'timing', weight: 4 }
+  { id: 'eyeLeadTime', weight: 5 },
+  { id: 'leftRightScanning', weight: 5 },
+  { id: 'mirrorsTracking', weight: 5 },
+  { id: 'defensiveDistance', weight: 5 },
+  { id: 'spaceAtStops', weight: 5 },
+  { id: 'leastResistance', weight: 5 },
+  { id: 'rightOfWay', weight: 5 },
+  { id: 'acceleration', weight: 5 },
+  { id: 'braking', weight: 5 },
+  { id: 'speedForConditions', weight: 5 },
+  { id: 'trafficSigns', weight: 5 },
+  { id: 'lanePosition', weight: 5 },
+  { id: 'steering', weight: 5 },
+  { id: 'signals', weight: 5 },
+  { id: 'eyeContact', weight: 5 },
+  { id: 'seating', weight: 5 },
+  { id: 'parking', weight: 5 },
+  { id: 'anticipation', weight: 5 },
+  { id: 'judgment', weight: 5 },
+  { id: 'timing', weight: 5 }
 ];
 
 // Define the maximum scores for each category
@@ -733,8 +766,6 @@ function saveAssessmentDataToSession() {
 
     // Save the assessment data in session storage with a key based on the student index
     sessionStorage.setItem(`4WheelsAssess_${selectedStudentIndex}`, JSON.stringify(assessmentData));
-
-    showNotification(`Assessment data has been saved successfully for ${assessmentData.studentName}`);
 }
 
 async function sendAssessmentDataToFlask() {
@@ -801,10 +832,11 @@ async function sendAssessmentDataToFlask() {
   }
 }
 
+// Function to save all data to Firestore for the 4-Wheels modal
 async function saveAllDataToFirestore() {
   if (selectedStudentIndex === null) {
       showNotification('No student selected. Please select a student to save data.');
-      return;
+      return false;
   }
 
   // Retrieve assessment data from session storage
@@ -812,9 +844,17 @@ async function saveAllDataToFirestore() {
   const processedData = JSON.parse(sessionStorage.getItem(`ProcessedData_${selectedStudentIndex}`)) || {};
 
   // Get data from the checklist
+  const studentPermit = document.getElementById('studentPermit').value;
+
+  // Check if student permit is empty
+  if (!studentPermit) {
+    showNotification('Student permit is empty. Please fill in the student permit before saving.');
+    return false; // Stop the function here and keep the modal open
+  }
+
   const checklistData = {
       studentName: document.getElementById('studentName').textContent,
-      studentPermit: document.getElementById('studentPermit').value,
+      studentPermit: studentPermit,
       checklist: {
           lesson1TopicA: document.getElementById('lesson1TopicA').checked,
           lesson1TopicB: document.getElementById('lesson1TopicB').checked,
@@ -855,73 +895,90 @@ async function saveAllDataToFirestore() {
       await setDoc(doc(db, "applicants", studentsData[selectedStudentIndex].id), combinedData, { merge: true });
       console.log('Saving combined data:', combinedData);
       showNotification(`All data has been saved successfully for ${checklistData.studentName}`);
+      return true;
   } catch (e) {
       console.error("Error saving combined data: ", e);
       showNotification('Failed to save all data. Please try again.');
+      return false;
   }
 }
 
 // Attach event listeners to input fields for real-time calculation and prevent exceeding 5
 document.querySelectorAll('input.numeric-input').forEach(input => {
   input.addEventListener('input', function (event) {
-      // Remove non-numeric characters
-      this.value = this.value.replace(/[^0-9.]/g, '');
+    // Determine the modal to which this input belongs
+    const modalElement = this.closest('.modal');
+    let maxValue = 5; // Default maximum value
 
-      // Ensure there's only one decimal point in the input
-      if ((this.value.match(/\./g) || []).length > 1) {
-          this.value = this.value.slice(0, -1);
+    if (modalElement) {
+      if (modalElement.id === 'edit4WheelsModal') {
+        // Extract the maximum value from the appropriate element for edit4WheelsModal
+        maxValue = parseFloat(this.nextElementSibling?.nextElementSibling?.textContent) || 5;
+      } else if (modalElement.id === 'editMotorsModal') {
+        // Extract the maximum value for editMotorsModal
+        maxValue = parseFloat(this.nextElementSibling?.nextElementSibling?.textContent) || 10; // Default value is based on motorcycle fields
       }
+    }
 
-      // Limit the value to a maximum of 5
-      if (parseFloat(this.value) > 5) {
-          this.value = '5';
-      }
+    // Remove non-numeric characters
+    this.value = this.value.replace(/[^0-9.]/g, '');
 
-      // Ensure the value is between 0 and 5
-      if (parseFloat(this.value) < 0) {
-          this.value = '0';
-      }
+    // Ensure there's only one decimal point in the input
+    if ((this.value.match(/\./g) || []).length > 1) {
+      this.value = this.value.slice(0, -1);
+    }
 
-      // Recalculate the total score after filtering
-      calculateTotalScore();
+    // Cap the value to the specified maximum for that field
+    if (parseFloat(this.value) > maxValue) {
+      this.value = maxValue.toString();
+    }
+
+    // Ensure the value is between 0 and the maximum allowed
+    if (parseFloat(this.value) < 0) {
+      this.value = '0';
+    }
+
+    // Recalculate the total score after filtering
+    if (modalElement?.id === 'edit4WheelsModal') {
+      calculateTotalScore(); // Call the appropriate score calculation function
+    } else if (modalElement?.id === 'editMotorsModal') {
+      calculateMotorcycleTotalScore(); // Call the motorcycle-specific score calculation
+    }
   });
 });
 
-document.getElementById('nextBtn').addEventListener('click', async function () {
-    // Calculate total score before saving
-    const totalScore = calculateTotalScore(); 
+document.getElementById('nextBtn').addEventListener('click', async function (event) {
+  event.preventDefault(); // Prevent the default action, especially for form submission
+  event.stopPropagation(); // Prevent the event from bubbling up to parent elements
 
-    // Save raw assessment data to session storage
-    saveAssessmentDataToSession(); 
+  // Calculate total score before saving
+  const totalScore = calculateTotalScore();
 
-    // Wait for AI processing and store the processed data
-    await sendAssessmentDataToFlask(); // Send data to Flask API and wait for response
+  // Save raw assessment data to session storage
+  saveAssessmentDataToSession();
 
-    // After processing, show the next modal
-    const currentModal = document.querySelector('.modal.show');
-    const nextModal = document.getElementById('editChecklistModal');
+  // Wait for AI processing and store the processed data
+  await sendAssessmentDataToFlask();
 
-    if (currentModal) {
-        const modalInstance = bootstrap.Modal.getInstance(currentModal);
-        if (modalInstance) {
-            modalInstance.hide(); // Hide the current modal
-        }
-    }
+  // After processing, transition to the next section instead of hiding the modal
+  const currentModal = document.querySelector('#edit4WheelsModal');
 
-    if (nextModal) {
-        const nextModalInstance = new bootstrap.Modal(nextModal, {
-            backdrop: 'static',
-            keyboard: false
-        });
-        nextModalInstance.show(); // Show the next modal
-    }
+  const [firstSection, secondSection] = currentModal.querySelectorAll('.modal-body');
+  const [backBtn, nextBtn, saveBtn] = currentModal.querySelectorAll('.back-btn, .next-btn, .save-btn');
 
-    // Show showNotification if needed but after transitioning to the next modal
-    if (totalScore > 100) {
-        setTimeout(() => {
-            showNotification('Total score exceeds 100. Please adjust the scores.');
-        }, 100); // Slight delay to ensure modal transition completes first
-    }
+  // Show second section and relevant buttons
+  firstSection.classList.add('d-none');
+  secondSection.classList.remove('d-none');
+  backBtn.classList.remove('d-none');
+  nextBtn.classList.add('d-none');
+  saveBtn.classList.remove('d-none');
+
+  // Show showNotification if needed after transitioning to the next modal
+  if (totalScore > 100) {
+      setTimeout(() => {
+          showNotification('Total score exceeds 100. Please adjust the scores.');
+      }, 100);
+  }
 });
 
 // Attach event listener to "Save" button on the checklist modal
@@ -981,6 +1038,18 @@ document.getElementById('saveBtn').addEventListener('click', function() {
       backdrop: 'static',
       keyboard: false
   });
+
+  // Reset to first section (evaluation table) before showing the modal
+  const modalElement = document.getElementById(modalId);
+  const [firstSection, secondSection] = modalElement.querySelectorAll('.modal-body');
+  const [backBtn, nextBtn, saveBtn] = modalElement.querySelectorAll('.back-btn, .next-btn, .save-btn');
+
+  firstSection.classList.remove('d-none');
+  secondSection.classList.add('d-none');
+  backBtn.classList.add('d-none');
+  nextBtn.classList.remove('d-none');
+  saveBtn.classList.add('d-none');
+
   modalToOpen.show();
 }
 
@@ -1231,8 +1300,6 @@ function saveMotorcycleAssessmentDataToSession() {
 
   // Save the assessment data in session storage with a key based on the student index
   sessionStorage.setItem(`MotorcycleAssess_${selectedStudentIndex}`, JSON.stringify(assessmentData));
-
-  showNotification(`Assessment data has been saved successfully for ${assessmentData.studentName}`);
 }
 
 async function sendMotorcycleAssessmentDataToFlask() {
@@ -1309,9 +1376,6 @@ async function sendMotorcycleAssessmentDataToFlask() {
     // Store the interpreted results in session storage
     sessionStorage.setItem(`ProcessedData_${selectedStudentIndex}`, JSON.stringify(interpretedResults));
 
-    // Notify user of success
-    showNotification('Assessment data successfully sent and processed.');
-
   } catch (error) {
     console.error('Error sending data to Flask API:', error);
     showNotification('Failed to send data. Please try again.');
@@ -1322,7 +1386,7 @@ async function sendMotorcycleAssessmentDataToFlask() {
 async function saveAllMotorcycleDataToFirestore() {
   if (selectedStudentIndex === null) {
       showNotification('No student selected. Please select a student to save data.');
-      return;
+      return false;
   }
 
   // Retrieve assessment data from session storage
@@ -1330,9 +1394,17 @@ async function saveAllMotorcycleDataToFirestore() {
   const processedData = JSON.parse(sessionStorage.getItem(`ProcessedData_${selectedStudentIndex}`)) || {};
 
   // Get data from the motorcycle checklist
+  const studentPermit = document.getElementById('motorcycleStudentPermit').value;
+
+  // Check if student permit is empty
+  if (!studentPermit) {
+    showNotification('Student permit is empty. Please fill in the student permit before saving.');
+    return false; // Stop the function here and keep the modal open
+  }
+
   const checklistData = {
       studentName: document.getElementById('motorcycleStudentName').textContent,
-      studentPermit: document.getElementById('motorcycleStudentPermit').value,
+      studentPermit: studentPermit,
       checklist: {
           motorcycleLesson1TopicA: document.getElementById('motorcycleLesson1TopicA').checked,
           motorcycleLesson1TopicB: document.getElementById('motorcycleLesson1TopicB').checked,
@@ -1372,15 +1444,20 @@ async function saveAllMotorcycleDataToFirestore() {
   try {
       await setDoc(doc(db, "applicants", studentsData[selectedStudentIndex].id), combinedData, { merge: true });
       console.log('Saving combined motorcycle data:', combinedData);
-      showNotification(`All motorcycle data has been saved successfully for ${checklistData.studentName}`);
+      showNotification(`All data has been saved successfully for ${checklistData.studentName}`);
+      return true;
   } catch (e) {
       console.error("Error saving combined motorcycle data: ", e);
       showNotification('Failed to save all motorcycle data. Please try again.');
+      return false;
   }
 }
 
 // Attach event listener to "Next" button for the motorcycle modal
-document.getElementById('motorcycleNextBtn').addEventListener('click', async function () {
+document.getElementById('motorcycleNextBtn').addEventListener('click', async function (event) {
+  event.preventDefault(); // Prevent the default action, especially for form submission
+  event.stopPropagation(); // Prevent the event from bubbling up to parent elements
+
   // Calculate total score before saving
   const totalScore = calculateMotorcycleTotalScore(); // Call the motorcycle-specific score calculation
 
@@ -1390,26 +1467,20 @@ document.getElementById('motorcycleNextBtn').addEventListener('click', async fun
   // Wait for AI processing and store the processed data
   await sendMotorcycleAssessmentDataToFlask(); // Send motorcycle data to Flask API and wait for response
 
-  // After processing, show the next modal (if applicable)
-  const currentModal = document.querySelector('.modal.show');
-  const nextModal = document.getElementById('motorcycleChecklistModal'); // Motorcycle-specific modal ID
+  // Transition within the motorcycle modal instead of closing it
+  const currentModal = document.querySelector('#editMotorsModal');
 
-  if (currentModal) {
-      const modalInstance = bootstrap.Modal.getInstance(currentModal);
-      if (modalInstance) {
-          modalInstance.hide(); // Hide the current motorcycle modal
-      }
-  }
+  const [firstSection, secondSection] = currentModal.querySelectorAll('.modal-body');
+  const [backBtn, nextBtn, saveBtn] = currentModal.querySelectorAll('.back-btn, .next-btn, .save-btn');
 
-  if (nextModal) {
-      const nextModalInstance = new bootstrap.Modal(nextModal, {
-          backdrop: 'static',
-          keyboard: false
-      });
-      nextModalInstance.show(); // Show the next motorcycle modal
-  }
+  // Show second section and relevant buttons
+  firstSection.classList.add('d-none');
+  secondSection.classList.remove('d-none');
+  backBtn.classList.remove('d-none');
+  nextBtn.classList.add('d-none');
+  saveBtn.classList.remove('d-none');
 
-  // Show a notification if the total score exceeds 100, after modal transition
+  // Show showNotification if needed after transitioning to the next modal
   if (totalScore > 100) {
       setTimeout(() => {
           showNotification('Total score exceeds 100. Please adjust the scores.');
@@ -1418,10 +1489,14 @@ document.getElementById('motorcycleNextBtn').addEventListener('click', async fun
 });
 
 // Attach event listener to "Save" button for saving all motorcycle data to Firestore
-document.getElementById('motorcycleSaveBtn').addEventListener('click', function() {
-  saveAllMotorcycleDataToFirestore(); // Save all motorcycle data to Firestore
-});
+document.getElementById('motorcycleSaveBtn').addEventListener('click', async function() {
+  const saveSuccessful = await saveAllMotorcycleDataToFirestore(); // Save all data to Firestore
 
+  if (saveSuccessful) {
+    // Close the modal only if data is successfully saved
+    $('#editMotorsModal').modal('hide');
+  }
+});
 
 function setupModalListeners() {
   const studentList = document.getElementById('student-list');
@@ -1435,7 +1510,10 @@ function setupModalListeners() {
       const index = event.target.getAttribute('data-index');
       const studentData = studentsData[index]; // Retrieve student data using the correct index
 
-      // Hide options based on student data
+      // Always show the "Certificate Control Number" option
+      // No need to hide it based on TDCStatus
+
+      // Hide options based on student data for the other modals
       const edit4WheelsOption = options.querySelector('[data-modal="edit4WheelsModal"]');
       const editMotorsOption = options.querySelector('[data-modal="editMotorsModal"]');
 
@@ -1457,8 +1535,13 @@ function setupModalListeners() {
     if (event.target.classList.contains('option-dropdown')) {
       const modalId = event.target.getAttribute('data-modal'); // Get the modal ID from the clicked option
       const index = event.target.closest('td').querySelector('.bi-three-dots').getAttribute('data-index'); // Get the student index
-      openEditModal(index, modalId); // Open the corresponding modal
-      openMotorcycleEditModal(index, modalId); // Open the corresponding motorcycle modal
+
+      // Call the appropriate modal-opening function based on the modalId
+      if (modalId === 'editCcnModal' || modalId === 'edit4WheelsModal') {
+        openEditModal(index, modalId);
+      } else if (modalId === 'editMotorsModal') {
+        openMotorcycleEditModal(index, modalId);
+      }
     }
   });
 
@@ -1517,6 +1600,10 @@ document.getElementById('vehicleDropdown').addEventListener('click', function (e
   e.stopPropagation(); // Prevent event from bubbling to the document level
 });
 
+document.querySelectorAll('.selected').forEach(dropdown => {
+  dropdown.textContent = 'Select Vehicle'; // Set the default label to 'Select Vehicle'
+});
+
 // Close Vehicle Type dropdown on selecting an option and update the selected value
 document.querySelectorAll('#vehicleTypeOptions .option').forEach(option => {
   option.addEventListener('click', function (e) {
@@ -1524,7 +1611,7 @@ document.querySelectorAll('#vehicleTypeOptions .option').forEach(option => {
       const dropdown = selectedOption.closest('.custom-dropdown');
       dropdown.querySelector('.selected').textContent = selectedOption.textContent;
       dropdown.classList.remove('open'); // Close the dropdown after selecting an option
-      e.stopPropagation(); // Prevent the event from bubbling up and causing unintended behavior
+      e.stopPropagation(); // Prevent event from bubbling up and causing unintended behavior
   });
 });
 
@@ -1534,5 +1621,114 @@ document.addEventListener('click', function (event) {
   if (!vehicleDropdown.contains(event.target)) {
       vehicleDropdown.classList.remove('open');
   }
+});
 
+document.addEventListener('DOMContentLoaded', () => {
+  let isDataSaved = false; // Tracks if data was saved in the current session
+  let wasDataPreviouslySaved = false; // Tracks if the data was previously saved for the current student
+
+  // Add event listeners for save buttons to set the isDataSaved flag to true
+  document.getElementById('saveBtn').addEventListener('click', function () {
+    isDataSaved = true;
+    wasDataPreviouslySaved = true; // Mark as previously saved once saved
+  });
+
+  document.getElementById('motorcycleSaveBtn').addEventListener('click', function () {
+    isDataSaved = true;
+    wasDataPreviouslySaved = true; // Mark as previously saved once saved
+  });
+
+  // Add event listeners for the modal close events
+  $('#edit4WheelsModal').on('hidden.bs.modal', function () {
+    if (!isDataSaved && !wasDataPreviouslySaved) {
+      resetModalFields('edit4WheelsModal');
+    }
+    isDataSaved = false; // Reset the flag for the next time the modal opens
+  });
+
+  $('#editMotorsModal').on('hidden.bs.modal', function () {
+    if (!isDataSaved && !wasDataPreviouslySaved) {
+      resetModalFields('editMotorsModal');
+    }
+    isDataSaved = false; // Reset the flag for the next time the modal opens
+  });
+
+  // Add event listeners for modal open events to determine if the modal has previously saved data
+  $('#edit4WheelsModal').on('show.bs.modal', function () {
+    wasDataPreviouslySaved = checkIfDataExists('edit4WheelsModal'); // Check if data exists
+  });
+
+  $('#editMotorsModal').on('show.bs.modal', function () {
+    wasDataPreviouslySaved = checkIfDataExists('editMotorsModal'); // Check if data exists
+  });
+});
+
+// Function to reset fields in the given modal
+function resetModalFields(modalId) {
+  const modal = document.getElementById(modalId);
+
+  // Reset all text inputs and text areas to empty
+  modal.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
+    input.value = '';
+  });
+
+  // Reset all checkboxes to unchecked
+  modal.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
+
+  // Reset dropdown selections (if any)
+  const dropdownSelected = modal.querySelector('.selected');
+  if (dropdownSelected) {
+    dropdownSelected.textContent = 'Select Vehicle'; // Replace with your default dropdown value
+  }
+
+  // Reset any dynamic text content like student name or permit details
+  modal.querySelectorAll('.student-info span').forEach(span => {
+    span.textContent = ''; // Reset to empty or a placeholder if needed
+  });
+
+  // Hide the second section and reset to the first section
+  const [firstSection, secondSection] = modal.querySelectorAll('.modal-body');
+  const [backBtn, nextBtn, saveBtn] = modal.querySelectorAll('.back-btn, .next-btn, .save-btn');
+
+  firstSection.classList.remove('d-none');
+  secondSection.classList.add('d-none');
+  backBtn.classList.add('d-none');
+  nextBtn.classList.remove('d-none');
+  saveBtn.classList.add('d-none');
+}
+
+// Function to check if data exists for the given modal
+function checkIfDataExists(modalId) {
+  const modal = document.getElementById(modalId);
+
+  // Check if any input field, textarea, or checkbox has data
+  let hasData = false;
+
+  modal.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
+    if (input.value.trim() !== '') {
+      hasData = true;
+    }
+  });
+
+  modal.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    if (checkbox.checked) {
+      hasData = true;
+    }
+  });
+
+  return hasData;
+}
+
+// Fetch students data on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+  const loader = document.getElementById('loader1');
+  loader.style.display = 'flex';  // Show loader while data is being fetched
+  
+  fetchAppointments().then(() => {
+      // After the appointments are fetched, trigger render to hide loader once done
+      renderStudents();
+      updatePaginationControls();
+  });
 });

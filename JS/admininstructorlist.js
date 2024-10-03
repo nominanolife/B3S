@@ -30,6 +30,7 @@ const paginationControls = document.querySelector('.pagination-controls');
 const traitsInput = document.querySelector('.traits-input');
 const addTraitButton = document.querySelector('.add-trait');
 const traitsList = document.querySelector('.traits-list');
+const loader = document.getElementById('loader1');
 let instructorIdToDelete = null; // Store the ID of the instructor to delete
 let currentInstructorId = null; // Store the current instructor's ID for editing
 
@@ -41,12 +42,19 @@ let totalPages = 1; // Total number of pages
 
 // Fetch and display instructors
 async function fetchInstructors() {
-  const querySnapshot = await getDocs(collection(db, 'instructors'));
-  instructors = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  filteredInstructors = instructors; // Initialize with all instructors
-  totalPages = Math.ceil(filteredInstructors.length / itemsPerPage);
-  renderInstructors(); // Render the first page
-  updatePaginationControls(); // Update pagination controls
+  loader.style.display = 'flex'; // Show loader when fetching instructors
+  try {
+    const querySnapshot = await getDocs(collection(db, 'instructors'));
+    instructors = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    filteredInstructors = instructors; // Initialize with all instructors
+    totalPages = Math.ceil(filteredInstructors.length / itemsPerPage);
+    renderInstructors(); // Render the first page
+    updatePaginationControls(); // Update pagination controls
+  } catch (error) {
+    console.error("Error fetching instructors:", error);
+  } finally {
+    loader.style.display = 'none'; // Hide loader after fetching instructors
+  }
 }
 
 // Render instructors in the table

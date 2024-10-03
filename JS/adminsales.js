@@ -46,6 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const currentMonthDisplay = document.getElementById('currentMonthDisplay');
   currentMonthDisplay.textContent = `${currentMonth} ${currentYear}`;
 
+  updateFilterDateDropdowns();
+
   const monthDropdown = document.getElementById('monthDropdown');
   const yearDropdownInfo = document.getElementById('yearDropdownInfo');
   const yearDropdownFilter = document.getElementById('yearDropdownFilter');
@@ -476,6 +478,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 function filterStudents(searchTerm = '') {
+  // Filter students based on current month and year selection
   filteredStudentsData = studentsData.filter(student => {
     const fullName = `${student.personalInfo?.first || ''} ${student.personalInfo?.last || ''}`.toLowerCase();
 
@@ -483,7 +486,7 @@ function filterStudents(searchTerm = '') {
       const paymentDate = new Date(student.paymentDate);
       const paymentMonth = paymentDate.toLocaleString('default', { month: 'long' });
       const paymentYear = paymentDate.getFullYear();
-      
+
       return (
         fullName.startsWith(searchTerm.toLowerCase()) &&
         paymentMonth === currentMonth &&
@@ -501,10 +504,53 @@ function filterStudents(searchTerm = '') {
   updatePaginationControls();
   calculatePopularPackage();
   updateSplineChartWithSalesData();
+
+  // Update the dropdown to reflect the current month and year being displayed
+  updateFilterDateDropdowns();
+}
+
+function updateFilterDateDropdowns() {
+  // Update month dropdown to reflect the current selected month
+  const monthDropdownSelected = document.querySelector('#monthDropdown .selected');
+  if (monthDropdownSelected) {
+    monthDropdownSelected.textContent = currentMonth;
+  }
+
+  // Update year dropdown (both filter and info) to reflect the current selected year
+  const yearDropdownInfoSelected = document.querySelector('#yearDropdownInfo .selected');
+  const yearDropdownFilterSelected = document.querySelector('#yearDropdownFilter .selected');
+  if (yearDropdownInfoSelected) {
+    yearDropdownInfoSelected.textContent = currentYear;
+  }
+  if (yearDropdownFilterSelected) {
+    yearDropdownFilterSelected.textContent = currentYear;
+  }
+
+  // Update the "Yearly Sales Year" dropdown to reflect the current selected year
+  const yearlySalesYearDropdownSelected = document.querySelector('#yearlySalesYearDropdown .selected');
+  if (yearlySalesYearDropdownSelected) {
+    yearlySalesYearDropdownSelected.textContent = currentYear;
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   updateTotalSalesForYear(currentYear);
+});
+
+// Update Total Sales Year based on the selected year from dropdown
+document.querySelectorAll('#yearlySalesYearOptions .option').forEach(option => {
+  option.addEventListener('click', function (e) {
+    const selectedOption = e.currentTarget;
+    const dropdown = selectedOption.closest('.custom-dropdown');
+    dropdown.querySelector('.selected').textContent = selectedOption.textContent;
+    dropdown.classList.remove('open');
+
+    currentYear = selectedOption.getAttribute('data-value');
+    updateTotalSalesForYear(currentYear);
+
+    // Update dropdowns to reflect the new current year
+    updateFilterDateDropdowns();
+  });
 });
 
 const ctx = document.getElementById('splineChart').getContext('2d');

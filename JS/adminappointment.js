@@ -289,7 +289,7 @@ async function populateFormForEdit(id) {
         for (const appointment of appointments) {
             addTableRow(appointment);
         }
-    }    
+    }   
 
     // Update the table with real-time changes
     async function updateTable() {
@@ -304,32 +304,39 @@ async function populateFormForEdit(id) {
         const prevLastDayDate = new Date(currentYear, currentMonth, 0).getDate();
         const lastDayIndex = lastDay.getDay();
         const lastDayDate = lastDay.getDate();
-
+    
         const nextDays = 7 - lastDayIndex - 1;
-
+    
         let days = "";
-
+    
+        // Get the month name dynamically
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const currentMonthName = monthNames[currentMonth];
+    
+        // Update the displayed month and year
+        month.innerText = `${currentMonthName} ${currentYear}`;
+    
         // Add previous month's days
         for (let x = firstDay.getDay(); x > 0; x--) {
             days += `<div class="day prev">${prevLastDayDate - x + 1}</div>`;
         }
-
+    
         // Add current month's days
         for (let i = 1; i <= lastDayDate; i++) {
             const fullDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
             const isToday = currentYear === date.getFullYear() && currentMonth === date.getMonth() && i === date.getDate();
             days += `<div class="day ${isToday ? 'today' : ''}" data-date="${fullDate}">${i}</div>`;
         }
-
+    
         // Add next month's days
         for (let j = 1; j <= nextDays; j++) {
             days += `<div class="day next">${j}</div>`;
         }
-
+    
         document.getElementById('calendar-days').innerHTML = days;
-
+    
         updateCalendarColors();
-    };
+    };    
 
     const updateCalendarColors = () => {
         const dayElements = document.querySelectorAll("#calendar-days .day");
@@ -360,10 +367,13 @@ async function populateFormForEdit(id) {
     // Initialize Firestore real-time listener
     const appointmentsRef = collection(db, "appointments");
     onSnapshot(appointmentsRef, async (snapshot) => {
+        // Delete past appointments
+        await deletePastAppointments();
+        
         // Clear current table rows
         const tableBody = document.getElementById("slots-table-body");
-        tableBody.innerHTML = ""; 
-        
+        tableBody.innerHTML = "";
+
         // Update global appointments array
         appointments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
 
@@ -419,10 +429,10 @@ async function populateFormForEdit(id) {
     async function deletePastAppointments() {
         const today = new Date();
         const todayString = today.toISOString().split('T')[0]; // Get date in YYYY-MM-DD format
-
+    
         const q = query(collection(db, "appointments"), where("date", "<", todayString));
         const querySnapshot = await getDocs(q);
-
+    
         for (const doc of querySnapshot.docs) {
             await deleteDoc(doc.ref);
         }

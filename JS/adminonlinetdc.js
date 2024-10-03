@@ -19,29 +19,20 @@ const db = getFirestore(app);
 
 let quizQuestions = []; // Declare this globally to be used across functions
 let editingVideoId = null;  // Holds the ID of the video being edited
-let videoIdToDelete = null;  // To store videoId for deletion
+let videoIdToDelete = null;  // Track the videoId for deletion
 
 async function fetchSavedVideosAndQuizzes() {
     try {
-        // Reference to Firestore collections
         const videosCollection = collection(db, 'videos');
         const quizzesCollection = collection(db, 'quizzes');
-        
-        // Fetch all documents from 'videos' and 'quizzes' collections
         const videosSnapshot = await getDocs(videosCollection);
         const quizzesSnapshot = await getDocs(quizzesCollection);
 
-        // Check if videosSnapshot has documents
-        if (videosSnapshot.empty) {
-            console.error("No videos found in Firestore.");
-            return;
-        }
+        const courseContent = document.querySelector('.course-content');
+        const uploadContainer = document.querySelector('.upload-container');
+        const courseContentLists = document.querySelectorAll('.course-content-list');
+        courseContentLists.forEach(contentList => contentList.remove());
 
-        // Clear any existing content in the course-content-list container
-        const courseContentList = document.querySelector('.course-content-list');
-        courseContentList.innerHTML = '';  // Clear out the default static content
-
-        // Map quizzes to video IDs
         const quizzesMap = {};
         quizzesSnapshot.forEach(quizDoc => {
             const quizData = quizDoc.data();
@@ -49,16 +40,15 @@ async function fetchSavedVideosAndQuizzes() {
         });
 
         videosSnapshot.forEach(doc => {
-            const videoData = doc.data(); // Get the video document data
-            const videoId = doc.id; // Get the video document ID
+            const videoData = doc.data();
+            const videoId = doc.id;
         
-            console.log("Rendering video: ", videoData); // Check if the videos are rendering
+            const courseContentList = document.createElement('div');
+            courseContentList.classList.add('course-content-list');
         
-            // Create a new course card for each video
             const courseCard = document.createElement('div');
             courseCard.classList.add('course-card');
         
-            // Create and append the course image (thumbnail)
             const courseImage = document.createElement('div');
             courseImage.classList.add('course-image');
             const thumbnail = document.createElement('img');
@@ -67,7 +57,6 @@ async function fetchSavedVideosAndQuizzes() {
             thumbnail.classList.add('video-thumbnail');
             courseImage.appendChild(thumbnail);
         
-            // Create and append the course details (title)
             const courseDetails = document.createElement('div');
             courseDetails.classList.add('course-details');
             const courseTitle = document.createElement('div');
@@ -77,45 +66,58 @@ async function fetchSavedVideosAndQuizzes() {
             courseTitle.appendChild(title);
             courseDetails.appendChild(courseTitle);
         
-            // Add Edit and Delete buttons
             const courseOptions = document.createElement('div');
             courseOptions.classList.add('course-options');
             const threeDots = document.createElement('i');
             threeDots.classList.add('bi', 'bi-three-dots-vertical');
             const optionsDropdown = document.createElement('div');
             optionsDropdown.classList.add('triple-dot-options');
+        
             const editButton = document.createElement('i');
             editButton.classList.add('option-dropdown', 'edit-btn');
             editButton.textContent = 'Edit';
-            editButton.onclick = () => editLesson(videoId); // Attach edit functionality
+            editButton.onclick = () => editLesson(videoId);
+        
             const deleteButton = document.createElement('i');
             deleteButton.classList.add('option-dropdown', 'delete-btn');
-            // Updated deleteButton functionality
             deleteButton.textContent = 'Delete';
-            deleteButton.onclick = () => showDeleteModal(videoId); 
+            deleteButton.onclick = () => showDeleteModal(videoId);
+        
             optionsDropdown.appendChild(editButton);
             optionsDropdown.appendChild(deleteButton);
             courseOptions.appendChild(threeDots);
             courseOptions.appendChild(optionsDropdown);
             courseDetails.appendChild(courseOptions);
         
-            // Append course image and details to the course card
             courseCard.appendChild(courseImage);
             courseCard.appendChild(courseDetails);
-        
-            // Append the new course card to the course-content-list
             courseContentList.appendChild(courseCard);
+            courseContent.appendChild(courseContentList);
         
-            // **Add this part to toggle the dropdown visibility**
             threeDots.addEventListener('click', function () {
+                // Close any other open dropdowns
+                const openDropdowns = document.querySelectorAll('.triple-dot-options.show');
+                openDropdowns.forEach(dropdown => {
+                    dropdown.classList.remove('show');
+                    dropdown.style.display = 'none';
+                });
+            
+                // Toggle the current dropdown
                 const options = this.nextElementSibling;
-                if (options) options.style.display = options.style.display === 'block' ? 'none' : 'block';
-            });
-        });
+                if (options.style.display === 'block') {
+                    options.style.display = 'none';
+                    options.classList.remove('show');
+                } else {
+                    options.style.display = 'block';
+                    options.classList.add('show');
+                }
+            });            
+        });        
 
+        courseContent.appendChild(uploadContainer);
     } catch (error) {
         console.error("Error fetching videos and quizzes:", error);
-        alert('Failed to fetch videos and quizzes. Please try again.');
+        displayNotification('error', 'Failed to fetch videos and quizzes.');
     }
 }
 
@@ -144,15 +146,10 @@ async function editLesson(videoId) {
 
         // Populate Video Fields
         document.getElementById('editVideoTitleInput').value = videoData.title;
-        
-        // Check if category exists in Firestore data and populate it
+
+        // Populate category dropdown
         const selectedCategoryElement = document.querySelector('#editSelectedCategory');
-        if (videoData.category) {
-            selectedCategoryElement.innerHTML = videoData.category;
-        } else {
-            selectedCategoryElement.innerHTML = 'Select a category';  // Fallback if no category is found
-            console.error('No category found for this video.');
-        }
+        selectedCategoryElement.innerHTML = videoData.category || 'Select a category';
 
         // Populate video thumbnail and video
         document.querySelector('#editModal .video-thumbnail-box .video-thumbnail-area').innerHTML = 
@@ -164,19 +161,101 @@ async function editLesson(videoId) {
                 Your browser does not support the video tag.
             </video>`;
 
-        // Populate Quiz Fields
+        // Populate Quiz Fields if quiz data exists
         if (quizData && quizData.questions) {
             quizQuestions = quizData.questions; // Store fetched quiz data into quizQuestions[]
             populateQuizFields(quizQuestions); // Call a function to populate the quiz fields
         }
 
         // Open the modal
-        $('#editModal').modal('show');
+        $('#editModal').modal({
+            backdrop: 'static',
+            keyboard: false
+        });// Ensure the modal is shown after fetching and populating data
 
     } catch (error) {
         console.error('Error fetching video/quiz data for editing:', error);
     }
 }
+
+async function deleteLesson(videoId) {
+    try {
+        // Step 1: Fetch the video document to get the storage URLs
+        const videoDocRef = doc(db, 'videos', videoId);
+        const videoDoc = await getDoc(videoDocRef);
+
+        if (!videoDoc.exists()) {
+            showNotification("Video not found.");
+            return;
+        }
+
+        const videoData = videoDoc.data();
+        const videoURL = videoData.videoURL;
+        const thumbnailURL = videoData.thumbnailURL;
+
+        // Step 2: Delete the video file from Firebase Storage
+        if (videoURL) {
+            const videoRef = ref(storage, videoURL);
+            await deleteObject(videoRef);
+        }
+
+        // Step 3: Delete the thumbnail file from Firebase Storage
+        if (thumbnailURL) {
+            const thumbnailRef = ref(storage, thumbnailURL);
+            await deleteObject(thumbnailRef);
+        }
+
+        // Step 4: Delete any associated quiz images from Firebase Storage
+        const quizQuery = query(collection(db, 'quizzes'), where('videoId', '==', videoId));
+        const quizSnapshot = await getDocs(quizQuery);
+
+        if (!quizSnapshot.empty) {
+            quizSnapshot.forEach(async (quizDoc) => {
+                const quizData = quizDoc.data();
+                const questions = quizData.questions || [];
+
+                // Delete quiz images if they exist
+                for (const question of questions) {
+                    if (question.imageURL) {
+                        const quizImageRef = ref(storage, question.imageURL);
+                        await deleteObject(quizImageRef);
+                    }
+                }
+
+                // Delete the quiz document from Firestore
+                const quizDocRef = doc(db, 'quizzes', quizDoc.id);
+                await deleteDoc(quizDocRef);
+            });
+        }
+
+        // Step 5: Delete the video document from Firestore
+        await deleteDoc(videoDocRef);
+
+        showNotification("Lesson successfully deleted.");
+
+        // Optionally, refresh the page or fetch the latest lessons after deletion
+        fetchSavedVideosAndQuizzes();
+    } catch (error) {
+        console.error("Error deleting lesson:", error);
+        showNotification("Failed to delete the lesson. Please try again.");
+    }
+}
+
+// Call the delete function when the delete button is clicked
+function showDeleteModal(videoId) {
+    videoIdToDelete = videoId; // Store the videoId for deletion
+
+    // Display the delete confirmation modal
+    $('#deleteConfirmationModal').modal('show');
+}
+
+// When user confirms deletion, call the deleteLesson function
+document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    if (videoIdToDelete) {
+        await deleteLesson(videoIdToDelete);
+        $('#deleteConfirmationModal').modal('hide'); // Close the confirmation modal after deletion
+    }
+});
 
 function populateQuizFields(questions) {
     const quizContent = document.querySelector('.edit-quiz-container .quiz-content');
@@ -273,7 +352,6 @@ function populateQuizFields(questions) {
     });
 }
 
-
 function updateEditPreview() {
     console.log("Updating preview based on form data");
 
@@ -283,7 +361,7 @@ function updateEditPreview() {
     if (videoTitleContainer) {
         videoTitleContainer.innerHTML = ''; // Clear previous title content
         if (videoTitle) {
-            videoTitleContainer.innerHTML = `<h5>${videoTitle}</h5>`;
+            videoTitleContainer.innerHTML = `<p>${videoTitle}</p>`;
         } else {
             videoTitleContainer.innerHTML = `<p>No title provided</p>`;
         }
@@ -326,11 +404,11 @@ function updateEditPreview() {
 
     // Category preview
     const categoryPreviewContainer = document.getElementById('editCategoryPreviewContainer');
-    const selectedCategory = document.querySelector('#editSelectedCategory').textContent;
-
+    const selectedCategory = document.querySelector('#editSelectedCategory').textContent.trim();
+    
     if (categoryPreviewContainer) {
         categoryPreviewContainer.innerHTML = '';
-        if (selectedCategory) {
+        if (selectedCategory && selectedCategory !== 'Select a category') {
             categoryPreviewContainer.innerHTML = `<p>${selectedCategory}</p>`;
         } else {
             categoryPreviewContainer.innerHTML = `<p>No category selected</p>`;
@@ -413,85 +491,6 @@ function updateEditPreview() {
     }
 }
 
-async function deleteLesson(videoId) {
-    try {
-        // Step 1: Retrieve the video document to get the video and thumbnail URLs
-        const videoDocRef = doc(db, 'videos', videoId);
-        const videoDocSnapshot = await getDoc(videoDocRef);
-        if (!videoDocSnapshot.exists()) {
-            throw new Error('Video document not found.');
-        }
-
-        const videoData = videoDocSnapshot.data();
-        const videoURL = videoData.videoURL;
-        const thumbnailURL = videoData.thumbnailURL;
-
-        // Step 2: Delete the video document from Firestore
-        await deleteDoc(videoDocRef);
-        console.log('Video document deleted successfully.');
-
-        // Step 3: Delete related quiz document from Firestore
-        const quizQuery = query(collection(db, 'quizzes'), where('videoId', '==', videoId));
-        const quizSnapshot = await getDocs(quizQuery);
-        quizSnapshot.forEach(async (quizDoc) => {
-            await deleteDoc(doc(db, 'quizzes', quizDoc.id));
-            console.log('Quiz document deleted successfully.');
-        });
-
-        // Step 4: Delete video file from Firebase Storage
-        if (videoURL) {
-            const videoRef = ref(storage, videoURL);
-            await deleteObject(videoRef);
-            console.log('Video file deleted successfully.');
-        }
-
-        // Step 5: Delete thumbnail file from Firebase Storage
-        if (thumbnailURL) {
-            const thumbnailRef = ref(storage, thumbnailURL);
-            await deleteObject(thumbnailRef);
-            console.log('Thumbnail file deleted successfully.');
-        }
-
-        // Step 6: Delete any quiz images associated with the video
-        for (let i = 1; i <= quizSnapshot.docs.length; i++) {
-            // Handle multiple file types (jpg and png)
-            const quizImageExtensions = ['jpg', 'png']; // Add any other supported formats
-            for (const extension of quizImageExtensions) {
-                const quizImageRef = ref(storage, `quiz_images/${videoId}_question_${i}.${extension}`);
-                try {
-                    await deleteObject(quizImageRef);
-                    console.log(`Quiz image ${i} with extension ${extension} deleted successfully.`);
-                } catch (error) {
-                    if (error.code === 'storage/object-not-found') {
-                        console.log(`Quiz image ${i} with extension ${extension} not found (which is okay).`);
-                    } else {
-                        throw error; // Re-throw if it's another error
-                    }
-                }
-            }
-        }
-
-        alert('Lesson and related data deleted successfully.');
-        
-    } catch (error) {
-        console.error('Error deleting lesson:', error);
-        alert('An error occurred while deleting the lesson. Please try again.');
-    }
-}
-
-function showDeleteModal(videoId) {
-    console.log('Opening delete alert for video:', videoId);
-
-    // Instead of showing the modal, directly use an alert to confirm the delete action
-    if (confirm('Are you sure you want to delete this lesson?')) {
-        // If the user clicks "OK", proceed with the delete function
-        deleteLesson(videoId);
-    } else {
-        // If the user clicks "Cancel", just log the action
-        console.log('Deletion canceled for video ID:', videoId);
-    }
-}
-
 document.addEventListener('DOMContentLoaded', async function () {
     fetchSavedVideosAndQuizzes();
     const uploadContainer = document.querySelector('.upload-container');
@@ -501,20 +500,27 @@ document.addEventListener('DOMContentLoaded', async function () {
     const editSaveBtn = document.querySelector('.modal-footer .editSavebtn');
     const tripleDotIcons = document.querySelectorAll('.bi-three-dots-vertical');
     const editButtons = document.querySelectorAll('.option-dropdown');
+    const uploadModal = $('#uploadModal');
     const editModal = $('#editModal');
     const courseImage = document.querySelector('.course-image');
     const editCategorySelectElement = document.querySelector('#editModal .category');
     const editSelected = editCategorySelectElement.querySelector('.selected');
     const editOptionsContainer = editCategorySelectElement.querySelector('.dropdown-options');
     const editOptionsList = editOptionsContainer.querySelectorAll('.options');
-
+    
     $('#uploadModal').on('shown.bs.modal', function () {
+        currentStep = 0; // Reset to Step 1
+        showStep(currentStep); // Ensure Step 1 is displayed
+
         const addQuestionBtn = document.querySelector('#uploadModal .add-question');
         addQuestionBtn.removeEventListener('click', addQuestion);  // Ensure no duplicate listeners
         addQuestionBtn.addEventListener('click', addQuestion);
     });
     
     $('#editModal').on('shown.bs.modal', function () {
+        currentEditStep = 0;  // Reset the step to 0 (Step 1) every time the modal is shown
+        showEditStep(currentEditStep);  // Ensure the first step is displayed
+
         const addQuestionBtn = document.querySelector('#editModal .add-question');
         addQuestionBtn.removeEventListener('click', addEditQuestion);  // Ensure no duplicate listeners
         addQuestionBtn.addEventListener('click', addEditQuestion);
@@ -534,11 +540,131 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
+    // Add Event Listener for when the uploadModal is hidden (closed)
+    $('#uploadModal').on('hidden.bs.modal', function () {
+        // Pause all videos within the upload modal
+        const uploadModalElement = document.getElementById('uploadModal');
+        const videos = uploadModalElement.querySelectorAll('video');
+        videos.forEach(video => {
+            video.pause();
+            video.currentTime = 0; // Optional: Reset to the start
+        });
+
+        // Reset to Step 1
+        currentStep = 0;
+        showStep(currentStep);
+
+        // Reset question count
+        questionCount = 0;
+
+        // Clear quiz content and add one empty question
+        const quizContent = document.querySelector('.quiz-content');
+        quizContent.innerHTML = ''; // Remove all existing quiz questions
+        addQuestion(); // Add a fresh question
+
+        // Reset category selection
+        const selectedCategory = document.getElementById('selectedCategory');
+        selectedCategory.textContent = 'Select a category';
+
+        // Reset video title input
+        const videoTitleInput = document.getElementById('videoTitleInput');
+        videoTitleInput.value = '';
+
+        // Clear file inputs
+        const thumbnailUpload = document.getElementById('thumbnailUpload');
+        thumbnailUpload.value = '';
+
+        const videoUpload = document.getElementById('videoUpload');
+        videoUpload.value = '';
+
+        // Clear thumbnail preview
+        const thumbnailBox = document.querySelector('.video-thumbnail-box .video-thumbnail-area');
+        thumbnailBox.innerHTML = `<i class="bi bi-image-fill"></i><p>Add Image</p>`;
+
+        // Clear video preview
+        const videoBox = document.querySelector('.video-upload-box .video-upload-area');
+        videoBox.innerHTML = `<i class="bi bi-file-earmark-play-fill"></i><p>Add Video</p>`;
+
+        // Optionally, hide any dropdowns or additional UI elements if needed
+        const optionsContainer = document.querySelector('.category .dropdown-options');
+        if (optionsContainer) optionsContainer.style.display = 'none';
+    });
+
+    // Ensure that when the modal is opened, it starts at Step 1
+    uploadModal.on('show.bs.modal', function () {
+        currentStep = 0;
+        showStep(currentStep);
+    });
+
+    $('#editModal').on('hidden.bs.modal', function () {
+        // Pause all videos within the edit modal
+        const editModalElement = document.getElementById('editModal');
+        const videos = editModalElement.querySelectorAll('video');
+        videos.forEach(video => {
+            video.pause();
+            video.currentTime = 0; // Optional: Reset to the start
+        });
+    });
+
     const thumbnailUpload = document.getElementById('thumbnailUpload');
     const videoUpload = document.getElementById('videoUpload');
     const videoTitleInput = document.getElementById('videoTitleInput');
+    const editThumbnailButton = document.getElementById('editThumbnailButton');
+    const editVideoButton = document.getElementById('editVideoButton');
+    const editThumbnailUpload = document.getElementById('editThumbnailUpload');
+    const editVideoUpload = document.getElementById('editVideoUpload');
     const thumbnailBox = document.querySelector('.video-thumbnail-box .video-thumbnail-area');
     const videoBox = document.querySelector('.video-upload-box .video-upload-area');
+
+    // When the user clicks the 'Select Thumbnail' button, trigger the file input click event
+    editThumbnailButton.addEventListener('click', function () {
+        editThumbnailUpload.click();
+    });
+
+    // When the user clicks the 'Select Video' button, trigger the file input click event
+    editVideoButton.addEventListener('click', function () {
+        editVideoUpload.click();
+    });
+
+    // Display the selected thumbnail image when a new file is chosen
+    editThumbnailUpload.addEventListener('change', function () {
+        if (editThumbnailUpload.files.length > 0) {
+            const file = editThumbnailUpload.files[0];
+            const imageUrl = URL.createObjectURL(file);
+
+            // Update thumbnail preview in Step 1 (the video-thumbnail-box in Step 1)
+            const thumbnailBoxInStep1 = document.querySelector('#editvideothumbnailbox #editvideothumbnailarea');
+            thumbnailBoxInStep1.innerHTML = `<img src="${imageUrl}" class="img-thumbnail">`;
+
+            // Also update the preview in Step 3 (if needed)
+            const thumbnailPreviewContainer = document.getElementById('editThumbnailPreviewContainer');
+            thumbnailPreviewContainer.innerHTML = `<div class="image-thumbnail">
+                <img src="${imageUrl}" class="img-thumbnail">
+            </div>`;
+        }
+    });
+
+    // Display the selected video in Step 1 when a new file is chosen
+    editVideoUpload.addEventListener('change', function () {
+        if (editVideoUpload.files.length > 0) {
+            const file = editVideoUpload.files[0];
+            const videoUrl = URL.createObjectURL(file);
+
+            // Update video preview in Step 1 (the video-upload-box in Step 1)
+            const videoBoxInStep1 = document.querySelector('#editvideouploadbox #editvideouploadarea');
+            videoBoxInStep1.innerHTML = `<video controls class="vid-thumbnail">
+                <source src="${videoUrl}" type="${file.type}">
+                Your browser does not support the video tag.
+            </video>`;
+
+            // Also update the preview in Step 3 (if needed)
+            const videoPreviewContainer = document.getElementById('editVideoPreviewContainer');
+            videoPreviewContainer.innerHTML = `<video controls class="vid-thumbnail">
+                <source src="${videoUrl}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>`;
+        }
+    });
 
     if (thumbnailUpload) {
         thumbnailUpload.addEventListener('change', function () {
@@ -566,26 +692,35 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.querySelector('.video-thumbnail-box').addEventListener('click', function () {
         if (thumbnailUpload) thumbnailUpload.click();
     });
-
-    document.querySelector('.video-upload-box').addEventListener('click', function () {
-        if (videoUpload) videoUpload.click();
+    
+    document.querySelector('.video-upload-box .video-upload-area').addEventListener('click', function (event) {
+        // Prevent the video from playing
+        event.preventDefault();
+        videoUpload.click(); // Trigger the file input to select a new video file
     });
-
-
 
     function showStep(stepIndex) {
         steps.forEach(step => {
             const stepElement = document.getElementById(step);
-            if (stepElement) stepElement.classList.add('d-none');
+            if (stepElement) {
+                // Pause all videos within the step being hidden
+                const videos = stepElement.querySelectorAll('video');
+                videos.forEach(video => {
+                    video.pause();
+                    video.currentTime = 0; // Optional: Reset to the start
+                });
+                // Hide the step
+                stepElement.classList.add('d-none');
+            }
         });
         const currentStepElement = document.getElementById(steps[stepIndex]);
         if (currentStepElement) currentStepElement.classList.remove('d-none');
         updateButtonVisibility(stepIndex);
-
+    
         if (stepIndex === 2) {
             updatePreview();
         }
-    }
+    }    
 
     function updateButtonVisibility(stepIndex) {
         if (backButton) backButton.style.display = stepIndex > 0 ? 'inline-block' : 'none';
@@ -635,23 +770,33 @@ document.addEventListener('DOMContentLoaded', async function () {
     const editModalSteps = ['editstep1', 'editstep2', 'editstep3'];
     let currentEditStep = 0;
 
-    const editBackButton = document.querySelector('#editModal .back-btn');
     const editNextButton = document.querySelector('#editModal .next-btn');
-    const editSaveButton = document.querySelector('#editModal .save-btn');
+    const editBackButton = document.querySelector('#editModal .back-btn');
+    const editSaveButton = document.querySelector('#editModal .editSavebtn');
 
     function showEditStep(stepIndex) {
+        const editModalSteps = ['editstep1', 'editstep2', 'editstep3'];
         editModalSteps.forEach(step => {
             const stepElement = document.getElementById(step);
-            if (stepElement) stepElement.classList.add('d-none');
+            if (stepElement) {
+                // Pause all videos within the step being hidden
+                const videos = stepElement.querySelectorAll('video');
+                videos.forEach(video => {
+                    video.pause();
+                    video.currentTime = 0; // Optional: Reset to the start
+                });
+                // Hide the step
+                stepElement.classList.add('d-none');
+            }
         });
         const currentStepElement = document.getElementById(editModalSteps[stepIndex]);
         if (currentStepElement) currentStepElement.classList.remove('d-none');
         updateEditButtonVisibility(stepIndex);
-
+    
         if (stepIndex === 2) {
             updateEditPreview();
         }
-    }
+    }       
 
     function updateEditButtonVisibility(stepIndex) {
         if (editBackButton) editBackButton.style.display = stepIndex > 0 ? 'inline-block' : 'none';
@@ -661,13 +806,13 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     if (editNextButton) {
         editNextButton.addEventListener('click', function () {
-            if (currentEditStep < editModalSteps.length - 1) {
+            if (currentEditStep < 2) {  // Assuming 3 steps (0, 1, 2)
                 currentEditStep++;
                 showEditStep(currentEditStep);
             }
         });
     }
-
+    
     if (editBackButton) {
         editBackButton.addEventListener('click', function () {
             if (currentEditStep > 0) {
@@ -675,7 +820,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 showEditStep(currentEditStep);
             }
         });
-    }
+    }    
 
     // Initialize the steps for editModal
     showEditStep(currentEditStep);
@@ -931,6 +1076,24 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     function updatePreview() {
+        // Update category preview
+        const selectedCategory = document.querySelector('.category .selected').textContent.trim();
+        if (selectedCategory && selectedCategory !== 'Select a category') {
+            categoryPreviewContainer.innerHTML = `<p>${selectedCategory}</p>`;
+        } else {
+            categoryPreviewContainer.innerHTML = `<p>No category selected</p>`;
+        }
+
+        const videoTitle = document.getElementById('videoTitleInput').value.trim();
+        if (videoTitlePreviewContainer) {
+            videoTitlePreviewContainer.innerHTML = ''; // Clear previous title content
+            if (videoTitle) {
+                videoTitlePreviewContainer.innerHTML = `<p>${videoTitle}</p>`;
+            } else {
+                videoTitlePreviewContainer.innerHTML = `<p>No title provided</p>`;
+            }
+        }
+
         // Update video preview
         const videoPreviewContainer = document.getElementById('videoPreviewContainer');
         const videoFile = videoUpload.files[0];
@@ -945,13 +1108,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Update thumbnail preview with title
         const thumbnailPreviewContainer = document.getElementById('thumbnailPreviewContainer');
         const thumbnailFile = thumbnailUpload.files[0];
-        const videoTitle = videoTitleInput.value; // Ensure the title is retrieved
     
         if (thumbnailFile) {
             const thumbnailUrl = URL.createObjectURL(thumbnailFile);
             thumbnailPreviewContainer.innerHTML = `<div class="image-thumbnail">
                                                         <img src="${thumbnailUrl}" class="img-thumbnail">
-                                                        <h5 class="video-thumbnail-title">${videoTitle}</h5>
                                                     </div>`;
         }
     
@@ -1014,28 +1175,22 @@ document.addEventListener('DOMContentLoaded', async function () {
         
             quizPreviewContainer.appendChild(quizPreviewItem);
         });
-        
-        // Update category preview
-        const categoryPreviewContainer = document.getElementById('categoryPreviewContainer');
-        const selectedCategory = document.querySelector('.category .selected').textContent; // Get the selected category text
-        
-        if (selectedCategory) {
-            categoryPreviewContainer.innerHTML = `<p>${selectedCategory}</p>`;
-        } else {
-            categoryPreviewContainer.innerHTML = `<p>No category selected</p>`;
-        }
     }
 
     saveButton.addEventListener('click', async function () {
         const videoFile = videoUpload.files[0];
         const thumbnailFile = thumbnailUpload.files[0];
-        const title = videoTitleInput.value;
+        const title = videoTitleInput.value.trim();
         const category = document.querySelector('.category .selected').textContent.trim();
     
+        // Check if all required fields are filled in
         if (!videoFile || !thumbnailFile || !title || !category) {
-            alert("Please fill in all required fields.");
+            showNotification("Please fill in all required fields.");
             return;
         }
+    
+        // Turn on loader only after fields are validated
+        toggleLoader(true);
     
         try {
             // Step 1: Save video metadata first to generate videoId
@@ -1070,7 +1225,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             let quizQuestions = [];
     
             for (const [index, container] of quizContainers.entries()) {
-                const questionText = container.querySelector('.question-input input').value;
+                const questionText = container.querySelector('.question-input input').value.trim();
                 const options = container.querySelectorAll('.question-options input[type="text"]');
                 const correctOption = container.querySelector('.question-options input[type="radio"]:checked');
     
@@ -1095,7 +1250,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 options.forEach((option, optIndex) => {
                     quizQuestion.options.push({
                         label: `Option ${optIndex + 1}`,
-                        value: option.value
+                        value: option.value.trim()
                     });
                     if (correctOption && correctOption.id === option.previousElementSibling.id) {
                         quizQuestion.correctAnswer = optIndex;  // Save the correct answer index
@@ -1111,36 +1266,46 @@ document.addEventListener('DOMContentLoaded', async function () {
                 category: category,
                 questions: quizQuestions
             });
+            
+            toggleLoader(false);
+            showNotification('Video and Quiz saved successfully.');
+            $('#uploadModal').modal('hide');
     
-            alert('Video and Quiz saved successfully.');
+            fetchSavedVideosAndQuizzes();
     
         } catch (error) {
             console.error('Error saving video and quiz:', error);
-            alert('An error occurred while saving the video and quiz. Please try again.');
+            toggleLoader(false);
+            showNotification('An error occurred while saving the video and quiz. Please try again.');
         }
-    });
+    });    
 
     editSaveBtn.addEventListener('click', async function () {
+        // Start by validating the form input before enabling the loader
+        const videoTitle = document.getElementById('editVideoTitleInput').value.trim();
+        const selectedCategory = document.querySelector('#editSelectedCategory').textContent.trim();
+    
+        // Validate title and category
+        if (!videoTitle) {
+            showNotification('Please provide a title for the video.');
+            return;
+        }
+    
+        if (!selectedCategory) {
+            showNotification('Please select a category before saving.');
+            return;
+        }
+    
+        // Enable loader only after all validation has passed
+        toggleLoader(true);
+    
         try {
             console.log("Starting the Firebase edit process...");
             
             // Collect data from the preview (already validated)
-            const videoTitle = document.getElementById('editVideoTitleInput').value.trim();
             const videoUrlFromPreview = document.querySelector('#editVideoPreviewContainer video source')?.src;
             const thumbnailUrlFromPreview = document.querySelector('#editThumbnailPreviewContainer img')?.src;
-            const selectedCategory = document.querySelector('#editSelectedCategory').textContent.trim();
             const quizQuestions = await collectQuizQuestions();  // Custom function to collect quiz questions from the preview
-    
-            // Validate title and category
-            if (!videoTitle) {
-                alert('Please provide a title for the video.');
-                return;
-            }
-    
-            if (!selectedCategory) {
-                alert('Please select a category before saving.');
-                return;
-            }
     
             // Upload video and thumbnail files if changed
             const videoFile = document.getElementById('editVideoUpload').files[0];
@@ -1166,14 +1331,15 @@ document.addEventListener('DOMContentLoaded', async function () {
     
             // Ensure videoURL and thumbnailURL are valid
             if (!videoUrl || !thumbnailUrl) {
-                alert('Error with video or thumbnail upload. Please ensure files are uploaded correctly.');
+                toggleLoader(false);
+                showNotification('Error with video or thumbnail upload. Please ensure files are uploaded correctly.');
                 return;
             }
     
             // Prepare video data to save/update in Firestore
             const updatedVideoData = {
                 title: videoTitle,
-                category: selectedCategory,  // Ensure the category is properly set
+                category: selectedCategory,
                 videoURL: videoUrl,
                 thumbnailURL: thumbnailUrl
             };
@@ -1188,8 +1354,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     
             // Prepare quiz data to save/update in Firestore
             const updatedQuizData = {
-                videoId: editingVideoId,  // Use the same videoId from edit mode
-                category: selectedCategory,  // Make sure the category is being set in quizzes too
+                videoId: editingVideoId,
+                category: selectedCategory,
                 questions: quizQuestions
             };
     
@@ -1201,20 +1367,25 @@ document.addEventListener('DOMContentLoaded', async function () {
     
             if (!quizSnapshot.empty) {
                 // If quiz exists, update it
-                const quizDocRef = quizSnapshot.docs[0].ref;  // Get the document reference from the query result
+                const quizDocRef = quizSnapshot.docs[0].ref;
                 await setDoc(quizDocRef, updatedQuizData, { merge: true });
             } else {
                 // If no existing quiz, create a new document
                 await addDoc(collection(db, 'quizzes'), updatedQuizData);
             }
+            
+            toggleLoader(false);
+            showNotification('Video and quiz updated successfully.');
+            $('#editModal').modal('hide');
     
-            alert('Video and quiz updated successfully.');
+            fetchSavedVideosAndQuizzes();
     
         } catch (error) {
             console.error('Error saving video and quiz:', error);
-            alert('An error occurred while saving the video and quiz. Please try again.');
+            toggleLoader(false);
+            showNotification('An error occurred while saving the video and quiz. Please try again.');
         }
-    });
+    });    
     
     // Updated collectQuizQuestions function to handle image uploads for each question
     async function collectQuizQuestions() {
@@ -1257,3 +1428,20 @@ document.addEventListener('DOMContentLoaded', async function () {
         return await getDownloadURL(fileRef);
     }
 });
+
+function toggleLoader(show) {
+    const loader = document.getElementById('loader1');
+    if (show) {
+        loader.style.display = 'flex';
+    } else {
+        loader.style.display = 'none';
+    }
+}
+
+
+function showNotification(message) {
+    const notificationModalBody = document.getElementById('notificationModalBody');
+    notificationModalBody.textContent = message; // Set the message content
+    const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal')); // Initialize the modal
+    notificationModal.show(); // Show the modal
+}
