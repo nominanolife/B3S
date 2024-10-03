@@ -207,27 +207,53 @@ h2 {
     padding: 20px;
 }
 
-.tdc-content {
+.exam-content {
     display: flex;
     flex-direction: column;
+    gap: 20px;
 }
 
-.tdc-content h3 {
+.exam-content h3 {
     font-family: Poppins;
     font-size: 40px;
     font-weight: bold;
     color: #2F2E2E;
 }
 
-.tdc-content p {
+.exam-content-reminder {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.exam-content-reminder h4 {
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2F2E2E;
+}
+
+.exam-content-list {
     font-family: Poppins;
     font-size: 18px;
     font-weight: normal;
     color: #2F2E2E;
-    margin-top: 20px;
 }
 
-.tdc-content a {
+.exam-content-list li {
+    margin-top: 10px;
+    padding-left: 10px;
+    list-style-type: disc;
+}
+
+.exam-content p {
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: normal;
+    color: #2F2E2E;
+}
+
+.exam-content a {
     font-family: Poppins;
     font-size: 14px;
     font-weight: bold;
@@ -236,7 +262,6 @@ h2 {
     border: none;
     border-radius: 30px;
     padding: 10px 30px;
-    margin-top: 20px;
 }
 
 @keyframes popOut {

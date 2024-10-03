@@ -27,97 +27,109 @@ let allBookingsCancelled = [];
 
 // Items per page
 const itemsPerPage = 10;
+const loader = document.getElementById('loader1');
 
 // Fetch and render the bookings
 async function fetchBookings() {
+    // Show loader while fetching data
+    loader.style.display = 'flex';
+    
     const upcomingList = document.querySelector('.upcoming-list');
     const cancelledList = document.querySelector('.cancelled-list');
 
     upcomingList.innerHTML = '';
     cancelledList.innerHTML = '';
 
-    const appointmentsSnapshot = await getDocs(collection(db, "appointments"));
+    try {
+        const appointmentsSnapshot = await getDocs(collection(db, "appointments"));
 
-    allBookingsUpcoming = [];
-    allBookingsCancelled = [];
+        allBookingsUpcoming = [];
+        allBookingsCancelled = [];
 
-    for (const appointmentDoc of appointmentsSnapshot.docs) {
-        const appointmentData = appointmentDoc.data();
-        let bookings = appointmentData.bookings;
+        for (const appointmentDoc of appointmentsSnapshot.docs) {
+            const appointmentData = appointmentDoc.data();
+            let bookings = appointmentData.bookings;
 
-        if (!Array.isArray(bookings) || bookings.length === 0) {
-            console.log(`No bookings found for document ID: ${appointmentDoc.id}`);
-            continue;
-        }
+            if (!Array.isArray(bookings) || bookings.length === 0) {
+                console.log(`No bookings found for document ID: ${appointmentDoc.id}`);
+                continue;
+            }
 
-        const course = appointmentData.course;
+            const course = appointmentData.course;
 
-        for (const booking of bookings) {
-            const applicantDoc = await getDoc(doc(db, "applicants", booking.userId));
-            let fullName = '';
+            for (const booking of bookings) {
+                const applicantDoc = await getDoc(doc(db, "applicants", booking.userId));
+                let fullName = '';
 
-            if (applicantDoc.exists()) {
-                const applicantData = applicantDoc.data();
-                if (applicantData && applicantData.personalInfo) {
-                    fullName = `${applicantData.personalInfo.first} ${applicantData.personalInfo.middle} ${applicantData.personalInfo.last} ${applicantData.personalInfo.suffix ? applicantData.personalInfo.suffix : ''}`.trim();
+                if (applicantDoc.exists()) {
+                    const applicantData = applicantDoc.data();
+                    if (applicantData && applicantData.personalInfo) {
+                        fullName = `${applicantData.personalInfo.first} ${applicantData.personalInfo.middle} ${applicantData.personalInfo.last} ${applicantData.personalInfo.suffix ? applicantData.personalInfo.suffix : ''}`.trim();
+                    } else {
+                        console.warn(`Applicant data is missing or malformed for userId: ${booking.userId}`);
+                        continue;
+                    }
                 } else {
-                    console.warn(`Applicant data is missing or malformed for userId: ${booking.userId}`);
+                    console.log(`Account for userId: ${booking.userId} has been deleted. Ignoring this booking.`);
                     continue;
                 }
-            } else {
-                console.log(`Account for userId: ${booking.userId} has been deleted. Ignoring this booking.`);
-                continue;
-            }
 
-            let formattedTime = '';
-            if (booking.timeSlot) {
-                const [startHour, startMinute] = booking.timeSlot.split('-')[0].split(':');
-                const [endHour, endMinute] = booking.timeSlot.split('-')[1].split(':');
+                let formattedTime = '';
+                if (booking.timeSlot) {
+                    const [startHour, startMinute] = booking.timeSlot.split('-')[0].split(':');
+                    const [endHour, endMinute] = booking.timeSlot.split('-')[1].split(':');
 
-                const startPeriod = startHour >= 12 ? 'PM' : 'AM';
-                const adjustedStartHour = startHour % 12 || 12;
-                const formattedStartTime = `${adjustedStartHour}:${startMinute} ${startPeriod}`;
+                    const startPeriod = startHour >= 12 ? 'PM' : 'AM';
+                    const adjustedStartHour = startHour % 12 || 12;
+                    const formattedStartTime = `${adjustedStartHour}:${startMinute} ${startPeriod}`;
 
-                const endPeriod = endHour >= 12 ? 'PM' : 'AM';
-                const adjustedEndHour = endHour % 12 || 12;
-                const formattedEndTime = `${adjustedEndHour}:${endMinute} ${endPeriod}`;
+                    const endPeriod = endHour >= 12 ? 'PM' : 'AM';
+                    const adjustedEndHour = endHour % 12 || 12;
+                    const formattedEndTime = `${adjustedEndHour}:${endMinute} ${endPeriod}`;
 
-                formattedTime = `${formattedStartTime} - ${formattedEndTime}`;
-            }
+                    formattedTime = `${formattedStartTime} - ${formattedEndTime}`;
+                }
 
-            const appointmentDate = new Date(appointmentData.date);
-            const currentDate = new Date();
+                const appointmentDate = new Date(appointmentData.date);
+                const currentDate = new Date();
 
-            // Skip past appointments
-            if (appointmentDate < currentDate) {
-                console.log(`Appointment on ${appointmentData.date} has already passed. Ignoring this booking.`);
-                continue;
-            }
+                // Skip past appointments
+                if (appointmentDate < currentDate) {
+                    console.log(`Appointment on ${appointmentData.date} has already passed. Ignoring this booking.`);
+                    continue;
+                }
 
-            const rowHtml = `
-                <tr>
-                    <td>${fullName}</td>
-                    <td>${course}</td>
-                    <td>${appointmentData.date}</td>
-                    <td>${formattedTime}</td>
-                </tr>
-            `;
+                const rowHtml = `
+                    <tr>
+                        <td>${fullName}</td>
+                        <td>${course}</td>
+                        <td>${appointmentData.date}</td>
+                        <td>${formattedTime}</td>
+                    </tr>
+                `;
 
-            if (booking.status === 'Cancelled' || booking.status === 'Rescheduled') {
-                allBookingsCancelled.push(rowHtml);
-            } else {
-                allBookingsUpcoming.push(rowHtml);
+                if (booking.status === 'Cancelled' || booking.status === 'Rescheduled') {
+                    allBookingsCancelled.push(rowHtml);
+                } else {
+                    allBookingsUpcoming.push(rowHtml);
+                }
             }
         }
+
+        totalPagesUpcoming = Math.ceil(allBookingsUpcoming.length / itemsPerPage);
+        totalPagesCancelled = Math.ceil(allBookingsCancelled.length / itemsPerPage);
+
+        displayBookings('upcoming');
+        displayBookings('cancelled');
+        updatePaginationControls('upcoming');
+        updatePaginationControls('cancelled');
+
+    } catch (error) {
+        console.error("Error fetching appointments: ", error);
+    } finally {
+        // Hide loader after fetching data
+        loader.style.display = 'none';
     }
-
-    totalPagesUpcoming = Math.ceil(allBookingsUpcoming.length / itemsPerPage);
-    totalPagesCancelled = Math.ceil(allBookingsCancelled.length / itemsPerPage);
-
-    displayBookings('upcoming');
-    displayBookings('cancelled');
-    updatePaginationControls('upcoming');
-    updatePaginationControls('cancelled');
 }
 
 // Global variables to hold filtered bookings

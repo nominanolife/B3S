@@ -40,6 +40,9 @@ function renderApplicants() {
         `;
         contentElement.insertAdjacentHTML('beforeend', rowHtml);
     });
+
+    // Hide the loader once the table is fully rendered
+    document.getElementById('loader1').style.display = 'none';
 }
 
 // Function to update pagination controls
@@ -131,6 +134,9 @@ function renderFilteredApplicants(filteredApplicants) {
 
 // Real-time listener for applicants collection
 function setupRealTimeListener() {
+    // Show loader while data is being fetched
+    document.getElementById('loader1').style.display = 'flex';
+
     db.collection('applicants').onSnapshot((snapshot) => {
         applicantsData = [];
 

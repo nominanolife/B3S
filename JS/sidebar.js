@@ -17,6 +17,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Flag to prevent multiple redirections
+let redirectionInProgress = false;
+
 // Listen for authentication state and handle sidebar button click
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -25,7 +28,11 @@ onAuthStateChanged(auth, (user) => {
         // Add event listener to the "Instructors" button
         document.getElementById('sidebarInstructorButton').addEventListener('click', async function(event) {
             event.preventDefault();  // Prevent the default navigation action
-            await checkMatch(studentId);  // Run the checkMatch function when the button is clicked
+            
+            // Check if a redirection is already in progress
+            if (!redirectionInProgress) {
+                await checkMatch(studentId);  // Run the checkMatch function when the button is clicked
+            }
         });
     } else {
         console.error('No user is logged in.');
@@ -37,6 +44,14 @@ onAuthStateChanged(auth, (user) => {
 // Function to check if the student is already matched with an instructor
 async function checkMatch(studentId) {
     try {
+        // Check if a redirection is already in progress
+        if (redirectionInProgress) {
+            return; // Exit the function if a redirection is already in progress
+        }
+
+        // Set the flag to true to prevent further clicks during processing
+        redirectionInProgress = true;
+
         // Fetch the match document from Firestore
         const matchDoc = await getDoc(doc(db, 'matches', studentId));
 
@@ -63,5 +78,24 @@ async function checkMatch(studentId) {
         }
     } catch (error) {
         console.error('Error checking match status:', error);
+    } finally {
+        // Reset the flag after processing
+        redirectionInProgress = false;
     }
 }
+
+// Add debounce to the button click event
+let debounceTimeout;
+document.getElementById('sidebarInstructorButton').addEventListener('click', function(event) {
+    event.preventDefault();
+
+    // Clear the previous timeout if the button was clicked again quickly
+    clearTimeout(debounceTimeout);
+
+    // Set a new timeout to call the function after a short delay (e.g., 500ms)
+    debounceTimeout = setTimeout(() => {
+        if (!redirectionInProgress) {
+            checkMatch(studentId);
+        }
+    }, 100);
+});
