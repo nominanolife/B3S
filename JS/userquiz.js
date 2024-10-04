@@ -81,3 +81,12 @@ document.querySelector('.back-btn').addEventListener('click', () => {
 
 // Initial call to set up the buttons based on the first question
 manageButtons(currentQuestion, totalQuestions);
+
+document.addEventListener("DOMContentLoaded", function() {
+    const submitButton = document.querySelector('.save-btn');
+    if (submitButton) {
+        submitButton.addEventListener('click', function() {
+            window.location.href = 'userresults.html';
+        });
+    }
+});
