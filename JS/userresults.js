@@ -1,20 +1,138 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import { getFirestore, collection, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+    authDomain: "authentication-d6496.firebaseapp.com",
+    projectId: "authentication-d6496",
+    storageBucket: "authentication-d6496.appspot.com",
+    messagingSenderId: "195867894399",
+    appId: "1:195867894399:web:596fb109d308aea8b6154a"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let questions = [];
+
+// Fetch and Randomize Quizzes
+async function fetchQuizzes() {
+    try {
+        const quizzesSnapshot = await getDocs(collection(db, 'quizzes'));
+        quizzesSnapshot.forEach(doc => {
+            const quizData = doc.data();
+            quizData.questions.forEach(question => {
+                questions.push({
+                    ...question,
+                    category: quizData.category
+                });
+            });
+        });
+    } catch (error) {
+        console.error("Error fetching quizzes:", error);
+    }
+}
+
+// Function to calculate category scores from session storage data
+function calculateCategoryScores() {
+    const userAnswers = JSON.parse(sessionStorage.getItem('userAnswers')) || {};
+    let categoryScores = {};
+    let categoryCounts = {};
+
+    // Iterate through user answers
+    Object.keys(userAnswers).forEach(index => {
+        const { question, answer, category } = userAnswers[index];
+        const correctAnswer = questions[index].correctAnswer;
+
+        if (!categoryScores[category]) {
+            categoryScores[category] = 0;
+            categoryCounts[category] = 0;
+        }
+
+        categoryCounts[category]++;
+
+        // Compare user answer with correct answer index
+        if (answer === questions[index].options[correctAnswer].value) {
+            categoryScores[category] += 100; // Award full score if correct
+        }
+    });
+
+    // Calculate average score per category
+    Object.keys(categoryScores).forEach(category => {
+        categoryScores[category] /= categoryCounts[category];
+    });
+
+    return categoryScores;
+}
+
+// Function to determine if the user passed
+function checkIfPassed(categoryScores) {
+    let totalScore = 0;
+    let categoryCount = 0;
+
+    Object.values(categoryScores).forEach(score => {
+        totalScore += score;
+        categoryCount++;
+    });
+
+    const averageScore = totalScore / categoryCount;
+    return averageScore >= 80;
+}
+
+// Function to save results if the user passed
+async function saveResultsIfPassed(categoryScores) {
+    if (checkIfPassed(categoryScores)) {
+        try {
+            // Check if user is authenticated
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    const userId = user.uid;
+                    const userResultsRef = doc(db, 'userResults', userId);
+                    const userResults = {
+                        categoryScores: categoryScores,
+                        timestamp: new Date(),
+                    };
+
+                    await setDoc(userResultsRef, userResults, { merge: true });
+                    console.log("User results saved successfully.");
+                } else {
+                    console.error("No authenticated user found.");
+                }
+            });
+        } catch (error) {
+            console.error("Error saving user results:", error);
+        }
+    }
+}
+
 // Function to show the loader and display results when the result button is clicked
-document.getElementById('seeResultsBtn').addEventListener('click', function() {
+document.getElementById('seeResultsBtn').addEventListener('click', async function () {
     // Show the loader
     document.getElementById('loader1').style.display = 'flex';
 
+    // Fetch the quiz data
+    await fetchQuizzes();
+
+    // Calculate category scores
+    const categoryScores = calculateCategoryScores();
+
+    // Save results if the user passed
+    saveResultsIfPassed(categoryScores);
+
     // Simulate a delay to mimic data loading
-    setTimeout(function() {
+    setTimeout(function () {
         // Hide the loader after 3 seconds
         document.getElementById('loader1').style.display = 'none';
 
         // Logic to display the chart
-        showChart();
-
+        showChart(categoryScores);
     }, 3000);  // 3 seconds delay for simulation
 });
 
-function showChart() {
+function showChart(categoryScores) {
     let resultContainer = document.querySelector('.result-container');
 
     // Clear the existing content in the result-container
@@ -32,17 +150,20 @@ function showChart() {
     nextButton.innerHTML = 'Next';
     resultContainer.appendChild(nextButton);
 
+    const labels = Object.keys(categoryScores);
+    const dataPoints = Object.values(categoryScores);
+
     // Create a bar graph using Chart.js
     const ctx = document.getElementById('myBarChart').getContext('2d');
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['General Knowledge', 'Emergencies', 'Handling and Driving', 'Parking', 'Road Position', 'Violation'],
+            labels: labels,
             datasets: [{
                 label: 'Performance Score',
-                data: [85, 90, 78, 92, 100, 20], // Sample data points
-                backgroundColor: ['rgba(75, 192, 192, 0.2)'],
-                borderColor: ['rgba(75, 192, 192, 1)'],
+                data: dataPoints,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1
             }]
         },
@@ -56,15 +177,11 @@ function showChart() {
     });
 
     // Add event listener for the "Next" button
-    nextButton.addEventListener('click', function() {
-        const evaluationData = [
-            { category: 'Parking', score: 20 },
-            { category: 'Road Position', score: 92 },
-            { category: 'Violation', score: 20 },
-            { category: 'Emergencies', score: 90 },
-            { category: 'Handling and Driving', score: 78 },
-            { category: 'General Knowledge', score: 85 }
-        ];
+    nextButton.addEventListener('click', function () {
+        const evaluationData = labels.map((label, index) => ({
+            category: label,
+            score: dataPoints[index]
+        }));
         showPerformanceEvaluation(evaluationData);
     });
 }
@@ -105,8 +222,8 @@ function showPerformanceEvaluation(evaluationData) {
             <ul>
                 <li>Areas to Improve:</li>
                 <ul>
-                    <li>Practice different parking techniques.</li>
-                    <li>Focus on parallel and reverse parking skills.</li>
+                    <li>Practice different techniques in this category.</li>
+                    <li>Focus on improving key skills relevant to this area.</li>
                     <li>Seek additional training or guidance if necessary.</li>
                 </ul>
             </ul>
@@ -125,7 +242,7 @@ function showPerformanceEvaluation(evaluationData) {
     resultContainer.appendChild(backButton);
 
     // Add event listener for the "Back" button
-    backButton.addEventListener('click', function() {
-        showChart();
+    backButton.addEventListener('click', function () {
+        showChart(calculateCategoryScores());
     });
 }
