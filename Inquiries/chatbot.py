@@ -180,7 +180,7 @@ def fallback_response(user_input):
     processed_text = preprocess_text_advanced(user_input)
 
     # Step 2: Detect if input is meaningless (e.g., contains repeated letters or is too short)
-    if len(processed_text) < 2 or re.match(r'^[a-zA-Z]\1*$', processed_text):
+    if len(processed_text) < 2 or re.match(r'^([a-zA-Z])\1*$', processed_text):
         return "It seems like you entered something unclear or repetitive. Could you please ask a complete question?"
 
     # Step 3: Get prediction and confidence
