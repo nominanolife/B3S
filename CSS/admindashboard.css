@@ -250,7 +250,7 @@ h2 {
 .page-body {
     display: flex;
     flex-direction: column;
-    margin-top: 40px;
+    margin-top: 50px;
 }
 
 .page-body h2 {

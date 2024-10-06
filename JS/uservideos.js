@@ -18,19 +18,80 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Declare global variable for user progress
+let globalUserProgress = {}; // Declare at the top level to make it accessible throughout the code
+let fadeOutTimer, cursorFadeTimer;
+
+// Function to show video controls and cursor
+const showControls = (controlsDiv, videoPlayer) => {
+    controlsDiv.style.opacity = '1';
+    videoPlayer.style.cursor = 'default'; // Show cursor
+};
+
+// Function to hide video controls and cursor
+const hideControls = (controlsDiv, videoPlayer) => {
+    controlsDiv.style.opacity = '0';
+    videoPlayer.style.cursor = 'none'; // Hide cursor
+};
+
+// Function to reset the timer for fading controls and cursor
+const resetFadeOutTimer = (videoElement, controlsDiv, videoPlayer) => {
+    // Clear any existing timers
+    clearTimeout(fadeOutTimer);
+    clearTimeout(cursorFadeTimer);
+    
+    // Show controls and cursor when user moves the mouse
+    showControls(controlsDiv, videoPlayer);
+    
+    // Set the fade-out timer for controls and cursor for 2 seconds
+    fadeOutTimer = setTimeout(() => {
+        if (!videoElement.paused) {
+            hideControls(controlsDiv, videoPlayer);
+        }
+    }, 2000);
+    
+    // Set the fade-out timer for cursor for 2 seconds
+    cursorFadeTimer = setTimeout(() => {
+        if (!videoElement.paused) {
+            videoPlayer.style.cursor = 'none'; // Hide cursor
+        }
+    }, 2000);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM fully loaded and parsed.");
+
+    const videoPlayer = document.getElementById('lesson-video'); // Define videoPlayer after DOM is loaded
+
+    if (videoPlayer) {
+        videoPlayer.addEventListener('mousemove', () => {
+            const controlsDiv = videoPlayer.querySelector('.video-controls');
+            if (controlsDiv) {
+                resetFadeOutTimer(videoPlayer.querySelector('video'), controlsDiv, videoPlayer);
+            }
+        });
+
+        videoPlayer.addEventListener('mouseleave', () => {
+            const controlsDiv = videoPlayer.querySelector('.video-controls');
+            if (controlsDiv) {
+                hideControls(controlsDiv, videoPlayer);
+            }
+        });
+
+        // Initial show of the controls and fade after a delay
+        const controlsDiv = videoPlayer.querySelector('.video-controls');
+        if (controlsDiv) {
+            resetFadeOutTimer(videoPlayer.querySelector('video'), controlsDiv, videoPlayer);
+        }
+    }
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             console.log("User is authenticated.");
             const userId = user.uid;
-            const videoId = sessionStorage.getItem('selectedVideoId');
-            console.log("Selected video ID:", videoId);
-            console.log("Current user ID:", userId);
+            let videoId = sessionStorage.getItem('selectedVideoId');
 
             try {
-                // Step 1: Fetch all lessons from Firestore
                 console.log("Fetching lessons from Firestore...");
                 const videosSnapshot = await getDocs(collection(db, 'videos'));
 
@@ -45,70 +106,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }));
                 console.log("Fetched videos:", videos);
 
-                // Step 2: Set up a real-time listener for user progress
                 console.log("Fetching user progress in real-time...");
                 const userProgressDocRef = doc(db, 'userProgress', userId);
+
                 onSnapshot(userProgressDocRef, (userProgressDoc) => {
-                    const userProgress = userProgressDoc.exists() ? userProgressDoc.data() : {};
-                    console.log("Real-time user progress:", userProgress);
-                    // Update the sidebar lessons dynamically whenever progress changes
-                    updateLessonList(videos, userProgress);
-                    updateExamAvailability(videos, userProgress);
+                    globalUserProgress = userProgressDoc.exists() ? userProgressDoc.data() : {};
+                    console.log("Real-time user progress:", globalUserProgress);
+                    updateLessonList(videos, globalUserProgress, userId);
+                    updateExamAvailability(videos, globalUserProgress);
                 });
 
-                // Step 3: Render the current video
+                if (!videoId && videos.length > 0) {
+                    videoId = videos[0].id; // Default to the first video if no video is selected
+                    sessionStorage.setItem('selectedVideoId', videoId);
+                }
+
+                // Render video details for the selected video
                 if (videoId) {
-                    console.log("Fetching video document from Firestore...");
-                    const videoDoc = await getDoc(doc(db, 'videos', videoId));
-                    if (videoDoc.exists()) {
-                        const videoData = videoDoc.data();
-                        const videoTitleElement = document.querySelector('.video-header h3');
-                        const videoPlayer = document.getElementById('lesson-video');
-
-                        if (!videoTitleElement || !videoPlayer) {
-                            console.error("Video title element or video player not found in DOM.");
-                            return;
-                        }
-
-                        // Set video details
-                        videoTitleElement.textContent = videoData.title;
-                        videoPlayer.src = videoData.videoURL;
-
-                        // Disable the seek bar to prevent skipping
-                        videoPlayer.addEventListener('timeupdate', () => {
-                            videoPlayer.controls = false;
-                        });
-
-                        // Check when 10 seconds are left, mark as completed
-                        videoPlayer.addEventListener('timeupdate', async () => {
-                            const remainingTime = videoPlayer.duration - videoPlayer.currentTime;
-                            if (remainingTime <= 10) {
-                                try {
-                                    console.log(`10 seconds or less remaining. Marking video ${videoId} as completed.`);
-                                    await setDoc(userProgressDocRef, {
-                                        [videoId]: {
-                                            currentTime: 0,
-                                            completed: true
-                                        }
-                                    }, { merge: true });
-
-                                    // Unlock the next lesson
-                                    await unlockNextLesson(userId, videos, videoId);
-
-                                    // Update the lesson list to reflect changes
-                                    const updatedUserProgressDoc = await getDoc(userProgressDocRef);
-                                    const updatedUserProgress = updatedUserProgressDoc.exists() ? updatedUserProgressDoc.data() : {};
-                                    updateLessonList(videos, updatedUserProgress);
-                                    updateExamAvailability(videos, updatedUserProgress);
-                                } catch (error) {
-                                    console.error("Error marking video as completed:", error);
-                                }
-                            }
-                        });
-
-                    } else {
-                        console.error("No such video document found in Firestore for videoId:", videoId);
-                    }
+                    renderVideoDetails(videoId, videos, userId);
                 }
             } catch (error) {
                 console.error("Error during Firestore operations:", error);
@@ -118,6 +133,254 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+async function renderVideoDetails(videoId, videos, userId) {
+    const videoPlayer = document.getElementById('lesson-video');
+    const userProgressDocRef = doc(db, 'userProgress', userId);
+
+    try {
+        console.log("Fetching video document from Firestore...");
+        const videoDoc = await getDoc(doc(db, 'videos', videoId));
+        if (videoDoc.exists()) {
+            const videoData = videoDoc.data();
+            const videoTitleElement = document.querySelector('.video-header h3');
+
+            if (!videoTitleElement || !videoPlayer) {
+                console.error("Video title element or video player not found in DOM.");
+                return;
+            }
+
+            // Pause and unload existing video element
+            const existingVideoElement = videoPlayer.querySelector('video');
+            if (existingVideoElement) {
+                existingVideoElement.pause();
+                existingVideoElement.src = '';
+                existingVideoElement.load();
+            }
+
+            videoPlayer.innerHTML = ''; // Clear the video player container
+
+            const videoElement = document.createElement('video');
+            videoElement.src = videoData.videoURL;
+            videoElement.style.width = "100%";
+            videoElement.style.height = "100%";
+            videoElement.style.objectFit = "contain";
+            videoElement.style.backgroundColor = "black";
+            videoElement.volume = 0.5;
+            videoElement.autoplay = true;
+
+            videoElement.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+            });
+
+            videoPlayer.appendChild(videoElement);
+            videoTitleElement.textContent = videoData.title;
+
+            const controlsDiv = document.createElement('div');
+            controlsDiv.classList.add('video-controls');
+            videoPlayer.appendChild(controlsDiv);
+
+            const playPauseButton = document.createElement('button');
+            playPauseButton.classList.add('control-button');
+            playPauseButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
+            controlsDiv.appendChild(playPauseButton);
+
+            const seekContainer = document.createElement('div');
+            seekContainer.classList.add('seek-container');
+            controlsDiv.appendChild(seekContainer);
+
+            const currentTimeDisplay = document.createElement('span');
+            currentTimeDisplay.classList.add('current-time');
+            currentTimeDisplay.textContent = '0:00';
+            seekContainer.appendChild(currentTimeDisplay);
+
+            const seekBar = document.createElement('input');
+            seekBar.type = 'range';
+            seekBar.classList.add('seek-bar');
+            seekBar.value = 0;
+            seekBar.max = 100;
+            seekContainer.appendChild(seekBar);
+
+            let maxAllowedSeekTime = 0;
+            let lastSavedTime = 0; // For throttling save progress
+
+            // Fetch user progress for the current video
+            const userProgressDoc = await getDoc(userProgressDocRef);
+            if (userProgressDoc.exists() && userProgressDoc.data()[videoId]) {
+                const userProgress = userProgressDoc.data()[videoId];
+                maxAllowedSeekTime = userProgress.completed ? Infinity : userProgress.currentTime;
+                console.log("User progress found, max allowed seek time:", maxAllowedSeekTime);
+            } else {
+                console.log("No user progress found, starting from the beginning.");
+            }
+
+            videoElement.addEventListener('loadedmetadata', () => {
+                if (Number.isFinite(maxAllowedSeekTime) && maxAllowedSeekTime >= 0 && maxAllowedSeekTime <= videoElement.duration) {
+                    videoElement.currentTime = maxAllowedSeekTime;
+                }
+            });
+            
+            const volumeContainer = document.createElement('div');
+            volumeContainer.classList.add('volume-container');
+            controlsDiv.appendChild(volumeContainer);
+
+            const volumeIcon = document.createElement('i');
+            volumeIcon.classList.add('bi', 'bi-volume-up-fill');
+            volumeContainer.appendChild(volumeIcon);
+
+            const volumeControl = document.createElement('input');
+            volumeControl.type = 'range';
+            volumeControl.classList.add('volume-control');
+            volumeControl.min = 0;
+            volumeControl.max = 1;
+            volumeControl.step = 0.1;
+            volumeControl.value = 0.5;
+            volumeContainer.appendChild(volumeControl);
+
+            const fullscreenButton = document.createElement('button');
+            fullscreenButton.classList.add('control-button');
+            fullscreenButton.innerHTML = '<i class="bi bi-fullscreen"></i>';
+            controlsDiv.appendChild(fullscreenButton);
+
+            const togglePlayPause = () => {
+                if (videoElement.paused) {
+                    videoElement.play();
+                    playPauseButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
+                } else {
+                    videoElement.pause();
+                    playPauseButton.innerHTML = '<i class="bi bi-play-fill"></i>';
+                }
+            };
+
+            playPauseButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                togglePlayPause();
+            });
+
+            videoPlayer.addEventListener('click', (e) => {
+                if (e.target !== volumeControl && e.target !== volumeIcon) {
+                    togglePlayPause();
+                }
+            });
+
+            videoElement.addEventListener('timeupdate', () => {
+                if (videoElement.duration && videoElement.currentTime <= videoElement.duration) {
+                    const value = (100 / videoElement.duration) * videoElement.currentTime;
+                    seekBar.value = value;
+                }
+
+                const currentMinutes = Math.floor(videoElement.currentTime / 60);
+                const currentSeconds = Math.floor(videoElement.currentTime % 60).toString().padStart(2, '0');
+                currentTimeDisplay.textContent = `${currentMinutes}:${currentSeconds}`;
+
+                if (videoElement.currentTime > maxAllowedSeekTime) {
+                    maxAllowedSeekTime = videoElement.currentTime;
+                }
+
+                // Save progress every 5 seconds
+                if (videoElement.currentTime - lastSavedTime >= 5) {
+                    saveUserProgress(userId, videoId, videoElement.currentTime);
+                    lastSavedTime = videoElement.currentTime;
+                }
+            });
+
+            seekBar.addEventListener('input', () => {
+                const seekTo = (videoElement.duration / 100) * seekBar.value;
+                if (maxAllowedSeekTime === Infinity || seekTo <= maxAllowedSeekTime) {
+                    videoElement.currentTime = seekTo;
+                } else {
+                    seekBar.value = (100 / videoElement.duration) * maxAllowedSeekTime;
+                }
+            });
+
+            volumeControl.addEventListener('input', () => {
+                videoElement.volume = volumeControl.value;
+            });
+
+            fullscreenButton.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    videoPlayer.requestFullscreen().catch(err => {
+                        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                    });
+                } else {
+                    document.exitFullscreen().catch(err => {
+                        console.error(`Error attempting to exit full-screen mode: ${err.message} (${err.name})`);
+                    });
+                }
+            });
+
+            document.addEventListener('fullscreenchange', () => {
+                if (document.fullscreenElement) {
+                    fullscreenButton.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
+                } else {
+                    fullscreenButton.innerHTML = '<i class="bi bi-fullscreen"></i>';
+                }
+            });
+
+            videoElement.addEventListener('ended', async () => {
+                console.log("Video ended. Marking as completed.");
+
+                try {
+                    // Mark current video as completed in the database
+                    await saveUserProgress(userId, videoId, videoElement.duration, true);
+
+                    await unlockNextLesson(userId, videos, videoId);
+                    const currentIndex = videos.findIndex(video => video.id === videoId);
+                    if (currentIndex >= 0 && currentIndex < videos.length - 1) {
+                        const nextVideoId = videos[currentIndex + 1].id;
+                        console.log(`Auto-playing next video: ${nextVideoId}`);
+
+                        // Update sessionStorage with the next video ID
+                        sessionStorage.setItem('selectedVideoId', nextVideoId);
+
+                        // Render the next video
+                        renderVideoDetails(nextVideoId, videos, userId);
+
+                        // Update the lesson list to reflect the new current video
+                        updateLessonList(videos, globalUserProgress, userId);
+                    }
+                } catch (error) {
+                    console.error("Error marking video as completed:", error);
+                }
+            });
+
+            // Update sessionStorage with the current video ID
+            sessionStorage.setItem('selectedVideoId', videoId);
+
+            // Update the lesson list to reflect the current video
+            updateLessonList(videos, globalUserProgress, userId);
+
+            controlsDiv.classList.remove('hidden'); // Ensure controls are visible initially
+
+        } else {
+            console.error("No such video document found in Firestore for videoId:", videoId);
+        }
+    } catch (error) {
+        console.error("Error during video rendering:", error);
+    }
+}
+
+// Function to save user progress
+async function saveUserProgress(userId, videoId, currentTime, completed = false) {
+    try {
+        const userProgressDocRef = doc(db, 'userProgress', userId);
+        const existingProgressDoc = await getDoc(userProgressDocRef);
+        let existingProgress = {};
+        
+        if (existingProgressDoc.exists()) {
+            existingProgress = existingProgressDoc.data();
+        }
+
+        await setDoc(userProgressDocRef, {
+            [videoId]: {
+                currentTime: currentTime,
+                completed: existingProgress[videoId]?.completed || completed
+            }
+        }, { merge: true });
+    } catch (error) {
+        console.error("Error saving user progress:", error);
+    }
+}
 
 // Function to unlock the next lesson
 async function unlockNextLesson(userId, videos, currentVideoId) {
@@ -142,7 +405,7 @@ async function unlockNextLesson(userId, videos, currentVideoId) {
 }
 
 // Function to update the lesson list dynamically
-function updateLessonList(videos, userProgress) {
+function updateLessonList(videos, userProgress, userId) {
     const lessonListContainer = document.querySelector('.lessons ul');
     if (!lessonListContainer) {
         console.error("Lesson list container not found in DOM.");
@@ -150,6 +413,8 @@ function updateLessonList(videos, userProgress) {
     }
 
     lessonListContainer.innerHTML = ''; // Clear old list items
+    const currentVideoId = sessionStorage.getItem('selectedVideoId'); // Get the currently playing video ID
+
     videos.forEach((video, index) => {
         const listItem = document.createElement('li');
         const isUnlocked = userProgress[video.id]?.completed || (index === 0) || (userProgress[videos[index - 1]?.id]?.completed);
@@ -158,49 +423,87 @@ function updateLessonList(videos, userProgress) {
         lessonLink.textContent = video.title;
 
         if (isUnlocked) {
-            lessonLink.href = '#';
-            lessonLink.addEventListener('click', () => {
+            lessonLink.href = '#'; // Optional: keep the link here if needed
+            listItem.addEventListener('click', () => {
                 sessionStorage.setItem('selectedVideoId', video.id);
                 console.log("Navigating to video ID:", video.id);
-                renderVideoDetails(video.id); // Ensure that the correct video gets displayed
+                renderVideoDetails(video.id, videos, userId);
+
+                // Update the lesson list to reflect the new current video
+                updateLessonList(videos, userProgress, userId);
             });
+            listItem.appendChild(lessonLink);
         } else {
             listItem.classList.add('locked');
             lessonLink.classList.add('disabled');
             const lockIcon = document.createElement('i');
             lockIcon.classList.add('bi', 'bi-lock');
+            listItem.appendChild(lessonLink);
             listItem.appendChild(lockIcon);
         }
 
-        listItem.appendChild(lessonLink);
+        // Highlight the currently playing video
+        if (video.id === currentVideoId) {
+            listItem.classList.add('active-lesson');
+        }
+
+        // Append the list item to the container
         lessonListContainer.appendChild(listItem);
     });
 }
 
-// Function to update "Written Exam" availability
+// Function to update "Written Exam" availability dynamically
 function updateExamAvailability(videos, userProgress) {
-    const writtenExamLink = document.querySelector('.exams ul li a');
-    if (!writtenExamLink) {
-        console.error("Written Exam link not found in DOM.");
-        return;
-    }
+    const examContainer = document.querySelector('.exams ul');
+
+    // Clear any existing exam list items to prevent duplicates
+    examContainer.innerHTML = '';
 
     // Check if all videos are completed
     const allCompleted = videos.every(video => userProgress[video.id]?.completed);
-    if (allCompleted) {
-        writtenExamLink.classList.remove('disabled');
-        writtenExamLink.href = 'userquizreminder.html';
-    } else {
-        writtenExamLink.classList.add('disabled');
-        writtenExamLink.removeAttribute('href');
-    }
-}
 
-// Function to render a specific video (called when navigating between lessons)
-function renderVideoDetails(videoId) {
-    console.log(`Rendering video with ID: ${videoId}`);
-    sessionStorage.setItem('selectedVideoId', videoId);
-    window.location.reload(); // Reload the page with new context
+    if (allCompleted) {
+        // Create a new list item for the written exam
+        const examListItem = document.createElement('li');
+        examListItem.classList.add('unlocked'); // You can add custom styling here if needed
+
+        // Create the anchor element for the exam
+        const examLink = document.createElement('a');
+        examLink.href = 'useronlinetdc.html';
+        examLink.textContent = 'Take the Written Exam';
+
+        // Append the anchor to the list item
+        examListItem.appendChild(examLink);
+
+        // Add click event to navigate when the entire list item is clicked
+        examListItem.addEventListener('click', () => {
+            window.location.href = 'useronlinetdc.html';
+        });
+
+        // Append the list item to the exam container
+        examContainer.appendChild(examListItem);
+    } else {
+        // Create a locked list item if not all videos are completed
+        const examListItem = document.createElement('li');
+        examListItem.classList.add('locked');
+
+        // Create the anchor element for the locked exam
+        const examLink = document.createElement('a');
+        examLink.href = '#'; // No link when locked
+        examLink.classList.add('disabled');
+        examLink.textContent = 'Take the Written Exam';
+
+        // Create a lock icon
+        const lockIcon = document.createElement('i');
+        lockIcon.classList.add('bi', 'bi-lock');
+
+        // Append elements to the list item
+        examListItem.appendChild(examLink);
+        examListItem.appendChild(lockIcon);
+
+        // Append the list item to the exam container
+        examContainer.appendChild(examListItem);
+    }
 }
 
 document.getElementById('toggle-button').addEventListener('click', function () {

@@ -212,7 +212,7 @@ function showPerformanceEvaluation(evaluationData) {
     evaluationData.forEach(item => {
         let performanceBlock = document.createElement('div');
         performanceBlock.className = 'performance-evaluation';
-        
+
         // Determine status and color based on the score
         let status = item.score < 50 ? 'Poor' : 'Great';
         let color = item.score < 50 ? 'red' : 'green';
@@ -241,8 +241,19 @@ function showPerformanceEvaluation(evaluationData) {
     backButton.innerHTML = 'Back';
     resultContainer.appendChild(backButton);
 
+    // Create a "Download PDF" button to generate the performance PDF
+    let downloadButton = document.createElement('button');
+    downloadButton.className = 'result-button';
+    downloadButton.innerHTML = 'Certificate of Completion';
+    resultContainer.appendChild(downloadButton);
+
     // Add event listener for the "Back" button
     backButton.addEventListener('click', function () {
         showChart(calculateCategoryScores());
+    });
+
+    // Add event listener for the "Download PDF" button
+    downloadButton.addEventListener('click', function () {
+        downloadPDF(evaluationData);
     });
 }

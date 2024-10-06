@@ -60,9 +60,13 @@ function saveUserAnswer(index) {
 
 async function renderQuestion(index) {
     if (index >= 0 && index < questions.length) {
+        // Update question number dynamically
+        const questionHeader = document.querySelector('.quiz-container-header h5');
+        questionHeader.textContent = `Question ${index + 1}`;
+
         const questionElement = document.querySelector('.quiz-question-body h4');
         const optionsContainer = document.querySelector('.question-options');
-        const questionImage = document.querySelector('.quiz-image img');
+        const questionImageContainer = document.querySelector('.quiz-image');
         const categoryElement = document.querySelector('.quiz-category');
 
         const questionData = questions[index];
@@ -71,15 +75,28 @@ async function renderQuestion(index) {
         questionElement.textContent = `${index + 1}. ${questionData.question}`;
 
         // Update category text
-        categoryElement.textContent = `Category: ${questionData.category}`;
+        categoryElement.textContent = `${questionData.category}`;
 
-        // Update question image if available
+        // Clear existing content in questionImageContainer
+        questionImageContainer.innerHTML = '';
+
+        // Dynamically create and add image if available
         if (questionData.imageURL) {
             try {
+                // Fetch the image reference from Firebase Storage
                 const imageRef = ref(storage, questionData.imageURL);  // Directly use the imageURL field from Firestore
                 const imageUrl = await getDownloadURL(imageRef);
                 questionImage.src = imageUrl;  // Update the image source with the Firebase URL
                 questionImage.style.display = "block";  // Show the image if the URL is valid
+
+                // Create an image element dynamically
+                const imgElement = document.createElement('img');
+                imgElement.src = imageUrl;
+                imgElement.alt = "Quiz Image";
+                imgElement.style.display = "block";
+
+                // Append image to the container
+                questionImageContainer.appendChild(imgElement);
             } catch (error) {
                 console.error("Error fetching image from storage:", error);
                 questionImage.style.display = "none";  // Hide image if an error occurs
@@ -98,10 +115,8 @@ async function renderQuestion(index) {
                 optionElement.className = 'option';
                 optionElement.innerHTML = `
                     <input type="radio" name="questionanswer" id="option${i}" value="${option.value}">
-                    <label for="option${i}">
-                        <span class="option-answer">${String.fromCharCode(65 + i)}.</span>
-                        <p>${option.value}</p>
-                    </label>
+                    <span class="option-answer">${String.fromCharCode(65 + i)}.</span>
+                    <p>${option.value}</p>
                 `;
                 optionsContainer.appendChild(optionElement);
             });
@@ -119,7 +134,7 @@ async function renderQuestion(index) {
 
         // Update the progress bar and text
         updateProgress(index + 1);
-        manageButtons(index + 1, questions.length);
+        updateButtons();  // Update button visibility based on current question
     }
 }
 
@@ -153,12 +168,35 @@ function manageButtons(currentQuestion, totalQuestions) {
     }
 }
 
+// Manage Button Visibility Dynamically
+function updateButtons() {
+    const backBtn = document.querySelector('.back-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    const saveBtn = document.querySelector('.save-btn');
+
+    // Determine button states based on the current question index
+    if (currentQuestionIndex === 0) {
+        backBtn.style.display = 'none';  // Hide 'Back' button for the first question
+        nextBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'none';  // Hide 'Submit' button until the end
+    } else if (currentQuestionIndex === questions.length - 1) {
+        backBtn.style.display = 'inline-block';
+        nextBtn.style.display = 'none';  // Hide 'Next' button on the last question
+        saveBtn.style.display = 'inline-block';
+    } else {
+        backBtn.style.display = 'inline-block';
+        nextBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'none';
+    }
+}
+
 // Navigation Event Listeners
 document.querySelector('.next-btn').addEventListener('click', () => {
     if (currentQuestionIndex < questions.length - 1) {
         saveUserAnswer(currentQuestionIndex);
         currentQuestionIndex++;
         renderQuestion(currentQuestionIndex);
+        updateButtons();  // Update buttons visibility based on current question index
     }
 });
 
@@ -167,6 +205,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
         saveUserAnswer(currentQuestionIndex);
         currentQuestionIndex--;
         renderQuestion(currentQuestionIndex);
+        updateButtons();  // Update buttons visibility based on current question index
     }
 });
 
@@ -196,6 +235,12 @@ document.querySelector('.save-btn').addEventListener('click', async () => {
     } else {
         console.error("No authenticated user found.");
     }
+});
+
+// Initial Fetch and Render
+document.addEventListener('DOMContentLoaded', () => {
+    // Fetch and randomize quizzes will only be called after the user is authenticated
+    updateButtons();  // Set the initial state of buttons when the page loads
 });
 
 // Listen for authentication state changes
