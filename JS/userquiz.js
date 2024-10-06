@@ -74,7 +74,7 @@ async function renderQuestion(index) {
 
         // Update category text
         if (categoryElement) {
-            categoryElement.textContent = `Category: ${questionData.category}`;
+            categoryElement.textContent = `${questionData.category}`;
         }
 
         // Clear existing content in the image container
@@ -114,10 +114,8 @@ async function renderQuestion(index) {
                 optionElement.className = 'option';
                 optionElement.innerHTML = `
                     <input type="radio" name="questionanswer" id="option${i}" value="${option.value}">
-                    <label for="option${i}">
-                        <span class="option-answer">${String.fromCharCode(65 + i)}.</span>
-                        <p>${option.value}</p>
-                    </label>
+                    <span class="option-answer">${String.fromCharCode(65 + i)}.</span>
+                    <p>${option.value}</p>
                 `;
                 optionsContainer.appendChild(optionElement);
             });
