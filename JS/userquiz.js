@@ -58,7 +58,6 @@ function saveUserAnswer(index) {
     }
 }
 
-// Render Question and Load Saved Answer if Available
 async function renderQuestion(index) {
     if (index >= 0 && index < questions.length) {
         const questionElement = document.querySelector('.quiz-question-body h4');
@@ -77,16 +76,16 @@ async function renderQuestion(index) {
         // Update question image if available
         if (questionData.imageURL) {
             try {
-                const imageRef = ref(storage, `quiz_images/${questionData.imageURL}`);
+                const imageRef = ref(storage, questionData.imageURL);  // Directly use the imageURL field from Firestore
                 const imageUrl = await getDownloadURL(imageRef);
-                questionImage.src = imageUrl;
-                questionImage.style.display = "block";
+                questionImage.src = imageUrl;  // Update the image source with the Firebase URL
+                questionImage.style.display = "block";  // Show the image if the URL is valid
             } catch (error) {
                 console.error("Error fetching image from storage:", error);
-                questionImage.style.display = "none";
+                questionImage.style.display = "none";  // Hide image if an error occurs
             }
         } else {
-            questionImage.style.display = "none";
+            questionImage.style.display = "none";  // Hide the image if no imageURL is available
         }
 
         // Clear existing options

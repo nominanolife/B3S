@@ -429,7 +429,12 @@ function updateEditPreview() {
                 const correctOptionIndex = Array.from(container.querySelectorAll('.question-options input[type="radio"]')).findIndex(radio => radio.checked);
                 const imageUploadInput = container.querySelector(`#imageUpload${index + 1}`);
                 const imageFile = imageUploadInput ? imageUploadInput.files[0] : null;
-                let imageUrl = imageFile ? URL.createObjectURL(imageFile) : null;
+
+                // Fetch the stored image URL if present
+                const savedImageUrl = quizQuestions[index].imageURL || null;
+
+                // Use newly uploaded image URL or fallback to saved image URL
+                let imageUrl = imageFile ? URL.createObjectURL(imageFile) : savedImageUrl;
 
                 const hasValidOptions = Array.from(options).some(option => option.value.trim() !== '');
 
@@ -442,7 +447,6 @@ function updateEditPreview() {
                     questionPreview.textContent = `Question ${index + 1}. ${questionText}`;
                     quizPreviewItem.appendChild(questionPreview);
 
-                    // Add question image preview if an image is uploaded
                     if (imageUrl) {
                         const imagePreview = document.createElement('img');
                         imagePreview.src = imageUrl;
