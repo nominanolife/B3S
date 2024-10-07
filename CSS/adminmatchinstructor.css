@@ -329,12 +329,12 @@ h2 {
 }
 
 .instructor-list i {
-    font-size: 24px;
-    color: #2F2E2E;
+    padding: 10px;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border-radius: 10px;
     border: none;
-    background: none;
-    display: flex;
-    padding-left: 15px;
     cursor: pointer;
 }
 
@@ -929,6 +929,59 @@ input:checked + .slider .slider-label-on {
 
 .btn-logout:hover {
     background-color: #c9302c; 
+}
+
+.close {
+    font-size: 20px;
+    color: #142A74;
+    cursor: pointer;
+}
+
+.custom-modal-size {
+    max-width: 60%;
+    top: auto;
+}
+
+#assigninstructormodal .modal-body {
+    border: 1px solid #142A74;
+    padding: 0;
+    margin: 0;
+}
+
+#assigninstructormodal .modal-body-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding: 10px 0px;
+}
+
+.modal-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modal-table th, .modal-table td {
+    padding: 15px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #D9D9D9;
+}
+
+.modal-table th {
+    font-family: Poppins;
+    font-size: 16px;
+    font-weight: bold;
+    color: #585353;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.table-thead-title th {
+    font-family: Poppins;
+    font-size: 16px;
+    font-weight: bold;
+    color: #585353;
+    text-align: left;
 }
 
 .loader1 {

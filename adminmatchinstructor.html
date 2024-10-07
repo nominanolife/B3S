@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DriveHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="CSS/admininstructorlist.css">
+    <link rel="stylesheet" href="CSS/adminmatchinstructor.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -44,19 +44,71 @@
                 <h2>Dashboard</h2>
             </div>
             <div class="page-content">
-                <div class="page-content-header">
-                    <div class="dashboard-bttns">
-                        <a href="adminapplicantlist.html" class="button-right">Applicant List</a>
-                        <a href="adminstudentlist.html" class="button-right">Student List</a>
-                        <a href="admininstructorlist.html" class="button-right active">Instructor List</a>
-                    </div>
-                </div>
+                <h3>Manual Assigning of Instructor</h3>
                 <div class="page-body">
                     <div class="upcomming-container">
-                        
+                        <table class="table">
+                            <thead class="table-headers">
+                                <tr class="table-headers-title">
+                                    <th>STUDENT NAME</th>
+                                    <th>INSTRUCTOR NAME</th>
+                                    <th>COURSE</th>
+                                    <th>DATE MATCHED</th>
+                                    <th>CHANGE MATCH</th>
+                                </tr>
+                            </thead>
+                            <tbody class="instructor-list">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td><i class="switch-instructor" data-toggle="modal" data-target="#assigninstructormodal">Switch Instructor</i></td>
+                            </tbody>
+                        </table>
                         <!-- Pagination controls for Instructor List -->
                         <div class="pagination-controls"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="assigninstructormodal" tabindex="-1" aria-labelledby="assigninstructormodalLabel" aria-hidden="true">
+        <div class="modal-dialog custom-modal-size">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-body-header">
+                        <div class="student-name">
+                            <span>Spencer Garcia Reid</span>
+                        </div>
+                        <div class="current-instructor">
+                            <span>Jason Mendoza</span>
+                        </div>
+                    </div>
+                    <table class="modal-table">
+                        <thead class="modal-thead">
+                            <tr class="table-thead-title">
+                                <th>INSTRUCTOR NAME</th>
+                                <th>COURSE</th>
+                                <th>TRAITS</th>
+                                <th>CHANGE INSTRUCOR</th>
+                            </tr>
+                        </thead>
+                        <tbody class="modal-tbody">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><i class="switch-ins">SWITCH</i></td>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+
                 </div>
             </div>
         </div>
@@ -123,7 +175,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script type="module" src="JS/admininstructorlist.js"></script>
+    <script type="module" src="JS/adminmatchinstructor.js"></script>
     <script src="JS/admincommon.js"></script>
 </body>
 </html>
