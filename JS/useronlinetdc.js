@@ -48,25 +48,23 @@ async function fetchVideos() {
     return videos;
 }
 
-// Function to fetch user progress from Firestore
-async function fetchUserProgress(userId) {
-    const userProgressDoc = await getDoc(doc(db, 'userProgress', userId));
-    return userProgressDoc.exists() ? userProgressDoc.data() : {};
-}
-
-// Monitor authentication state and fetch progress
+// Monitor authentication state and set up real-time listener for user progress
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         console.log("User is authenticated.");
         const userId = user.uid;
 
         try {
-            // Fetch videos and user progress
+            // Fetch videos once
             const videos = await fetchVideos();
-            const userProgress = await fetchUserProgress(userId);
 
-            // Update the exam button based on progress
-            updateExamAvailability(videos, userProgress);
+            // Set up real-time listener for user progress
+            const userProgressDocRef = doc(db, 'userProgress', userId);
+            onSnapshot(userProgressDocRef, (docSnapshot) => {
+                const userProgress = docSnapshot.exists() ? docSnapshot.data() : {};
+                // Update the exam button based on real-time progress
+                updateExamAvailability(videos, userProgress);
+            });
 
         } catch (error) {
             console.error("Error fetching data:", error);

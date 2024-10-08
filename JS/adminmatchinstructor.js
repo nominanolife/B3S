@@ -1,6 +1,6 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc, limit, startAfter, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc, limit, startAfter, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -15,6 +15,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app); // Firestore instance
+const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
 let currentPage = 1;
 let totalPages = 1;
@@ -22,96 +23,93 @@ const itemsPerPage = 10; // Limit of 10 students per page
 let lastVisibleStudent = null; // Keep track of the last fetched document for pagination
 const paginationControls = document.querySelector('.pagination-controls'); // Ensure this points to the correct element
 
-// Fetch students who have a match, with pagination
-async function fetchMatchedStudents() {
-    const matchesRef = collection(db, 'matches');
-    let q = query(matchesRef, where('matchStatus', '==', 'In Progress'), limit(itemsPerPage)); // Limit to 10 students
+function showNotification(message) {
+    document.getElementById('notificationModalBody').textContent = message;
+    $('#notificationModal').modal('show');
+}
 
-    if (lastVisibleStudent) {
-        q = query(matchesRef, where('matchStatus', '==', 'In Progress'), startAfter(lastVisibleStudent), limit(itemsPerPage));
-    }
+let matchesUnsubscribe = null;
+
+function setUpMatchedStudentsListener() {
+    const matchesRef = collection(db, 'matches');
+    const q = query(matchesRef, where('matchStatus', '==', 'In Progress'));
 
     try {
-        const querySnapshot = await getDocs(q);
-        const students = [];
+        matchesUnsubscribe = onSnapshot(q, async (querySnapshot) => {
+            const students = [];
 
-        querySnapshot.forEach((doc) => {
-            const matchData = doc.data();
-            students.push({
-                studentId: doc.id,
-                instructorId: matchData.instructorId,
-                matchedAt: matchData.matchedAt
+            querySnapshot.forEach((doc) => {
+                const matchData = doc.data();
+                students.push({
+                    studentId: doc.id,
+                    instructorId: matchData.instructorId,
+                    matchedAt: matchData.matchedAt
+                });
             });
+
+            await renderStudents(students);
+            // Update pagination controls if necessary
         });
-
-        // Update the last visible document for pagination
-        lastVisibleStudent = querySnapshot.docs[querySnapshot.docs.length - 1];
-        return students;
-
     } catch (error) {
-        console.error('Error fetching students with matches:', error);
+        console.error('Error setting up listener for students with matches:', error);
     }
 }
 
 // Fetch student name and instructor name from Firestore
 async function fetchStudentAndInstructorDetails(studentId, instructorId) {
     try {
-        // Fetch student details from the 'applicants' collection
-        const studentDocRef = doc(db, 'applicants', studentId);
-        const studentDoc = await getDoc(studentDocRef);
+        const [studentDocSnap, instructorDocSnap] = await Promise.all([
+            getDoc(doc(db, 'applicants', studentId)),
+            getDoc(doc(db, 'instructors', instructorId))
+        ]);
+
         let studentName = 'Unknown Student';
-        if (studentDoc.exists()) {
-            const studentData = studentDoc.data();
+        if (studentDocSnap.exists()) {
+            const studentData = studentDocSnap.data();
             studentName = `${studentData.personalInfo.first} ${studentData.personalInfo.last}`;
         }
 
-        // Fetch instructor details from the 'instructors' collection
-        const instructorDocRef = doc(db, 'instructors', instructorId);
-        const instructorDoc = await getDoc(instructorDocRef);
         let instructorName = 'Unknown Instructor';
-        if (instructorDoc.exists()) {
-            instructorName = instructorDoc.data().name;
+        if (instructorDocSnap.exists()) {
+            instructorName = instructorDocSnap.data().name;
         }
 
-        // Return both student and instructor names
         return { studentName, instructorName };
     } catch (error) {
         console.error('Error fetching student or instructor details:', error);
+        return { studentName: 'Error Fetching Name', instructorName: 'Error Fetching Name' };
     }
 }
 
-// Fetch course data and appointment date for the student based on the 'bookings' array, excluding completed status
+// Fetch course data and appointment date for the student
 async function fetchCourseAndAppointmentDateForStudent(studentId) {
     try {
         const appointmentsRef = collection(db, 'appointments');
-        const q = query(appointmentsRef);  // Query all documents in appointments
+        const q = query(appointmentsRef);
         const querySnapshot = await getDocs(q);
 
-        let course = 'Unknown Course'; // Default course if none is found
-        let appointmentDate = 'No Date';  // Default if no appointment is found
+        let course = 'Unknown Course';
+        let appointmentDate = 'No Date';
 
-        // Iterate through all appointments and find the booking matching the studentId
         querySnapshot.forEach((doc) => {
             const appointmentData = doc.data();
 
-            // Check if the bookings array exists and is not empty
             if (appointmentData.bookings && Array.isArray(appointmentData.bookings)) {
                 const bookings = appointmentData.bookings;
 
-                // Check each booking in the array for the correct studentId
                 bookings.forEach((booking) => {
                     if (booking.userId === studentId && booking.progress !== 'Completed') {
-                        course = appointmentData.course || 'Unknown Course';  // Get the course
-                        appointmentDate = new Date(appointmentData.date).toLocaleDateString();  // Get the appointment date
+                        course = appointmentData.course || 'Unknown Course';
+                        appointmentDate = new Date(appointmentData.date).toLocaleDateString('en-US', dateOptions);
                     }
                 });
             }
         });
 
-        return { course, appointmentDate };  // Return both course and appointment date
+        return { course, appointmentDate };
     } catch (error) {
         console.error('Error fetching course and appointment date for student:', error);
-        return { course: 'Error Fetching Course', appointmentDate: 'Error Fetching Date' };  // Return error if something goes wrong
+        return { course: 'Error Fetching Course', appointmentDate: 'Error Fetching Date' };
     }
 }
 
@@ -120,32 +118,53 @@ async function renderStudents(students) {
     const studentListContainer = document.querySelector('.student-list');
     studentListContainer.innerHTML = ''; // Clear any existing data
 
-    for (let student of students) {
+    // Array to hold all the promises
+    const studentPromises = students.map(async (student) => {
         const { studentId, instructorId, matchedAt } = student;
-        const { studentName, instructorName } = await fetchStudentAndInstructorDetails(studentId, instructorId);
-        const { course, appointmentDate } = await fetchCourseAndAppointmentDateForStudent(studentId);  // Fetch course and appointment date
+        const [studentDetails, courseDetails] = await Promise.all([
+            fetchStudentAndInstructorDetails(studentId, instructorId),
+            fetchCourseAndAppointmentDateForStudent(studentId)
+        ]);
+
+        return {
+            studentId,
+            instructorId,
+            matchedAt,
+            studentName: studentDetails.studentName,
+            instructorName: studentDetails.instructorName,
+            course: courseDetails.course,
+            appointmentDate: courseDetails.appointmentDate
+        };
+    });
+
+    // Wait for all promises to resolve
+    const studentDataList = await Promise.all(studentPromises);
+
+    // Now render all students
+    studentDataList.forEach((studentData) => {
+        const { studentId, instructorId, matchedAt, studentName, instructorName, course, appointmentDate } = studentData;
 
         const studentRow = `
             <tr>
                 <td>${studentName}</td>
                 <td>${instructorName}</td>
                 <td>${course}</td>
-                <td>${new Date(matchedAt.seconds * 1000).toLocaleDateString()}</td>
-                <td>${appointmentDate}</td>  <!-- Add appointment date here -->
+                <td>${new Date(matchedAt.seconds * 1000).toLocaleDateString('en-US', dateOptions)}</td>
+                <td>${appointmentDate}</td>
                 <td>
                     <button class="btn custom-btn" data-student-id="${studentId}" data-instructor-id="${instructorId}">See Instructor</button>
                 </td>
             </tr>
         `;
         studentListContainer.innerHTML += studentRow;
-    }
+    });
 
     // Attach event listeners for the "See Instructor" buttons
     document.querySelectorAll('.custom-btn').forEach(function(button) {
         button.addEventListener('click', async function() {
             const studentId = this.getAttribute('data-student-id');
             const currentInstructorId = this.getAttribute('data-instructor-id');
-            await showInstructorList(studentId, currentInstructorId);  // Show the instructor list for reassignment
+            await showInstructorList(studentId, currentInstructorId);
         });
     });
 }
@@ -171,10 +190,13 @@ async function reassignInstructor(studentId, newInstructorId) {
         });
 
         console.log('Instructor successfully reassigned!');
-        alert('Instructor successfully reassigned!');
+        showNotification('Instructor successfully reassigned!');
+
+        $('#assigninstructormodal').modal('hide');
+
     } catch (error) {
         console.error('Error reassigning instructor:', error);
-        alert('An error occurred while reassigning the instructor. Please try again.');
+        showNotification('An error occurred while reassigning the instructor. Please try again.');
     }
 }
 
@@ -189,7 +211,7 @@ async function fetchInstructorsForCourse(course, currentInstructorId) {
 
         querySnapshot.forEach((doc) => {
             const instructorData = doc.data();
-            
+
             // Exclude the current matched instructor from the list
             if (doc.id !== currentInstructorId) {  // Ensure the current instructor is excluded
                 instructors.push({
@@ -208,13 +230,19 @@ async function fetchInstructorsForCourse(course, currentInstructorId) {
     }
 }
 
-// Render instructor list in the modal
 function renderInstructors(instructors, studentId) {
     const instructorListContainer = document.querySelector('.instructor-list'); // Ensure class name matches
     instructorListContainer.innerHTML = ''; // Clear any existing data
 
     instructors.forEach(instructor => {
-        const courses = Array.isArray(instructor.courses) ? instructor.courses.join(', ') : 'Unknown Course';
+        const courses = Array.isArray(instructor.courses) ? instructor.courses.join(' || ') : 'Unknown Course';
+
+        // Generate the list of traits in the desired layout
+        const traitList = `
+            <ul class='trait-list'>
+                ${instructor.traits.map(trait => `<li>${trait}</li>`).join('')}
+            </ul>
+        `;
 
         const instructorRow = `
             <tr>
@@ -222,11 +250,12 @@ function renderInstructors(instructors, studentId) {
                 <td>${courses}</td>
                 <td>
                     <i class="bi bi-info-circle"
-                    data-toggle="popover"
-                    data-html="true"
-                    data-trigger="hover"
-                    data-placement="top"
-                    data-content="${instructor.traits.join(', ')}">
+                        data-toggle="popover"
+                        data-html="true"
+                        data-trigger="hover"
+                        data-placement="right"
+                        data-delay='{"show":100, "hide":100}'
+                        data-content="${traitList}">
                     </i>
                 </td>
                 <td>
@@ -237,7 +266,7 @@ function renderInstructors(instructors, studentId) {
         instructorListContainer.innerHTML += instructorRow;
     });
 
-    // Reattach popovers after dynamic rendering
+    // Reattach popovers and event listeners
     $('[data-toggle="popover"]').popover();
 
     // Attach event listeners for the "Reassign" buttons
@@ -245,10 +274,11 @@ function renderInstructors(instructors, studentId) {
         button.addEventListener('click', async function() {
             const newInstructorId = this.getAttribute('data-instructor-id');
             const studentId = this.getAttribute('data-student-id');
-            await reassignInstructor(studentId, newInstructorId);  // Call the reassignment function
+            await reassignInstructor(studentId, newInstructorId);
         });
     });
 }
+
 // Pagination controls
 function updatePaginationControls() {
     paginationControls.innerHTML = '';
@@ -292,9 +322,13 @@ function updatePaginationControls() {
 
 // Function to load students with matches and update pagination controls
 async function loadMatchedStudents() {
-    const students = await fetchMatchedStudents();
-    await renderStudents(students);
-    updatePaginationControls();
+    // Detach any existing listener
+    if (matchesUnsubscribe) {
+        matchesUnsubscribe();
+        matchesUnsubscribe = null;
+    }
+
+    setUpMatchedStudentsListener();
 }
 
 // Initialize pagination and fetching on page load
