@@ -333,24 +333,10 @@ h2 {
     text-align: left;
 }
 
-.instructor-list {
+.student-list, .instructor-list {
     font-family: Poppins;
     font-size: 14px;
     text-align: left;
-}
-
-.instructor-list i {
-    padding: 10px;
-    font-size: 14px;
-    color: #ffffff;
-    background-color: #142A74;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-}
-
-.instructor-list i:hover {
-    background-color: #18349C;
 }
 
 .table {
@@ -984,16 +970,17 @@ input:checked + .slider .slider-label-on {
     padding: 10px 0px;
 }
 
+#assigninstructormodal .modal-content {
+    height: 90vh;
+}
+
 .custom-header th {
     text-align: center;
 }
 
 .header-left {
-    border-right: 1px solid #142A74;
-}
-
-.header-right {
-    border-left: 1px solid #142A74;
+    display: flex;
+    justify-content: center;
 }
 
 .custom-table th:nth-child(3), .custom-table td:nth-child(3) {

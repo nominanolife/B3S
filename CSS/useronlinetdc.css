@@ -205,9 +205,9 @@ h2 {
     border-radius: 20px;
     background-color: #ffffff;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    gap: 100px;
-    width: 80%;
+    width: 50%;
     height: 750px;
+    gap: 50px;
 }
 
 .logo-icon {
@@ -224,7 +224,7 @@ h2 {
 .video-box {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 50px;
 }
 
 .tdc-content {
@@ -267,15 +267,15 @@ h2 {
     border-radius: 20px;
     background-color: #ffffff;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    gap: 20px;
-    width: 80%;
+    width: 50%;
     height: 750px;
+    gap: 30px;
 }
 
 .exam-box {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 50px;
 }
 
 .exam-content {

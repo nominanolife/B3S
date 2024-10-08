@@ -14,32 +14,11 @@
 </head>
 <body>
     <div class="whole-page">
-        <div class="sidebar">
-            <div class="sidebar-content">
-                <div class="logo">
-                    <img src="Assets/logo.png" class="b3slogo" alt="B3S Logo">
-                    <div class="brand-name">
-                        <span class="brand-title">DriveHub</span>
-                    </div>
-                </div>
-                <div class="sidebar-dashboard">
-                    <a href="userdashboard.html"><i class="bi bi-columns-gap"></i>Dashboard</a>
-                    <a id="sidebarInstructorButton" href="userinstructorreminder.html"><i class="bi bi-people"></i>Instructors</a>
-                </div>
-                <div class="sidebar-menu">
-                    <a href="userpackages.html"><i class="bi bi-mortarboard"></i>Packages</a>
-                    <a href="userappointment.html"><i class="bi bi-calendar2-week"></i>Appointment</a>
-                    <a href="usermodule.html"><i class="bi bi-book"></i>Modules</a>
-                    <a href="useronlinetdc.html" class="active"><i class="bi bi-journals"></i>Online TDC</a>
-                </div>
-                <div class="sidebar-account">
-                    <button class="profile" type="button" id="profileBtn"><i class="bi bi-person-circle"></i>Profile</button>
-                    <button class="logout" type="button"><i class="bi bi-box-arrow-left"></i>Logout</button>
-                </div>
-            </div>
-        </div>
         <div class="main-content">
             <div class="page-content">
+                <div class="back-button">
+                    <a href="useronlinetdc.html" class="back"><i class="bi bi-house"></i></a>
+                </div>
                 <div class="result-content">
                     <div class="result-container">
                         <div class="result-logo">
@@ -97,8 +76,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script type="module" src="JS/common.js"></script>
-    <script type="module" src="JS/sidebar.js"></script>
     <script type="module" src="JS/userresults.js"></script> 
 </body>
 </html>

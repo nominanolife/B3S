@@ -257,7 +257,6 @@ h2 {
 .page-body {
     display: flex;
     flex-direction: column;
-    margin-top: 50px;
 }
 
 .page-body h2 {
@@ -384,6 +383,23 @@ h2 {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+}
+
+.title-header button {
+    font-family: Poppins;
+    font-size: 12px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.title-header button:hover {
+    background-color: #142a74ec;
 }
 
 .cancelled-container {

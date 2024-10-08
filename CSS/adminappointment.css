@@ -328,7 +328,6 @@ h2 {
     max-width: 500px;
     height: auto;
     margin: 0 auto;
-    margin-top: 20px;
 }
 
 .slots-body {
@@ -356,9 +355,6 @@ h2 {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 1300px;
-    height: auto;
-    margin: 0 auto;
 }
 
 /* CSS for section headers */
@@ -877,8 +873,10 @@ body {
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-height: 400px; /* Adjust the height as needed */
+    max-height: 850px; /* Adjust the height as needed */
     overflow-y: auto; /* Enables vertical scrolling if content exceeds max-height */
+    scrollbar-width: thin; /* Makes the scrollbar thinner */
+    scrollbar-color: #142A74 #f1f1f1; /* Thumb color and track color */
 }
 
 /* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
@@ -900,3 +898,24 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background-color: #0e1d4d; /* Darker color on hover */
 }
+
+/* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+.available-slots-body::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+.available-slots-body::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background of the scrollbar track */
+    border-radius: 10px; /* Optional: Rounded corners for the track */
+}
+
+.available-slots-body::-webkit-scrollbar-thumb {
+    background-color: #142A74; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Optional: Rounded corners for the thumb */
+    border: 3px solid #f1f1f1; /* Optional: Adds padding around the thumb */
+}
+
+.available-slots-body::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d; /* Darker color on hover */
+}
+
