@@ -129,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const dropdown = selectedOption.closest('.custom-dropdown');
       dropdown.querySelector('.selected').textContent = selectedOption.textContent;
       dropdown.classList.remove('open');
+      e.stopPropagation();
       
       currentMonth = selectedOption.getAttribute('data-value');
       document.getElementById('currentMonthDisplay').textContent = `${currentMonth} ${currentYear}`;
@@ -347,23 +348,24 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
   }
 
   const amountPaidInput = document.querySelector('.edit-sales-amount');
-  const amountPaid = parseInt(amountPaidInput.value, 10);
-  const packagePrice = parseInt(selectedStudent.packagePrice, 10);
+  const amountPaid = parseFloat(amountPaidInput.value);
+  const packagePrice = parseFloat(selectedStudent.packagePrice);
 
   const amountPaidErrorElement = document.getElementById('amountPaidError');
 
-  if (amountPaid > packagePrice) {
-    amountPaidErrorElement.textContent = "Amount paid cannot exceed the package price.";
+  // Ensure that the amountPaid is at least 50% of the package price
+  const minAllowedAmount = packagePrice * 0.5;
+
+  if (amountPaid < minAllowedAmount) {
+    amountPaidErrorElement.textContent = `Amount paid must be at least 50% of the package price (₱${minAllowedAmount.toFixed(2)}).`;
     return;
   } else {
-    amountPaidErrorElement.textContent = "";
+    amountPaidErrorElement.textContent = ""; // Clear validation message if the input is valid
   }
 
   if (isNaN(amountPaid) || amountPaid <= 0) {
     amountPaidErrorElement.textContent = "Please enter a valid amount greater than 0.";
     return;
-  } else {
-    amountPaidErrorElement.textContent = "";
   }
 
   let paymentStatus = "Not Paid";
@@ -392,7 +394,6 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
       await setDoc(salesDocRef, updatedData);
       console.log('Sales data successfully saved.');
     }
-
   } catch (error) {
     console.error("Error saving sales data: ", error);
   }

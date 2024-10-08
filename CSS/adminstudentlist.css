@@ -12,6 +12,7 @@ body {
     position: fixed;
     top: 0;
     left: 0;
+
     display: flex;
     flex-direction: column;
     width: 300px;
@@ -174,10 +175,7 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    width: calc(100% - 300px);
-    height: calc(100vh - 120px);
     margin-left: 300px;
-    margin-top: 120px;
 }
 
 .header {
@@ -207,6 +205,10 @@ h2 {
 }
 
 .page-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
     padding: 30px 30px;
     background-color: #f5f5f5;
 }
@@ -554,6 +556,26 @@ h2 {
     font-size: 14px;
 }
 
+/* Custom scrollbar styling */
+.modal::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+.modal::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background of the scrollbar track */
+    border-radius: 10px; /* Optional: Rounded corners for the track */
+}
+
+.modal::-webkit-scrollbar-thumb {
+    background-color: #142A74; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Optional: Rounded corners for the thumb */
+    border: 3px solid #f1f1f1; /* Optional: Adds padding around the thumb */
+}
+
+.modal::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d; /* Darker color on hover */
+}
+
 #edit4WheelsModal .modal-dialog {
     max-width: 1000px;
     top: auto;
@@ -765,7 +787,6 @@ h2 {
 
 .evaluation-table td input {
     padding: 5px;
-    border: none;
     text-align: center;
     font-weight: 700;
     font-size: 14px;
@@ -1073,7 +1094,7 @@ tbody tr .main-text {
     bottom: 0;
     right: 0;
     width: 84.3%;
-    height: 87.5%;
+    height: 100%;
     background-color: rgba(255, 255, 255, 0.8);
     z-index: 9999;
     text-align: center;

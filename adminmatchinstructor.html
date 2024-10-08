@@ -40,13 +40,12 @@
             </div>
         </div>
         <div class="main-content">
-            <div class="header">
-                <h2>Dashboard</h2>
-            </div>
             <div class="page-content">
-                <h3>Manual Assigning of Instructor</h3>
                 <div class="page-body">
                     <div class="upcomming-container">
+                        <div class="title-header">
+                            <h2>MANUAL ASSIGNING OF INSTRUCTOR</h2>
+                        </div>
                         <table class="table">
                             <thead class="table-headers">
                                 <tr class="table-headers-title">
@@ -58,11 +57,11 @@
                                 </tr>
                             </thead>
                             <tbody class="instructor-list">
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td><i class="switch-instructor" data-toggle="modal" data-target="#assigninstructormodal">Switch Instructor</i></td>
+                                <td>Spencer Garcia Reid</td>
+                                <td>Jason Mendoza</td>
+                                <td>Motorcycle</td>
+                                <td>October 10, 2024</td>
+                                <td><i class="switch-instructor" data-toggle="modal" data-target="#assigninstructormodal">See Instructor</i></td>
                             </tbody>
                         </table>
                         <!-- Pagination controls for Instructor List -->
@@ -77,38 +76,85 @@
         <div class="modal-dialog custom-modal-size">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="close" data-dismiss="modal" aria-label="Close">
+                    <h5 class="modal-title" id="assigninstructormodalLabel">Assign Instructor</h5>
+                    <i class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
-                    </div>
+                    </i>
                 </div>
                 <div class="modal-body">
-                    <div class="modal-body-header">
-                        <div class="student-name">
-                            <span>Spencer Garcia Reid</span>
-                        </div>
-                        <div class="current-instructor">
-                            <span>Jason Mendoza</span>
-                        </div>
+                    <!-- Table Structure -->
+                    <div class="table-responsive">
+                        <table class="table custom-table">
+                            <thead>
+                                <tr class="custom-header">
+                                    <th class="header-left">Spencer Garcia Reid</th>
+                                    <th class="header-right">Jason Mendoza</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <table class="table custom-table">
+                            <thead class="modal-table-header">
+                                <tr>
+                                    <th>INSTRUCTOR NAME</th>
+                                    <th>COURSE</th>
+                                    <th>TRAITS</th>
+                                    <th>CHANGE INSTRUCTOR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Kang Taehyun</td>
+                                    <td>Motorcycle</td>
+                                    <td>
+                                        <i class="bi bi-info-circle"
+                                        data-toggle="popover"
+                                        data-html="true"
+                                        data-trigger="hover"
+                                        data-placement="top"
+                                        data-delay='{"show":100, "hide":100}'
+                                        data-content="
+                                            <ul class='trait-list'>
+                                                <li>Patient</li>
+                                                <li>Friendly</li>
+                                                <li>Experienced</li>
+                                                <li>Strict</li>
+                                                <li>Professional</li>
+                                            </ul>">
+                                        </i>
+                                    </td>
+                                    <td><i class="btn custom-btn">Reassign</i></td>
+                                </tr>
+                                <tr>
+                                    <td>Choi Soobin</td>
+                                    <td>Motorcycle</td>
+                                    <td>
+                                        <i class="bi bi-info-circle"
+                                        data-toggle="popover"
+                                        data-html="true"
+                                        data-trigger="hover"
+                                        data-placement="top"
+                                        data-delay='{"show":100, "hide":100}'
+                                        data-content="
+                                            <ul class='trait-list'>
+                                                <li>Patient</li>
+                                                <li>Friendly</li>
+                                                <li>Experienced</li>
+                                                <li>Strict</li>
+                                                <li>Professional</li>
+                                                <li>Good Communication Skills</li>
+                                                <li>Good Listener</li>
+                                                <li>Good Teacher</li>
+                                            </ul>">
+                                        </i>
+                                    </td>
+                                    <td><i class="btn custom-btn">Reassign</i></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <table class="modal-table">
-                        <thead class="modal-thead">
-                            <tr class="table-thead-title">
-                                <th>INSTRUCTOR NAME</th>
-                                <th>COURSE</th>
-                                <th>TRAITS</th>
-                                <th>CHANGE INSTRUCOR</th>
-                            </tr>
-                        </thead>
-                        <tbody class="modal-tbody">
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td><i class="switch-ins">SWITCH</i></td>
-                        </tbody>
-                    </table>
                 </div>
                 <div class="modal-footer">
-
+                    
                 </div>
             </div>
         </div>
@@ -173,7 +219,7 @@
     </div>
     
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="module" src="JS/adminmatchinstructor.js"></script>
     <script src="JS/admincommon.js"></script>

@@ -41,9 +41,6 @@
             </div>
         </div>
         <div class="main-content">
-            <div class="header">
-                <h2>Sales Report</h2>
-            </div>
             <div class="page-content">
                 <div class="show-sales">
                     <button id="toggleSalesInfo" class="btn btn-primary">Overview</button>
@@ -131,9 +128,9 @@
                 </div>
                 <form class="modal-body">
                     <div class="input-body">
-                        <input type="text" class="edit-sales-name" placeholder="Name" readonly>
-                        <input type="text" class="edit-sales-package" placeholder="Package" readonly>
-                        <input type="text" class="edit-sales-package-price" placeholder="Package Price" readonly>
+                        <input type="text" class="edit-sales-name" placeholder="Name" disabled>
+                        <input type="text" class="edit-sales-package" placeholder="Package" disabled>
+                        <input type="text" class="edit-sales-package-price" placeholder="Package Price" disabled>
                         <input type="date" class="edit-sales-date" placeholder="Date of Payment" required>
                         <input type="text" class="edit-sales-amount" placeholder="Amount" required>
                         <small class="form-text text-danger validation-error" id="amountPaidError"></small>
