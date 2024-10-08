@@ -46,6 +46,7 @@
                         <div class="title-header">
                             <h2>MANUAL ASSIGNING OF INSTRUCTOR</h2>
                         </div>
+                        <!-- Add table for student list -->
                         <table class="table">
                             <thead class="table-headers">
                                 <tr class="table-headers-title">
@@ -53,18 +54,15 @@
                                     <th>INSTRUCTOR NAME</th>
                                     <th>COURSE</th>
                                     <th>DATE MATCHED</th>
+                                    <th>APPOINTMENT DATE</th>
                                     <th>CHANGE MATCH</th>
                                 </tr>
                             </thead>
-                            <tbody class="instructor-list">
-                                <td>Spencer Garcia Reid</td>
-                                <td>Jason Mendoza</td>
-                                <td>Motorcycle</td>
-                                <td>October 10, 2024</td>
-                                <td><i class="switch-instructor" data-toggle="modal" data-target="#assigninstructormodal">See Instructor</i></td>
+                            <tbody class="student-list"> <!-- Add student list container here -->
+                                <!-- Student list will be dynamically injected here -->
                             </tbody>
                         </table>
-                        <!-- Pagination controls for Instructor List -->
+                        <!-- Pagination controls for Student List -->
                         <div class="pagination-controls"></div>
                     </div>
                 </div>
@@ -87,8 +85,7 @@
                         <table class="table custom-table">
                             <thead>
                                 <tr class="custom-header">
-                                    <th class="header-left">Spencer Garcia Reid</th>
-                                    <th class="header-right">Jason Mendoza</th>
+                                    <th class="header-left">Available Instructors</th>
                                 </tr>
                             </thead>
                         </table>
@@ -101,60 +98,14 @@
                                     <th>CHANGE INSTRUCTOR</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Kang Taehyun</td>
-                                    <td>Motorcycle</td>
-                                    <td>
-                                        <i class="bi bi-info-circle"
-                                        data-toggle="popover"
-                                        data-html="true"
-                                        data-trigger="hover"
-                                        data-placement="top"
-                                        data-delay='{"show":100, "hide":100}'
-                                        data-content="
-                                            <ul class='trait-list'>
-                                                <li>Patient</li>
-                                                <li>Friendly</li>
-                                                <li>Experienced</li>
-                                                <li>Strict</li>
-                                                <li>Professional</li>
-                                            </ul>">
-                                        </i>
-                                    </td>
-                                    <td><i class="btn custom-btn">Reassign</i></td>
-                                </tr>
-                                <tr>
-                                    <td>Choi Soobin</td>
-                                    <td>Motorcycle</td>
-                                    <td>
-                                        <i class="bi bi-info-circle"
-                                        data-toggle="popover"
-                                        data-html="true"
-                                        data-trigger="hover"
-                                        data-placement="top"
-                                        data-delay='{"show":100, "hide":100}'
-                                        data-content="
-                                            <ul class='trait-list'>
-                                                <li>Patient</li>
-                                                <li>Friendly</li>
-                                                <li>Experienced</li>
-                                                <li>Strict</li>
-                                                <li>Professional</li>
-                                                <li>Good Communication Skills</li>
-                                                <li>Good Listener</li>
-                                                <li>Good Teacher</li>
-                                            </ul>">
-                                        </i>
-                                    </td>
-                                    <td><i class="btn custom-btn">Reassign</i></td>
-                                </tr>
+                            <tbody class="instructor-list"> <!-- This will be populated dynamically by JavaScript -->
+                                <!-- Instructor rows will be dynamically added here by JavaScript -->
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    
+                    <!-- Add any footer content if necessary -->
                 </div>
             </div>
         </div>
