@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, getDocs, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
@@ -47,12 +47,16 @@ async function fetchAndRandomizeQuizzes() {
 function saveUserAnswer(index) {
     const selectedOption = document.querySelector('input[name="questionanswer"]:checked');
     if (selectedOption) {
+        const correctAnswerIndex = questions[index].correctAnswer; // Get the index of the correct answer from Firestore
+        const correctAnswerValue = questions[index].options[correctAnswerIndex].value; // Get the value of the correct answer
+        
         userAnswers[index] = {
             question: questions[index].question,
             answer: selectedOption.value,
+            isCorrect: selectedOption.value === correctAnswerValue, // Compare user's answer with the correct answer value
             category: questions[index].category
         };
-        
+
         // Save to session storage
         sessionStorage.setItem('userAnswers', JSON.stringify(userAnswers));
     }
@@ -85,11 +89,9 @@ async function renderQuestion(index) {
         // Dynamically create and add image if available
         if (questionData.imageURL && questionImageContainer) {
             try {
-                // Fetch the image reference from Firebase Storage
                 const imageRef = ref(storage, questionData.imageURL);  // Directly use the imageURL field from Firestore
                 const imageUrl = await getDownloadURL(imageRef);
 
-                // Create an image element dynamically
                 const imgElement = document.createElement('img');
                 imgElement.src = imageUrl;
                 imgElement.alt = "Quiz Image";
@@ -137,8 +139,6 @@ async function renderQuestion(index) {
     }
 }
 
-
-
 // Update Progress Bar
 function updateProgress(currentQuestion) {
     const progressBarFill = document.querySelector(".progress-bar-fill");
@@ -169,6 +169,74 @@ function manageButtons(currentQuestion, totalQuestions) {
     }
 }
 
+// Function to determine if the user passed
+function checkIfPassed() {
+    const userAnswers = JSON.parse(sessionStorage.getItem('userAnswers')) || {};
+    let correctCount = 0;
+
+    Object.keys(userAnswers).forEach(index => {
+        if (userAnswers[index].isCorrect) {
+            correctCount++;
+        }
+    });
+
+    const totalQuestions = Object.keys(userAnswers).length;
+    const scorePercentage = (correctCount / totalQuestions) * 100;
+    console.log("Score Percentage:", scorePercentage);
+
+    return scorePercentage >= 80; // 80% passing grade
+}
+
+// Function to get the current number of attempts
+async function getAttempts(userId) {
+    const userResultsRef = doc(db, 'userResults', userId);
+    const userResultsSnap = await getDoc(userResultsRef);
+    
+    if (userResultsSnap.exists()) {
+        const data = userResultsSnap.data();
+        return data.attempts || 0; // Default to 0 if no attempts field
+    }
+    return 0; // No record means no attempts yet
+}
+
+// Function to save quiz results and attempts
+async function saveResultsAndAttempts() {
+    if (userId) {
+        try {
+            const userResultsRef = doc(db, 'userResults', userId);
+            
+            // Get current attempts
+            let attempts = await getAttempts(userId);
+            
+            // Increment attempts if user hasn't passed
+            const passed = checkIfPassed();
+            if (!passed) {
+                attempts++;
+            }
+            
+            // Prepare data to save
+            const userResults = {
+                answers: JSON.parse(sessionStorage.getItem('userAnswers')),
+                timestamp: new Date(),
+                attempts: attempts,
+                passed: passed,
+            };
+
+            // Save to Firestore
+            await setDoc(userResultsRef, userResults, { merge: true });
+            console.log("User results and attempts saved successfully.");
+            
+            // Redirect to results page
+            window.location.href = 'userresults.html';
+
+        } catch (error) {
+            console.error("Error saving user results and attempts:", error);
+        }
+    } else {
+        console.error("No authenticated user found.");
+    }
+}
+
 // Navigation Event Listeners
 document.querySelector('.next-btn').addEventListener('click', () => {
     if (currentQuestionIndex < questions.length - 1) {
@@ -191,27 +259,8 @@ document.querySelector('.save-btn').addEventListener('click', async () => {
     // Save the current answer
     saveUserAnswer(currentQuestionIndex);
 
-    // Check if user is authenticated
-    if (userId) {
-        try {
-            // Create or update the user's quiz results in Firestore
-            const userResultsRef = doc(db, 'userResults', userId);
-            const userResults = {
-                answers: JSON.parse(sessionStorage.getItem('userAnswers')),
-                timestamp: new Date(),
-            };
-
-            await setDoc(userResultsRef, userResults, { merge: true });
-            console.log("User results saved successfully.");
-
-            // Redirect to the results page
-            window.location.href = 'userresults.html';
-        } catch (error) {
-            console.error("Error saving user results:", error);
-        }
-    } else {
-        console.error("No authenticated user found.");
-    }
+    // Save quiz results and attempts
+    await saveResultsAndAttempts();
 });
 
 // Listen for authentication state changes

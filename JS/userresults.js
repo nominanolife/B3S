@@ -1,7 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, getDocs, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
     authDomain: "authentication-d6496.firebaseapp.com",
@@ -16,9 +17,90 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-let questions = [];
+// Global variable to store authenticated user
+let currentUser = null;
+
+// Store the authenticated user globally for later use
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUser = user; // Store the user globally
+        console.log("User logged in:", user.displayName || user.email);
+    } else {
+        console.error("No authenticated user found.");
+        // Optionally, redirect to login
+        window.location.href = 'login.html';
+    }
+});
+
+// Fetch user full name from `applicants` collection
+async function getUserFullName(userId) {
+    const applicantDoc = await getDoc(doc(db, 'applicants', userId));
+    if (applicantDoc.exists()) {
+        const personalInfo = applicantDoc.data().personalInfo;
+        const fullName = `${personalInfo.first} ${personalInfo.middle ? personalInfo.middle + ' ' : ''}${personalInfo.last}`;
+        return fullName;
+    } else {
+        console.error("No applicant data found for user:", userId);
+        return "John Doe";  // Fallback
+    }
+}
+
+// Fetch certificate ID from `userResults` collection
+async function getCertificateData(userId) {
+    const resultsDoc = await getDoc(doc(db, 'userResults', userId));
+    if (resultsDoc.exists()) {
+        const userData = resultsDoc.data();
+        return { certificateID: userData.certificateID, totalScore: userData.totalScore };
+    } else {
+        console.error("No results data found for user:", userId);
+        return { certificateID: 'GeneratedCertID', totalScore: '0.00' };  // Fallback
+    }
+}
+
+async function predictPerformanceAndFetchInsights(studentId, category, percentage) {
+    try {
+        // Log data being sent for better debugging
+        console.log(`Sending data to Flask: studentId=${studentId}, category=${category}, percentage=${percentage}`);
+
+        if (!studentId || typeof studentId !== 'string') {
+            console.error("Invalid studentId passed to prediction function.");
+            return;
+        }
+
+        if (isNaN(percentage)) {
+            console.error("Invalid percentage passed to prediction function.");
+            return;
+        }
+
+        const response = await fetch('http://127.0.0.1:5000/predict_and_insights', {  // Full URL with the correct port
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                studentId: studentId,  // Pass the studentId as a string directly
+                category: category,
+                percentage: parseFloat(percentage)  // Ensure percentage is a float
+            })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            console.log("Received data from Flask:", data);
+            return {
+                predicted_performance: data.predicted_performance,  // "Poor" or "Great"
+                insights: data.insights  // Insights for this category and performance
+            };
+        } else {
+            console.error("Error in prediction and insights:", data.error);
+        }
+    } catch (error) {
+        console.error("Error sending data to Flask:", error);
+    }
+}
 
 // Fetch and Randomize Quizzes
+let questions = [];
 async function fetchQuizzes() {
     try {
         const quizzesSnapshot = await getDocs(collection(db, 'quizzes'));
@@ -42,29 +124,26 @@ function calculateCategoryScores() {
     let categoryScores = {};
     let categoryCounts = {};
 
-    // Iterate through user answers
     Object.keys(userAnswers).forEach(index => {
-        const { question, answer, category } = userAnswers[index];
-        const correctAnswer = questions[index].correctAnswer;
-
+        const { isCorrect, category } = userAnswers[index]; 
+    
         if (!categoryScores[category]) {
             categoryScores[category] = 0;
             categoryCounts[category] = 0;
         }
-
+    
         categoryCounts[category]++;
-
-        // Compare user answer with correct answer index
-        if (answer === questions[index].options[correctAnswer].value) {
+    
+        if (isCorrect) {
             categoryScores[category] += 100; // Award full score if correct
         }
     });
 
-    // Calculate average score per category
     Object.keys(categoryScores).forEach(category => {
-        categoryScores[category] /= categoryCounts[category];
+        categoryScores[category] /= categoryCounts[category]; // Average percentage
     });
 
+    console.log("Category Scores Calculated:", categoryScores);
     return categoryScores;
 }
 
@@ -79,59 +158,9 @@ function checkIfPassed(categoryScores) {
     });
 
     const averageScore = totalScore / categoryCount;
+    console.log("Average Score:", averageScore);
     return averageScore >= 80;
 }
-
-// Function to save results if the user passed
-async function saveResultsIfPassed(categoryScores) {
-    if (checkIfPassed(categoryScores)) {
-        try {
-            // Check if user is authenticated
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    const userId = user.uid;
-                    const userResultsRef = doc(db, 'userResults', userId);
-                    const userResults = {
-                        categoryScores: categoryScores,
-                        timestamp: new Date(),
-                    };
-
-                    await setDoc(userResultsRef, userResults, { merge: true });
-                    console.log("User results saved successfully.");
-                } else {
-                    console.error("No authenticated user found.");
-                }
-            });
-        } catch (error) {
-            console.error("Error saving user results:", error);
-        }
-    }
-}
-
-// Function to show the loader and display results when the result button is clicked
-document.getElementById('seeResultsBtn').addEventListener('click', async function () {
-    // Show the loader
-    document.getElementById('loader1').style.display = 'flex';
-
-    // Fetch the quiz data
-    await fetchQuizzes();
-
-    // Calculate category scores
-    const categoryScores = calculateCategoryScores();
-
-    // Save results if the user passed
-    saveResultsIfPassed(categoryScores);
-
-    // Simulate a delay to mimic data loading
-    setTimeout(function () {
-        // Hide the loader after 3 seconds
-        document.getElementById('loader1').style.display = 'none';
-
-        // Logic to display the chart
-        showChart(categoryScores);
-    }, 1000);  // 3 seconds delay for simulation
-});
-
 function showChart(categoryScores) {
     let resultContainer = document.querySelector('.result-container');
 
@@ -186,17 +215,75 @@ function showChart(categoryScores) {
     });
 }
 
-function showPerformanceEvaluation(evaluationData) {
+// Function to save results only (without generating the certificate immediately)
+async function saveResults(categoryScores) {
+    const passed = checkIfPassed(categoryScores);
+    if (passed && currentUser) { 
+        try {
+            const userId = currentUser.uid;
+            const certificateID = Math.random().toString(36).substring(2, 10);
+            const totalScore = calculateTotalScore(categoryScores);
+
+            const userResultsRef = doc(db, 'userResults', userId);
+            const userResults = {
+                categoryScores: categoryScores,
+                totalScore: totalScore,
+                certificateID: certificateID,
+                passed: true,
+                timestamp: new Date(),
+            };
+
+            await setDoc(userResultsRef, userResults, { merge: true });
+            console.log("User results saved successfully.");
+        } catch (error) {
+            console.error("Error saving user results:", error);
+        }
+    }
+}
+
+function calculateTotalScore(categoryScores) {
+    let totalScore = 0;
+    let categoryCount = 0;
+
+    Object.values(categoryScores).forEach(score => {
+        totalScore += score;
+        categoryCount++;
+    });
+
+    return (totalScore / categoryCount).toFixed(2);
+}
+
+// In the button click handler, ensure currentUser.uid is available before proceeding
+document.getElementById('seeResultsBtn').addEventListener('click', async function () {
+    if (!currentUser) {
+        console.error('No authenticated user found!');
+        return;  // Exit if no authenticated user
+    }
+
+    const studentId = currentUser.uid;  // Ensure studentId is available
+    console.log("User ID:", studentId);  // Debug the userId
+
+    document.getElementById('loader1').style.display = 'flex';
+
+    await fetchQuizzes();
+    const categoryScores = calculateCategoryScores();
+
+    await saveResults(categoryScores);
+
+    setTimeout(function () {
+        document.getElementById('loader1').style.display = 'none';
+        showChart(categoryScores);
+    }, 1000);
+});
+
+// Function to show the performance evaluation and provide video links for poor performance
+async function showPerformanceEvaluation(evaluationData) {
     let resultContainer = document.querySelector('.result-container');
+    resultContainer.innerHTML = '';  // Clear content
 
-    // Clear the existing content in the result-container
-    resultContainer.innerHTML = '';
-
-    // Create a new div for displaying the performance evaluation
     let resultContent = document.createElement('div');
     resultContent.className = 'generated-results';
 
-    // Create header content
     resultContent.innerHTML = `
         <div class="result-header">
             <h3>Performance Evaluation</h3>
@@ -204,115 +291,86 @@ function showPerformanceEvaluation(evaluationData) {
         </div>
     `;
 
-    // Create a wrapper div for all performance-evaluation blocks
     let performanceWrapper = document.createElement('div');
     performanceWrapper.className = 'performance-wrapper';
 
-    // Create performance evaluation content dynamically
-    evaluationData.forEach(item => {
+    // Loop through each category evaluation data
+    for (const item of evaluationData) {
         let performanceBlock = document.createElement('div');
         performanceBlock.className = 'performance-evaluation';
 
-        // Determine status and color based on the score
-        let status = item.score < 50 ? 'Poor' : 'Great';
-        let color = item.score < 50 ? 'red' : 'green';
+        // Step 1: Predict performance and fetch insights using Flask
+        const result = await predictPerformanceAndFetchInsights(currentUser.uid, item.category, item.score);
+        
+        if (result) {
+            const predictedPerformance = result.predicted_performance;
+            const insights = result.insights;
 
-        performanceBlock.innerHTML = `
-            <p><strong>${item.category}:</strong> <span class="status" style="color:${color};">${status}</span></p>
-            <ul>
-                <li>Areas to Improve:</li>
-                <ul>
-                    <li>Practice different techniques in this category.</li>
-                    <li>Focus on improving key skills relevant to this area.</li>
-                    <li>Seek additional training or guidance if necessary.</li>
-                </ul>
-            </ul>
-        `;
+            // Determine status based on the predicted performance
+            let status;
+            let color;
 
-        performanceWrapper.appendChild(performanceBlock);
-    });
+            if (predictedPerformance === 'Poor') {
+                status = 'Poor';
+                color = 'red';
+            } else if (predictedPerformance === 'Great') {
+                status = 'Great';
+                color = 'green';
+            } else if (predictedPerformance === 'Excellent') {
+                status = 'Excellent';
+                color = 'blue';  // Optionally, choose another color for "Excellent"
+            }
+
+            let additionalResources = insights ? `<p><strong>Insights:</strong> ${insights}</p>` : '';
+
+            // If the predicted performance is Poor, provide a link to the video for that category
+            if (predictedPerformance === 'Poor') {
+                additionalResources += `
+                    <p><a href="uservideos.html?category=${encodeURIComponent(item.category)}" style="color:${color}; text-decoration:underline;">
+                        Click here to watch the video for ${item.category} improvement
+                    </a></p>
+                `;
+            }
+
+            // Display performance and insights (with link if performance is Poor)
+            performanceBlock.innerHTML = `
+                <p><strong>${item.category}:</strong> 
+                    <span class="status" style="color:${color};">${status}</span>
+                </p>
+                ${additionalResources}
+            `;
+
+            performanceWrapper.appendChild(performanceBlock);
+        }
+    }
 
     resultContent.appendChild(performanceWrapper);
     resultContainer.appendChild(resultContent);
 
-    // Create a "Back" button to go back to the chart
+    const categoryScores = calculateCategoryScores();
+    const passed = checkIfPassed(categoryScores);
+
     let backButton = document.createElement('button');
     backButton.className = 'result-button';
     backButton.innerHTML = 'Back';
     resultContainer.appendChild(backButton);
 
-    // Create a "Download PDF" button to generate the performance PDF
-    let downloadButton = document.createElement('button');
-    downloadButton.className = 'result-button';
-    downloadButton.innerHTML = 'Certificate of Completion';
-    resultContainer.appendChild(downloadButton);
-
-    // Add event listener for the "Back" button
     backButton.addEventListener('click', function () {
-        showChart(calculateCategoryScores());
+        showChart(categoryScores);
     });
 
-    // Add event listener for the "Download PDF" button
-    downloadButton.addEventListener('click', function () {
-        downloadPDF(evaluationData);
-    });
-}
+    if (passed) {
+        let downloadButton = document.createElement('button');
+        downloadButton.className = 'result-button';
+        downloadButton.innerHTML = 'Certificate of Completion';
+        resultContainer.appendChild(downloadButton);
 
-function downloadPDF(evaluationData) {
-    const { jsPDF } = window.jspdf;
-
-    // Create a new PDF document
-    const doc = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a4',
-    });
-
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-
-    // Add background image (cover entire page)
-    const backgroundBase64 = 'Assets/TDC Cert.png'; // Base64 of background image
-    doc.addImage(backgroundBase64, 'PNG', 0, 0, pageWidth, pageHeight);
-
-    // Set the title of the certificate with default fonts
-    doc.setFont("Times");
-    doc.setFontSize(66);
-
-    // Add logo and adjust size
-    const logoBase64 = 'Assets/logo.png';  // Base64 of the logo
-    doc.addImage(logoBase64, 'PNG', 130, 13, 30, 30);
-
-    // Center the text manually by calculating the width
-    doc.text("CERTIFICATE", pageWidth / 2, 60, { align: 'center' });
-
-    doc.setFontSize(26);
-    doc.text("OF COMPLETION", pageWidth / 2, 75, { align: 'center' });
-
-    doc.setFontSize(16);
-    doc.text("This is to certify that", pageWidth / 2, 85, { align: 'center' });
-
-    // Add the user's name with default fonts
-    doc.setFont("Helvetica");
-    doc.setFontSize(85);
-    doc.text("John Doe", pageWidth / 2, 115, { align: 'center' });
-
-    // Add quiz completion details with default fonts
-    doc.setFont("Helvetica");
-    doc.setFontSize(15);
-    doc.text("Has successfully passed the theoretical driving course on January 1, 2024", pageWidth / 2, 130, { align: 'center' });
-    doc.text("with a quiz result of 90%, earning Quiz Passing ID 1010101", pageWidth / 2, 140, { align: 'center' });
-
-    // Second signature fields
-    doc.setFont("Helvetica");
-    doc.setFontSize(24);
-    doc.text("Aaron Loeb", 195, 170);
-    doc.line(195, 172, 239, 172);  // Signature line
-
-    doc.setFont("Helvetica");
-    doc.setFontSize(17);
-    doc.text("Admin", 208, 180);
-
-    // Save the PDF
-    doc.save("Certificate_of_Completion.pdf");
+        downloadButton.addEventListener('click', async function () {
+            if (currentUser) {
+                const fullName = await getUserFullName(currentUser.uid);
+                const { certificateID, totalScore } = await getCertificateData(currentUser.uid);
+                generateCertificate(fullName, totalScore, certificateID);
+            }
+        });
+    }
 }
