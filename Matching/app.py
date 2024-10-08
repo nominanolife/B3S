@@ -4,14 +4,11 @@ from flask_cors import CORS
 from google.cloud import firestore
 from matching import main
 
-# Set up Firestore authentication
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "authentication-d6496-firebase-adminsdk-zoywr-32ecaa91eb.json"
-
 # Initialize Firestore globally
 db = firestore.Client()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET"], "allow_headers": ["Content-Type"]}})
+CORS(app, resources={r"/*": {"origins": ["https://authentication-d6496.df.r.appspot.com", "*"], "methods": ["GET"], "allow_headers": ["Content-Type"]}})
 
 @app.route('/match/<student_id>', methods=['GET'])
 def match(student_id):

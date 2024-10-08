@@ -3,9 +3,6 @@ import pandas as pd
 from google.cloud import firestore
 from ortools.sat.python import cp_model
 
-# Set up Firestore authentication
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "authentication-d6496-firebase-adminsdk-zoywr-32ecaa91eb.json"
-
 # Initialize Firestore
 db = firestore.Client()
 
@@ -58,8 +55,11 @@ def get_student_course(student_id, appointments):
                     return course
     return None
 
-def load_complementary_traits(file_path):
+def load_complementary_traits():
+    # Dynamically locate the file based on current directory
+    file_path = os.path.join(os.path.dirname(__file__), 'traits.csv')
     traits_data = pd.read_csv(file_path)
+
     complementary_traits = {
         (str(row['traits']).strip().lower(), str(row['instructor_traits']).strip().lower()): row['Match Result']
         for _, row in traits_data.iterrows()
@@ -145,8 +145,7 @@ def match_students_instructors(students, instructors, appointments, logged_in_st
         return {"status": "error", "message": "No suitable instructor found."}
 
 def main(logged_in_student_id):
-    file_path = r'Matching/traits.csv'
-    complementary_traits = load_complementary_traits(file_path)
+    complementary_traits = load_complementary_traits()
     students, instructors, appointments = fetch_data()
 
     if not students or not instructors:

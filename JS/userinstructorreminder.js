@@ -135,8 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Initial progress update - Fetching match data
             updateLoader(30);
         
-            // Start matching process
-            const response = await fetch(`http://127.0.0.1:5000/match/${studentId}`, {
+            const response = await fetch(`https://authentication-d6496.df.r.appspot.com/match/${studentId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
