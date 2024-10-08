@@ -1,6 +1,8 @@
 body {
     margin: 0;
     padding: 0;
+    scrollbar-width: thin; /* Makes the scrollbar thinner */
+    scrollbar-color: #142A74 #f1f1f1; /* Thumb color and track color */
 }
 
 .whole-page {
@@ -174,10 +176,7 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    width: calc(100% - 300px);
-    height: calc(100vh - 120px);
     margin-left: 300px;
-    margin-top: 120px;
 }
 
 .header {
@@ -215,6 +214,7 @@ h2 {
     font-family: Poppins;
     font-size: 17px;
     color: #2F2E2E;
+    margin: 0;
 }
 
 .page-content-header {
@@ -250,7 +250,6 @@ h2 {
 .page-body {
     display: flex;
     flex-direction: column;
-    margin-top: 50px;
 }
 
 .page-body h2 {
@@ -564,7 +563,7 @@ h2 {
     bottom: 0;
     right: 0;
     width: 84.3%;
-    height: 87.5%;
+    height: 100%;
     background-color: rgba(255, 255, 255, 0.8);
     z-index: 9999;
     text-align: center;
@@ -624,4 +623,24 @@ h2 {
     100% {
         content: '.';
     }
+}
+
+/* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background of the scrollbar track */
+    border-radius: 10px; /* Optional: Rounded corners for the track */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #142A74; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Optional: Rounded corners for the thumb */
+    border: 3px solid #f1f1f1; /* Optional: Adds padding around the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d; /* Darker color on hover */
 }

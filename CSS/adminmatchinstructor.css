@@ -174,10 +174,7 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    width: calc(100% - 300px);
-    height: calc(100vh - 120px);
     margin-left: 300px;
-    margin-top: 120px;
 }
 
 .header {
@@ -205,9 +202,23 @@ h2 {
     font-weight: normal;
     color: #2F2E2E;
 }
+
 .page-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
     padding: 30px 30px;
     background-color: #f5f5f5;
+    gap: 10px;
+}
+
+.page-content h3 {
+    font-family: Poppins;
+    font-size: 22px;
+    font-weight: bold;
+    color: #142A74;
+    margin: 0;
 }
 
 .bi-arrow-left {
@@ -336,6 +347,10 @@ h2 {
     border-radius: 10px;
     border: none;
     cursor: pointer;
+}
+
+.instructor-list i:hover {
+    background-color: #18349C;
 }
 
 .table {
@@ -650,6 +665,26 @@ input:checked + .slider .slider-label-on {
     font-size: 14px;
 }
 
+/* Custom scrollbar styling */
+.modal::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+.modal::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background of the scrollbar track */
+    border-radius: 10px; /* Optional: Rounded corners for the track */
+}
+
+.modal::-webkit-scrollbar-thumb {
+    background-color: #142A74; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Optional: Rounded corners for the thumb */
+    border: 3px solid #f1f1f1; /* Optional: Adds padding around the thumb */
+}
+
+.modal::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d; /* Darker color on hover */
+}
+
 #instructorModal .modal-dialog {
     top: 15%;
     left: 5%;
@@ -942,12 +977,6 @@ input:checked + .slider .slider-label-on {
     top: auto;
 }
 
-#assigninstructormodal .modal-body {
-    border: 1px solid #142A74;
-    padding: 0;
-    margin: 0;
-}
-
 #assigninstructormodal .modal-body-header {
     display: flex;
     flex-direction: row;
@@ -955,9 +984,85 @@ input:checked + .slider .slider-label-on {
     padding: 10px 0px;
 }
 
-.modal-table {
-    width: 100%;
-    border-collapse: collapse;
+.custom-header th {
+    text-align: center;
+}
+
+.header-left {
+    border-right: 1px solid #142A74;
+}
+
+.header-right {
+    border-left: 1px solid #142A74;
+}
+
+.custom-table th:nth-child(3), .custom-table td:nth-child(3) {
+    text-align: center;
+}
+
+.modal-table-header th {
+    background-color: #142A74;
+    color: #ffffff;
+}
+
+.custom-btn {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+    cursor: pointer;
+}
+
+.custom-btn:hover {
+    background-color: #18349C;
+    color: #ffffff;
+}
+
+.custom-btn.disabled-button {
+    background-color: #ccc;
+    color: #8d8b8b;
+    cursor: not-allowed;
+}
+
+.bi-info-circle {
+    font-size: 20px;
+    color: #142A74;
+}
+
+/* Style the trait list inside the popover */
+.trait-list {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.trait-list li {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #2F2E2E;
+}
+
+/* Customize the popover appearance */
+.popover {
+    border-radius: 10px;
+    width: auto;
+    height: auto;
+}
+
+.popover-body {
+    padding: 10px;
+}
+
+/* Add fade-in effect */
+.popover {
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.popover.show {
+    opacity: 1;
 }
 
 .modal-table th, .modal-table td {
@@ -990,7 +1095,7 @@ input:checked + .slider .slider-label-on {
     bottom: 0;
     right: 0;
     width: 84.3%;
-    height: 87.5%;
+    height: 100%;
     background-color: rgba(255, 255, 255, 0.8);
     z-index: 9999;
     text-align: center;

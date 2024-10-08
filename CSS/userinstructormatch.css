@@ -148,10 +148,9 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: 100vh;
     width: calc(100% - 300px);
-    height: calc(100vh - 120px);
     margin-left: 300px;
-    margin-top: 120px;
 }
 
 .main-content-header {
@@ -214,7 +213,7 @@ h2 {
     background-image: linear-gradient(to right, #142A74, #8597D4);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
-    height: 180px;
+    height: 200px;
 }
 
 .profile-pic {
@@ -224,7 +223,7 @@ h2 {
     height: 300px;
     border-radius: 50%;
     margin: 0 auto;
-    margin-top: 10px;
+    margin-top: 40px;
     border-radius: 50%;
     object-fit: cover;
     object-position: center;
@@ -236,13 +235,14 @@ h2 {
     flex-direction: column;
     padding: 30px;
     height: 100%;
+    gap: 40px;
 }
 
 .top-info {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 110px;
+    margin-top: 150px;
 }
 
 .name {
@@ -680,7 +680,7 @@ h2 {
     bottom: 0;
     right: 0;
     width: 84.3%;
-    height: 87.5%;
+    height: 100%;
     background-color: rgba(255, 255, 255, 0.8);
     z-index: 9999;
     text-align: center;

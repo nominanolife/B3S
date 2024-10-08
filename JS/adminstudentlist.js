@@ -546,91 +546,152 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Function to open the edit modal
 function openEditModal(index, modalId = 'editCcnModal') {
-    selectedStudentIndex = index; // Store the selected student's index or ID
-    const studentData = studentsData[index]; // Retrieve student data using the index
+  selectedStudentIndex = index; // Store the selected student's index or ID
+  const studentData = studentsData[index]; // Retrieve student data using the index
 
-    // Function to convert 24-hour time to 12-hour format
-    function convertTo12HourFormat(time24) {
-        let [hours, minutes] = time24.split(':');
-        hours = parseInt(hours);
-        const period = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
-        return `${hours}:${minutes} ${period}`;
-    }
+  // Function to convert 24-hour time to 12-hour format
+  function convertTo12HourFormat(time24) {
+      let [hours, minutes] = time24.split(':');
+      hours = parseInt(hours);
+      const period = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+      return `${hours}:${minutes} ${period}`;
+  }
 
-    // Convert date to "Month Day, Year" format
-    function formatDate(dateStr) {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    }
+  // Convert date to "Month Day, Year" format
+  function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
 
-    if (modalId === 'edit4WheelsModal') {
-        const booking = studentData.bookings[0];
+  if (modalId === 'edit4WheelsModal') {
+      const booking = studentData.bookings[0];
 
-        // Format date and time
-        const formattedDate = formatDate(booking.date);
-        const formattedStartTime = convertTo12HourFormat(booking.timeStart);
-        const formattedEndTime = convertTo12HourFormat(booking.timeEnd);
+      // Format date and time
+      const formattedDate = formatDate(booking.date);
+      const formattedStartTime = convertTo12HourFormat(booking.timeStart);
+      const formattedEndTime = convertTo12HourFormat(booking.timeEnd);
 
-        // Populate modal
-        document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(1) span').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
-        document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(2) span').textContent = `${formattedDate} || ${formattedStartTime} - ${formattedEndTime}`;
-        document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(3) span').textContent = studentData.instructorName || "N/A";
-        document.querySelector('#edit4WheelsModal .modal-body.second-section .student-info #studentName').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
-    }
+      // Populate modal with student information
+      document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(1) span').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
+      document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(2) span').textContent = `${formattedDate} || ${formattedStartTime} - ${formattedEndTime}`;
+      document.querySelector('#edit4WheelsModal .modal-body .student-info p:nth-child(3) span').textContent = studentData.instructorName || "N/A";
+      document.querySelector('#edit4WheelsModal .modal-body.second-section .student-info #studentName').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
 
-    // Check conditions for different modals
-    if (modalId === 'editCcnModal') {
-        if (!studentData.TDCStatus || studentData.TDCStatus !== "Completed") {
-            showNotification("This student has not yet finished their TDC appointment.");
-            return;
-        }
-    }
+      // Populate vehicle type
+      if (studentData.assessmentData && studentData.assessmentData.vehicleType) {
+          document.getElementById('vehicleTypeSelected').textContent = studentData.assessmentData.vehicleType;
+      } else {
+          // Set default value
+          document.getElementById('vehicleTypeSelected').textContent = 'Select Vehicle';
+      }
 
-    if (modalId === 'edit4WheelsModal' && !studentData.has4WheelsCourse) {
-        showNotification("This student does not have a 4-Wheels appointment.");
-        return;
-    }
+      // Populate assessment data if it exists
+      if (studentData.assessmentData) {
+          const assessmentData = studentData.assessmentData;
+          const sentenceToFieldIdMap = {
+              "Eye lead time": "eyeLeadTime",
+              "Left – Right / Scanning / Shoulder checks": "leftRightScanning",
+              "Mirrors / tracking traffic": "mirrorsTracking",
+              "Following defensive distance": "defensiveDistance",
+              "Space at Stops": "spaceAtStops",
+              "Path of least resistance": "leastResistance",
+              "Right-of-way": "rightOfWay",
+              "Acceleration / Deceleration – Smoothness": "acceleration",
+              "Braking: Full Stops, smooth": "braking",
+              "Speed for Conditions": "speedForConditions",
+              "Speed and Traffic signs": "trafficSigns",
+              "Lane / Turn Position / set-up": "lanePosition",
+              "Steering: hand position, smoothness": "steering",
+              "Signals: timing and use": "signals",
+              "Other: i.e horn, eye contact": "eyeContact",
+              "Seating, head rest position, and mirror adjustment: seatbelt use": "seating",
+              "Parking / Backing": "parking",
+              "Anticipation: Adjusts": "anticipation",
+              "Judgment: decisions": "judgment",
+              "Timing: approach, Traffic interactions": "timing"
+          };
 
-    if (modalId === 'editMotorsModal' && !studentData.hasMotorsCourse) {
-        showNotification("This student does not have a Motorcycle appointment.");
-        return;
-    }
+          assessmentData.categories.forEach(category => {
+              category.items.forEach(item => {
+                  const fieldId = sentenceToFieldIdMap[item.sentence];
+                  if (fieldId) {
+                      // Populate score
+                      const scoreInput = document.getElementById(fieldId);
+                      if (scoreInput) {
+                          scoreInput.value = item.score;
+                      }
 
-    if (modalId === 'editCcnModal') {
-        document.getElementById('certificateControlNumberInput').value = studentData.certificateControlNumber || '';
-    }
+                      // Populate comment
+                      const commentFieldId = 'comment' + fieldId.charAt(0).toUpperCase() + fieldId.slice(1);
+                      const commentInput = document.getElementById(commentFieldId);
+                      if (commentInput) {
+                          commentInput.value = item.comment;
+                      }
+                  }
+              });
+          });
 
-    // Set the index as a data attribute on the save button
-    const saveButton = document.getElementById('saveChangesBtn');
-    saveButton.setAttribute('data-student-index', index);
+          // Update the total score display
+          calculateTotalScore();
+      }
 
-    console.log("Setting data-student-index to:", index); // Debugging output
+      // Populate student permit
+      document.getElementById('studentPermit').value = studentData.studentPermit || '';
 
-    // Show the correct modal with options to prevent closing
-    const modalToOpen = new bootstrap.Modal(document.getElementById(modalId), {
-        backdrop: 'static',
-        keyboard: false
-    });
+      // Populate checklist data if it exists
+      if (studentData.checklist) {
+          const checklist = studentData.checklist;
+          for (const [fieldId, value] of Object.entries(checklist)) {
+              const checkbox = document.getElementById(fieldId);
+              if (checkbox) {
+                  checkbox.checked = value;
+              }
+          }
+      }
+  }
 
-    if (modalId !== 'editCcnModal') {
+  // Existing code for editCcnModal
+  if (modalId === 'editCcnModal') {
+      if (!studentData.TDCStatus || studentData.TDCStatus !== "Completed") {
+          showNotification("This student has not yet finished their TDC appointment.");
+          return;
+      }
+      // Populate the certificate control number if it exists
+      document.getElementById('certificateControlNumberInput').value = studentData.certificateControlNumber || '';
+  }
+
+  // Existing code for modal visibility and transitions
+  // Set the index as a data attribute on the save button
+  const saveButton = document.getElementById('saveChangesBtn');
+  if (saveButton) {
+      saveButton.setAttribute('data-student-index', index);
+  }
+
+  // Show the correct modal with options to prevent closing
+  const modalToOpen = new bootstrap.Modal(document.getElementById(modalId), {
+      backdrop: 'static',
+      keyboard: false
+  });
+
+  // Reset and show the appropriate sections for non-CCN modals
+  if (modalId !== 'editCcnModal') {
       const modalElement = document.getElementById(modalId);
       const [firstSection, secondSection] = modalElement.querySelectorAll('.modal-body');
       const [backBtn, nextBtn, saveBtn] = modalElement.querySelectorAll('.back-btn, .next-btn, .save-btn');
-    
-      // Ensure that all the queried elements exist before trying to access their classList
-      if (firstSection && secondSection && backBtn && nextBtn && saveBtn) {
-        firstSection.classList.remove('d-none');
-        secondSection.classList.add('d-none');
-        backBtn.classList.add('d-none');
-        nextBtn.classList.remove('d-none');
-        saveBtn.classList.add('d-none');
-      } else {
-        console.error('One or more elements are missing in the modal:', { firstSection, secondSection, backBtn, nextBtn, saveBtn });
-      }
-    }
 
-    modalToOpen.show();
+      if (firstSection && secondSection && backBtn && nextBtn && saveBtn) {
+          firstSection.classList.remove('d-none');
+          secondSection.classList.add('d-none');
+          backBtn.classList.add('d-none');
+          nextBtn.classList.remove('d-none');
+          saveBtn.classList.add('d-none');
+      } else {
+          console.error('One or more elements are missing in the modal:', { firstSection, secondSection, backBtn, nextBtn, saveBtn });
+      }
+  }
+
+  modalToOpen.show();
 }
 
 let selectedStudentIndex = null; // Global variable to store the selected student's index or ID
@@ -986,8 +1047,8 @@ document.getElementById('saveBtn').addEventListener('click', function() {
     saveAllDataToFirestore(); // Save all data to Firestore
 });
 
- // Function to open the edit modal for motorcycle form
- function openMotorcycleEditModal(index, modalId = 'editMotorsModal') {
+// Function to open the edit modal for motorcycle form
+function openMotorcycleEditModal(index, modalId = 'editMotorsModal') {
   selectedStudentIndex = index; // Store the selected student's index or ID
   const studentData = studentsData[index]; // Retrieve student data using the index
 
@@ -1005,6 +1066,68 @@ document.getElementById('saveBtn').addEventListener('click', function() {
       const date = new Date(dateStr);
       return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   }
+
+   // Populate assessment data
+   if (studentData.assessmentData) {
+    const assessmentData = studentData.assessmentData;
+    const sentenceToFieldIdMap = {
+        "Moving off, riding ahead and stopping": "motorcycleMovingOff",
+        "Positioning in different environments": "motorcyclePositioning",
+        "motorcycleLowSpeedBalancing": "motorcycleLowSpeedBalancing",
+        "motorcycleHillRiding": "motorcycleHillRiding",
+        "motorcycleCornering": "motorcycleCornering",
+        "motorcycleRailwayCrossings": "motorcycleRailwayCrossings",
+        "motorcycleLaneShift": "motorcycleLaneShift",
+        "motorcycleTurningLaneChanging": "motorcycleTurningLaneChanging",
+        "Passing stationary vehicles and pedestrians": "motorcyclePassingVehicles",
+        "Meeting oncoming traffic": "motorcycleOncomingTraffic",
+        "Riding ahead of or behind other road users": "ridingAheadorBehind",
+        "Riding side by side": "ridingSidebySide",
+        "Overtaking": "overtaking",
+        "Straight through": "straightThrough",
+        "Turning Left or Right": "turningLeftorRight",
+        "With or Without obligation to give the right of way": "obligationsToGiveRightofWay",
+        "ABC of passing junction": "abcPassingJunction",
+        "Roundabouts": "roundabouts",
+        "Stopping and Parking": "stoppingandParking",
+        "Riding with a back ride": "ridingBackRide"
+    };
+
+    assessmentData.categories.forEach(category => {
+        category.items.forEach(item => {
+            const fieldId = sentenceToFieldIdMap[item.sentence];
+            if (fieldId) {
+                const scoreInput = document.getElementById(fieldId);
+                if (scoreInput) {
+                    scoreInput.value = item.score;
+                }
+
+                const commentFieldId = 'motorcycleComment' + fieldId.charAt(0).toUpperCase() + fieldId.slice(1);
+                const commentInput = document.getElementById(commentFieldId);
+                if (commentInput) {
+                    commentInput.value = item.comment;
+                }
+            }
+        });
+    });
+
+    // Update the total score display
+    calculateMotorcycleTotalScore();
+}
+
+// Populate student permit
+document.getElementById('motorcycleStudentPermit').value = studentData.studentPermit || '';
+
+// Populate checklist data
+if (studentData.checklist) {
+    const checklist = studentData.checklist;
+    for (const [fieldId, value] of Object.entries(checklist)) {
+        const checkbox = document.getElementById(fieldId);
+        if (checkbox) {
+            checkbox.checked = value;
+        }
+    }
+}
 
   if (modalId === 'editMotorsModal') {
       const booking = studentData.bookings[0];
@@ -1128,7 +1251,6 @@ function saveMotorcycleAssessmentDataToSession() {
     studentName: `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`,
     instructorName: studentData.instructorName || "N/A",
     dateAndTime: document.getElementById('motorcycleDateAndTime') ? document.getElementById('motorcycleDateAndTime').textContent : "N/A",
-    vehicleType: 'Motorcycle',
     categories: [
         {
             category: "Start the engine",
@@ -1669,26 +1791,26 @@ function resetModalFields(modalId) {
 
   // Reset all text inputs and text areas to empty
   modal.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
-    input.value = '';
+      input.value = '';
   });
 
   // Reset all checkboxes to unchecked
   modal.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-    checkbox.checked = false;
+      checkbox.checked = false;
   });
-
-  // Reset dropdown selections (if any)
-  const dropdownSelected = modal.querySelector('.selected');
-  if (dropdownSelected) {
-    dropdownSelected.textContent = 'Select Vehicle'; // Replace with your default dropdown value
-  }
 
   // Reset any dynamic text content like student name or permit details
   modal.querySelectorAll('.student-info span').forEach(span => {
-    span.textContent = ''; // Reset to empty or a placeholder if needed
+      span.textContent = '';
   });
 
-  // Hide the second section and reset to the first section
+  // Reset total score display
+  const totalScoreDisplay = modal.querySelector('#motorcycleTotalScore');
+  if (totalScoreDisplay) {
+      totalScoreDisplay.textContent = '0 / 100';
+  }
+
+  // Reset modal sections and buttons
   const [firstSection, secondSection] = modal.querySelectorAll('.modal-body');
   const [backBtn, nextBtn, saveBtn] = modal.querySelectorAll('.back-btn, .next-btn, .save-btn');
 
