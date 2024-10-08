@@ -169,6 +169,27 @@ async function renderStudents(students) {
     });
 }
 
+// Initialize modal hidden event to clear the modal content
+$('#assigninstructormodal').on('hidden.bs.modal', function () {
+    // Clear instructor list
+    document.querySelector('.instructor-list').innerHTML = '';
+
+    // Clear any previously attached event listeners to avoid duplication
+    document.querySelectorAll('.custom-btn').forEach(function(button) {
+        button.removeEventListener('click', handleReassignClick);
+    });
+
+    // Remove any active popovers
+    $('[data-toggle="popover"]').popover('dispose');
+});
+
+// Function to handle instructor reassignment button click
+async function handleReassignClick(event) {
+    const newInstructorId = this.getAttribute('data-instructor-id');
+    const studentId = this.getAttribute('data-student-id');
+    await reassignInstructor(studentId, newInstructorId);
+}
+
 // Fetch and show available instructors (excluding current instructor)
 async function showInstructorList(studentId, currentInstructorId) {
     const { course } = await fetchCourseAndAppointmentDateForStudent(studentId);  // Fetch course dynamically
@@ -231,7 +252,7 @@ async function fetchInstructorsForCourse(course, currentInstructorId) {
 }
 
 function renderInstructors(instructors, studentId) {
-    const instructorListContainer = document.querySelector('.instructor-list'); // Ensure class name matches
+    const instructorListContainer = document.querySelector('.instructor-list');
     instructorListContainer.innerHTML = ''; // Clear any existing data
 
     instructors.forEach(instructor => {
@@ -266,16 +287,12 @@ function renderInstructors(instructors, studentId) {
         instructorListContainer.innerHTML += instructorRow;
     });
 
-    // Reattach popovers and event listeners
+    // Reattach popovers
     $('[data-toggle="popover"]').popover();
 
     // Attach event listeners for the "Reassign" buttons
     document.querySelectorAll('.custom-btn').forEach(function(button) {
-        button.addEventListener('click', async function() {
-            const newInstructorId = this.getAttribute('data-instructor-id');
-            const studentId = this.getAttribute('data-student-id');
-            await reassignInstructor(studentId, newInstructorId);
-        });
+        button.addEventListener('click', handleReassignClick);
     });
 }
 
