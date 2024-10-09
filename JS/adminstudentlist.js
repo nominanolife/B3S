@@ -587,8 +587,8 @@ function openEditModal(index, modalId = 'editCcnModal') {
       }
 
       // Populate assessment data if it exists
-      if (studentData.assessmentData) {
-          const assessmentData = studentData.assessmentData;
+      if (studentData.WassessmentData) {
+          const assessmentData = studentData.WassessmentData;
           const sentenceToFieldIdMap = {
               "Eye lead time": "eyeLeadTime",
               "Left – Right / Scanning / Shoulder checks": "leftRightScanning",
@@ -640,7 +640,7 @@ function openEditModal(index, modalId = 'editCcnModal') {
       document.getElementById('studentPermit').value = studentData.studentPermit || '';
 
       // Populate checklist data if it exists
-      if (studentData.checklist) {
+      if (studentData.Wchecklist) {
           const checklist = studentData.checklist;
           for (const [fieldId, value] of Object.entries(checklist)) {
               const checkbox = document.getElementById(fieldId);
@@ -901,8 +901,8 @@ async function saveAllDataToFirestore() {
   }
 
   // Retrieve assessment data from session storage
-  const assessmentData = JSON.parse(sessionStorage.getItem(`4WheelsAssess_${selectedStudentIndex}`)) || {};
-  const processedData = JSON.parse(sessionStorage.getItem(`4WProcessedData_${selectedStudentIndex}`)) || {};
+  const WassessmentData = JSON.parse(sessionStorage.getItem(`4WheelsAssess_${selectedStudentIndex}`)) || {};
+  const WprocessedData = JSON.parse(sessionStorage.getItem(`4WProcessedData_${selectedStudentIndex}`)) || {};
 
   // Get data from the checklist
   const studentPermit = document.getElementById('studentPermit').value;
@@ -913,10 +913,10 @@ async function saveAllDataToFirestore() {
     return false; // Stop the function here and keep the modal open
   }
 
-  const checklistData = {
+  const WchecklistData = {
       studentName: document.getElementById('studentName').textContent,
       studentPermit: studentPermit,
-      checklist: {
+      Wchecklist: {
           lesson1TopicA: document.getElementById('lesson1TopicA').checked,
           lesson1TopicB: document.getElementById('lesson1TopicB').checked,
           lesson1TopicC: document.getElementById('lesson1TopicC').checked,
@@ -947,15 +947,15 @@ async function saveAllDataToFirestore() {
   // Combine assessment, processed, and checklist data
   const combinedData = {
       ...studentDataWithoutBookings, // Include existing student data without bookings
-      assessmentData, // Add the assessment data
-      processedData, // Add the processed data
-      ...checklistData // Add the checklist data
+      WassessmentData, // Add the assessment data
+      WprocessedData, // Add the processed data
+      ...WchecklistData // Add the checklist data
   };
 
   try {
       await setDoc(doc(db, "applicants", studentsData[selectedStudentIndex].id), combinedData, { merge: true });
       console.log('Saving combined data:', combinedData);
-      showNotification(`All data has been saved successfully for ${checklistData.studentName}`);
+      showNotification(`All data has been saved successfully for ${WchecklistData.studentName}`);
       return true;
   } catch (e) {
       console.error("Error saving combined data: ", e);
@@ -1068,8 +1068,8 @@ function openMotorcycleEditModal(index, modalId = 'editMotorsModal') {
   }
 
    // Populate assessment data
-   if (studentData.assessmentData) {
-    const assessmentData = studentData.assessmentData;
+   if (studentData.MassessmentData) {
+    const assessmentData = studentData.MassessmentData;
     const sentenceToFieldIdMap = {
         "Moving off, riding ahead and stopping": "motorcycleMovingOff",
         "Positioning in different environments": "motorcyclePositioning",
@@ -1119,8 +1119,8 @@ function openMotorcycleEditModal(index, modalId = 'editMotorsModal') {
 document.getElementById('motorcycleStudentPermit').value = studentData.studentPermit || '';
 
 // Populate checklist data
-if (studentData.checklist) {
-    const checklist = studentData.checklist;
+if (studentData.Mchecklist) {
+    const checklist = studentData.Mchecklist;
     for (const [fieldId, value] of Object.entries(checklist)) {
         const checkbox = document.getElementById(fieldId);
         if (checkbox) {
@@ -1512,8 +1512,8 @@ async function saveAllMotorcycleDataToFirestore() {
   }
 
   // Retrieve assessment data from session storage
-  const assessmentData = JSON.parse(sessionStorage.getItem(`MotorcycleAssess_${selectedStudentIndex}`)) || {};
-  const processedData = JSON.parse(sessionStorage.getItem(`MProcessedData_${selectedStudentIndex}`)) || {};
+  const MassessmentData = JSON.parse(sessionStorage.getItem(`MotorcycleAssess_${selectedStudentIndex}`)) || {};
+  const MprocessedData = JSON.parse(sessionStorage.getItem(`MProcessedData_${selectedStudentIndex}`)) || {};
 
   // Get data from the motorcycle checklist
   const studentPermit = document.getElementById('motorcycleStudentPermit').value;
@@ -1524,10 +1524,10 @@ async function saveAllMotorcycleDataToFirestore() {
     return false; // Stop the function here and keep the modal open
   }
 
-  const checklistData = {
+  const MchecklistData = {
       studentName: document.getElementById('motorcycleStudentName').textContent,
       studentPermit: studentPermit,
-      checklist: {
+      Mchecklist: {
           motorcycleLesson1TopicA: document.getElementById('motorcycleLesson1TopicA').checked,
           motorcycleLesson1TopicB: document.getElementById('motorcycleLesson1TopicB').checked,
           motorcycleLesson1TopicC: document.getElementById('motorcycleLesson1TopicC').checked,
@@ -1558,15 +1558,15 @@ async function saveAllMotorcycleDataToFirestore() {
   // Combine assessment, processed, and checklist data
   const combinedData = {
       ...studentDataWithoutBookings, // Include existing student data without bookings
-      assessmentData, // Add the assessment data
-      processedData, // Add the processed data
-      ...checklistData // Add the motorcycle checklist data
+      MassessmentData, // Add the assessment data
+      MprocessedData, // Add the processed data
+      ...MchecklistData // Add the motorcycle checklist data
   };
 
   try {
       await setDoc(doc(db, "applicants", studentsData[selectedStudentIndex].id), combinedData, { merge: true });
       console.log('Saving combined motorcycle data:', combinedData);
-      showNotification(`All data has been saved successfully for ${checklistData.studentName}`);
+      showNotification(`All data has been saved successfully for ${MchecklistData.studentName}`);
       return true;
   } catch (e) {
       console.error("Error saving combined motorcycle data: ", e);

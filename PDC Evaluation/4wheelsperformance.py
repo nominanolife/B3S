@@ -14,7 +14,7 @@ def load_data(file_path):
 def relabel_performance(row):
     if row['percentage'] < 80:
         return 'Poor'
-    elif 80 <= row['percentage'] < 90:
+    elif 81 <= row['percentage'] < 89:
         return 'Great'
     else:
         return 'Excellent'
