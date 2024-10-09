@@ -128,7 +128,7 @@ async function fetchSavedVideosAndQuizzes() {
             });
         });
 
-        courseContent.appendChild(uploadContainer);
+        courseContent.insertBefore(uploadContainer, courseContent.firstChild);
     } catch (error) {
         console.error("Error fetching videos and quizzes:", error);
         displayNotification('error', 'Failed to fetch videos and quizzes.');

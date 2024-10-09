@@ -232,6 +232,7 @@ function renderStudents() {
   const loader = document.getElementById('loader1');
   const studentList = document.getElementById('student-list');
   studentList.innerHTML = ''; // Clear the list before rendering new data
+  
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   const paginatedStudents = filteredStudentsData.slice(start, end); // Paginated data
@@ -274,7 +275,6 @@ function renderStudents() {
 
   setupStatusToggleListeners(); // Call this after rendering the student list
 }
-
 
 function renderCourseStatus(course, status, bookings = []) {
   const today = new Date(); // Current date
@@ -1718,8 +1718,18 @@ function filterStudents(searchTerm) {
   });
   currentPage = 1;
   totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
-  renderStudents();
-  updatePaginationControls();
+
+  // Check if there are no results
+  if (filteredStudentsData.length === 0) {
+    document.getElementById('student-list').innerHTML = `
+      <tr>
+        <td colspan="10" class="text-center">No student/s found</td>
+      </tr>
+    `;
+  } else {
+    renderStudents();  // Render the filtered students
+    updatePaginationControls();  // Update the pagination controls
+  }
 }
 
 // Custom dropdown functionality for Vehicle Type

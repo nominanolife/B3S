@@ -60,6 +60,17 @@ async function fetchInstructors() {
 // Render instructors in the table
 function renderInstructors() {
   instructorList.innerHTML = '';
+
+  if (filteredInstructors.length === 0) {
+    // If no instructors are found, display a message
+    instructorList.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center">No instructor/s found</td>
+      </tr>
+    `;
+    return; // Stop further execution since there's nothing to render
+  }
+
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   const paginatedInstructors = filteredInstructors.slice(start, end);

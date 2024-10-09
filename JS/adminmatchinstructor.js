@@ -28,6 +28,15 @@ function showNotification(message) {
     $('#notificationModal').modal('show');
 }
 
+function showLoader() {
+    document.getElementById('loader1').style.display = 'flex'; // Ensure loader is visible
+}
+
+// Hide the loader
+function hideLoader() {
+    document.getElementById('loader1').style.display = 'none'; // Hide loader after table has loaded
+}
+
 let matchesUnsubscribe = null;
 
 function setUpMatchedStudentsListener() {
@@ -115,6 +124,7 @@ async function fetchCourseAndAppointmentDateForStudent(studentId) {
 
 // Render the list of students with their match details
 async function renderStudents(students) {
+    showLoader(); // Show loader before starting the rendering process
     const studentListContainer = document.querySelector('.student-list');
     studentListContainer.innerHTML = ''; // Clear any existing data
 
@@ -167,6 +177,8 @@ async function renderStudents(students) {
             await showInstructorList(studentId, currentInstructorId);
         });
     });
+
+    hideLoader(); // Hide the loader after rendering is done
 }
 
 // Initialize modal hidden event to clear the modal content
@@ -348,7 +360,8 @@ async function loadMatchedStudents() {
     setUpMatchedStudentsListener();
 }
 
-// Initialize pagination and fetching on page load
+// Initialize page loading
 document.addEventListener('DOMContentLoaded', function() {
+    showLoader(); // Show loader when the page starts loading
     loadMatchedStudents();  // Load the first page of students
 });

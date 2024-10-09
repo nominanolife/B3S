@@ -184,6 +184,7 @@ h2 {
 
 .page-content {
     display: flex;
+    align-items: center;
     padding: 30px 30px;
     background-color: #f5f5f5;
     height: 100%;
@@ -194,6 +195,7 @@ h2 {
     border-radius: 20px;
     background-color: #ffffff;
     width: 100%;
+    height: 85%;
 }
 
 .container-header {
@@ -273,15 +275,17 @@ h2 {
 .three-info{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     margin-top: 20px;
+    gap: 20px;
 }
 
 .two-info {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     margin-top: 30px;
+    gap: 20px;
 }
 
 .label {

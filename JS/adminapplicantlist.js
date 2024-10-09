@@ -127,6 +127,17 @@ function renderFilteredApplicants(filteredApplicants) {
     const contentElement = document.querySelector('.applicant-list');
     contentElement.innerHTML = '';
 
+    // Check if there are no matching students
+    if (filteredApplicants.length === 0) {
+        const noResultsHtml = `
+            <tr class="table-row">
+                <td colspan="4" class="table-row-content text-center">No student/s found</td>
+            </tr>
+        `;
+        contentElement.insertAdjacentHTML('beforeend', noResultsHtml);
+        return;
+    }
+
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const paginatedApplicants = filteredApplicants.slice(start, end);
@@ -141,10 +152,29 @@ function renderFilteredApplicants(filteredApplicants) {
                 <td class="table-row-content">${firstName} ${lastName}</td>
                 <td class="table-row-content">${applicant.email}</td>
                 <td class="table-row-content">${applicant.phoneNumber}</td>
-                <td class="table-row-content"><i class="bi bi-three-dots"></i></td>
+                <td class="table-row-content">
+                    <button class="btn btn-primary btn-sm send-sms-btn" data-phone="${applicant.phoneNumber}">Send SMS</button>
+                </td>
             </tr>
         `;
         contentElement.insertAdjacentHTML('beforeend', rowHtml);
+    });
+
+    // Add event listeners for "Send SMS" buttons
+    document.querySelectorAll('.send-sms-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const phoneNumber = this.getAttribute('data-phone');
+            const fromValue = "DriveHub"; // You can set this value dynamically or keep it static
+    
+            // Set the "From" field with the value "DriveHub"
+            document.getElementById('sms-from').value = fromValue;
+    
+            // Set the "To" field with the selected phone number
+            document.getElementById('sms-to').value = phoneNumber;
+    
+            // Show the modal
+            $('#smsModal').modal('show');
+        });
     });
 }
 

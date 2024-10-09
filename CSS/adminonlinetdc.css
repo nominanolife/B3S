@@ -486,16 +486,6 @@ h2 {
     max-width: 600px;
 }
 
-.modal-open {
-    overflow: auto !important;
-}
-
-.modal {
-    position: fixed;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
 .progress-container {
     display: flex;
     justify-content: space-between;
@@ -1377,22 +1367,21 @@ h2 {
     }
 }
 
-/* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
-    width: 12px; /* Width of the scrollbar */
+    width: 12px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Background of the scrollbar track */
-    border-radius: 10px; /* Optional: Rounded corners for the track */
+    background: #f1f1f1;
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #142A74; /* Color of the scrollbar thumb */
-    border-radius: 10px; /* Optional: Rounded corners for the thumb */
-    border: 3px solid #f1f1f1; /* Optional: Adds padding around the thumb */
+    background-color: #142A74;
+    border-radius: 10px;
+    border: 3px solid #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #0e1d4d; /* Darker color on hover */
+    background-color: #0e1d4d;
 }

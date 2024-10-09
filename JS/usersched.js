@@ -403,3 +403,13 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    // Add event listener to the arrow icon
+    const backArrowIcon = document.querySelector('.bi-arrow-left-short');
+    
+    if (backArrowIcon) {
+        backArrowIcon.addEventListener('click', () => {
+            window.location.href = 'userappointment.html';
+        });
+    }
+});

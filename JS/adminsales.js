@@ -32,6 +32,16 @@ const itemsPerPage = 10;
 let totalPages = 1;
 let popularPackage = ''; // To store the most popular package
 
+// Show the loader
+function showLoader() {
+  document.getElementById('loader1').style.display = 'flex'; // Display the loader
+}
+
+// Hide the loader
+function hideLoader() {
+  document.getElementById('loader1').style.display = 'none'; // Hide the loader
+}
+
 // Object to store filtered data for each month and year
 let monthYearData = {};
 
@@ -165,77 +175,82 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchStudentData() {
   try {
-    const studentsMap = new Map();
+      showLoader(); // Show loader before starting to fetch data
 
-    // Real-time listener for applicants collection
-    const unsubscribeApplicants = onSnapshot(collection(db, "applicants"), async (applicantsSnapshot) => {
-      studentsMap.clear(); // Clear the studentsMap to avoid duplicates
+      const studentsMap = new Map();
 
-      // Fetch appointments data to check for active bookings
-      const appointmentsSnapshot = await getDocs(collection(db, "appointments"));
-      appointmentsSnapshot.forEach(appointmentDoc => {
-        const appointmentData = appointmentDoc.data();
-        const bookings = appointmentData.bookings || [];
+      // Real-time listener for applicants collection
+      const unsubscribeApplicants = onSnapshot(collection(db, "applicants"), async (applicantsSnapshot) => {
+          studentsMap.clear(); // Clear the studentsMap to avoid duplicates
 
-        bookings.forEach(booking => {
-          const userId = booking.userId;
+          // Fetch appointments data to check for active bookings
+          const appointmentsSnapshot = await getDocs(collection(db, "appointments"));
+          appointmentsSnapshot.forEach(appointmentDoc => {
+              const appointmentData = appointmentDoc.data();
+              const bookings = appointmentData.bookings || [];
 
-          // Only add students with active bookings
-          const applicantDoc = applicantsSnapshot.docs.find(doc => doc.id === userId);
-          if (applicantDoc) {
-            const applicantData = applicantDoc.data();
-            if (applicantData.role === "student") {
-              studentsMap.set(userId, { ...applicantData, userId, activeBooking: booking });
-            }
-          }
-        });
+              bookings.forEach(booking => {
+                  const userId = booking.userId;
+
+                  // Only add students with active bookings
+                  const applicantDoc = applicantsSnapshot.docs.find(doc => doc.id === userId);
+                  if (applicantDoc) {
+                      const applicantData = applicantDoc.data();
+                      if (applicantData.role === "student") {
+                          studentsMap.set(userId, { ...applicantData, userId, activeBooking: booking });
+                      }
+                  }
+              });
+          });
+
+          // Further validate with completed status if the student has no active booking
+          applicantsSnapshot.forEach(applicantDoc => {
+              const applicantData = applicantDoc.data();
+              const userId = applicantDoc.id;
+
+              if (!studentsMap.has(userId) && applicantData.role === "student") {
+                  if (applicantData.TDCStatus === "Completed" ||
+                      applicantData["PDC-4WheelsStatus"] === "Completed" ||
+                      applicantData["PDC-MotorsStatus"] === "Completed") {
+                      studentsMap.set(userId, { ...applicantData, userId });
+                  }
+              }
+          });
+
+          // Fetch sales data and integrate with applicants data
+          const salesSnapshot = await getDocs(collection(db, "sales"));
+          salesSnapshot.forEach(saleDoc => {
+              const saleData = saleDoc.data();
+              const userId = saleDoc.id; // Assume sales are saved with userId as the document ID
+
+              if (studentsMap.has(userId)) {
+                  const student = studentsMap.get(userId);
+                  student.paymentDate = saleData.paymentDate;
+                  student.amountPaid = saleData.amountPaid;
+                  student.paymentStatus = saleData.paymentStatus;
+                  studentsMap.set(userId, student);
+              }
+          });
+
+          allStudentsData = Array.from(studentsMap.values()); // Save all data for year calculation
+          studentsData = [...allStudentsData]; // Also set this for filtering
+          storeMonthYearData(); // Store the data for the current month and year
+          filterStudents(); // Filter students based on current month and year selection
+          totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
+          calculatePopularPackage(); // Calculate the most popular package
+          renderStudents(); // Render the sales table
+
+          updatePaginationControls();
+          updateTotalSalesForYear(currentYear);
+          updatePackageData();
+
+          hideLoader(); // Hide loader once data is fully rendered
       });
 
-      // Further validate with completed status if the student has no active booking
-      applicantsSnapshot.forEach(applicantDoc => {
-        const applicantData = applicantDoc.data();
-        const userId = applicantDoc.id;
-
-        if (!studentsMap.has(userId) && applicantData.role === "student") {
-          if (applicantData.TDCStatus === "Completed" ||
-              applicantData["PDC-4WheelsStatus"] === "Completed" ||
-              applicantData["PDC-MotorsStatus"] === "Completed") {
-            studentsMap.set(userId, { ...applicantData, userId });
-          }
-        }
-      });
-
-      // Fetch sales data and integrate with applicants data
-      const salesSnapshot = await getDocs(collection(db, "sales"));
-      salesSnapshot.forEach(saleDoc => {
-        const saleData = saleDoc.data();
-        const userId = saleDoc.id; // Assume sales are saved with userId as the document ID
-
-        if (studentsMap.has(userId)) {
-          const student = studentsMap.get(userId);
-          student.paymentDate = saleData.paymentDate;
-          student.amountPaid = saleData.amountPaid;
-          student.paymentStatus = saleData.paymentStatus;
-          studentsMap.set(userId, student);
-        }
-      });
-
-      allStudentsData = Array.from(studentsMap.values()); // Save all data for year calculation
-      studentsData = [...allStudentsData]; // Also set this for filtering
-      storeMonthYearData(); // Store the data for the current month and year
-      filterStudents(); // Filter students based on current month and year selection
-      totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
-      calculatePopularPackage(); // Calculate the most popular package
-      renderStudents();
-      updatePaginationControls();
-
-      updateTotalSalesForYear(currentYear);
-      updatePackageData();
-    });
-
-    return { unsubscribeApplicants };
+      return { unsubscribeApplicants };
   } catch (error) {
-    console.error("Error fetching student data: ", error);
+      console.error("Error fetching student data: ", error);
+      hideLoader(); // Hide the loader in case of an error
   }
 }
 
@@ -248,15 +263,16 @@ function storeMonthYearData() {
 function renderStudents() {
   const studentList = document.querySelector('.sales-list');
   if (!studentList) {
-    console.error("Student list element not found.");
-    return;
+      console.error("Student list element not found.");
+      return;
   }
 
   studentList.innerHTML = '';
 
   if (filteredStudentsData.length === 0) {
-    studentList.innerHTML = '<tr><td colspan="7">No students found for the selected criteria.</td></tr>';
-    return;
+      studentList.innerHTML = '<tr><td colspan="7">No students found for the selected criteria.</td></tr>';
+      hideLoader(); // Hide the loader after rendering the message
+      return;
   }
 
   const start = (currentPage - 1) * itemsPerPage;
@@ -264,36 +280,29 @@ function renderStudents() {
   const paginatedStudents = filteredStudentsData.slice(start, end);
 
   paginatedStudents.forEach((student, index) => {
-    const personalInfo = student.personalInfo || { first: "N/A", last: "" };
-    const packageName = student.packageName || "N/A";
-    const packagePrice = student.packagePrice || "N/A";
-    const formattedPaymentDate = student.paymentDate ? formatDateToMDY(student.paymentDate) : 'N/A';
-    const amountPaid = student.amountPaid ? `&#8369; ${student.amountPaid}` : 'N/A';
-    const paymentStatus = student.paymentStatus || 'Not Paid';
+      const personalInfo = student.personalInfo || { first: "N/A", last: "" };
+      const packageName = student.packageName || "N/A";
+      const packagePrice = student.packagePrice || "N/A";
+      const formattedPaymentDate = student.paymentDate ? formatDateToMDY(student.paymentDate) : 'N/A';
+      const amountPaid = student.amountPaid ? `&#8369; ${student.amountPaid}` : 'N/A';
+      const paymentStatus = student.paymentStatus || 'Not Paid';
 
-    const studentHtml = `
-      <tr class="table-row">
-        <td class="table-row-content">${personalInfo.first} ${personalInfo.last}</td>
-        <td class="table-row-content">${packageName}</td>
-        <td class="table-row-content">&#8369; ${packagePrice}</td>
-        <td class="table-row-content">${paymentStatus}</td>
-        <td class="table-row-content">${formattedPaymentDate}</td>
-        <td class="table-row-content">${amountPaid}</td>
-        <td class="table-row-content">
-          <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
-        </td>
-      </tr>`;
-    studentList.insertAdjacentHTML('beforeend', studentHtml);
+      const studentHtml = `
+          <tr class="table-row">
+              <td class="table-row-content">${personalInfo.first} ${personalInfo.last}</td>
+              <td class="table-row-content">${packageName}</td>
+              <td class="table-row-content">&#8369; ${packagePrice}</td>
+              <td class="table-row-content">${paymentStatus}</td>
+              <td class="table-row-content">${formattedPaymentDate}</td>
+              <td class="table-row-content">${amountPaid}</td>
+              <td class="table-row-content">
+                  <i class="bi bi-pencil-square edit-icon" data-index="${index}"></i>
+              </td>
+          </tr>`;
+      studentList.insertAdjacentHTML('beforeend', studentHtml);
   });
 
-  // Add event listeners to the edit icons
-  const editIcons = studentList.querySelectorAll('.edit-icon');
-  editIcons.forEach(icon => {
-    icon.addEventListener('click', (event) => {
-      const studentIndex = event.target.getAttribute('data-index');
-      openEditModal(studentIndex);
-    });
-  });
+  hideLoader(); // Hide the loader after the table has been rendered
 }
 
 document.querySelector('.edit-sales-amount').addEventListener('input', function(event) {

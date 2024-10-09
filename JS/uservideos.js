@@ -113,7 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     globalUserProgress = userProgressDoc.exists() ? userProgressDoc.data() : {};
                     console.log("Real-time user progress:", globalUserProgress);
                     updateLessonList(videos, globalUserProgress, userId);
-                    updateExamAvailability(videos, globalUserProgress);
                 });
 
                 if (!videoId && videos.length > 0) {
@@ -412,7 +411,7 @@ async function unlockNextLesson(userId, videos, currentVideoId) {
     }
 }
 
-// Function to update the lesson list dynamically
+// Function to update the lesson list dynamically, now includes the exam logic
 function updateLessonList(videos, userProgress, userId) {
     const lessonListContainer = document.querySelector('.lessons ul');
     if (!lessonListContainer) {
@@ -431,7 +430,7 @@ function updateLessonList(videos, userProgress, userId) {
         lessonLink.textContent = video.title;
 
         if (isUnlocked) {
-            lessonLink.href = '#'; // Optional: keep the link here if needed
+            lessonLink.href = ''; // Optional: keep the link here if needed
             listItem.addEventListener('click', () => {
                 sessionStorage.setItem('selectedVideoId', video.id);
                 console.log("Navigating to video ID:", video.id);
@@ -446,6 +445,8 @@ function updateLessonList(videos, userProgress, userId) {
             lessonLink.classList.add('disabled');
             const lockIcon = document.createElement('i');
             lockIcon.classList.add('bi', 'bi-lock');
+            
+            // Append the lesson link first and then the lock icon
             listItem.appendChild(lessonLink);
             listItem.appendChild(lockIcon);
         }
@@ -458,60 +459,34 @@ function updateLessonList(videos, userProgress, userId) {
         // Append the list item to the container
         lessonListContainer.appendChild(listItem);
     });
-}
 
-// Function to update "Written Exam" availability dynamically
-function updateExamAvailability(videos, userProgress) {
-    const examContainer = document.querySelector('.exams ul');
-
-    // Clear any existing exam list items to prevent duplicates
-    examContainer.innerHTML = '';
-
-    // Check if all videos are completed
+    // Check if all videos are completed to unlock the exam
     const allCompleted = videos.every(video => userProgress[video.id]?.completed);
 
+    // Always show the "Take the Written Exam" as the last item
+    const examListItem = document.createElement('li');
+    const examLink = document.createElement('a');
+    examLink.textContent = 'Take the Written Exam';
+
     if (allCompleted) {
-        // Create a new list item for the written exam
-        const examListItem = document.createElement('li');
-        examListItem.classList.add('unlocked'); // You can add custom styling here if needed
-
-        // Create the anchor element for the exam
-        const examLink = document.createElement('a');
-        examLink.href = 'useronlinetdc.html';
-        examLink.textContent = 'Take the Written Exam';
-
-        // Append the anchor to the list item
-        examListItem.appendChild(examLink);
-
-        // Add click event to navigate when the entire list item is clicked
-        examListItem.addEventListener('click', () => {
-            window.location.href = 'useronlinetdc.html';
-        });
-
-        // Append the list item to the exam container
-        examContainer.appendChild(examListItem);
+        // Unlock the exam if all videos are completed
+        examLink.href = 'useronlinetdc.html'; // Link to the exam
+        examListItem.classList.add('unlocked');
+        examListItem.appendChild(examLink); // Added line
     } else {
-        // Create a locked list item if not all videos are completed
-        const examListItem = document.createElement('li');
+        // Lock the exam if not all videos are completed
         examListItem.classList.add('locked');
-
-        // Create the anchor element for the locked exam
-        const examLink = document.createElement('a');
-        examLink.href = '#'; // No link when locked
         examLink.classList.add('disabled');
-        examLink.textContent = 'Take the Written Exam';
-
-        // Create a lock icon
+        
         const lockIcon = document.createElement('i');
         lockIcon.classList.add('bi', 'bi-lock');
-
-        // Append elements to the list item
+        
+        // Append the text first and then the lock icon for the exam
         examListItem.appendChild(examLink);
         examListItem.appendChild(lockIcon);
-
-        // Append the list item to the exam container
-        examContainer.appendChild(examListItem);
     }
+
+    lessonListContainer.appendChild(examListItem); // Append the exam item at the end of the lessons list
 }
 
 document.getElementById('toggle-button').addEventListener('click', function () {

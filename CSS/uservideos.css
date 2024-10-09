@@ -213,7 +213,7 @@ h2 {
     right: 0;
 }
 
-.lessons, .exams {
+.lessons {
     display: flex;
     flex-direction: column;
     font-size: 14px;
@@ -226,13 +226,13 @@ h2 {
     max-height: 100%;
 }
 
-.lessons ul, .exams ul {
+.lessons ul {
     padding: 0;
     margin: 0;
     list-style: none;
 }
 
-.lessons li, .exams li {
+.lessons li {
     display: block;
     display: flex;
     flex-direction: row;
@@ -243,20 +243,24 @@ h2 {
     margin-bottom: 10px;
 }
 
-.lessons li:hover, .exams li:hover {
+.lessons li:hover{
     background-color: #f5f5f5;
     cursor: pointer;
 }
 
-.lessons li a, .exams li a {
+.lessons li a {
     text-decoration: none;
     color: #142A74;
     font-weight: 600;
     display: block;
 }
 
-.lessons li a:hover, .exams li a:hover {
+.lessons li a:hover {
     color: #142A74;
+}
+
+.unlocked {
+    display: block;
 }
 
 .locked {
@@ -282,16 +286,22 @@ h2 {
 }
 
 .lessons::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
 }
 
 .lessons::-webkit-scrollbar-thumb {
-    background-color: #babbbd;
+    background-color: #f1f1f1;
     border-radius: 10px;
 }
 
 .lessons::-webkit-scrollbar-thumb:hover {
-    background-color: #2F2E2E;
+    background-color: #142A74;
+    border-radius: 10px;
+    border: 1px solid #f1f1f1;
+}
+
+.lessons::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d; /* Darker color on hover */
 }
 
 .lesson-list .lessons li.active-lesson {

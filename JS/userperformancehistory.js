@@ -173,4 +173,13 @@ function applyRowStyles() {
     });
 }
 
-
+document.addEventListener('DOMContentLoaded', () => {
+    // Add event listener to the arrow icon
+    const backArrowIcon = document.querySelector('.bi-house');
+    
+    if (backArrowIcon) {
+        backArrowIcon.addEventListener('click', () => {
+            window.location.href = 'useronlinetdc.html';  // Navigate to useronlinetdc.html
+        });
+    }
+});

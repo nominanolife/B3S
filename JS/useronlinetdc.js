@@ -25,7 +25,13 @@ const startExamButton = document.getElementById('startExamButton');
 const confirmStartQuizBtn = document.getElementById('confirmStartQuizBtn');
 
 $(document).ready(function () {
-    // Initialize the popover for the wrapper (since the button is disabled)
+    // Initialize the popover only if the button is disabled
+    if (startExamButton.disabled || startExamButton.classList.contains('disabled-btn')) {
+        initializePopover();
+    }
+});
+
+function initializePopover() {
     $('.buttons').popover({
         trigger: 'hover', // Automatically show popover on hover
         html: true,
@@ -33,22 +39,17 @@ $(document).ready(function () {
         content: 'You need to complete all videos to unlock the exam'
     });
 
-    // Check if the button was already enabled and disable popover if needed
-    if (localStorage.getItem('examEnabled') === 'true') {
-        enableStartExamButton();
-    } else {
-        // Add event listeners for the popover only if the button is disabled
-        $('.buttons').on('mouseenter', function () {
-            if ($('#startExamButton').hasClass('disabled-btn')) {
-                $(this).popover('show');
-            }
-        });
+    // Add event listeners for the popover
+    $('.buttons').on('mouseenter', function () {
+        if ($('#startExamButton').hasClass('disabled-btn')) {
+            $(this).popover('show');
+        }
+    });
 
-        $('.buttons').on('mouseleave', function () {
-            $(this).popover('hide');
-        });
-    }
-});
+    $('.buttons').on('mouseleave', function () {
+        $(this).popover('hide');
+    });
+}
 
 // Function to enable the Start Exam button
 function enableStartExamButton() {
@@ -86,6 +87,8 @@ function updateExamAvailability(videos, userProgress) {
             $(this).popover('hide');
         });
 
+        initializePopover();
+
         // Remove the enabled state from localStorage if the user hasn't completed the videos
         localStorage.removeItem('examEnabled');
     }
@@ -105,8 +108,22 @@ async function fetchVideos() {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         userId = user.uid;  // Set userId globally when the user is authenticated
-        checkUserProgress();  // Immediately check the user progress upon authentication
         console.log("User is authenticated.");
+
+        // Fetch videos and user progress
+        try {
+            const videos = await fetchVideos();
+            const userProgressDoc = await getDoc(doc(db, 'userProgress', userId));
+            const userProgress = userProgressDoc.exists() ? userProgressDoc.data() : {};
+
+            // Update exam availability based on fetched data
+            updateExamAvailability(videos, userProgress);
+        } catch (error) {
+            console.error("Error fetching videos or user progress:", error);
+        }
+
+        // Check quiz progress
+        checkUserProgress();  // Ensure this runs after updating exam availability
     } else {
         console.error("User is not authenticated.");
     }
@@ -117,21 +134,20 @@ async function checkUserProgress() {
     if (!userId) return;
 
     try {
+        // Fetch quiz progress
         const userQuizDocRef = doc(db, 'userQuizProgress', userId);
         const userQuizDoc = await getDoc(userQuizDocRef);
         const continueButton = document.getElementById('continueButton');
         const startExamButton = document.getElementById('startExamButton');
 
-        // Initially hide both buttons to avoid flashing the wrong button
-        continueButton.style.display = 'none';
-        startExamButton.style.display = 'none';
-
         // Determine which button to show based on quiz progress
         if (userQuizDoc.exists() && userQuizDoc.data().answers) {
             // Show "Continue Quiz" button
             continueButton.style.display = 'block';
+            startExamButton.style.display = 'none'; // Hide "Start Exam" button
         } else {
             // Show "Start the Exam" button
+            continueButton.style.display = 'none';
             startExamButton.style.display = 'block';
         }
     } catch (error) {

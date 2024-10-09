@@ -146,6 +146,16 @@ function displayBookings(type, isFiltered = false) {
 
     list.innerHTML = '';
 
+    if (allBookings.length === 0) {
+        const noResultsHtml = `
+            <tr>
+                <td colspan="4" class="text-center">No student/s found</td>
+            </tr>
+        `;
+        list.insertAdjacentHTML('beforeend', noResultsHtml);
+        return; // Exit the function since there's nothing more to display
+    }
+
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const paginatedBookings = allBookings.slice(start, end);

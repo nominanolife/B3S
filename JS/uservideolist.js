@@ -1,7 +1,7 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+import { getFirestore, collection, getDocs, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Firebase configuration
@@ -20,8 +20,11 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 
-async function renderVideoCards() {
+async function renderVideoCards(userProgress) {
     const videoContainer = document.querySelector('.video-grid'); // Container to hold all video cards
+
+    // Clear existing video cards to prevent duplicates
+    videoContainer.innerHTML = '';
 
     try {
         // Step 1: Fetch all videos from the 'videos' collection
@@ -32,25 +35,25 @@ async function renderVideoCards() {
         }));
 
         // Step 2: Sort videos by title
-        videos.sort((a, b) => {
-            if (a.title < b.title) return -1;
-            if (a.title > b.title) return 1;
-            return 0;
-        });
+        videos.sort((a, b) => a.title.localeCompare(b.title));
 
-        // Step 3: Fetch user progress
-        const userId = auth.currentUser.uid; // Assuming the user is already authenticated
-        const userProgressDoc = await getDoc(doc(db, 'userProgress', userId));
-        const userProgress = userProgressDoc.exists() ? userProgressDoc.data() : {};
-
-        // Step 4: Render each video card
+        // Step 3: Render each video card
         videos.forEach((video, index) => {
             const videoCard = document.createElement('div');
             videoCard.classList.add('video-card');
             videoCard.setAttribute('data-video-id', video.id);
 
-            // Check if the video is unlocked or locked
-            const isUnlocked = userProgress[video.id] || index === 0;
+            // Corrected isUnlocked logic
+            let isUnlocked;
+            if (index === 0) {
+                // First video is always unlocked
+                isUnlocked = true;
+            } else {
+                // Check if the previous video is completed
+                const prevVideo = videos[index - 1];
+                const prevVideoProgress = userProgress[prevVideo.id];
+                isUnlocked = prevVideoProgress && prevVideoProgress.completed === true;
+            }
 
             // Add content to video card
             videoCard.innerHTML = `
@@ -74,9 +77,8 @@ async function renderVideoCards() {
             } else {
                 // Add click event listener for unlocked video
                 videoCard.addEventListener('click', () => {
-                    // Option 1: Use localStorage or sessionStorage to pass context
+                    // Use sessionStorage to pass context
                     sessionStorage.setItem('selectedVideoId', video.id);
-
                     // Redirect to uservideos.html
                     window.location.href = "uservideos.html";
                 });
@@ -91,12 +93,25 @@ async function renderVideoCards() {
     }
 }
 
+function listenToUserProgress() {
+    const userId = auth.currentUser.uid;
+    const userProgressRef = doc(db, 'userProgress', userId);
+
+    // Listen for real-time updates to the userProgress document
+    onSnapshot(userProgressRef, async (docSnapshot) => {
+        const userProgress = docSnapshot.exists() ? docSnapshot.data() : {};
+
+        // Call renderVideoCards with the updated userProgress
+        await renderVideoCards(userProgress);
+    });
+}
+
 // Call the function when the page is loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Wait for Firebase authentication to initialize and ensure user is logged in
     onAuthStateChanged(auth, user => {
         if (user) {
-            renderVideoCards();
+            listenToUserProgress();
         } else {
             console.log('User is not logged in');
             // Optionally redirect to login page

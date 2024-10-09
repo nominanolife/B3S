@@ -44,13 +44,21 @@
         <div class="main-content">
             <div class="page-content">
                 <div class="page-body">
-                    <div class="upcoming-container">
+                    <div class="upcomming-container">
                         <div class="title-header">
                             <h2>COMPLETED STUDENT LIST</h2>
-                            <div class="search-container">
-                                <i class="bi bi-search"></i>
-                                <input type="text" id="search" class="search" placeholder="Search by name">
-                            </div>
+                            <div class="search-area">
+                                <div class="search-container">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" id="search" class="search" placeholder="Search by name">
+                                </div>
+                                <div class="custom-dropdown" id="yearDropdownFilter">
+                                    <div class="selected" id="yearSelectedFilter">Select Year</div>
+                                    <ul class="dropdown-options" id="yearOptionsFilter">
+                                        <!-- Dropdown options will be dynamically populated with JavaScript -->
+                                    </ul>
+                                </div>
+                            </div>                            
                             <button class="btn btn-primary" id="exportButton"><i>Export List</i></button>
                         </div>
                         <table class="table">
