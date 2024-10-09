@@ -44,12 +44,12 @@
         <div class="main-content">
             <div class="page-content">
                 <div class="page-body">
-                    <div class="upcomming-container">
+                    <div class="upcoming-container">
                         <div class="title-header">
                             <h2>COMPLETED STUDENT LIST</h2>
                             <div class="search-container">
                                 <i class="bi bi-search"></i>
-                                <input type="text" class="search" placeholder="Search">
+                                <input type="text" id="search" class="search" placeholder="Search by name">
                             </div>
                             <button class="btn btn-primary" id="exportButton"><i>Export List</i></button>
                         </div>
@@ -65,41 +65,11 @@
                                     <th>4 Wheels</th>
                                     <th>Motors</th>
                                     <th>CERTIFICATE CONTROL NUMBER</th>
+                                    <th>RECORDED DATE</th> <!-- New column for completion date -->
                                 </tr>
                             </thead>
                             <tbody class="student-list" id="student-list">
-                                <tr class="table-row">
-                                    <td class="table-row-content">dasda</td>
-                                    <td class="table-row-content">dsadas</td>
-                                    <td class="table-row-content">dasdasd</td>
-                                    <td class="table-row-content">dsadasda</td>
-                                    <td class="table-row-content package-price">sdsadassa</td>
-                                    <td class="table-row-content">
-                                        <label class="status-label">
-                                          <input type="checkbox" class="status-toggle" checked
-                                                 data-booking-id="${booking.appointmentId}"
-                                                 data-user-id="${booking.userId}"
-                                                 data-column="${course}">
-                                        </label>
-                                    </td>
-                                    <td class="table-row-content">
-                                    <label class="status-label">
-                                        <input type="checkbox" class="status-toggle" checked
-                                                data-booking-id="${booking.appointmentId}"
-                                                data-user-id="${booking.userId}"
-                                                data-column="${course}">
-                                    </label>
-                                    </td>
-                                    <td class="table-row-content">
-                                    <label class="status-label">
-                                        <input type="checkbox" class="status-toggle" checked
-                                                data-booking-id="${booking.appointmentId}"
-                                                data-user-id="${booking.userId}"
-                                                data-column="${course}">
-                                    </label>
-                                    </td>
-                                    <td class="table-row-content">dasdasdasad</td>
-                                </tr>
+                                <!-- Dynamic content will be inserted here -->
                             </tbody>
                         </table>
                         <!-- Pagination controls for Student List -->

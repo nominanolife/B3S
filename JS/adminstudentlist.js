@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getFirestore, collection, onSnapshot, doc, updateDoc, getDoc, setDoc, deleteField, getDocs, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { getFirestore, collection, onSnapshot, doc, updateDoc, getDoc, setDoc, deleteField, getDocs, deleteDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
 
 // Your web app's Firebase configuration
@@ -178,7 +178,6 @@ document.getElementById('saveChangesBtn').onclick = async (event) => {
 
   // Retrieve the student index from the button's data attribute
   const studentIndex = event.target.getAttribute('data-student-index');
-  console.log("Retrieved student index from data attribute:", studentIndex); // Debugging output
 
   if (studentIndex === null || studentIndex === undefined) {
     console.error("Student index is null or undefined.");
@@ -194,13 +193,13 @@ document.getElementById('saveChangesBtn').onclick = async (event) => {
     return;
   }
 
-  console.log("Student Data:", studentData); // Debugging output to see if the student data is correctly fetched
-
   try {
     const studentDocRef = doc(db, "applicants", studentData.id); // Ensure studentData.id is correct
-    console.log("Updating student with ID:", studentData.id); // Debugging output to confirm the correct student ID
-
     await setDoc(studentDocRef, { certificateControlNumber: newCertificateNumber }, { merge: true });
+
+    // Also update CTC in completedStudents collection
+    const completedStudentRef = doc(db, "completedStudents", studentData.id);
+    await setDoc(completedStudentRef, { certificateControlNumber: newCertificateNumber }, { merge: true });
 
     studentData.certificateControlNumber = newCertificateNumber;
 
@@ -232,34 +231,34 @@ document.getElementById('saveBtn').addEventListener('click', async function() {
 function renderStudents() {
   const loader = document.getElementById('loader1');
   const studentList = document.getElementById('student-list');
-  studentList.innerHTML = '';
+  studentList.innerHTML = ''; // Clear the list before rendering new data
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
-  const paginatedStudents = filteredStudentsData.slice(start, end);
+  const paginatedStudents = filteredStudentsData.slice(start, end); // Paginated data
 
   paginatedStudents.forEach((student, index) => {
-    const personalInfo = student.personalInfo || {};
+    const personalInfo = student.personalInfo || {}; // Fallback if personalInfo is missing
     const statuses = {
-      TDC: student.TDCStatus || null,
+      TDC: student.TDCStatus || null, // Handle null values
       "PDC-4Wheels": student['PDC-4WheelsStatus'] || null,
       "PDC-Motors": student['PDC-MotorsStatus'] || null
     };
 
-    const certificateControlNumber = student.certificateControlNumber || '';
+    const certificateControlNumber = student.certificateControlNumber || ''; // Default to empty string if undefined
 
     const studentHtml = `
         <tr class="table-row">
-            <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td>
+            <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td> <!-- Handle missing names -->
             <td class="table-row-content">${student.email}</td>
             <td class="table-row-content">${student.phoneNumber || ''}</td>
-            <td class="table-row-content">${student.packageName}</td>
-            <td class="table-row-content package-price">&#8369; ${student.packagePrice || ''}</td>
-            ${renderCourseStatus('TDC', statuses.TDC, student.bookings)}
-            ${renderCourseStatus('PDC-4Wheels', statuses["PDC-4Wheels"], student.bookings)}
-            ${renderCourseStatus('PDC-Motors', statuses["PDC-Motors"], student.bookings)}
-            <td class="table-row-content">${certificateControlNumber}</td>
+            <td class="table-row-content">${student.packageName || ''}</td> <!-- Handle missing package name -->
+            <td class="table-row-content package-price">&#8369; ${student.packagePrice || ''}</td> <!-- Handle missing price -->
+            ${renderCourseStatus('TDC', statuses.TDC, student.bookings)} <!-- Render TDC status -->
+            ${renderCourseStatus('PDC-4Wheels', statuses["PDC-4Wheels"], student.bookings)} <!-- Render 4-Wheels status -->
+            ${renderCourseStatus('PDC-Motors', statuses["PDC-Motors"], student.bookings)} <!-- Render Motors status -->
+            <td class="table-row-content">${certificateControlNumber}</td> <!-- Render Certificate Control Number -->
             <td class="table-row-content">
-                <!-- Only one icon to trigger the dropdown options -->
+                <!-- Triple dot options -->
                 <i class="bi bi-three-dots" data-toggle="options" data-index="${index}"></i>
                 <div class="triple-dot-options" style="display: none;">
                     <i class="option-dropdown" data-modal="editCcnModal" data-index="${index}">Certificate Control Number</i>
@@ -269,10 +268,13 @@ function renderStudents() {
             </td>
         </tr>
     `;
-    studentList.insertAdjacentHTML('beforeend', studentHtml);
+
+    studentList.insertAdjacentHTML('beforeend', studentHtml); // Append the generated HTML to the list
   });
-  setupStatusToggleListeners(); // Set up listeners for toggles after rendering
+
+  setupStatusToggleListeners(); // Call this after rendering the student list
 }
+
 
 function renderCourseStatus(course, status, bookings = []) {
   const today = new Date(); // Current date
@@ -327,6 +329,9 @@ async function handleStatusToggle(event) {
   const course = event.target.dataset.column;
   const isCompleted = event.target.checked;
 
+  // Log for debugging
+  console.log(`Checkbox toggled for user ${userId}, course: ${course}, completed: ${isCompleted}`);
+
   // Show confirmation message dynamically based on the checkbox state
   const confirmationMessage = isCompleted
     ? "Are you sure you want to complete the appointment of this student?"
@@ -341,6 +346,7 @@ async function handleStatusToggle(event) {
   confirmButton.onclick = null; // Clear previous listener
   confirmButton.onclick = async () => {
     confirmationModal.hide();
+    // Migrate the student data to Firestore when confirmed
     await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
     renderStudents(); // Re-render students to update UI
     setupStatusToggleListeners(); // Re-setup listeners after rendering
@@ -360,13 +366,23 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
     }
 
     const applicantDocRef = doc(db, "applicants", userId);
+    const applicantSnapshot = await getDoc(applicantDocRef);
+
+    if (!applicantSnapshot.exists()) {
+      console.error("Applicant data not found.");
+      return;
+    }
+
+    const applicantData = applicantSnapshot.data();
     const updateData = {};
 
-    // Update the course status field in the applicant document
+    // Include completion date if the course is completed
     if (isCompleted) {
       updateData[`${course}Status`] = "Completed";
+      updateData[`${course}CompletionDate`] = new Date().toISOString(); // Store completion date
     } else {
       updateData[`${course}Status`] = deleteField();
+      updateData[`${course}CompletionDate`] = deleteField(); // Remove completion date if unchecked
     }
     await updateDoc(applicantDocRef, updateData);
 
@@ -394,52 +410,43 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
           if (isCompleted) {
             const completedBookingData = {
               course: course,
-              date: appointmentData.date,
+              date: new Date().toISOString(),  // Store current completion date
               startTime: appointmentData.timeStart,
               endTime: appointmentData.timeEnd,
               progress: "Completed",
               status: "Completed",
+              appointmentId: appointmentId
             };
+
             await updateCompletedBookings(userId, completedBookingData);
+
+            // Migrate to 'completedStudents' collection with completion date
+            const completedStudentRef = doc(db, "completedStudents", userId);
+            const completedStudentData = {
+              name: applicantData.personalInfo.first + " " + applicantData.personalInfo.last,
+              email: applicantData.email || "N/A",
+              phoneNumber: applicantData.phoneNumber || "N/A",
+              packageName: applicantData.packageName || "N/A",
+              packagePrice: applicantData.packagePrice || "N/A",
+              userId: userId,
+              courses: {
+                [course]: "Completed"
+              },
+              certificateControlNumber: appointmentData.certificateControlNumber || 'N/A',
+              completionDate: new Date().toISOString()  // Add the completion date here
+            };
+            await setDoc(completedStudentRef, completedStudentData, { merge: true });
           } else {
             await removeCompletedBooking(userId, course);
           }
-
-        } else {
-          console.error("No bookings array found in document:", appointmentId);
-        }
-      } else {
-        console.error("No document found with ID:", appointmentId);
-      }
-    } else {
-      console.error("Appointment ID is undefined.");
-    }
-
-    // Update the local studentsData array
-    const studentIndex = studentsData.findIndex(s => s.id === userId);
-    if (studentIndex !== -1) {
-      const student = studentsData[studentIndex];
-      if (isCompleted) {
-        student[`${course}Status`] = "Completed";
-      } else {
-        delete student[`${course}Status`];
-      }
-
-      // Also update the bookings
-      if (student.bookings) {
-        const bookingIndex = student.bookings.findIndex(b => b.appointmentId === appointmentId);
-        if (bookingIndex !== -1) {
-          const booking = student.bookings[bookingIndex];
-          booking.progress = isCompleted ? "Completed" : "Not yet Started";
-          booking.status = isCompleted ? "Completed" : "Booked";
         }
       }
     }
-
   } catch (error) {
     console.error("Error updating completion status:", error);
   }
 }
+
 
 async function updateCompletedBookings(userId, bookingDetails) {
   try {
