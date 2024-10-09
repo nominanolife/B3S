@@ -214,33 +214,6 @@ h2 {
     gap: 10px;
 }
 
-.page-content a {
-    width: 15%;
-    margin-left: auto;
-    display: flex;
-    justify-content: center;
-}
-
-.complete {
-    font-family: Poppins;
-    font-size: 14px;
-    font-weight: bold;
-    color: #ffffff;
-    background-color: #142A74;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 30px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    text-decoration: none;
-}
-
-.complete:hover {
-    background-color: #142a74ec;
-    color: #ffffff;
-    text-decoration: none;
-}
-
 .page-content-header {
     display: flex;
     flex-direction: row;

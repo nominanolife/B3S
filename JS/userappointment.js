@@ -21,18 +21,47 @@ const auth = getAuth(app);
 let userCache = null;
 
 // Function to update PDC state in the UI
+$(document).ready(function () {
+  // Apply stored PDC state immediately after the DOM is ready
+  applyStoredPDCState();
+});
+
+// Function to update PDC state in the UI with popover handling
 function updatePDCState(enabled) {
-  const pdcElement = document.querySelector('.pdc');
+  const pdcElement = $('.pdc');
+  
   if (enabled) {
-    pdcElement.classList.remove('disabled');
-    pdcElement.removeAttribute('disabled');
+    pdcElement.removeClass('disabled-link');
     console.log("PDC Enabled");
     localStorage.setItem('pdcState', 'enabled');
+
+    // Remove the popover and event handlers
+    pdcElement.popover('dispose');
+    pdcElement.off('mouseenter mouseleave click');
   } else {
-    pdcElement.classList.add('disabled');
-    pdcElement.setAttribute('disabled', true);
+    pdcElement.addClass('disabled-link');
     console.log("PDC Disabled");
     localStorage.setItem('pdcState', 'disabled');
+
+    // Initialize popover
+    pdcElement.popover({
+      trigger: 'manual',
+      html: true,
+      placement: 'bottom',
+      content: 'You must avail PDC package to unlock this feature.'
+    });
+
+    // Show popover on hover
+    pdcElement.on('mouseenter', function () {
+      $(this).popover('show');
+    }).on('mouseleave', function () {
+      $(this).popover('hide');
+    });
+
+    // Prevent default action on click
+    pdcElement.on('click', function (e) {
+      e.preventDefault();
+    });
   }
 }
 
@@ -41,9 +70,6 @@ function applyStoredPDCState() {
   const storedState = localStorage.getItem('pdcState');
   updatePDCState(storedState === 'enabled');
 }
-
-// Load PDC state immediately on page load
-applyStoredPDCState();
 
 // Fetch user data once to prevent repeated calls
 async function fetchUserData(userId) {

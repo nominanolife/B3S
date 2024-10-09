@@ -247,9 +247,17 @@ h2 {
     font-size: 14px;
 }
 
+.modal-dialog-centered {
+    top: auto;
+    max-width: 1000px;
+    width: 100%;
+    padding: 20px;
+}
+
 .close {
     font-size: 24px;
     color: #142A74;
+    cursor: default;
 }
 
 .btn-primary {
@@ -318,6 +326,21 @@ h2 {
     background-color: #f5f5f5;
 }
 
+.table tbody tr a {
+    text-decoration: underline;
+    color: #B60505;
+}
+
+.status-passed {
+    color: green;
+    font-weight: normal;
+}
+
+.status-failed {
+    color: red;
+    font-weight: normal;
+}
+
 .cancel-btn {
     font-family: Poppins;
     font-size: 14px;
@@ -340,49 +363,86 @@ h2 {
     color: white;
 }
 
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 34px;
-    height: 20px;
+.generated-results {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 80%;
 }
-  
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+
+.result-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-  
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 34px;
+
+.result-header h3 {
+    font-family: Poppins;
+    font-size: 24px;
+    font-weight: bold;
+    color: #142A74;
 }
-  
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
+
+.result-header p {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #2F2E2E;
 }
-  
-input:checked + .slider {
-    background-color: #2196F3;
+
+.performance-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: 400px; /* Ensure the content area is scrollable */
+    overflow-y: auto;
+    padding-left: 50px;
+    gap: 20px;
+    scrollbar-width: thin; /* Makes the scrollbar thinner */
+    scrollbar-color: #142A74 #f1f1f1; /* Thumb color and track color */
 }
-  
-input:checked + .slider:before {
-    transform: translateX(14px);
+
+#performanceEvaluationModal .performance-wrapper::-webkit-scrollbar {
+    width: 10px;
+}
+
+#performanceEvaluationModal .performance-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 20px;
+}
+
+#performanceEvaluationModal .performance-wrapper::-webkit-scrollbar-thumb {
+    background: #142A74;
+    border-radius: 20px;
+    border: 2px solid #ffffff;
+}
+
+#performanceEvaluationModal .performance-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #0d1e52;
+}
+
+.performance-evaulation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.performance-evaluation p {
+    font-family: Poppins;
+    font-size: 16px;
+    font-weight: normal;
+    color: #2F2E2E;
+}
+
+.performance-evaluation ul {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #2F2E2E;
+}
+
+.performance-evaluation li {
+    margin-top: 10px;
 }
 
 /* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */

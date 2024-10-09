@@ -101,62 +101,47 @@ async function fetchVideos() {
     return videos;
 }
 
-// Function to check if there's existing progress and show the Continue button
-async function checkUserProgress() {
-    if (userId) {
-        try {
-            const userQuizDocRef = doc(db, 'userQuizProgress', userId);
-            const userQuizDoc = await getDoc(userQuizDocRef);
-            const continueButton = document.getElementById('continueButton');
-
-            // Ensure the "Continue" button exists in the DOM
-            if (continueButton) {
-                if (userQuizDoc.exists() && userQuizDoc.data().answers) {
-                    // Show the "Continue" button if progress exists
-                    continueButton.style.display = 'block';
-                } else {
-                    // Hide the "Continue" button if no progress is found
-                    continueButton.style.display = 'none';
-                }
-            } else {
-                console.error('Continue button not found in DOM.');
-            }
-        } catch (error) {
-            console.error("Error checking user progress:", error);
-        }
-    }
-}
-
-// Add event listener for the "Continue" button to resume the quiz
-document.getElementById('continueButton').addEventListener('click', function () {
-    window.location.href = 'userquiz.html';  // Redirect to the quiz page
-});
-
-// Monitor authentication state and set up real-time listener for user progress
+// Monitor authentication state and check user progress instantly on page load
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         userId = user.uid;  // Set userId globally when the user is authenticated
-        checkUserProgress();  // Check user progress on page load
+        checkUserProgress();  // Immediately check the user progress upon authentication
         console.log("User is authenticated.");
-
-        try {
-            // Fetch videos once
-            const videos = await fetchVideos();
-
-            // Set up real-time listener for user progress
-            const userProgressDocRef = doc(db, 'userProgress', userId);
-            onSnapshot(userProgressDocRef, (docSnapshot) => {
-                const userProgress = docSnapshot.exists() ? docSnapshot.data() : {};
-                // Update the exam button based on real-time progress
-                updateExamAvailability(videos, userProgress);
-            });
-
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
     } else {
         console.error("User is not authenticated.");
     }
+});
+
+// Function to check if there's existing progress and instantly show the appropriate button
+async function checkUserProgress() {
+    if (!userId) return;
+
+    try {
+        const userQuizDocRef = doc(db, 'userQuizProgress', userId);
+        const userQuizDoc = await getDoc(userQuizDocRef);
+        const continueButton = document.getElementById('continueButton');
+        const startExamButton = document.getElementById('startExamButton');
+
+        // Initially hide both buttons to avoid flashing the wrong button
+        continueButton.style.display = 'none';
+        startExamButton.style.display = 'none';
+
+        // Determine which button to show based on quiz progress
+        if (userQuizDoc.exists() && userQuizDoc.data().answers) {
+            // Show "Continue Quiz" button
+            continueButton.style.display = 'block';
+        } else {
+            // Show "Start the Exam" button
+            startExamButton.style.display = 'block';
+        }
+    } catch (error) {
+        console.error("Error checking user progress:", error);
+    }
+}
+
+// Event listener for the "Continue" button to resume the quiz
+document.getElementById('continueButton').addEventListener('click', function () {
+    window.location.href = 'userquiz.html';  // Redirect to the quiz page
 });
 
 // Event listener for the confirm button in the modal
