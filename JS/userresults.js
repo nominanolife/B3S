@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, setDoc, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, setDoc, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Firebase configuration
@@ -31,7 +31,7 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Fetch user full name from `applicants` collection
+// Fetch user full name from applicants collection
 async function getUserFullName(userId) {
     const applicantDoc = await getDoc(doc(db, 'applicants', userId));
     if (applicantDoc.exists()) {
@@ -41,18 +41,6 @@ async function getUserFullName(userId) {
     } else {
         console.error("No applicant data found for user:", userId);
         return "John Doe";  // Fallback
-    }
-}
-
-// Fetch certificate ID and score from `userResults` collection
-async function getCertificateData(userId) {
-    const resultsDoc = await getDoc(doc(db, 'userResults', userId));
-    if (resultsDoc.exists()) {
-        const userData = resultsDoc.data();
-        return { certificateID: userData.certificateID, totalScore: userData.totalScore };
-    } else {
-        console.error("No results data found for user:", userId);
-        return { certificateID: 'GeneratedCertID', totalScore: '0.00' };  // Fallback
     }
 }
 
@@ -84,8 +72,6 @@ async function fetchUserQuizProgress(userId) {
     }
 }
 
-
-
 // Predict performance and fetch insights from Flask API
 async function predictPerformanceAndFetchInsights(studentId, category, percentage) {
     try {
@@ -100,7 +86,7 @@ async function predictPerformanceAndFetchInsights(studentId, category, percentag
         const data = await response.json();
         if (response.ok) {
             return {
-                predicted_performance: data.predicted_performance,  // "Poor" or "Great"
+                predicted_performance: data.predicted_performance,  // "Poor", "Great", or "Excellent"
                 insights: data.insights  // Insights for this category and performance
             };
         } else {
@@ -153,32 +139,6 @@ function checkIfPassed(categoryScores) {
     return averageScore >= 80;
 }
 
-// Function to save results to Firestore
-async function saveResults(categoryScores) {
-    const passed = checkIfPassed(categoryScores);
-    if (currentUser) { 
-        try {
-            const userId = currentUser.uid;
-            const certificateID = Math.random().toString(36).substring(2, 10);
-            const totalScore = calculateTotalScore(categoryScores);
-
-            const userResults = {
-                categoryScores,
-                totalScore,
-                certificateID,
-                passed,
-                timestamp: new Date(),
-                userAnswers: JSON.parse(sessionStorage.getItem('userAnswers')) || {} // Save user answers
-            };
-
-            await setDoc(doc(db, 'userResults', userId), userResults, { merge: true });
-            console.log("User results saved successfully.");
-        } catch (error) {
-            console.error("Error saving user results:", error);
-        }
-    }
-}
-
 // Calculate the total score
 function calculateTotalScore(categoryScores) {
     let totalScore = 0;
@@ -190,6 +150,93 @@ function calculateTotalScore(categoryScores) {
     });
 
     return (totalScore / categoryCount).toFixed(2);
+}
+
+// Function to save user attempt data to Firestore (in an array of attempts)
+async function saveUserAttemptToFirestore(userId, totalScore, evaluation, evaluationDetails) {
+    try {
+        const userAttemptRef = doc(db, 'userAttempt', userId);
+        const userAttemptDoc = await getDoc(userAttemptRef);
+
+        const newAttempt = {
+            date: new Date().toISOString(),
+            percentage: totalScore,
+            evaluation: evaluation,
+            status: evaluation === 'Passed' ? 'Pass' : 'Fail',
+            evaluationDetails: evaluationDetails  // Include category insights and performance
+        };
+
+        if (userAttemptDoc.exists()) {
+            // Append new attempt to existing array
+            await updateDoc(userAttemptRef, {
+                attempts: [...userAttemptDoc.data().attempts, newAttempt]
+            });
+        } else {
+            // Create new document with the first attempt
+            await setDoc(userAttemptRef, {
+                attempts: [newAttempt]
+            });
+        }
+
+        console.log("User attempt data saved successfully.");
+    } catch (error) {
+        console.error("Error saving user attempt data:", error);
+    }
+}
+
+// Function to save final user results to Firestore (used when user passes)
+async function saveFinalUserResultsToFirestore(userId, fullName, totalScore, certificateID, evaluationDetails) {
+    try {
+        const userResultData = {
+            name: fullName,
+            date: new Date().toISOString(),
+            percentage: totalScore,
+            certificateID: certificateID, // Store certificate ID for the final phase
+            status: 'Pass', // Final phase status, Pass only
+            evaluationDetails // Save evaluation details (including insights)
+        };
+
+        // Create a new document in the 'userResults' collection
+        await setDoc(doc(db, 'userResults', userId), userResultData);
+        console.log("User results saved successfully.");
+    } catch (error) {
+        console.error("Error saving user results:", error);
+    }
+}
+
+// Function to calculate overall status (pass or fail)
+function calculateOverallStatus(categoryScores) {
+    const passed = checkIfPassed(categoryScores);
+    const totalScore = calculateTotalScore(categoryScores);
+    const evaluation = passed ? "Passed" : "Failed";
+    return { passed, totalScore, evaluation };
+}
+
+// Function to handle saving after the evaluation
+async function handleSavingResults(categoryScores) {
+    const fullName = await getUserFullName(currentUser.uid); // Get user's full name
+    const { passed, totalScore, evaluation } = calculateOverallStatus(categoryScores);  // Determine if passed or failed
+
+    // Collect insights for all categories
+    const evaluationDetails = await Promise.all(Object.keys(categoryScores).map(async (category) => {
+        const score = categoryScores[category];
+        const result = await predictPerformanceAndFetchInsights(currentUser.uid, category, score);
+        return {
+            category,
+            score,
+            status: result.predicted_performance,
+            insights: result.insights
+        };
+    }));
+
+    // Save in userAttempt regardless of pass or fail
+    await saveUserAttemptToFirestore(currentUser.uid, fullName, totalScore, evaluation, evaluationDetails);
+
+    // If passed, save final results to userResults
+    if (passed) {
+        const certificateID = Math.random().toString(36).substring(2, 10);  // Generate certificate ID
+        await saveFinalUserResultsToFirestore(currentUser.uid, fullName, totalScore, certificateID, evaluationDetails); // Save result in userResults
+    }
 }
 
 // In the button click handler (for fetching and calculating results)
@@ -209,7 +256,7 @@ document.getElementById('seeResultsBtn').addEventListener('click', async functio
 
     const categoryScores = calculateCategoryScores();  // Calculate category scores based on fetched progress
 
-    await saveResults(categoryScores);  // Save results
+    await handleSavingResults(categoryScores);  // Save results based on pass or fail
 
     setTimeout(function () {
         document.getElementById('loader1').style.display = 'none';
