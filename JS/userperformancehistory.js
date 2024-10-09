@@ -1,85 +1,157 @@
-// Select all rows in the table body
-document.querySelectorAll('tbody tr').forEach(row => {
-    // Find the status cell, assuming it's the 5th cell (index 4 in the table)
-    const statusCell = row.querySelector('td:nth-child(5)');
-    
-    // Check the content of the status cell and add the appropriate class
-    if (statusCell.textContent.trim() === 'Completed') {
-        statusCell.classList.add('status-passed'); // Apply green color for "Completed"
-    } else if (statusCell.textContent.trim() === 'Failed') {
-        statusCell.classList.add('status-failed'); // Apply red color for "Failed"
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+    authDomain: "authentication-d6496.firebaseapp.com",
+    projectId: "authentication-d6496",
+    storageBucket: "authentication-d6496.appspot.com",
+    messagingSenderId: "195867894399",
+    appId: "1:195867894399:web:596fb109d308aea8b6154a"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Global variable to hold the applicant's full name
+let applicantName = "";
+
+// Check if the user is logged in and fetch their quiz attempts and name
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        fetchApplicantName(user.uid).then(() => {
+            fetchUserAttempts(user.uid);  // Fetch the user's attempts after the name is fetched
+        });
+    } else {
+        console.log("No user is logged in");
+        window.location.href = '/login.html';
     }
 });
 
-async function showPerformanceEvaluation(evaluationData) {
-    const resultContainer = document.querySelector('.result-container');
-    resultContainer.innerHTML = ''; // Clear content
+// Fetch applicant name from Firestore based on UID
+async function fetchApplicantName(uid) {
+    try {
+        const applicantDocRef = doc(db, 'applicants', uid);
+        const applicantDoc = await getDoc(applicantDocRef);
 
-    const resultContent = document.createElement('div');
-    resultContent.className = 'generated-results';
-    resultContent.innerHTML = `
-        <div class="result-header">
-            <h3>Performance Evaluation</h3>
-            <p>Here is your performance evaluation based on the data:</p>
-        </div>
-    `;
+        if (applicantDoc.exists()) {
+            const applicantData = applicantDoc.data();
+            applicantName = `${applicantData.personalInfo.first} ${applicantData.personalInfo.last}`;
+        } else {
+            console.log("No applicant data found.");
+        }
+    } catch (error) {
+        console.error("Error fetching applicant name:", error);
+    }
+}
 
-    const performanceWrapper = document.createElement('div');
-    performanceWrapper.className = 'performance-wrapper';
+// Fetch user attempts from Firestore
+async function fetchUserAttempts(uid) {
+    try {
+        const userAttemptsRef = doc(db, 'userAttempt', uid);
+        const docSnapshot = await getDoc(userAttemptsRef);
 
-    for (const item of evaluationData) {
+        if (docSnapshot.exists()) {
+            const attempts = docSnapshot.data().attempts;
+            populateTable(attempts);
+        } else {
+            console.log("No attempt data found.");
+        }
+    } catch (error) {
+        console.error("Error fetching user attempts:", error);
+    }
+}
+
+// Populate the table with user attempt data
+function populateTable(attempts) {
+    const tableBody = document.getElementById('attempts-table-body');
+    tableBody.innerHTML = ''; // Clear any existing data
+
+    attempts.forEach((attempt, index) => {
+        const row = document.createElement('tr');
+
+        // Create table cells and append them
+        row.innerHTML = `
+            <td>${applicantName}</td>  <!-- Display the applicant's name -->
+            <td>${new Date(attempt.date).toLocaleDateString()}</td>
+            <td>${attempt.percentage || 'N/A'}%</td>
+            <td><a href="#" class="view-result-link" data-attempt-index="${index}" data-toggle="modal" data-target="#performanceEvaluationModal">View Result</a></td>
+            <td class="${attempt.evaluation === 'Passed' ? 'status-passed' : 'status-failed'}">${attempt.evaluation}</td>
+            <td>${index + 1}</td>
+        `;
+
+        tableBody.appendChild(row);
+    });
+
+    // Add event listeners for each "View Result" link
+    document.querySelectorAll('.view-result-link').forEach(link => {
+        link.addEventListener('click', function () {
+            const attemptIndex = this.getAttribute('data-attempt-index');
+            showPerformanceEvaluation(attempts[attemptIndex]);
+        });
+    });
+
+    // Call the applyRowStyles function to color-code the rows based on their status
+    applyRowStyles();
+}
+
+// Show performance evaluation in the modal (handling the array of evaluationDetails)
+function showPerformanceEvaluation(attempt) {
+    const performanceBody = document.getElementById('performance-evaluation-body');
+    performanceBody.innerHTML = ''; // Clear previous content
+
+    attempt.evaluationDetails.forEach((item) => {
         const performanceBlock = document.createElement('div');
         performanceBlock.className = 'performance-evaluation';
 
-        const result = await predictPerformanceAndFetchInsights(currentUser.uid, item.category, item.score);
-        if (result) {
-            const predictedPerformance = result.predicted_performance;
-            const insights = result.insights;
-
-            let status;
-            let color;
-
-            if (predictedPerformance === 'Poor') {
-                status = 'Poor';
-                color = 'red';
-            } else if (predictedPerformance === 'Great') {
-                status = 'Great';
-                color = 'green';
-            } else if (predictedPerformance === 'Excellent') {
-                status = 'Excellent';
-                color = 'blue';
-            }
-
-            let additionalResources = insights ? `<p><strong>Insights:</strong> ${insights}</p>` : '';
-
-            if (predictedPerformance === 'Poor') {
-                additionalResources += `
-                    <p><a href="uservideos.html?category=${encodeURIComponent(item.category)}" style="color:${color}; text-decoration:underline;">
-                        Click here to watch the video for ${item.category} improvement
-                    </a></p>
-                `;
-            }
-
-            performanceBlock.innerHTML = `
-                <p><strong>${item.category}:</strong> 
-                    <span class="status" style="color:${color};">${status}</span>
-                </p>
-                ${additionalResources}
+        const statusColor = item.status === 'Poor' ? 'red' : (item.status === 'Great' ? 'green' : 'blue');
+        const insights = `<p><strong>Insights:</strong> ${item.insights}</p>`;
+        
+        let additionalResources = '';
+        if (item.status === 'Poor') {
+            additionalResources = `
+                <p><a href="uservideos.html?category=${encodeURIComponent(item.category)}" style="color:${statusColor}; text-decoration:underline;">
+                    Click here to watch the video for ${item.category} improvement
+                </a></p>
             `;
-
-            performanceWrapper.appendChild(performanceBlock);
         }
-    }
 
-    resultContent.appendChild(performanceWrapper);
-    resultContainer.appendChild(resultContent);
+        performanceBlock.innerHTML = `
+            <p><strong>${item.category}:</strong> 
+                <span class="status" style="color:${statusColor};">${item.status}</span>
+            </p>
+            ${insights}
+            ${additionalResources}
+        `;
 
-    const categoryScores = calculateCategoryScores();
+        performanceBody.appendChild(performanceBlock);
+    });
 
+    // Add back button to close the modal
     const backButton = document.createElement('button');
     backButton.className = 'result-button';
     backButton.innerHTML = 'Back';
-    resultContainer.appendChild(backButton);
+    performanceBody.appendChild(backButton);
 
-    backButton.addEventListener('click', () => showChart(categoryScores));
+    backButton.addEventListener('click', () => {
+        $('#performanceEvaluationModal').modal('hide');
+    });
 }
+
+// Helper function to color-code table rows based on status
+function applyRowStyles() {
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const statusCell = row.querySelector('td:nth-child(5)');
+        if (statusCell.textContent.trim() === 'Passed') {
+            statusCell.classList.add('status-passed'); // Apply green color for "Passed"
+        } else if (statusCell.textContent.trim() === 'Failed') {
+            statusCell.classList.add('status-failed'); // Apply red color for "Failed"
+        }
+    });
+}
+
+
