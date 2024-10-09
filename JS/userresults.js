@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, setDoc, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Firebase configuration
@@ -56,7 +56,7 @@ async function getCertificateData(userId) {
     }
 }
 
-// Function to fetch the user's quiz progress from Firestore
+// Fetch the user's quiz progress from Firestore, save to sessionStorage, and then delete the Firestore document
 async function fetchUserQuizProgress(userId) {
     try {
         const userQuizDocRef = doc(db, 'userQuizProgress', userId);
@@ -64,21 +64,27 @@ async function fetchUserQuizProgress(userId) {
 
         if (userQuizDoc.exists()) {
             const userProgressData = userQuizDoc.data();
-            console.log("User Quiz Progress:", userProgressData);
+            console.log("User Quiz Progress fetched:", userProgressData);
 
-            // Save the progress to session storage
+            // Save progress to sessionStorage
             sessionStorage.setItem('userAnswers', JSON.stringify(userProgressData.answers));
-            
-            return userProgressData.answers;  // Return the answers
+
+            // After saving, delete the entire quiz progress document from Firestore
+            await deleteDoc(userQuizDocRef);  // Delete the document
+            console.log("Quiz progress document deleted from Firestore.");
+
+            return userProgressData.answers;  // Return the fetched answers for further use
         } else {
             console.error("No quiz progress found for user.");
-            return {};  // Return an empty object if no progress found
+            return {};  // Return an empty object if no progress is found
         }
     } catch (error) {
-        console.error("Error fetching user quiz progress:", error);
+        console.error("Error fetching and deleting user quiz progress:", error);
         return {};
     }
 }
+
+
 
 // Predict performance and fetch insights from Flask API
 async function predictPerformanceAndFetchInsights(studentId, category, percentage) {
@@ -102,25 +108,6 @@ async function predictPerformanceAndFetchInsights(studentId, category, percentag
         }
     } catch (error) {
         console.error("Error sending data to Flask:", error);
-    }
-}
-
-// Fetch and Randomize Quizzes
-let questions = [];
-async function fetchQuizzes() {
-    try {
-        const quizzesSnapshot = await getDocs(collection(db, 'quizzes'));
-        quizzesSnapshot.forEach(doc => {
-            const quizData = doc.data();
-            quizData.questions.forEach(question => {
-                questions.push({
-                    ...question,
-                    category: quizData.category
-                });
-            });
-        });
-    } catch (error) {
-        console.error("Error fetching quizzes:", error);
     }
 }
 
