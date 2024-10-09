@@ -1442,7 +1442,6 @@ function toggleLoader(show) {
     }
 }
 
-
 function showNotification(message) {
     const notificationModalBody = document.getElementById('notificationModalBody');
     notificationModalBody.textContent = message; // Set the message content

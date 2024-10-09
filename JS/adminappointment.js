@@ -166,15 +166,19 @@ document.addEventListener("DOMContentLoaded", async function() {
     // Add a new row to the table
     function addTableRow(appointment) {
         const { id, course, date, timeStart, timeEnd, slots, bookings } = appointment;
+        
+        // Convert date to "October 9, 2024" format
+        const formattedDate = new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        
         const formattedTimeStart = formatTimeToAMPM(timeStart);
         const formattedTimeEnd = formatTimeToAMPM(timeEnd);
         const availableSlots = slots - (bookings ? bookings.length : 0);
-
+    
         const row = document.createElement("tr");
         row.setAttribute("data-id", id);
         row.innerHTML = `
             <td>${course}</td>
-            <td>${date}</td>
+            <td>${formattedDate}</td> <!-- Use the formatted date here -->
             <td>${formattedTimeStart}</td>
             <td>${formattedTimeEnd}</td>
             <td>${availableSlots}</td>
@@ -184,8 +188,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             </td>
         `;
         document.getElementById("slots-table-body").appendChild(row);
-    }
-
+    }    
 
     // Event delegation for edit and delete buttons
     document.getElementById("slots-table-body").addEventListener("click", async function(event) {

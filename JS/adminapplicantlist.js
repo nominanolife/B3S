@@ -34,14 +34,30 @@ function renderApplicants() {
                 <td class="table-row-content">${applicant.email}</td>
                 <td class="table-row-content">${applicant.phoneNumber}</td>
                 <td class="table-row-content">
-                    <button class="dropdown-item">Send SMS</button>
+                    <button class="btn btn-primary btn-sm send-sms-btn" data-phone="${applicant.phoneNumber}">Send SMS</button>
                 </td>
             </tr>
         `;
         contentElement.insertAdjacentHTML('beforeend', rowHtml);
     });
 
-    // Hide the loader once the table is fully rendered
+    // Add event listeners for "Send SMS" buttons
+    document.querySelectorAll('.send-sms-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const phoneNumber = this.getAttribute('data-phone');
+            const fromValue = "DriveHub"; // You can set this value dynamically or keep it static
+    
+            // Set the "From" field with the value "DriveHub"
+            document.getElementById('sms-from').value = fromValue;
+    
+            // Set the "To" field with the selected phone number
+            document.getElementById('sms-to').value = phoneNumber;
+    
+            // Show the modal
+            $('#smsModal').modal('show');
+        });
+    });    
+
     document.getElementById('loader1').style.display = 'none';
 }
 
