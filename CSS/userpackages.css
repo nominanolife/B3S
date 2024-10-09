@@ -482,3 +482,41 @@ h2 {
 ::-webkit-scrollbar-thumb:hover {
     background-color: #0e1d4d; /* Darker color on hover */
 }
+
+.popover {
+    border-radius: 10px;
+    background-color: #f8f9fa; /* Light background color */
+    width: auto;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out; /* Smooth transition */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for better visibility */
+    padding: 10px; /* Adjust padding inside popover */
+}
+
+/* Popover visible state */
+.popover.show {
+    opacity: 1; /* Make it visible */
+}
+
+/* Style for the popover arrow */
+.popover .arrow {
+    border-width: 10px;
+    border-color: transparent;
+}
+
+/* Popover body style */
+.popover-body {
+    font-size: 14px; /* Adjust font size for content */
+    padding: 10px; /* Add padding to the body */
+    color: #333; /* Text color */
+}
+
+/* Optional: Add custom background color and text color for better visibility */
+.popover-header {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 10px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 16px;
+    border-radius: 10px 10px 0 0;
+}

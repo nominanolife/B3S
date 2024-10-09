@@ -30,6 +30,29 @@ function hideLoader() {
     document.getElementById('loader1').style.display = 'none';
 }
 
+$(document).ready(function () {
+    // Initialize the popover for the wrapper (since the button is disabled)
+    $('.feedback').popover({
+        trigger: 'hover', // Automatically show popover on hover
+        html: true,
+        placement: 'top', // Adjust placement if needed
+        content: 'The feedback will be available when the appointment is completed or after 24 hours of the appointment'
+    });
+
+    // Show the popover when hovering over the wrapper, but only if the button is disabled
+    $('.feedback').on('mouseenter', function () {
+        const feedbackButton = $('#giveFeedbackBtn');
+        if (feedbackButton.is(':disabled')) {
+            $(this).popover('show');
+        }
+    });
+
+    // Hide the popover when the mouse leaves the wrapper
+    $('.feedback').on('mouseleave', function () {
+        $(this).popover('hide');
+    });
+});
+
 // Listen to authentication state and fetch the match data once a user is logged in
 onAuthStateChanged(auth, (user) => {
     if (user) {

@@ -56,6 +56,19 @@ function renderPackages(packagesToRender) {
     packageContainer.insertAdjacentHTML('beforebegin', packageHtml);
   });
 
+  $('body').on('mouseenter', '.enroll-now-button:disabled', function () {
+    const button = $(this);
+    button.popover({
+      trigger: 'hover',
+      html: true,
+      placement: 'top',
+      content: 'You are currently enrolled in one of the packages. You can only enroll in one package at a time.',
+    });
+    button.popover('show');
+  }).on('mouseleave', '.enroll-now-button:disabled', function () {
+    $(this).popover('hide');
+  });
+
   showTiles(currentIndex);
 }
 
@@ -186,6 +199,8 @@ onAuthStateChanged(auth, async (user) => {
         userEnrolledPackage = userData.packageName || null;
         if (userEnrolledPackage) {
           document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
+          // Re-render packages to apply disabled state and popover
+          renderPackages(packages);
         }
       } else {
         console.error("No such document!");

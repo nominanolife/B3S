@@ -46,6 +46,8 @@ async function fetchBookings() {
         allBookingsUpcoming = [];
         allBookingsCancelled = [];
 
+        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' }; // Define date format options
+
         for (const appointmentDoc of appointmentsSnapshot.docs) {
             const appointmentData = appointmentDoc.data();
             let bookings = appointmentData.bookings;
@@ -90,11 +92,11 @@ async function fetchBookings() {
                     formattedTime = `${formattedStartTime} - ${formattedEndTime}`;
                 }
 
-                const appointmentDate = new Date(appointmentData.date);
+                const appointmentDate = new Date(appointmentData.date).toLocaleDateString('en-US', dateOptions); // Apply the date format
                 const currentDate = new Date();
 
                 // Skip past appointments
-                if (appointmentDate < currentDate) {
+                if (new Date(appointmentData.date) < currentDate) {
                     console.log(`Appointment on ${appointmentData.date} has already passed. Ignoring this booking.`);
                     continue;
                 }
@@ -103,7 +105,7 @@ async function fetchBookings() {
                     <tr>
                         <td>${fullName}</td>
                         <td>${course}</td>
-                        <td>${appointmentData.date}</td>
+                        <td>${appointmentDate}</td>
                         <td>${formattedTime}</td>
                     </tr>
                 `;

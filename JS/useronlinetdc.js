@@ -24,19 +24,70 @@ let userId = null;  // Declare userId globally so it can be accessed in all func
 const startExamButton = document.getElementById('startExamButton');
 const confirmStartQuizBtn = document.getElementById('confirmStartQuizBtn');
 
+$(document).ready(function () {
+    // Initialize the popover for the wrapper (since the button is disabled)
+    $('.buttons').popover({
+        trigger: 'hover', // Automatically show popover on hover
+        html: true,
+        placement: 'bottom',
+        content: 'You need to complete all videos to unlock the exam'
+    });
+
+    // Check if the button was already enabled and disable popover if needed
+    if (localStorage.getItem('examEnabled') === 'true') {
+        enableStartExamButton();
+    } else {
+        // Add event listeners for the popover only if the button is disabled
+        $('.buttons').on('mouseenter', function () {
+            if ($('#startExamButton').hasClass('disabled-btn')) {
+                $(this).popover('show');
+            }
+        });
+
+        $('.buttons').on('mouseleave', function () {
+            $(this).popover('hide');
+        });
+    }
+});
+
+// Function to enable the Start Exam button
+function enableStartExamButton() {
+    // Enable the "Start Exam" button
+    startExamButton.disabled = false;
+    startExamButton.classList.remove('disabled', 'disabled-btn');
+
+    // Dispose of the popover and remove any popover-related events
+    $(startExamButton).popover('dispose');
+    $('.buttons').off('mouseenter mouseleave'); // Disable hover events for the buttons wrapper
+
+    // Store in localStorage that the exam is enabled
+    localStorage.setItem('examEnabled', 'true');
+}
+
 // Function to update exam button based on user progress
 function updateExamAvailability(videos, userProgress) {
     // Check if all videos are completed
     const allCompleted = videos.every(video => userProgress[video.id]?.completed);
 
     if (allCompleted) {
-        // Enable the "Start Exam" button
-        startExamButton.disabled = false;
-        startExamButton.classList.remove('disabled');
+        enableStartExamButton(); // Enable the button if all videos are completed
     } else {
-        // Keep the button disabled
+        // Keep the button disabled and change color
         startExamButton.disabled = true;
-        startExamButton.classList.add('disabled');
+        startExamButton.classList.add('disabled', 'disabled-btn');
+
+        // Re-enable the popover if the button is disabled
+        $(startExamButton).popover();
+        $('.buttons').on('mouseenter', function () {
+            if ($('#startExamButton').hasClass('disabled-btn')) {
+                $(this).popover('show');
+            }
+        }).on('mouseleave', function () {
+            $(this).popover('hide');
+        });
+
+        // Remove the enabled state from localStorage if the user hasn't completed the videos
+        localStorage.removeItem('examEnabled');
     }
 }
 

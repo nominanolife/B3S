@@ -578,12 +578,22 @@ h2 {
     border-top: none;
 }
 
-.edit-sales-name, .edit-sales-package, .edit-sales-payment, .edit-sales-date, .edit-sales-amount {
+.input-body input {
     width: 100%;
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ced4da;
+}
+
+.input-body input:disabled {
+    background-color: #f0f0f0; /* Light gray background */
+    color: #555555; /* Darker text color */
+    cursor: not-allowed; /* Show "not-allowed" cursor on hover */
+}
+
+.input-body input:disabled {
+    border-color: #cccccc; /* Light gray border */
 }
 
 .update-sales {

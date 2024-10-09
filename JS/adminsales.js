@@ -301,19 +301,29 @@ document.querySelector('.edit-sales-amount').addEventListener('input', function(
 });
 
 async function openEditModal(studentIndex) {
-  const selectedStudent = filteredStudentsData[studentIndex];
+  // Clear input fields before opening the modal
+  document.querySelector('.edit-sales-name').value = '';
+  document.querySelector('.edit-sales-package').value = '';
+  document.querySelector('.edit-sales-package-price').value = '';
+  document.querySelector('.edit-sales-date').value = '';
+  document.querySelector('.edit-sales-amount').value = '';
+  
+  // Clear validation error message
+  document.getElementById('amountPaidError').textContent = '';
 
+  const selectedStudent = filteredStudentsData[studentIndex];
+  
   let existingSalesDocId = null;
   const salesQuery = collection(db, "sales");
   const salesSnapshot = await getDocs(salesQuery);
 
   salesSnapshot.forEach((doc) => {
-    const data = doc.data();
-    if (data.name === selectedStudent.personalInfo.first && data.packageName === selectedStudent.packageName) {
-      existingSalesDocId = doc.id;
-      document.querySelector('.edit-sales-date').value = data.paymentDate || '';
-      document.querySelector('.edit-sales-amount').value = data.amountPaid || '';
-    }
+      const data = doc.data();
+      if (data.name === selectedStudent.personalInfo.first && data.packageName === selectedStudent.packageName) {
+          existingSalesDocId = doc.id;
+          document.querySelector('.edit-sales-date').value = data.paymentDate || '';
+          document.querySelector('.edit-sales-amount').value = data.amountPaid || '';
+      }
   });
 
   document.querySelector('.edit-sales-name').value = selectedStudent.personalInfo.first || '';
@@ -323,8 +333,8 @@ async function openEditModal(studentIndex) {
   $('#editSalesModal').modal('show');
 
   document.querySelector('.update-sales').onclick = async (event) => {
-    event.preventDefault();
-    await saveSalesData(studentIndex, existingSalesDocId);
+      event.preventDefault();
+      await saveSalesData(studentIndex, existingSalesDocId);
   };
 }
 
@@ -343,59 +353,67 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
 
   const userId = selectedStudent.userId;
   if (!userId) {
-    console.error("User ID is undefined or missing for the selected student.");
-    return;
+      console.error("User ID is undefined or missing for the selected student.");
+      return;
   }
 
   const amountPaidInput = document.querySelector('.edit-sales-amount');
-  const amountPaid = parseFloat(amountPaidInput.value);
+  const amountPaid = parseFloat(amountPaidInput.value); // Convert input to number
   const packagePrice = parseFloat(selectedStudent.packagePrice);
 
   const amountPaidErrorElement = document.getElementById('amountPaidError');
 
-  // Ensure that the amountPaid is at least 50% of the package price
-  const minAllowedAmount = packagePrice * 0.5;
-
-  if (amountPaid < minAllowedAmount) {
-    amountPaidErrorElement.textContent = `Amount paid must be at least 50% of the package price (₱${minAllowedAmount.toFixed(2)}).`;
-    return;
+  // Allow null values (empty input field)
+  if (amountPaidInput.value === '') {
+      // Clear validation error and allow save
+      amountPaidErrorElement.textContent = ""; 
   } else {
-    amountPaidErrorElement.textContent = ""; // Clear validation message if the input is valid
+      // Ensure that the amountPaid is a valid number
+      if (isNaN(amountPaid) || amountPaid <= 0) {
+          amountPaidErrorElement.textContent = "Please enter a valid amount greater than 0.";
+          return;
+      }
+
+      // Ensure that the amountPaid is at least 50% of the package price
+      const minAllowedAmount = packagePrice * 0.5;
+
+      if (amountPaid > 0 && amountPaid < minAllowedAmount) {
+          amountPaidErrorElement.textContent = `Amount paid must be at least 50% of the package price (₱${minAllowedAmount.toFixed(2)}).`;
+          return;
+      } else {
+          amountPaidErrorElement.textContent = ""; // Clear validation message if the input is valid
+      }
   }
 
-  if (isNaN(amountPaid) || amountPaid <= 0) {
-    amountPaidErrorElement.textContent = "Please enter a valid amount greater than 0.";
-    return;
-  }
-
+  // Define payment status based on amountPaid
   let paymentStatus = "Not Paid";
   if (amountPaid >= packagePrice) {
-    paymentStatus = "Paid";
+      paymentStatus = "Paid";
   } else if (amountPaid >= packagePrice * 0.10) {
-    paymentStatus = "Partial Payment";
+      paymentStatus = "Partial Payment";
   }
 
   const updatedData = {
-    name: document.querySelector('.edit-sales-name').value,
-    packageName: document.querySelector('.edit-sales-package').value,
-    packagePrice: packagePrice.toString(),
-    paymentDate: document.querySelector('.edit-sales-date').value,
-    amountPaid: amountPaid.toString(),
-    paymentStatus: paymentStatus,
+      name: document.querySelector('.edit-sales-name').value,
+      packageName: document.querySelector('.edit-sales-package').value,
+      packagePrice: packagePrice.toString(),
+      paymentDate: document.querySelector('.edit-sales-date').value,
+      amountPaid: amountPaidInput.value === '' ? null : amountPaid.toString(), // Store null if the field is empty
+      paymentStatus: paymentStatus,
   };
 
   try {
-    if (existingSalesDocId) {
-      const salesDocRef = doc(db, "sales", existingSalesDocId);
-      await updateDoc(salesDocRef, updatedData);
-      console.log('Sales data successfully updated.');
-    } else {
-      const salesDocRef = doc(db, "sales", userId);
-      await setDoc(salesDocRef, updatedData);
-      console.log('Sales data successfully saved.');
-    }
+      if (existingSalesDocId) {
+          const salesDocRef = doc(db, "sales", existingSalesDocId);
+          await updateDoc(salesDocRef, updatedData);
+          console.log('Sales data successfully updated.');
+      } else {
+          const salesDocRef = doc(db, "sales", userId);
+          await setDoc(salesDocRef, updatedData);
+          console.log('Sales data successfully saved.');
+      }
   } catch (error) {
-    console.error("Error saving sales data: ", error);
+      console.error("Error saving sales data: ", error);
   }
 
   $('#editSalesModal').modal('hide');
