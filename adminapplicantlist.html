@@ -75,6 +75,37 @@
         <div class="car-loader"></div>
         <p>Please wait<span class="dots"></span></p>
     </div>
+    
+    <!-- SMS Modal -->
+    <div class="modal fade" id="smsModal" tabindex="-1" aria-labelledby="smsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="smsModalLabel">Send SMS</h5>
+                    <div class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="sms-from">From:</label>
+                        <input type="text" id="sms-from" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="sms-to">To:</label>
+                        <input type="text" id="sms-to" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="sms-message">Message:</label>
+                        <textarea id="sms-message" class="form-control" rows="4" placeholder="Type your message here"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="sendSmsBtn">Send SMS</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Logout Confirmation Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">

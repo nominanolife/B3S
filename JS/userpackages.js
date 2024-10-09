@@ -62,7 +62,7 @@ function renderPackages(packagesToRender) {
       trigger: 'hover',
       html: true,
       placement: 'top',
-      content: 'You are currently enrolled in one of the packages. You can only enroll in one package at a time.',
+      content: 'You are currently enrolled in one of the packages. Only one package at a time.',
     });
     button.popover('show');
   }).on('mouseleave', '.enroll-now-button:disabled', function () {

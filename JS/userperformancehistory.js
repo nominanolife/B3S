@@ -57,46 +57,65 @@ async function fetchUserAttempts(uid) {
 
         if (docSnapshot.exists()) {
             const attempts = docSnapshot.data().attempts;
-            populateTable(attempts);
+
+            if (attempts && attempts.length > 0) {
+                populateTable(attempts);
+            } else {
+                populateTable([]); // Pass an empty array if no attempts
+            }
         } else {
             console.log("No attempt data found.");
+            populateTable([]); // No attempts found, pass an empty array
         }
     } catch (error) {
         console.error("Error fetching user attempts:", error);
+        populateTable([]); // Handle error by showing "No history yet"
     }
 }
 
-// Populate the table with user attempt data
+// Populate the table with user attempt data or show "No history yet"
 function populateTable(attempts) {
     const tableBody = document.getElementById('attempts-table-body');
     tableBody.innerHTML = ''; // Clear any existing data
 
-    attempts.forEach((attempt, index) => {
+    if (attempts.length === 0) {
+        // Display "No history yet" if there are no attempts
         const row = document.createElement('tr');
-
-        // Create table cells and append them
-        row.innerHTML = `
-            <td>${applicantName}</td>  <!-- Display the applicant's name -->
-            <td>${new Date(attempt.date).toLocaleDateString()}</td>
-            <td>${attempt.percentage || 'N/A'}%</td>
-            <td><a href="#" class="view-result-link" data-attempt-index="${index}" data-toggle="modal" data-target="#performanceEvaluationModal">View Result</a></td>
-            <td class="${attempt.evaluation === 'Passed' ? 'status-passed' : 'status-failed'}">${attempt.evaluation}</td>
-            <td>${index + 1}</td>
-        `;
-
+        const cell = document.createElement('td');
+        cell.setAttribute('colspan', '6'); // Span across all columns
+        cell.style.textAlign = 'center'; // Center the text
+        cell.textContent = 'No quiz history yet';
+        row.appendChild(cell);
         tableBody.appendChild(row);
-    });
+    } else {
+        // Display each attempt if available
+        attempts.forEach((attempt, index) => {
+            const row = document.createElement('tr');
 
-    // Add event listeners for each "View Result" link
-    document.querySelectorAll('.view-result-link').forEach(link => {
-        link.addEventListener('click', function () {
-            const attemptIndex = this.getAttribute('data-attempt-index');
-            showPerformanceEvaluation(attempts[attemptIndex]);
+            // Create table cells and append them
+            row.innerHTML = `
+                <td>${applicantName}</td>  <!-- Display the applicant's name -->
+                <td>${new Date(attempt.date).toLocaleDateString()}</td>
+                <td>${attempt.percentage || 'N/A'}%</td>
+                <td><a href="#" class="view-result-link" data-attempt-index="${index}" data-toggle="modal" data-target="#performanceEvaluationModal">View Result</a></td>
+                <td class="${attempt.evaluation === 'Passed' ? 'status-passed' : 'status-failed'}">${attempt.evaluation}</td>
+                <td>${index + 1}</td>
+            `;
+
+            tableBody.appendChild(row);
         });
-    });
 
-    // Call the applyRowStyles function to color-code the rows based on their status
-    applyRowStyles();
+        // Add event listeners for each "View Result" link
+        document.querySelectorAll('.view-result-link').forEach(link => {
+            link.addEventListener('click', function () {
+                const attemptIndex = this.getAttribute('data-attempt-index');
+                showPerformanceEvaluation(attempts[attemptIndex]);
+            });
+        });
+
+        // Call the applyRowStyles function to color-code the rows based on their status
+        applyRowStyles();
+    }
 }
 
 // Show performance evaluation in the modal (handling the array of evaluationDetails)
