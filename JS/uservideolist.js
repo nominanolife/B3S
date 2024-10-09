@@ -20,24 +20,30 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 
-// Function to render the video cards
 async function renderVideoCards() {
     const videoContainer = document.querySelector('.video-grid'); // Container to hold all video cards
 
     try {
         // Step 1: Fetch all videos from the 'videos' collection
         const videosSnapshot = await getDocs(collection(db, 'videos'));
-        const videos = videosSnapshot.docs.map(doc => ({
+        let videos = videosSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         }));
 
-        // Step 2: Fetch user progress
+        // Step 2: Sort videos by title
+        videos.sort((a, b) => {
+            if (a.title < b.title) return -1;
+            if (a.title > b.title) return 1;
+            return 0;
+        });
+
+        // Step 3: Fetch user progress
         const userId = auth.currentUser.uid; // Assuming the user is already authenticated
         const userProgressDoc = await getDoc(doc(db, 'userProgress', userId));
         const userProgress = userProgressDoc.exists() ? userProgressDoc.data() : {};
 
-        // Step 3: Render each video card
+        // Step 4: Render each video card
         videos.forEach((video, index) => {
             const videoCard = document.createElement('div');
             videoCard.classList.add('video-card');

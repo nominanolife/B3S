@@ -39,16 +39,30 @@ async function fetchSavedVideosAndQuizzes() {
             quizzesMap[quizData.videoId] = quizData;
         });
 
+        // Fetch the videos into an array to allow sorting
+        const videosArray = [];
         videosSnapshot.forEach(doc => {
             const videoData = doc.data();
-            const videoId = doc.id;
-        
+            videosArray.push({ id: doc.id, ...videoData });
+        });
+
+        // Sort the videosArray by the 'title' field
+        videosArray.sort((a, b) => {
+            if (a.title < b.title) return -1;
+            if (a.title > b.title) return 1;
+            return 0;
+        });
+
+        // Now loop through the sorted array and display the items
+        videosArray.forEach(videoData => {
+            const videoId = videoData.id;
+
             const courseContentList = document.createElement('div');
             courseContentList.classList.add('course-content-list');
-        
+
             const courseCard = document.createElement('div');
             courseCard.classList.add('course-card');
-        
+
             const courseImage = document.createElement('div');
             courseImage.classList.add('course-image');
             const thumbnail = document.createElement('img');
@@ -56,7 +70,7 @@ async function fetchSavedVideosAndQuizzes() {
             thumbnail.alt = videoData.title;
             thumbnail.classList.add('video-thumbnail');
             courseImage.appendChild(thumbnail);
-        
+
             const courseDetails = document.createElement('div');
             courseDetails.classList.add('course-details');
             const courseTitle = document.createElement('div');
@@ -65,35 +79,35 @@ async function fetchSavedVideosAndQuizzes() {
             title.textContent = videoData.title;
             courseTitle.appendChild(title);
             courseDetails.appendChild(courseTitle);
-        
+
             const courseOptions = document.createElement('div');
             courseOptions.classList.add('course-options');
             const threeDots = document.createElement('i');
             threeDots.classList.add('bi', 'bi-three-dots-vertical');
             const optionsDropdown = document.createElement('div');
             optionsDropdown.classList.add('triple-dot-options');
-        
+
             const editButton = document.createElement('i');
             editButton.classList.add('option-dropdown', 'edit-btn');
             editButton.textContent = 'Edit';
             editButton.onclick = () => editLesson(videoId);
-        
+
             const deleteButton = document.createElement('i');
             deleteButton.classList.add('option-dropdown', 'delete-btn');
             deleteButton.textContent = 'Delete';
             deleteButton.onclick = () => showDeleteModal(videoId);
-        
+
             optionsDropdown.appendChild(editButton);
             optionsDropdown.appendChild(deleteButton);
             courseOptions.appendChild(threeDots);
             courseOptions.appendChild(optionsDropdown);
             courseDetails.appendChild(courseOptions);
-        
+
             courseCard.appendChild(courseImage);
             courseCard.appendChild(courseDetails);
             courseContentList.appendChild(courseCard);
             courseContent.appendChild(courseContentList);
-        
+
             threeDots.addEventListener('click', function () {
                 // Close any other open dropdowns
                 const openDropdowns = document.querySelectorAll('.triple-dot-options.show');
@@ -101,7 +115,7 @@ async function fetchSavedVideosAndQuizzes() {
                     dropdown.classList.remove('show');
                     dropdown.style.display = 'none';
                 });
-            
+
                 // Toggle the current dropdown
                 const options = this.nextElementSibling;
                 if (options.style.display === 'block') {
@@ -111,8 +125,8 @@ async function fetchSavedVideosAndQuizzes() {
                     options.style.display = 'block';
                     options.classList.add('show');
                 }
-            });            
-        });        
+            });
+        });
 
         courseContent.appendChild(uploadContainer);
     } catch (error) {

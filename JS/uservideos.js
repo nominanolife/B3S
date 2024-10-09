@@ -140,6 +140,14 @@ async function renderVideoDetails(videoId, videos, userId) {
 
     try {
         console.log("Fetching video document from Firestore...");
+        
+        // Sort videos array by title
+        videos.sort((a, b) => {
+            if (a.title < b.title) return -1;
+            if (a.title > b.title) return 1;
+            return 0;
+        });
+
         const videoDoc = await getDoc(doc(db, 'videos', videoId));
         if (videoDoc.exists()) {
             const videoData = videoDoc.data();
