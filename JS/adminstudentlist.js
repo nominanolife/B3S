@@ -863,7 +863,7 @@ async function sendAssessmentDataToFlask() {
   console.log('Raw Data to send:', dataToSend); // Log the raw data
 
   try {
-      const response = await fetch('http://127.0.0.1:5000/predict', {
+      const response = await fetch('https://4wheels-ai-dot-authentication-d6496.df.r.appspot.com/predict', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -885,7 +885,7 @@ async function sendAssessmentDataToFlask() {
       const interpretedResults = result.predictions;
 
       // Store the interpreted results in session storage
-      sessionStorage.setItem(`ProcessedData_${selectedStudentIndex}`, JSON.stringify(interpretedResults));
+      sessionStorage.setItem(`4WProcessedData_${selectedStudentIndex}`, JSON.stringify(interpretedResults));
 
   } catch (error) {
       console.error('Error sending data to Flask API:', error);
@@ -902,7 +902,7 @@ async function saveAllDataToFirestore() {
 
   // Retrieve assessment data from session storage
   const assessmentData = JSON.parse(sessionStorage.getItem(`4WheelsAssess_${selectedStudentIndex}`)) || {};
-  const processedData = JSON.parse(sessionStorage.getItem(`ProcessedData_${selectedStudentIndex}`)) || {};
+  const processedData = JSON.parse(sessionStorage.getItem(`4WProcessedData_${selectedStudentIndex}`)) || {};
 
   // Get data from the checklist
   const studentPermit = document.getElementById('studentPermit').value;
@@ -1474,7 +1474,7 @@ async function sendMotorcycleAssessmentDataToFlask() {
   console.log('Aggregated Data to send:', dataToSend); // Log the aggregated data for debug
 
   try {
-    const response = await fetch('http://127.0.0.1:5000/predict', {
+    const response = await fetch('https://motor-eval-dot-authentication-d6496.df.r.appspot.com/predict', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -1496,7 +1496,7 @@ async function sendMotorcycleAssessmentDataToFlask() {
     const interpretedResults = result.predictions;
 
     // Store the interpreted results in session storage
-    sessionStorage.setItem(`ProcessedData_${selectedStudentIndex}`, JSON.stringify(interpretedResults));
+    sessionStorage.setItem(`MProcessedData_${selectedStudentIndex}`, JSON.stringify(interpretedResults));
 
   } catch (error) {
     console.error('Error sending data to Flask API:', error);
@@ -1513,7 +1513,7 @@ async function saveAllMotorcycleDataToFirestore() {
 
   // Retrieve assessment data from session storage
   const assessmentData = JSON.parse(sessionStorage.getItem(`MotorcycleAssess_${selectedStudentIndex}`)) || {};
-  const processedData = JSON.parse(sessionStorage.getItem(`ProcessedData_${selectedStudentIndex}`)) || {};
+  const processedData = JSON.parse(sessionStorage.getItem(`MProcessedData_${selectedStudentIndex}`)) || {};
 
   // Get data from the motorcycle checklist
   const studentPermit = document.getElementById('motorcycleStudentPermit').value;

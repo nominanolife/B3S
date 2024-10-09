@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/fireba
 import { getFirestore, collection, getDocs, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-// Your web app's Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
     authDomain: "authentication-d6496.firebaseapp.com",
@@ -27,8 +27,7 @@ onAuthStateChanged(auth, (user) => {
         console.log("User logged in:", user.displayName || user.email);
     } else {
         console.error("No authenticated user found.");
-        // Optionally, redirect to login
-        window.location.href = 'login.html';
+        window.location.href = 'login.html'; // Redirect to login if no user found
     }
 });
 
@@ -45,7 +44,7 @@ async function getUserFullName(userId) {
     }
 }
 
-// Fetch certificate ID from `userResults` collection
+// Fetch certificate ID and score from `userResults` collection
 async function getCertificateData(userId) {
     const resultsDoc = await getDoc(doc(db, 'userResults', userId));
     if (resultsDoc.exists()) {
@@ -57,36 +56,43 @@ async function getCertificateData(userId) {
     }
 }
 
+// Function to fetch the user's quiz progress from Firestore
+async function fetchUserQuizProgress(userId) {
+    try {
+        const userQuizDocRef = doc(db, 'userQuizProgress', userId);
+        const userQuizDoc = await getDoc(userQuizDocRef);
+
+        if (userQuizDoc.exists()) {
+            const userProgressData = userQuizDoc.data();
+            console.log("User Quiz Progress:", userProgressData);
+
+            // Save the progress to session storage
+            sessionStorage.setItem('userAnswers', JSON.stringify(userProgressData.answers));
+            
+            return userProgressData.answers;  // Return the answers
+        } else {
+            console.error("No quiz progress found for user.");
+            return {};  // Return an empty object if no progress found
+        }
+    } catch (error) {
+        console.error("Error fetching user quiz progress:", error);
+        return {};
+    }
+}
+
+// Predict performance and fetch insights from Flask API
 async function predictPerformanceAndFetchInsights(studentId, category, percentage) {
     try {
-        // Log data being sent for better debugging
-        console.log(`Sending data to Flask: studentId=${studentId}, category=${category}, percentage=${percentage}`);
-
-        if (!studentId || typeof studentId !== 'string') {
-            console.error("Invalid studentId passed to prediction function.");
-            return;
-        }
-
-        if (isNaN(percentage)) {
-            console.error("Invalid percentage passed to prediction function.");
-            return;
-        }
-
-        const response = await fetch('http://127.0.0.1:5000/predict_and_insights', {  // Full URL with the correct port
+        const response = await fetch('http://127.0.0.1:5000/predict_and_insights', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                studentId: studentId,  // Pass the studentId as a string directly
-                category: category,
-                percentage: parseFloat(percentage)  // Ensure percentage is a float
-            })
+            body: JSON.stringify({ studentId, category, percentage: parseFloat(percentage) })
         });
 
         const data = await response.json();
         if (response.ok) {
-            console.log("Received data from Flask:", data);
             return {
                 predicted_performance: data.predicted_performance,  // "Poor" or "Great"
                 insights: data.insights  // Insights for this category and performance
@@ -118,7 +124,7 @@ async function fetchQuizzes() {
     }
 }
 
-// Function to calculate category scores from session storage data
+// Calculate category scores from session storage data
 function calculateCategoryScores() {
     const userAnswers = JSON.parse(sessionStorage.getItem('userAnswers')) || {};
     let categoryScores = {};
@@ -143,11 +149,10 @@ function calculateCategoryScores() {
         categoryScores[category] /= categoryCounts[category]; // Average percentage
     });
 
-    console.log("Category Scores Calculated:", categoryScores);
     return categoryScores;
 }
 
-// Function to determine if the user passed
+// Determine if the user passed based on average score
 function checkIfPassed(categoryScores) {
     let totalScore = 0;
     let categoryCount = 0;
@@ -158,82 +163,28 @@ function checkIfPassed(categoryScores) {
     });
 
     const averageScore = totalScore / categoryCount;
-    console.log("Average Score:", averageScore);
     return averageScore >= 80;
 }
-function showChart(categoryScores) {
-    let resultContainer = document.querySelector('.result-container');
 
-    // Clear the existing content in the result-container
-    resultContainer.innerHTML = '';
-
-    // Create a new div for displaying the bar graph
-    let chartContent = document.createElement('div');
-    chartContent.className = 'chart-content';
-    chartContent.innerHTML = `<canvas id="myBarChart"></canvas>`;
-    resultContainer.appendChild(chartContent);
-
-    // Create a "Next" button to go to the performance evaluation
-    let nextButton = document.createElement('button');
-    nextButton.className = 'result-button';
-    nextButton.innerHTML = 'Next';
-    resultContainer.appendChild(nextButton);
-
-    const labels = Object.keys(categoryScores);
-    const dataPoints = Object.values(categoryScores);
-
-    // Create a bar graph using Chart.js
-    const ctx = document.getElementById('myBarChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Performance Score',
-                data: dataPoints,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    // Add event listener for the "Next" button
-    nextButton.addEventListener('click', function () {
-        const evaluationData = labels.map((label, index) => ({
-            category: label,
-            score: dataPoints[index]
-        }));
-        showPerformanceEvaluation(evaluationData);
-    });
-}
-
-// Function to save results only (without generating the certificate immediately)
+// Function to save results to Firestore
 async function saveResults(categoryScores) {
     const passed = checkIfPassed(categoryScores);
-    if (passed && currentUser) { 
+    if (currentUser) { 
         try {
             const userId = currentUser.uid;
             const certificateID = Math.random().toString(36).substring(2, 10);
             const totalScore = calculateTotalScore(categoryScores);
 
-            const userResultsRef = doc(db, 'userResults', userId);
             const userResults = {
-                categoryScores: categoryScores,
-                totalScore: totalScore,
-                certificateID: certificateID,
-                passed: true,
+                categoryScores,
+                totalScore,
+                certificateID,
+                passed,
                 timestamp: new Date(),
+                userAnswers: JSON.parse(sessionStorage.getItem('userAnswers')) || {} // Save user answers
             };
 
-            await setDoc(userResultsRef, userResults, { merge: true });
+            await setDoc(doc(db, 'userResults', userId), userResults, { merge: true });
             console.log("User results saved successfully.");
         } catch (error) {
             console.error("Error saving user results:", error);
@@ -241,6 +192,7 @@ async function saveResults(categoryScores) {
     }
 }
 
+// Calculate the total score
 function calculateTotalScore(categoryScores) {
     let totalScore = 0;
     let categoryCount = 0;
@@ -253,37 +205,85 @@ function calculateTotalScore(categoryScores) {
     return (totalScore / categoryCount).toFixed(2);
 }
 
-// In the button click handler, ensure currentUser.uid is available before proceeding
+// In the button click handler (for fetching and calculating results)
 document.getElementById('seeResultsBtn').addEventListener('click', async function () {
     if (!currentUser) {
         console.error('No authenticated user found!');
-        return;  // Exit if no authenticated user
+        return;
     }
 
-    const studentId = currentUser.uid;  // Ensure studentId is available
-    console.log("User ID:", studentId);  // Debug the userId
+    const studentId = currentUser.uid;
+    console.log("User ID:", studentId);
 
     document.getElementById('loader1').style.display = 'flex';
 
-    await fetchQuizzes();
-    const categoryScores = calculateCategoryScores();
+    // Fetch user's quiz progress from Firestore
+    await fetchUserQuizProgress(studentId);
 
-    await saveResults(categoryScores);
+    const categoryScores = calculateCategoryScores();  // Calculate category scores based on fetched progress
+
+    await saveResults(categoryScores);  // Save results
 
     setTimeout(function () {
         document.getElementById('loader1').style.display = 'none';
-        showChart(categoryScores);
+        showChart(categoryScores);  // Display the chart
     }, 1000);
 });
 
-// Function to show the performance evaluation and provide video links for poor performance
+// Show the chart with category scores
+function showChart(categoryScores) {
+    const resultContainer = document.querySelector('.result-container');
+    resultContainer.innerHTML = ''; // Clear previous content
+
+    const chartContent = document.createElement('div');
+    chartContent.className = 'chart-content';
+    chartContent.innerHTML = `<canvas id="myBarChart"></canvas>`;
+    resultContainer.appendChild(chartContent);
+
+    const nextButton = document.createElement('button');
+    nextButton.className = 'result-button';
+    nextButton.innerHTML = 'Next';
+    resultContainer.appendChild(nextButton);
+
+    const labels = Object.keys(categoryScores);
+    const dataPoints = Object.values(categoryScores);
+
+    const ctx = document.getElementById('myBarChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Performance Score',
+                data: dataPoints,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    nextButton.addEventListener('click', () => {
+        const evaluationData = labels.map((label, index) => ({
+            category: label,
+            score: dataPoints[index]
+        }));
+        showPerformanceEvaluation(evaluationData);
+    });
+}
+
+// Show performance evaluation with Flask AI insights
 async function showPerformanceEvaluation(evaluationData) {
-    let resultContainer = document.querySelector('.result-container');
-    resultContainer.innerHTML = '';  // Clear content
+    const resultContainer = document.querySelector('.result-container');
+    resultContainer.innerHTML = ''; // Clear content
 
-    let resultContent = document.createElement('div');
+    const resultContent = document.createElement('div');
     resultContent.className = 'generated-results';
-
     resultContent.innerHTML = `
         <div class="result-header">
             <h3>Performance Evaluation</h3>
@@ -291,22 +291,18 @@ async function showPerformanceEvaluation(evaluationData) {
         </div>
     `;
 
-    let performanceWrapper = document.createElement('div');
+    const performanceWrapper = document.createElement('div');
     performanceWrapper.className = 'performance-wrapper';
 
-    // Loop through each category evaluation data
     for (const item of evaluationData) {
-        let performanceBlock = document.createElement('div');
+        const performanceBlock = document.createElement('div');
         performanceBlock.className = 'performance-evaluation';
 
-        // Step 1: Predict performance and fetch insights using Flask
         const result = await predictPerformanceAndFetchInsights(currentUser.uid, item.category, item.score);
-        
         if (result) {
             const predictedPerformance = result.predicted_performance;
             const insights = result.insights;
 
-            // Determine status based on the predicted performance
             let status;
             let color;
 
@@ -318,12 +314,11 @@ async function showPerformanceEvaluation(evaluationData) {
                 color = 'green';
             } else if (predictedPerformance === 'Excellent') {
                 status = 'Excellent';
-                color = 'blue';  // Optionally, choose another color for "Excellent"
+                color = 'blue';
             }
 
             let additionalResources = insights ? `<p><strong>Insights:</strong> ${insights}</p>` : '';
 
-            // If the predicted performance is Poor, provide a link to the video for that category
             if (predictedPerformance === 'Poor') {
                 additionalResources += `
                     <p><a href="uservideos.html?category=${encodeURIComponent(item.category)}" style="color:${color}; text-decoration:underline;">
@@ -332,7 +327,6 @@ async function showPerformanceEvaluation(evaluationData) {
                 `;
             }
 
-            // Display performance and insights (with link if performance is Poor)
             performanceBlock.innerHTML = `
                 <p><strong>${item.category}:</strong> 
                     <span class="status" style="color:${color};">${status}</span>
@@ -350,22 +344,20 @@ async function showPerformanceEvaluation(evaluationData) {
     const categoryScores = calculateCategoryScores();
     const passed = checkIfPassed(categoryScores);
 
-    let backButton = document.createElement('button');
+    const backButton = document.createElement('button');
     backButton.className = 'result-button';
     backButton.innerHTML = 'Back';
     resultContainer.appendChild(backButton);
 
-    backButton.addEventListener('click', function () {
-        showChart(categoryScores);
-    });
+    backButton.addEventListener('click', () => showChart(categoryScores));
 
     if (passed) {
-        let downloadButton = document.createElement('button');
+        const downloadButton = document.createElement('button');
         downloadButton.className = 'result-button';
         downloadButton.innerHTML = 'Certificate of Completion';
         resultContainer.appendChild(downloadButton);
 
-        downloadButton.addEventListener('click', async function () {
+        downloadButton.addEventListener('click', async () => {
             if (currentUser) {
                 const fullName = await getUserFullName(currentUser.uid);
                 const { certificateID, totalScore } = await getCertificateData(currentUser.uid);

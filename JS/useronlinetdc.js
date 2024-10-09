@@ -18,6 +18,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+let userId = null;  // Declare userId globally so it can be accessed in all functions
+
 // Get the "Start Exam" button and the "Confirm" button from the modal
 const startExamButton = document.getElementById('startExamButton');
 const confirmStartQuizBtn = document.getElementById('confirmStartQuizBtn');
@@ -48,11 +50,43 @@ async function fetchVideos() {
     return videos;
 }
 
+// Function to check if there's existing progress and show the Continue button
+async function checkUserProgress() {
+    if (userId) {
+        try {
+            const userQuizDocRef = doc(db, 'userQuizProgress', userId);
+            const userQuizDoc = await getDoc(userQuizDocRef);
+            const continueButton = document.getElementById('continueButton');
+
+            // Ensure the "Continue" button exists in the DOM
+            if (continueButton) {
+                if (userQuizDoc.exists() && userQuizDoc.data().answers) {
+                    // Show the "Continue" button if progress exists
+                    continueButton.style.display = 'block';
+                } else {
+                    // Hide the "Continue" button if no progress is found
+                    continueButton.style.display = 'none';
+                }
+            } else {
+                console.error('Continue button not found in DOM.');
+            }
+        } catch (error) {
+            console.error("Error checking user progress:", error);
+        }
+    }
+}
+
+// Add event listener for the "Continue" button to resume the quiz
+document.getElementById('continueButton').addEventListener('click', function () {
+    window.location.href = 'userquiz.html';  // Redirect to the quiz page
+});
+
 // Monitor authentication state and set up real-time listener for user progress
 onAuthStateChanged(auth, async (user) => {
     if (user) {
+        userId = user.uid;  // Set userId globally when the user is authenticated
+        checkUserProgress();  // Check user progress on page load
         console.log("User is authenticated.");
-        const userId = user.uid;
 
         try {
             // Fetch videos once

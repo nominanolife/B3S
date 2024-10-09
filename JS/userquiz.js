@@ -43,26 +43,50 @@ async function fetchAndRandomizeQuizzes() {
     }
 }
 
-// Save User Answer and Store in Session Storage
-function saveUserAnswer(index) {
+// Save User Answer in Firestore
+async function saveUserAnswerToFirestore(index) {
     const selectedOption = document.querySelector('input[name="questionanswer"]:checked');
-    if (selectedOption) {
-        const correctAnswerIndex = questions[index].correctAnswer; // Get the index of the correct answer from Firestore
-        const correctAnswerValue = questions[index].options[correctAnswerIndex].value; // Get the value of the correct answer
+    if (selectedOption && userId) {
+        const correctAnswerIndex = questions[index].correctAnswer;
+        const correctAnswerValue = questions[index].options[correctAnswerIndex].value;
         
         userAnswers[index] = {
             question: questions[index].question,
             answer: selectedOption.value,
-            isCorrect: selectedOption.value === correctAnswerValue, // Compare user's answer with the correct answer value
+            isCorrect: selectedOption.value === correctAnswerValue,
             category: questions[index].category
         };
 
-        // Save to session storage
-        sessionStorage.setItem('userAnswers', JSON.stringify(userAnswers));
+        // Save to Firestore
+        try {
+            const userQuizDocRef = doc(db, 'userQuizProgress', userId);
+            await setDoc(userQuizDocRef, { answers: userAnswers }, { merge: true });
+            console.log("Answer saved to Firestore for question index:", index);
+        } catch (error) {
+            console.error("Error saving user answer to Firestore:", error);
+        }
+    }
+}
+
+// Load User Answers from Firestore on page reload
+async function loadUserAnswersFromFirestore() {
+    if (userId) {
+        try {
+            const userQuizDocRef = doc(db, 'userQuizProgress', userId);
+            const userQuizDoc = await getDoc(userQuizDocRef);
+            if (userQuizDoc.exists()) {
+                userAnswers = userQuizDoc.data().answers || {};
+                console.log("Loaded answers from Firestore:", userAnswers);
+            }
+        } catch (error) {
+            console.error("Error loading user answers from Firestore:", error);
+        }
     }
 }
 
 async function renderQuestion(index) {
+    await loadUserAnswersFromFirestore();  // Load answers when rendering each question
+
     if (index >= 0 && index < questions.length) {
         const questionElement = document.querySelector('.quiz-question-body h4');
         const optionsContainer = document.querySelector('.question-options');
@@ -89,7 +113,7 @@ async function renderQuestion(index) {
         // Dynamically create and add image if available
         if (questionData.imageURL && questionImageContainer) {
             try {
-                const imageRef = ref(storage, questionData.imageURL);  // Directly use the imageURL field from Firestore
+                const imageRef = ref(storage, questionData.imageURL);
                 const imageUrl = await getDownloadURL(imageRef);
 
                 const imgElement = document.createElement('img');
@@ -97,7 +121,6 @@ async function renderQuestion(index) {
                 imgElement.alt = "Quiz Image";
                 imgElement.style.display = "block";  // Show the image if the URL is valid
 
-                // Append image to the container
                 questionImageContainer.appendChild(imgElement);
             } catch (error) {
                 console.error("Error fetching image from storage:", error);
@@ -123,11 +146,10 @@ async function renderQuestion(index) {
             });
         }
 
-        // Load saved answer from session storage if available
-        const savedAnswers = JSON.parse(sessionStorage.getItem('userAnswers'));
-        if (savedAnswers && savedAnswers[index]) {
-            const savedAnswerValue = savedAnswers[index].answer;
-            const optionToSelect = document.querySelector(`input[name="questionanswer"][value="${savedAnswerValue}"]`);
+        // Load saved answer from Firestore if available
+        const savedAnswer = userAnswers[index];
+        if (savedAnswer) {
+            const optionToSelect = document.querySelector(`input[name="questionanswer"][value="${savedAnswer.answer}"]`);
             if (optionToSelect) {
                 optionToSelect.checked = true;
             }
@@ -171,7 +193,6 @@ function manageButtons(currentQuestion, totalQuestions) {
 
 // Function to determine if the user passed
 function checkIfPassed() {
-    const userAnswers = JSON.parse(sessionStorage.getItem('userAnswers')) || {};
     let correctCount = 0;
 
     Object.keys(userAnswers).forEach(index => {
@@ -216,7 +237,7 @@ async function saveResultsAndAttempts() {
             
             // Prepare data to save
             const userResults = {
-                answers: JSON.parse(sessionStorage.getItem('userAnswers')),
+                answers: userAnswers,
                 timestamp: new Date(),
                 attempts: attempts,
                 passed: passed,
@@ -240,7 +261,7 @@ async function saveResultsAndAttempts() {
 // Navigation Event Listeners
 document.querySelector('.next-btn').addEventListener('click', () => {
     if (currentQuestionIndex < questions.length - 1) {
-        saveUserAnswer(currentQuestionIndex);
+        saveUserAnswerToFirestore(currentQuestionIndex);
         currentQuestionIndex++;
         renderQuestion(currentQuestionIndex);
     }
@@ -248,7 +269,7 @@ document.querySelector('.next-btn').addEventListener('click', () => {
 
 document.querySelector('.back-btn').addEventListener('click', () => {
     if (currentQuestionIndex > 0) {
-        saveUserAnswer(currentQuestionIndex);
+        saveUserAnswerToFirestore(currentQuestionIndex);
         currentQuestionIndex--;
         renderQuestion(currentQuestionIndex);
     }
@@ -257,7 +278,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
 // Submit Button Event Listener
 document.querySelector('.save-btn').addEventListener('click', async () => {
     // Save the current answer
-    saveUserAnswer(currentQuestionIndex);
+    saveUserAnswerToFirestore(currentQuestionIndex);
 
     // Save quiz results and attempts
     await saveResultsAndAttempts();

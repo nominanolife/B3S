@@ -5,8 +5,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.metrics import multilabel_confusion_matrix, f1_score
-import joblib
-import os
 
 # Load the dataset
 def load_data(file_path):
@@ -93,24 +91,9 @@ def evaluate_model(model, X_test, y_test):
         print(f"F1 Score for {category}: {f1_score(y_true, y_pred_cat, average='macro'):.2f}")
         print()
 
-def save_model(model, mlb, model_filename='student_performance_classifier.pkl'):
-    # Ensure the directory exists
-    if not os.path.exists('models'):
-        os.makedirs('models')
-    
-    # Save the model
-    filename = f"models/{model_filename}"
-    print(f"Saving model to {filename}")
-    joblib.dump(model, filename)
-    
-    # Save label binarizer
-    binarizer_filename = 'models/label_binarizer.pkl'
-    print(f"Saving label binarizer to {binarizer_filename}")
-    joblib.dump(mlb, binarizer_filename)
-
 def main():
     # Path to your dataset
-    file_path = 'PDC Evaluation/student_scores.csv'
+    file_path = 'student_scores.csv'
     
     # Load and prepare the dataset
     data = load_data(file_path)
@@ -124,9 +107,6 @@ def main():
     
     # Evaluate the model
     evaluate_model(model, X_test, y_test)
-    
-    # Save the model and encoder
-    save_model(model, mlb)
 
 if __name__ == '__main__':
     main()

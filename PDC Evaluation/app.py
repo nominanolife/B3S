@@ -13,8 +13,8 @@ CORS(app)
 logging.basicConfig(level=logging.DEBUG)
 
 # Load the trained model and label binarizer
-model = joblib.load('models/student_performance_classifier.pkl')
-mlb = joblib.load('models/label_binarizer.pkl')
+model = joblib.load('student_performance_classifier.pkl')
+mlb = joblib.load('label_binarizer.pkl')
 
 # Attempt to get the feature names directly from the model
 try:
@@ -46,14 +46,9 @@ def adjust_predictions_based_on_rules(predictions, categories):
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # Log incoming request data
-        logging.debug(f"Incoming request data: {request.data}")
 
         # Get the JSON data from the request
         data = request.json
-
-        # Log parsed JSON data
-        logging.debug(f"Parsed JSON data: {data}")
 
         if 'categories' not in data or not data['categories']:
             raise ValueError("Invalid input format: 'categories' field is missing or empty.")
@@ -64,9 +59,6 @@ def predict():
         # Extract maximum scores from the data
         max_scores = data.get('maxScores', {})  # Get the maximum scores for each category
 
-        # Log the extracted categories and maximum scores
-        logging.debug(f"Extracted categories: {categories}")
-        logging.debug(f"Max scores: {max_scores}")
 
         # Ensure all categories are provided and in the correct order
         if set(categories.keys()) != set(expected_features):
@@ -83,16 +75,11 @@ def predict():
             max_score = max_scores.get(feature, 1)  # Get the max score for the category; default to 1 to avoid division by zero
             normalized_score = (categories[feature] / max_score) * 100  # Convert to percentage
             normalized_categories[feature] = normalized_score
-        
-        logging.debug(f"Normalized categories: {normalized_categories}")
 
         # Create a DataFrame from the normalized categories
         X_new = pd.DataFrame([normalized_categories], columns=expected_features)
-        logging.debug(f"DataFrame created for prediction: {X_new}")
-
         # Predict
         y_pred = model.predict(X_new)
-        logging.debug(f"Model raw prediction: {y_pred}")
 
         # Convert numerical predictions to descriptive labels
         prediction_labels = []
@@ -102,20 +89,16 @@ def predict():
 
         # Prepare the final output to map categories to descriptive labels
         prediction_results = dict(zip(expected_features, prediction_labels))
-        logging.debug(f"Formatted prediction results: {prediction_results}")
 
         # Adjust predictions based on your rules
         adjusted_results = adjust_predictions_based_on_rules(prediction_results, normalized_categories)
-        logging.debug(f"Adjusted prediction results: {adjusted_results}")
 
         # Return the adjusted prediction results
         return jsonify({"predictions": adjusted_results})
 
     except ValueError as ve:
-        logging.error(f"ValueError: {ve}")
         return jsonify({"error": str(ve)}), 400
     except Exception as e:
-        logging.error(f"Unexpected error: {e}")
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 
 if __name__ == '__main__':
