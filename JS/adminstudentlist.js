@@ -668,8 +668,8 @@ function openEditModal(index, modalId = 'editCcnModal') {
       document.querySelector('#edit4WheelsModal .modal-body.second-section .student-info #studentName').textContent = `${studentData.personalInfo.first || ''} ${studentData.personalInfo.last || ''}`;
 
       // Populate vehicle type
-      if (studentData.assessmentData && studentData.assessmentData.vehicleType) {
-          document.getElementById('vehicleTypeSelected').textContent = studentData.assessmentData.vehicleType;
+      if (studentData.WassessmentData && studentData.WassessmentData.vehicleType) {
+          document.getElementById('vehicleTypeSelected').textContent = studentData.WassessmentData.vehicleType;
       } else {
           // Set default value
           document.getElementById('vehicleTypeSelected').textContent = 'Select Vehicle';
