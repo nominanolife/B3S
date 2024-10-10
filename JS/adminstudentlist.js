@@ -487,18 +487,29 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
           completedStudentData = completedStudentSnap.data(); // Fetch existing data
         }
 
-        // Add the new completed booking to the array
-        completedStudentData.completedBookings.push({
-          course: course,
-          completionDate: appointmentData.date, // Store appointment date as string
-        });
+        // Check if a booking with the same appointmentId and course already exists
+        const existingBookingIndex = completedStudentData.completedBookings.findIndex(
+          booking => booking.appointmentId === appointmentId && booking.course === course
+        );
+
+        if (existingBookingIndex >= 0) {
+          // Update the existing booking with the same appointmentId and course
+          completedStudentData.completedBookings[existingBookingIndex].completionDate = appointmentData.date;
+        } else {
+          // Add the new completed booking to the array
+          completedStudentData.completedBookings.push({
+            course: course,
+            completionDate: appointmentData.date, // Store appointment date as string
+            appointmentId: appointmentId // Use the unique appointment ID to differentiate appointments
+          });
+        }
 
         // Update the certificateControlNumber outside the completedBookings array
         completedStudentData.certificateControlNumber = appointmentData.certificateControlNumber || 'N/A';
 
         await setDoc(completedStudentRef, completedStudentData, { merge: true });
       } else {
-        await removeCompletedBooking(userId, course);
+        await removeCompletedBooking(userId, course, appointmentId);
       }
     }
   } catch (error) {
@@ -514,18 +525,26 @@ async function updateCompletedBookings(userId, bookingDetails) {
 
     if (completedBookingSnap.exists()) {
       const existingBookings = completedBookingSnap.data().completedBookings || [];
-      const courseIndex = existingBookings.findIndex(b => b.course === bookingDetails.course);
 
-      if (courseIndex !== -1) {
-        existingBookings[courseIndex] = bookingDetails;
+      // Find the booking by both course and appointmentId
+      const bookingIndex = existingBookings.findIndex(
+        b => b.course === bookingDetails.course && b.appointmentId === bookingDetails.appointmentId
+      );
+
+      if (bookingIndex !== -1) {
+        // Update the existing booking if both course and appointmentId match
+        existingBookings[bookingIndex] = bookingDetails;
       } else {
+        // Add a new booking if it doesn't exist
         existingBookings.push(bookingDetails);
       }
 
+      // Update the document with the new or updated bookings array
       await updateDoc(completedBookingRef, {
         completedBookings: existingBookings
       });
     } else {
+      // Create a new document with the first booking entry
       await setDoc(completedBookingRef, {
         completedBookings: [bookingDetails]
       });
@@ -534,30 +553,32 @@ async function updateCompletedBookings(userId, bookingDetails) {
     console.error("Error updating completed bookings: ", error);
   }
 }
-
 // Removing a completed booking if reverted
-async function removeCompletedBooking(userId, course) {
+async function removeCompletedBooking(userId, course, appointmentId) {
   try {
     const completedBookingRef = doc(db, "completedBookings", userId);
     const completedBookingSnap = await getDoc(completedBookingRef);
 
     if (completedBookingSnap.exists()) {
       let existingBookings = completedBookingSnap.data().completedBookings || [];
-      existingBookings = existingBookings.filter(b => b.course !== course);
+
+      // Filter out the booking with the matching course and appointmentId
+      existingBookings = existingBookings.filter(b => !(b.course === course && b.appointmentId === appointmentId));
 
       if (existingBookings.length > 0) {
+        // Update the document with the filtered completedBookings array
         await updateDoc(completedBookingRef, {
           completedBookings: existingBookings
         });
       } else {
-        await deleteDoc(completedBookingRef); // Delete the document if no bookings are left
+        // Delete the document if no bookings are left
+        await deleteDoc(completedBookingRef);
       }
     }
   } catch (error) {
     console.error("Error removing completed booking: ", error);
   }
 }
-
 
 function updatePaginationControls() {
   const paginationControls = document.querySelector('.pagination-controls');
