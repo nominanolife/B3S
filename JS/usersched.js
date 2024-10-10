@@ -153,9 +153,10 @@ async function fetchUserAppointments(userId) {
                         const currentDate = new Date();
                         const bookingStartDate = new Date(`${appointment.date}T${appointment.timeStart}:00.000Z`);
                         const bookingEndDate = new Date(`${appointment.date}T${appointment.timeEnd}:00.000Z`);
-        
+
                         // Ensure the progress is reflecting the latest status
                         if (booking.progress === 'Completed') {
+                            // Update the booking in the map instead of adding it again
                             activeBookingsMap.set(bookingKey, { appointment, booking, docId: doc.id });
                         } else if (bookingEndDate < currentDate) {
                             booking.progress = 'Completed';
@@ -174,74 +175,68 @@ async function fetchUserAppointments(userId) {
             updateAppointmentData(activeBookingsMap, appointmentsData, userId);
         });
 
-        // Real-time listener for completed bookings
         onSnapshot(completedBookingsParentRef, (completedSnapshot) => {
             console.log("Real-time update for completed bookings...");
-
+          
             if (completedSnapshot.exists()) {
-                const completedBookingDoc = completedSnapshot.data();
-                console.log("Processing Completed Bookings:", completedBookingDoc);
-
-                if (Array.isArray(completedBookingDoc.completedBookings)) {
-                    completedBookingDoc.completedBookings.forEach(booking => {
-                        const bookingKey = `${booking.date}_${booking.startTime}`;
-                        console.log("Completed Booking Key:", bookingKey, "Booking Data:", booking);
-
-                        if (!activeBookingsMap.has(bookingKey)) {
-                            appointmentsData.push({ appointment: booking, booking: booking, docId: completedSnapshot.id, isCompleted: true });
-                            console.log("Added Completed Booking to Appointments Data:", booking);
-                        } else {
-                            console.log("Skipped adding completed booking because an active booking exists for the same time slot:", bookingKey);
-                        }
-                    });
-                } else {
-                    console.log("No completed bookings array found in this document:", completedSnapshot.id);
-                }
+              const completedBookingDoc = completedSnapshot.data();
+              console.log("Processing Completed Bookings:", completedBookingDoc);
+          
+              if (Array.isArray(completedBookingDoc.completedBookings)) {
+                completedBookingDoc.completedBookings.forEach(booking => {
+                  const bookingKey = `${booking.date}_${booking.startTime}`;
+                  console.log("Completed Booking Key:", bookingKey, "Booking Data:", booking);
+          
+                  if (!activeBookingsMap.has(bookingKey)) {
+                    appointmentsData.push({ appointment: booking, booking: booking, docId: completedSnapshot.id, isCompleted: true });
+                    console.log("Added Completed Booking to Appointments Data:", booking);
+                  } else {
+                    console.log("Skipped adding completed booking because an active booking exists for the same time slot:", bookingKey);
+                  }
+                });
+              } else {
+                console.log("No completed bookings array found in this document:", completedSnapshot.id);
+              }
             }
-
+          
             updateAppointmentData(activeBookingsMap, appointmentsData, userId);
-        });
+          });
     } catch (error) {
         console.error("Error fetching appointments:", error);
     }
 }
 
 function updateAppointmentData(activeBookingsMap, appointmentsData, userId) {
-    // Ensure appointmentsData retains its values
     if (!appointmentsData) {
         appointmentsData = [];
     }
 
-    // Combine active bookings from map into the appointmentsData array
     const activeBookingsArray = Array.from(activeBookingsMap.values());
 
-    // Merge active and completed bookings
+    // Combine active bookings from map into the appointmentsData array
     appointmentsData = appointmentsData.concat(activeBookingsArray);
+
+    // Remove duplicate bookings from completedBookings by filtering out those already present in activeBookingsMap
+    appointmentsData = appointmentsData.filter(appointment => {
+        const bookingKey = `${appointment.date}_${appointment.startTime}`;
+        return !activeBookingsMap.has(bookingKey); // Only include bookings not present in activeBookingsMap
+    });
 
     // Clear the table body before rendering new rows
     appointmentsTableBody.innerHTML = "";
 
     // Check if there are no appointments
     if (appointmentsData.length === 0) {
-        // Display a default message when there are no schedules
         const noScheduleRow = document.createElement('tr');
         const noScheduleCell = document.createElement('td');
-        noScheduleCell.setAttribute('colspan', '7'); // Span all columns
-        noScheduleCell.classList.add('text-center'); // Center the text
+        noScheduleCell.setAttribute('colspan', '7');
+        noScheduleCell.classList.add('text-center');
         noScheduleCell.innerText = "No schedules yet.";
         noScheduleRow.appendChild(noScheduleCell);
         appointmentsTableBody.appendChild(noScheduleRow);
         return;
     }
 
-    // Sort appointments by date or other criteria as needed
-    appointmentsData.sort((a, b) => {
-        const dateA = new Date(`${a.appointment.date}T${a.appointment.timeStart}`);
-        const dateB = new Date(`${b.appointment.date}T${b.appointment.timeStart}`);
-        return dateA - dateB;
-    });
-
-    // Render each appointment row
     appointmentsData.forEach(({ appointment, booking, docId, isCompleted }) => {
         renderAppointmentRow(appointment, booking, docId, isCompleted);
     });
@@ -256,12 +251,12 @@ function renderAppointmentRow(appointment, booking, docId, isCompleted = false) 
     courseCell.innerText = appointment.course || '';
     row.appendChild(courseCell);
 
-    const { date } = parseDateTime(appointment.date || '', appointment.startTime || appointment.timeStart || '');
-    const startTime = parseDateTime(appointment.date || '', appointment.startTime || appointment.timeStart || '').time;
-    const endTime = parseDateTime(appointment.date || '', appointment.endTime || appointment.timeEnd || '').time;
+    const appointmentDate = appointment.date ? appointment.date : '';
+    const startTime = appointment.timeStart ? appointment.timeStart : '';
+    const endTime = appointment.timeEnd ? appointment.timeEnd : '';
 
     const dateCell = document.createElement('td');
-    dateCell.innerText = date;
+    dateCell.innerText = appointmentDate;
     row.appendChild(dateCell);
 
     const startTimeCell = document.createElement('td');

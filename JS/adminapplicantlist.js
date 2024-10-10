@@ -61,6 +61,55 @@ function renderApplicants() {
     document.getElementById('loader1').style.display = 'none';
 }
 
+// Function to send SMS using Infobip API
+async function sendSms(toPhoneNumber, messageText) {
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", "App ba75641591f862bc54203ea8d54981cb-01e251f1-6b6a-4cb7-95fc-421005602226"); // Ensure the API key is correct
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Accept", "application/json");
+
+    const raw = JSON.stringify({
+        "messages": [
+            {
+                "destinations": [{ "to": toPhoneNumber }],
+                "from": "DriveHub", // Set the sender (can be a phone number or name as registered in Infobip)
+                "text": messageText
+            }
+        ]
+    });
+
+    const requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    };
+
+    try {
+        const response = await fetch("https://qddq63.api.infobip.com/sms/2/text/advanced", requestOptions); // Use correct endpoint
+        const result = await response.text();
+        console.log("SMS sent successfully:", result);
+        alert("SMS sent successfully!");
+    } catch (error) {
+        console.error("Error sending SMS:", error);
+        alert("Failed to send SMS. Please try again.");
+    }
+}
+
+// Function to handle sending SMS from the modal
+document.getElementById('sendSmsBtn').addEventListener('click', function() {
+    const toPhoneNumber = document.getElementById('sms-to').value;
+    const messageText = document.getElementById('sms-message').value;
+
+    if (!messageText) {
+        alert("Please enter a message.");
+        return;
+    }
+
+    // Call the function to send SMS
+    sendSms(toPhoneNumber, messageText);
+});
+
 // Function to update pagination controls
 function updatePaginationControls() {
     const paginationControls = document.querySelector('.applicant-pagination-controls');

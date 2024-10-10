@@ -229,7 +229,6 @@ document.getElementById('saveBtn').addEventListener('click', async function() {
 });
 
 function renderStudents() {
-  const loader = document.getElementById('loader1');
   const studentList = document.getElementById('student-list');
   studentList.innerHTML = ''; // Clear the list before rendering new data
   
@@ -244,31 +243,49 @@ function renderStudents() {
       "PDC-4Wheels": student['PDC-4WheelsStatus'] || null,
       "PDC-Motors": student['PDC-MotorsStatus'] || null
     };
-
     const certificateControlNumber = student.certificateControlNumber || ''; // Default to empty string if undefined
 
-    const studentHtml = `
-        <tr class="table-row">
-            <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td> <!-- Handle missing names -->
-            <td class="table-row-content">${student.email}</td>
-            <td class="table-row-content">${student.phoneNumber || ''}</td>
-            <td class="table-row-content">${student.packageName || ''}</td> <!-- Handle missing package name -->
-            <td class="table-row-content package-price">&#8369; ${student.packagePrice || ''}</td> <!-- Handle missing price -->
-            ${renderCourseStatus('TDC', statuses.TDC, student.bookings)} <!-- Render TDC status -->
-            ${renderCourseStatus('PDC-4Wheels', statuses["PDC-4Wheels"], student.bookings)} <!-- Render 4-Wheels status -->
-            ${renderCourseStatus('PDC-Motors', statuses["PDC-Motors"], student.bookings)} <!-- Render Motors status -->
-            <td class="table-row-content">${certificateControlNumber}</td> <!-- Render Certificate Control Number -->
-            <td class="table-row-content">
-                <!-- Triple dot options -->
-                <i class="bi bi-three-dots" data-toggle="options" data-index="${index}"></i>
-                <div class="triple-dot-options" style="display: none;">
-                    <i class="option-dropdown" data-modal="editCcnModal" data-index="${index}">Certificate Control Number</i>
-                    <i class="option-dropdown" data-modal="edit4WheelsModal" data-index="${index}">4-Wheels Course Checklist</i>
-                    <i class="option-dropdown" data-modal="editMotorsModal" data-index="${index}">Motorcycle Course Checklist</i>
-                </div>
-            </td>
-        </tr>
+    // First row with completed courses
+    let studentHtml = `
+      <tr class="table-row">
+          <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td> <!-- Handle missing names -->
+          <td class="table-row-content">${student.email}</td>
+          <td class="table-row-content">${student.phoneNumber || ''}</td>
+          <td class="table-row-content">${student.packageName || ''}</td> <!-- Handle missing package name -->
+          <td class="table-row-content package-price">&#8369; ${student.packagePrice || ''}</td> <!-- Handle missing price -->
+          ${renderCourseStatus('TDC', statuses.TDC, student.bookings)} <!-- Render TDC status -->
+          ${renderCourseStatus('PDC-4Wheels', statuses["PDC-4Wheels"], student.bookings)} <!-- Render 4-Wheels status -->
+          ${renderCourseStatus('PDC-Motors', statuses["PDC-Motors"], student.bookings)} <!-- Render Motors status -->
+          <td class="table-row-content">${certificateControlNumber}</td> <!-- Render Certificate Control Number -->
+          <td class="table-row-content">
+              <!-- Triple dot options -->
+              <i class="bi bi-three-dots" data-toggle="options" data-index="${index}"></i>
+              <div class="triple-dot-options" style="display: none;">
+                  <i class="option-dropdown" data-modal="editCcnModal" data-index="${index}">Certificate Control Number</i>
+                  <i class="option-dropdown" data-modal="edit4WheelsModal" data-index="${index}">4-Wheels Course Checklist</i>
+                  <i class="option-dropdown" data-modal="editMotorsModal" data-index="${index}">Motorcycle Course Checklist</i>
+              </div>
+          </td>
+      </tr>
     `;
+
+    // Check for re-booked courses and add them as separate rows
+    student.bookings.forEach(booking => {
+      if (booking.status === "Booked") {
+        studentHtml += `
+          <tr class="table-row">
+              <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td> <!-- Keep student name -->
+              <td class="table-row-content">${student.email}</td> <!-- Same email -->
+              <td class="table-row-content">${student.phoneNumber || ''}</td> <!-- Same phone number -->
+              <td class="table-row-content">${student.packageName || ''}</td> <!-- Same package -->
+              <td class="table-row-content package-price">&#8369; ${student.packagePrice || ''}</td> <!-- Same price -->
+              ${renderCourseStatus(booking.course, null, [booking], true)} <!-- New booking row -->
+              <td class="table-row-content"></td> <!-- Empty Certificate Number for new booking -->
+              <td class="table-row-content"></td> <!-- Empty Action column for new booking -->
+          </tr>
+        `;
+      }
+    });
 
     studentList.insertAdjacentHTML('beforeend', studentHtml); // Append the generated HTML to the list
   });
@@ -276,11 +293,11 @@ function renderStudents() {
   setupStatusToggleListeners(); // Call this after rendering the student list
 }
 
-function renderCourseStatus(course, status, bookings = []) {
+function renderCourseStatus(course, status, bookings = [], isRebooked = false) {
   const today = new Date(); // Current date
   const booking = bookings.find(b => b.course === course);
   
-  if (booking) {
+  if (booking && !isRebooked) {
     const appointmentDate = new Date(booking.date);
     const isPastDate = appointmentDate < today;
 
@@ -307,6 +324,17 @@ function renderCourseStatus(course, status, bookings = []) {
         </td>
       `;
     }
+  } else if (isRebooked) {
+    return `
+      <td class="table-row-content">
+        <label class="status-label">
+          <input type="checkbox" class="status-toggle"
+                 data-booking-id="${booking?.appointmentId || ''}"
+                 data-user-id="${booking?.userId || ''}"
+                 data-column="${course}">
+        </label>
+      </td>
+    `;
   } else {
     return '<td class="table-row-content"></td>';
   }
@@ -410,15 +438,16 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
           if (isCompleted) {
             const completedBookingData = {
               course: course,
-              date: new Date().toISOString(),  // Store current completion date
+              date: appointmentData.date,  // Use the actual appointment date
               startTime: appointmentData.timeStart,
               endTime: appointmentData.timeEnd,
               progress: "Completed",
               status: "Completed",
               appointmentId: appointmentId
             };
-
+            
             await updateCompletedBookings(userId, completedBookingData);
+
 
             // Migrate to 'completedStudents' collection with completion date
             const completedStudentRef = doc(db, "completedStudents", userId);
