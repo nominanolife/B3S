@@ -112,44 +112,57 @@ function setupSearch() {
   });
 }
 
-// Render students on the page
 function renderStudents() {
-  const studentList = document.getElementById('student-list');
-  studentList.innerHTML = ''; // Clear previous data
+    const studentList = document.getElementById('student-list');
+    studentList.innerHTML = ''; // Clear previous data
+  
+    // Use either the filtered data or all students if no search term is applied
+    const studentsToRender = filteredStudentsData.length > 0 ? filteredStudentsData : studentsData;
+  
+    // Render students according to the current page
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const studentsOnPage = studentsToRender.slice(start, end);
+  
+    studentsOnPage.forEach(student => {
+      const completedBookings = student.completedBookings || []; // Get the completed bookings array
+      const certificateControlNumber = student.certificateControlNumber || 'N/A'; // Get the CTC outside the array
+  
+      if (completedBookings.length === 0) {
+        // If no bookings, show a single row with 'N/A'
+        studentList.innerHTML += `
+          <tr class="table-row">
+            <td class="table-row-content">${student.name || 'N/A'}</td>
+            <td class="table-row-content">${student.email || 'N/A'}</td>
+            <td class="table-row-content">${student.phoneNumber || 'N/A'}</td>
+            <td class="table-row-content">${student.packageName || 'N/A'}</td>
+            <td class="table-row-content package-price">${student.packagePrice || 'N/A'}</td>
+            <td class="table-row-content" colspan="4" class="text-center">No completed bookings available</td>
+          </tr>
+        `;
+      } else {
+        // Loop through each booking and render a row for each completed booking
+        completedBookings.forEach(booking => {
+          const formattedCompletionDate = formatCompletionDate(booking.completionDate); // Format date
+  
+          studentList.innerHTML += `
+            <tr class="table-row">
+              <td class="table-row-content">${student.name || 'N/A'}</td>
+              <td class="table-row-content">${student.email || 'N/A'}</td>
+              <td class="table-row-content">${student.phoneNumber || 'N/A'}</td>
+              <td class="table-row-content">${student.packageName || 'N/A'}</td>
+              <td class="table-row-content package-price">${student.packagePrice || 'N/A'}</td>
+              <td class="table-row-content">${booking.course || 'N/A'}</td> <!-- Course name -->
+              <td class="table-row-content">Completed</td> <!-- Automatically labeled as Completed -->
+              <td class="table-row-content">${certificateControlNumber}</td> <!-- CTC from outside the array -->
+              <td class="table-row-content">${formattedCompletionDate}</td> <!-- Completion Date -->
+            </tr>
+          `;
+        });
+      }
+    });
+  }
 
-  // Use either the filtered data or all students if no search term is applied
-  const studentsToRender = filteredStudentsData.length > 0 ? filteredStudentsData : studentsData;
-
-  // Render students according to the current page
-  const start = (currentPage - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  const studentsOnPage = studentsToRender.slice(start, end);
-
-  studentsOnPage.forEach(student => {
-    const formattedCompletionDate = formatCompletionDate(student.completionDate); // Format date as necessary
-
-    studentList.innerHTML += `
-      <tr class="table-row">
-        <td class="table-row-content">${student.name}</td>
-        <td class="table-row-content">${student.email || 'N/A'}</td>
-        <td class="table-row-content">${student.phoneNumber || 'N/A'}</td>
-        <td class="table-row-content">${student.packageName || 'N/A'}</td>
-        <td class="table-row-content package-price">${student.packagePrice || 'N/A'}</td>
-        <td class="table-row-content">
-          <input type="checkbox" ${student.courses.TDC === 'Completed' ? 'checked' : ''} disabled>
-        </td>
-        <td class="table-row-content">
-          <input type="checkbox" ${student.courses["PDC-4Wheels"] === 'Completed' ? 'checked' : ''} disabled>
-        </td>
-        <td class="table-row-content">
-          <input type="checkbox" ${student.courses["PDC-Motors"] === 'Completed' ? 'checked' : ''} disabled>
-        </td>
-        <td class="table-row-content">${student.certificateControlNumber || 'N/A'}</td>
-        <td class="table-row-content">${formattedCompletionDate}</td>
-      </tr>
-    `;
-  });
-}
 function filterByYear(selectedYear) {
     // Reset the current page to 1 when filtering
     currentPage = 1;
