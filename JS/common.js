@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -26,13 +26,7 @@ function disableLinks() {
     ];
 
     linksToDisable.forEach(link => {
-        const anchor = document.querySelector(`a[href="${link}"]`);
-        if (anchor) {
-            anchor.classList.add('disabled-link');
-            anchor.style.pointerEvents = 'none';  // Make the link unclickable
-            anchor.style.color = 'gray';  // Change color to indicate it's disabled
-            anchor.style.cursor = 'default';  // Change cursor to default
-        }
+        disableLink(link);
     });
     // Store the state in local storage
     localStorage.setItem('linksState', 'disabled');
@@ -48,26 +42,56 @@ function enableLinks() {
     ];
 
     linksToEnable.forEach(link => {
-        const anchor = document.querySelector(`a[href="${link}"]`);
-        if (anchor) {
-            anchor.classList.remove('disabled-link');
-            anchor.style.pointerEvents = 'auto';  // Make the link clickable again
-            anchor.style.color = '';  // Reset color
-            anchor.style.cursor = 'pointer';  // Change cursor back to pointer
-        }
+        enableLink(link);
     });
     // Store the state in local storage
     localStorage.setItem('linksState', 'enabled');
 }
 
-// Function to check the stored links state and apply it
-function applyStoredLinksState() {
-    const storedState = localStorage.getItem('linksState');
-    if (storedState === 'enabled') {
-        enableLinks();
-    } else {
-        disableLinks();
+// Functions to enable or disable a single link and store its state
+function enableLink(link) {
+    const anchor = document.querySelector(`a[href="${link}"]`);
+    if (anchor) {
+        anchor.classList.remove('disabled-link');
+        anchor.style.pointerEvents = 'auto';
+        anchor.style.color = '';
+        anchor.style.cursor = 'pointer';
     }
+    // Store the state in local storage
+    localStorage.setItem(`linkState_${link}`, 'enabled');
+}
+
+function disableLink(link) {
+    const anchor = document.querySelector(`a[href="${link}"]`);
+    if (anchor) {
+        anchor.classList.add('disabled-link');
+        anchor.style.pointerEvents = 'none';
+        anchor.style.color = 'gray';
+        anchor.style.cursor = 'default';
+    }
+    // Store the state in local storage
+    localStorage.setItem(`linkState_${link}`, 'disabled');
+}
+
+// Function to apply the stored links state
+function applyStoredLinksState() {
+    const links = [
+        'usermodule.html',
+        'uservideolearning.html',
+        'userquiz.html',
+        'userappointment.html',
+        'useronlinetdc.html',
+        'userinstructorreminder.html'
+    ];
+
+    links.forEach(link => {
+        const storedState = localStorage.getItem(`linkState_${link}`);
+        if (storedState === 'enabled') {
+            enableLink(link);
+        } else {
+            disableLink(link);
+        }
+    });
 }
 
 // Apply the stored links state immediately on page load
@@ -100,26 +124,46 @@ function setupButtons() {
 
 // Check user role and disable links if needed
 function checkUserRole() {
-    onAuthStateChanged(auth, async function(user) {
+    onAuthStateChanged(auth, function(user) {
         if (user) {
             try {
                 const userDocRef = doc(db, "applicants", user.uid);
-                const docSnap = await getDoc(userDocRef);
-                if (docSnap.exists()) {
-                    const userData = docSnap.data();
-                    const userRole = userData.role;
+                // Set up a real-time listener on the user's document
+                onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        const userRole = userData.role;
 
-                    // Disable links based on user role
-                    if (userRole !== "student") {
-                        disableLinks();
+                        // Disable or enable links based on user role
+                        if (userRole !== "student") {
+                            disableLinks();
+                        } else {
+                            enableLinks();
+                        }
+
+                        const packageType = userData.packageType;  // Adjust this based on your data structure
+
+                        // Enable or disable 'useronlinetdc.html' based on 'TDC' in packageType
+                        if (packageType && packageType.includes('TDC')) {
+                            enableLink('useronlinetdc.html');
+                        } else {
+                            disableLink('useronlinetdc.html');
+                        }
+
+                        // Enable or disable 'userinstructorreminder.html' based on 'PDC' in packageType
+                        if (packageType && packageType.includes('PDC')) {
+                            enableLink('userinstructorreminder.html');
+                        } else {
+                            disableLink('userinstructorreminder.html');
+                        }
                     } else {
-                        enableLinks();
+                        console.error("No such document!");
                     }
-                } else {
-                    console.error("No such document!");
-                }
+                }, (error) => {
+                    console.error("Error getting document:", error);
+                });
             } catch (error) {
-                console.error("Error getting document:", error);
+                console.error("Error setting up snapshot listener:", error);
             }
         } else {
             console.error("No user is currently signed in.");
