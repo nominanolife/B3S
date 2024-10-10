@@ -287,11 +287,6 @@ h2 {
     background: none;
 }
 
-.table th.package-price, .table td.package-price {
-    text-align: center;
-    vertical-align: middle;
-}
-
 .table th {
     font-family: Poppins;
     font-size: 12px;

@@ -22,9 +22,24 @@ let userCache = null;
 
 // Function to update PDC state in the UI
 $(document).ready(function () {
-  // Apply stored PDC state immediately after the DOM is ready
+  // Apply stored PDC and TDC state immediately after the DOM is ready
   applyStoredPDCState();
+  applyStoredTDCState();
+
+  // Attach event listener to the appointment navigation button
+  $('#appointment-btn').on('click', function (e) {
+    if (localStorage.getItem('pdcState') !== 'enabled' || localStorage.getItem('tdcState') !== 'enabled') {
+      e.preventDefault(); // Prevent navigation
+      alert("You must enroll in both TDC and PDC packages to proceed to the appointment.");
+    }
+  });
 });
+
+// Function to apply stored TDC state
+function applyStoredTDCState() {
+  const storedState = localStorage.getItem('tdcState');
+  updateTDCState(storedState === 'enabled');
+}
 
 // Function to update PDC state in the UI with popover handling
 function updatePDCState(enabled) {
@@ -48,7 +63,7 @@ function updatePDCState(enabled) {
       trigger: 'manual',
       html: true,
       placement: 'bottom',
-      content: 'You must avail PDC package to unlock this feature.'
+      content: 'You must enroll in a package that includes PDC to unlock this feature.'
     });
 
     // Show popover on hover
@@ -91,11 +106,51 @@ async function fetchUserData(userId) {
   }
 }
 
-// Function to determine PDC status based on TDC completion and package type
+// Function to update TDC state in the UI with popover handling
+function updateTDCState(enabled) {
+  const tdcElement = $('.tdc');
+  
+  if (enabled) {
+    tdcElement.removeClass('disabled-link');
+    console.log("TDC Enabled");
+    localStorage.setItem('tdcState', 'enabled');
+
+    // Remove the popover and event handlers
+    tdcElement.popover('dispose');
+    tdcElement.off('mouseenter mouseleave click');
+  } else {
+    tdcElement.addClass('disabled-link');
+    console.log("TDC Disabled");
+    localStorage.setItem('tdcState', 'disabled');
+
+    // Initialize popover
+    tdcElement.popover({
+      trigger: 'manual',
+      html: true,
+      placement: 'bottom',
+      content: 'You must enroll in a package that includes TDC to unlock this feature.'
+    });
+
+    // Show popover on hover
+    tdcElement.on('mouseenter', function () {
+      $(this).popover('show');
+    }).on('mouseleave', function () {
+      $(this).popover('hide');
+    });
+
+    // Prevent default action on click
+    tdcElement.on('click', function (e) {
+      e.preventDefault();
+    });
+  }
+}
+
+// Modify determinePDCStatus to also check for TDC package
 async function determinePDCStatus(userId) {
   const userData = await fetchUserData(userId);
   if (!userData) {
     updatePDCState(false); // Disable if no user data found
+    updateTDCState(false); // Also disable TDC
     return;
   }
 
@@ -116,9 +171,55 @@ async function determinePDCStatus(userId) {
   } else {
     updatePDCState(false);
   }
+
+  // Check for TDC package and enable/disable TDC accordingly
+  if (packageType.includes("TDC")) {
+    updateTDCState(true); // Enable if the user has a TDC package
+  } else {
+    updateTDCState(false); // Disable if no TDC package
+  }
 }
 
-// Function to monitor active TDC progress using Firestore snapshots
+/// Modify determinePDCStatus to enable both TDC and PDC simultaneously if the package includes both
+async function determinePDCAndTDCStatus(userId) {
+  const userData = await fetchUserData(userId);
+  if (!userData) {
+    updatePDCState(false); // Disable if no user data found
+    updateTDCState(false); // Also disable TDC
+    return;
+  }
+
+  const packageType = userData.packageType || [];
+
+  // Check completed bookings for TDC
+  const completedBookingDocRef = doc(db, "completedBookings", userId);
+  const completedBookingDoc = await getDoc(completedBookingDocRef);
+  const completedBookings = completedBookingDoc.exists() ? completedBookingDoc.data().completedBookings || [] : [];
+
+  const hasCompletedTDC = completedBookings.some(
+    (booking) => booking.course === "TDC" && booking.progress === "Completed"
+  );
+
+  // Check if both PDC and TDC are part of the package
+  const hasPDCInPackage = packageType.includes("PDC");
+  const hasTDCInPackage = packageType.includes("TDC");
+
+  // Enable PDC if TDC is completed or user has a PDC package
+  if (hasCompletedTDC || hasPDCInPackage) {
+    updatePDCState(true);
+  } else {
+    updatePDCState(false);
+  }
+
+  // Enable TDC if the package includes TDC or if TDC has been completed
+  if (hasTDCInPackage || hasCompletedTDC) {
+    updateTDCState(true);
+  } else {
+    updateTDCState(false);
+  }
+}
+
+// Modify monitorActiveBookings to handle both TDC and PDC
 async function monitorActiveBookings(userId) {
   const appointmentsRef = collection(db, "appointments");
 
@@ -136,9 +237,10 @@ async function monitorActiveBookings(userId) {
 
     if (tdcCompleted) {
       console.log("TDC is completed in active bookings!");
-      updatePDCState(true); // Enable PDC if TDC is completed
+      updateTDCState(true); // Enable TDC if completed
+      updatePDCState(true); // Simultaneously check PDC as TDC is a prerequisite
     } else {
-      await determinePDCStatus(userId); // Check completed bookings and package type
+      await determinePDCAndTDCStatus(userId); // Check completed bookings and package types for both courses
     }
   });
 }
@@ -147,10 +249,11 @@ async function monitorActiveBookings(userId) {
 onAuthStateChanged(auth, (user) => {
   if (user) {
     const userId = user.uid;
-    determinePDCStatus(userId); // Check user's enrolled package and completed bookings
+    determinePDCAndTDCStatus(userId); // Check user's enrolled package and completed bookings for both PDC and TDC
     monitorActiveBookings(userId); // Monitor TDC progress in real-time
   } else {
     console.log("No user is signed in.");
     updatePDCState(false); // Ensure PDC is disabled if no user is signed in
+    updateTDCState(false); // Ensure TDC is disabled if no user is signed in
   }
 });
