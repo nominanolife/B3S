@@ -53,30 +53,41 @@ async function fetchQuizQuestions() {
 
             // Insert Category Header
             quizList.insertAdjacentHTML('beforeend', `
-                <div class="header-container">
-                    <h3 class="category-title">${category}</h3>
-                    <label for="selectAll${index}" class="select-all-label">
-                        <input type="checkbox" id="selectAll${index}" name="select_all_${index}" class="select-all-checkbox" data-quiz-id="${quizDoc.id}"> Select All
-                    </label>
-                </div>
-                <div class="container-box" id="category-${index}">
+                <div class="container-wrapper-wrap">
+                    <div class="header-container">
+                        <h3 class="category-title">${category}</h3>
+                        <label for="selectAll${index}" class="custom-checkbox">
+                            <input type="checkbox" id="selectAll${index}" name="select_all_${index}" class="select-all-checkbox" data-quiz-id="${quizDoc.id}"> 
+                            <span class="checkbox-label">Select All</span>
+                        </label>
+                    </div>
+                    <div class="container-box" id="category-${index}"></div>
                 </div>
             `);
 
             const categoryBox = document.getElementById(`category-${index}`);
+
+            // Check if all questions in the category are active
+            let allActive = true;
 
             quizDoc.data.questions.forEach((question, questionIndex) => {
                 const optionsHTML = question.options.map((option, i) => `
                     <p>${String.fromCharCode(65 + i)}. ${option.value}</p>
                 `).join('');
 
+                // If any question is inactive, the "Select All" checkbox should not be checked
+                if (!question.active) {
+                    allActive = false;
+                }
+
                 // Render each question with its active status (checked if active)
                 categoryBox.insertAdjacentHTML('beforeend', `
                     <div class="question">
                         <div class="question-header">
                             <p>Question ${questionIndex + 1}: ${question.question}</p>
-                            <label class="select-all-label">
+                            <label class="custom-checkbox">
                                 <input type="checkbox" name="select_${category}_${questionIndex}" class="question-checkbox" data-quiz-id="${quizDoc.id}" data-question-index="${questionIndex}" ${question.active ? 'checked' : ''}> 
+                                <span class="checkbox-label"></span>
                             </label>
                         </div>
                         <div class="options">
@@ -85,7 +96,14 @@ async function fetchQuizQuestions() {
                     </div>
                 `);
             });
+
+            // Set the "Select All" checkbox based on whether all questions are active
+            const selectAllCheckbox = document.getElementById(`selectAll${index}`);
+            selectAllCheckbox.checked = allActive;
         });
+
+        // Add the footer dynamically after questions are rendered
+        addFooterWithPublishButton();
 
         // Event listener for individual "Select All" in each category
         document.querySelectorAll('.select-all-checkbox').forEach((selectAllCheckbox) => {
@@ -120,7 +138,21 @@ function trackQuestionChange(quizId, questionIndex, isActive) {
 function setupCheckboxListeners() {
     document.querySelectorAll('.question-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', (event) => {
-            trackQuestionChange(checkbox.dataset.quizId, checkbox.dataset.questionIndex, checkbox.checked);
+            const quizId = checkbox.dataset.quizId;
+            const questionIndex = checkbox.dataset.questionIndex;
+
+            // Track changes to the specific question
+            trackQuestionChange(quizId, questionIndex, checkbox.checked);
+
+            // Find the associated 'Select All' checkbox for this category
+            const selectAllCheckbox = document.querySelector(`.select-all-checkbox[data-quiz-id="${quizId}"]`);
+
+            // Check if all checkboxes in the category are still checked
+            const checkboxes = document.querySelectorAll(`.question-checkbox[data-quiz-id="${quizId}"]`);
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+
+            // Update 'Select All' checkbox based on individual checkbox states
+            selectAllCheckbox.checked = allChecked;
         });
     });
 }
@@ -159,24 +191,58 @@ async function applyChangesToFirestore() {
     changesToApply = {};
 }
 
-// Setup publish button with batch write functionality
+// Function to dynamically add the footer and publish button
+function addFooterWithPublishButton() {
+    // Create footer element
+    const footer = document.createElement('div');
+    footer.classList.add('footer');
+
+    // Create publish button
+    const publishButton = document.createElement('button');
+    publishButton.type = 'button';
+    publishButton.classList.add('publish-btn');
+    publishButton.innerText = 'Publish';
+
+    // Append button to footer
+    footer.appendChild(publishButton);
+
+    // Append footer to the main-content or wherever you want it in your page structure
+    const mainContent = document.querySelector('.page-content');
+    if (mainContent) {
+        mainContent.appendChild(footer);  // Add footer dynamically
+    }
+
+    // Setup publish button functionality
+    setupPublishButton();  // This function handles the publish logic
+}
+
+// Setup publish button with confirmation modal functionality
 function setupPublishButton() {
     const publishButton = document.querySelector('.publish-btn');
+    const confirmationModalElement = document.getElementById('confirmationModal');
+    const confirmationModal = new bootstrap.Modal(confirmationModalElement); // Initialize Bootstrap modal
+    const confirmPublishButton = document.getElementById('confirmButton');
+
     if (!publishButton) {
         console.error("Publish button not found");
         return;
     }
 
-    publishButton.addEventListener('click', async () => {
+    // Open the confirmation modal when the publish button is clicked
+    publishButton.addEventListener('click', () => {
+        confirmationModal.show();  // Show the confirmation modal
+    });
+
+    // Confirm action: Apply changes to Firestore
+    confirmPublishButton.addEventListener('click', async () => {
         try {
             // Apply all tracked changes to Firestore using batch
             await applyChangesToFirestore();
             console.log("Changes applied successfully.");
         } catch (error) {
             console.error("Error applying batch changes:", error);
+        } finally {
+            confirmationModal.hide();  // Hide modal after confirmation
         }
     });
 }
-
-// Initialize the publish button with batch update functionality
-setupPublishButton();

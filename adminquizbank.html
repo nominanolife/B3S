@@ -42,62 +42,52 @@
         <div class="main-content">
             <div class="page-content">
                 <div class="button-container">
-                    <button class="back-btn" onclick="window.location.href='adminonlinetdc.html'">
-                        <i class="fas fa-arrow-left"></i> <!-- Font Awesome back arrow icon -->
-                    </button>
-                    <label for="selectAll0" class="select-all-label">
-                        <input type="checkbox" id="selectAll0" name="select_all_0" class="select-all-checkbox">
-                        <span>Select All</span>
-                    </label>
+                    <h3>Quiz Bank</h3>
                 </div>
-                
                 <div class="container-wrapper">
-                    <!-- Container for dynamically generated categories and questions -->
-                    <div id="quiz-container"></div>
-                </div>
-    
-                <!-- Footer -->
-                <div class="footer">
-                    <button type="button" class="publish-btn">Publish</button>
-                </div>
-            </div>
-    
-            <!-- Publish Modal -->
-            <div class="modal" id="publishModal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Confirm Publish</h5>
-                        </div>
-                        <div class="modal-body">
-                            <p>Are you sure you want to publish the quiz?</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn-primary btn-yes">Yes</button>
-                            <button type="button" class="btn-secondary btn-cancel" id="closeModal">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Warning Modal -->
-            <div class="modal" id="warningModal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Warning</h5>
-                            <button type="button" class="close" id="closeWarningModal">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <p>You must select at least one checkbox before publishing the quiz.</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn-secondary" id="closeWarningModal">OK</button>
-                        </div>
+                    <div class="container-wrapper-wrap">
+                        
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm publish</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to publish?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confirmButton">Confirm</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div class="modal" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body" id="notificationModalBody">
+                    <!-- Message will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Logout Confirmation Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -109,8 +99,8 @@
                     Are you sure you want to logout?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary btn-logout" id="confirmLogoutBtn">Logout</button>
-                    <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary btn-logout" id="confirmLogoutBtn">Logout</button>
+                    <button type="button" class="btn btn-primary btn-cancel" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
