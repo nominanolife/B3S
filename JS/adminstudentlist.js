@@ -709,7 +709,7 @@ function openEditModal(index, modalId = 'editCcnModal') {
 
       // Populate checklist data if it exists
       if (studentData.Wchecklist) {
-          const checklist = studentData.checklist;
+          const checklist = studentData.Wchecklist;
           for (const [fieldId, value] of Object.entries(checklist)) {
               const checkbox = document.getElementById(fieldId);
               if (checkbox) {
