@@ -169,8 +169,11 @@ function filterByYear(selectedYear) {
 
   // Filter the studentsData array by the selected year
   filteredStudentsData = studentsData.filter(student => {
-    const completionDate = student.completionDate ? new Date(student.completionDate) : null;
-    return completionDate && completionDate.getFullYear() === selectedYear;
+    const completedBookings = student.completedBookings || []; // Get completed bookings array
+    return completedBookings.some(booking => {
+      const completionDate = booking.completionDate ? new Date(booking.completionDate) : null;
+      return completionDate && completionDate.getFullYear() === selectedYear;
+    });
   });
 
   totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
@@ -258,22 +261,44 @@ function exportListToPDF() {
   // Define the columns for the table in the PDF
   const columns = [
     "NAME", "EMAIL", "PHONE NUMBER", "ENROLLED PACKAGE", 
-    "PACKAGE PRICE", "CERTIFICATE CONTROL NUMBER", "RECORDED DATE"
+    "PACKAGE PRICE","COURSE", "STATUS", "CERTIFICATE CONTROL NUMBER", "APPOINTMENT DATE"
   ];
 
   // Get the data from the studentsData or filteredStudentsData
   const studentsToExport = filteredStudentsData.length > 0 ? filteredStudentsData : studentsData;
 
   // Map student data to an array of rows for the PDF
-  const rows = studentsToExport.map(student => [
-    student.name || 'N/A',
-    student.email || 'N/A',
-    student.phoneNumber || 'N/A',
-    student.packageName || 'N/A',
-    student.packagePrice || 'N/A',
-    student.certificateControlNumber || 'N/A',
-    formatCompletionDate(student.completionDate) || 'N/A'
-  ]);
+  const rows = studentsToExport.map(student => {
+    const completedBookings = student.completedBookings || []; // Ensure we loop through completed bookings
+
+    // If there are completed bookings, add a row for each one
+    if (completedBookings.length > 0) {
+      return completedBookings.map(booking => [
+        student.name || 'N/A',
+        student.email || 'N/A',
+        student.phoneNumber || 'N/A',
+        student.packageName || 'N/A',
+        student.packagePrice || 'N/A',
+        booking.course || 'N/A',  // Add course name here
+        'Completed',  // Status is always 'Completed'
+        student.certificateControlNumber || 'N/A',  // CTC field
+        formatCompletionDate(booking.completionDate) || 'N/A'  // Add formatted appointment date here
+      ]);
+    } else {
+      // If no completed bookings, still include the student info, but with placeholders for booking info
+      return [[
+        student.name || 'N/A',
+        student.email || 'N/A',
+        student.phoneNumber || 'N/A',
+        student.packageName || 'N/A',
+        student.packagePrice || 'N/A',
+        'N/A',  // No course
+        'N/A',  // No status
+        student.certificateControlNumber || 'N/A',
+        'N/A'  // No completion date
+      ]];
+    }
+  }).flat();  // Flatten the array to handle multiple bookings per student
 
   // Calculate the center of the page for the title text
   const pageWidth = doc.internal.pageSize.getWidth();

@@ -790,9 +790,6 @@ h2 {
     vertical-align: middle;
 }
 
-.evaluation-table th:nth-child(2), .evaluation-table th:nth-child(3) {
-    text-align: center;
-}
 
 .evaluation-table td input {
     padding: 5px;
