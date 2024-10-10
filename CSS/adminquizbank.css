@@ -1,0 +1,387 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif; /* Set Poppins as the default font */
+    scrollbar-width: thin; /* Makes the scrollbar thinner */
+    scrollbar-color: #142A74 #f1f1f1; /* Thumb color and track color */
+}
+
+.whole-page {
+    display: flex;
+    flex-direction: row;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    height: 100vh;
+    padding: 30px;
+    background-color: #ffffff;
+    border-right: 1px solid #D9D9D9;
+}
+
+.sidebar-content {
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.b3slogo {
+    width: 55px;
+    height: 55px;
+}
+
+.brand-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #2F2E2E;
+}
+
+.brand-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.sidebar-dashboard {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    padding: 20px 0;
+}
+
+.sidebar-dashboard a {
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #2F2E2E;
+    padding: 20px 30px;
+}
+
+.sidebar-dashboard a:hover {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.sidebar-dashboard::after {
+    content: "";
+    display: block;
+    margin-top: 20px;
+    border-bottom: 1px solid #D9D9D9;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-menu a {
+    font-size: 14px;
+    font-weight: normal;
+    text-decoration: none;
+    color: #2F2E2E;
+    margin-top: 20px;
+    padding: 20px 30px;
+}
+
+.sidebar-menu a:hover {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.sidebar-menu::after {
+    content: "";
+    display: block;
+    margin-top: 20px;
+    border-bottom: 1px solid #D9D9D9;
+}
+
+.sidebar-dashboard i, .sidebar-menu i, .sidebar-learning i, .sidebar-account i {
+    margin-right: 10px;
+}
+
+.sidebar-learning {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-learning a {
+    font-size: 14px;
+    font-weight: normal;
+    text-decoration: none;
+    color: #2F2E2E;
+    margin-top: 20px;
+    padding: 20px 30px;
+}
+
+.sidebar-learning a:hover {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.sidebar-learning::after {
+    content: "";
+    display: block;
+    margin-top: 20px;
+    border-bottom: 1px solid #D9D9D9;
+}
+
+.sidebar-account {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar a.active, .sidebar button.active {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.profile, .logout {
+    border: none;
+    background: none;
+    font-size: 14px;
+    font-weight: normal;
+    text-decoration: none;
+    text-align: left;
+    margin-top: 20px;
+    padding: 20px 30px;
+}
+
+.profile:hover, .logout:hover {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 300px);
+    margin-left: 300px;
+}
+
+.page-content {
+    padding: 30px;
+    background-color: #f5f5f5;
+    height: 100vh;
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; 
+    overflow-y: auto; 
+}
+
+.button-container {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between items to align left and right */
+    align-items: center; /* Center items vertically */
+    margin-bottom: 20px; /* Optional: space below the button container */
+}
+
+.back-btn {
+    background: none; /* No background */
+    color: #142A74; /* Arrow color */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor */
+    font-size: 16px; /* Font size */
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
+}
+
+.back-btn i {
+    margin-right: 8px; /* Space between the icon and text */
+}
+
+.select-all-label {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    margin-left: auto; /* Push this label to the far right */
+}
+
+.select-all-checkbox {
+    margin-right: 8px; /* Space between checkbox and label */
+    cursor: pointer; /* Pointer cursor for checkbox */
+}
+
+.select-all-checkbox:checked {
+    accent-color: #142A74; /* Change the checkbox color when checked */
+}
+
+.select-all-label span {
+    font-family: 'Poppins', sans-serif; /* Font family */
+    font-size: 16px; /* Font size */
+    color: #142A74; /* Text color */
+}
+
+
+.container-box {
+    position: relative; /* Set the parent container to relative positioning */
+    background-color: #fff; /* Background color for the container */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 20px; /* Padding inside the container */
+    margin: 20px; /* Margin around the container */
+    height: 300px; /* Set a specific height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border: 1px solid #d9d9d9; /* Optional: Add a border for visibility */
+    padding: 10px; /* Optional: Add some padding */
+    border-radius: 5px; /* Optional: Rounded corners */
+    
+}
+
+.container-wrapper {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack child elements vertically */
+}
+
+.header-container {
+    display: flex; /* Align items horizontally */
+    justify-content: space-between; /* Space between items to align them left and right */
+    align-items: center; /* Center items vertically */
+    margin-top: 30px; /* Adjust this value to lower the header */
+}
+
+.category-title {
+    margin: 0; /* Remove margin to keep it aligned */
+}
+
+.question {
+    margin-top: 10px; /* Space above the question */
+}
+
+h3 {
+    color: #142A74; /* Color for the category title */
+    font-family: Poppins; /* Ensure font is Poppins */
+    font-size: 20px; /* Set the desired font size */
+    margin: 0; /* Remove margin to avoid unnecessary space */
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: normal;
+    color: #142A74;
+}
+
+.question-header {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between question text and checkbox */
+    align-items: center; /* Align items vertically centered */
+}
+
+.publish-btn {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.publish-btn:hover {
+    background-color: #1B3286;
+}
+
+/* Modal styles */
+.modal-header {
+    border: none;
+}
+
+.modal-body {
+    font-size: 14px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-primary {
+    background-color: #1B3286;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-secondary {
+    background-color: #7B1719;
+    color: #ffffff;
+}
+
+.btn-secondary:hover {
+    background-color: #c9302c;
+}
+
+.close {
+    font-size: 24px;
+    color: #142A74;
+}
+
+/* Additional styles for improved layout */
+.container {
+    padding: 20px; /* Space inside the container */
+}
+
+.modal-header, .modal-body, .input-body, .modal-footer {
+    border: none;
+}
+
+.modal-header h5{
+    color: #142A74;
+    font-family: Poppins;
+    font-weight: bold;
+}
+
+.modal-dialog {
+    top: 30%;
+    left: 5%;
+    border-radius: 20px;
+}
+
+.modal-content {
+    font-family: Poppins;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+}
+
+/* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+    background-color: #f1f1f1; /* Background color of the scrollbar track */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background of the scrollbar track */
+    border-radius: 10px; /* Rounded corners for the track */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #142A74; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners for the thumb */
+    border: 3px solid #f1f1f1; /* Adds padding around the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d; /* Darker color on hover */
+}
