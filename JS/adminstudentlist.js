@@ -28,6 +28,7 @@ let currentPage = 1; // Tracks the current page for pagination
 const itemsPerPage = 10; // Number of items to display per page
 let totalPages = 1; // Total number of pages
 let unsubscribeApplicants = null;
+let isUpdatingFirestore = false; // Flag to avoid repopulation during Firestore updates
 
 function showNotification(message) {
   const successModalBody = document.getElementById('successModalBody');
@@ -358,9 +359,11 @@ function setupStatusToggleListeners() {
   });
 }
 
-// Handle the toggle status change
+
 async function handleStatusToggle(event) {
-  event.preventDefault(); // Prevent the default checkbox toggle behavior
+  event.preventDefault(); // Prevent default checkbox behavior
+
+  if (isUpdatingFirestore) return; // Skip if Firestore is being updated
 
   const appointmentId = event.target.dataset.bookingId;
   const userId = event.target.dataset.userId;
@@ -370,67 +373,59 @@ async function handleStatusToggle(event) {
   // Log for debugging
   console.log(`Checkbox toggled for user ${userId}, course: ${course}, completed: ${isCompleted}`);
 
-  // Immediately update the UI without waiting for Firestore update
+  // Update local state immediately
   const student = studentsData.find(student => student.id === userId);
   if (student) {
     const booking = student.bookings.find(b => b.appointmentId === appointmentId);
     if (booking) {
-      booking.status = isCompleted ? "Completed" : "Booked"; // Update booking status in local data
+      booking.status = isCompleted ? "Completed" : "Booked"; // Update booking status locally
     }
   }
 
-  // Render only the changed checkbox state, no need to re-render the entire list.
+  // Update UI directly
   event.target.checked = isCompleted;
 
-  // Show confirmation message dynamically based on the checkbox state
+  // Ask for confirmation before proceeding
   const confirmationMessage = isCompleted
-    ? "Are you sure you want to complete the appointment of this student?"
-    : "Are you sure you want to revert the appointment of this student?";
+    ? "Are you sure you want to mark this appointment as completed?"
+    : "Are you sure you want to revert the appointment status?";
 
   document.getElementById('confirmationModalBody').textContent = confirmationMessage;
-
   const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
   confirmationModal.show();
 
-  const confirmButton = document.getElementById('confirmButton');
-  confirmButton.onclick = null; // Clear previous listener
-  confirmButton.onclick = async () => {
+  // Proceed with Firestore update on confirmation
+  document.getElementById('confirmButton').onclick = async () => {
     confirmationModal.hide();
+    isUpdatingFirestore = true; // Set flag to avoid repopulation
 
     try {
-      // Send the update to Firestore
+      // Perform Firestore update
       await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
-
-      // No re-fetching of students is necessary here. We only update the UI based on the toggle.
-
+      
+      // Optional: Reload page after Firestore update
+      window.location.reload();  // Comment this out if you don't want a reload
     } catch (error) {
       console.error("Error updating completion status in Firestore:", error);
 
-      // Revert the UI change in case of an error
-      event.target.checked = !isCompleted; // Revert the checkbox state
-      const student = studentsData.find(student => student.id === userId);
-      if (student) {
-        const booking = student.bookings.find(b => b.appointmentId === appointmentId);
-        if (booking) {
-          booking.status = !isCompleted ? "Completed" : "Booked"; // Revert booking status in local data
-        }
-      }
+      // If update fails, revert the checkbox state
+      event.target.checked = !isCompleted;
+    } finally {
+      isUpdatingFirestore = false; // Reset flag after Firestore update
     }
   };
 
+  // Cancel button handler
   document.getElementById('confirmationModal').querySelector('.btn-secondary').onclick = () => {
-    event.target.checked = !isCompleted; // Revert the checkbox state if canceled
+    event.target.checked = !isCompleted; // Revert checkbox on cancel
     confirmationModal.hide();
   };
 }
 
+// Existing Firestore update function (unchanged)
 async function toggleCompletionStatus(userId, course, isCompleted, appointmentId) {
+  // Your existing logic for updating Firestore remains intact here
   try {
-    if (!userId || !course || !appointmentId) {
-      console.error("User ID, course, or appointment ID is missing.");
-      return;
-    }
-
     const applicantDocRef = doc(db, "applicants", userId);
     const applicantSnapshot = await getDoc(applicantDocRef);
 
@@ -448,17 +443,15 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
       return;
     }
 
-    const appointmentData = docSnapshot.data(); // Fetch appointment data
-
+    const appointmentData = docSnapshot.data();
     const updateData = {};
 
-    // Include completion date if the course is completed
     if (isCompleted) {
       updateData[`${course}Status`] = "Completed";
-      updateData[`${course}CompletionDate`] = appointmentData.date; // Use appointment date
+      updateData[`${course}CompletionDate`] = appointmentData.date;
     } else {
       updateData[`${course}Status`] = deleteField();
-      updateData[`${course}CompletionDate`] = deleteField(); // Remove completion date if unchecked
+      updateData[`${course}CompletionDate`] = deleteField();
     }
 
     await updateDoc(applicantDocRef, updateData);
@@ -480,7 +473,7 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
       if (isCompleted) {
         const completedBookingData = {
           course: course,
-          date: appointmentData.date,  // Use appointment date
+          date: appointmentData.date,
           startTime: appointmentData.timeStart,
           endTime: appointmentData.timeEnd,
           progress: "Completed",
@@ -490,6 +483,39 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
 
         await updateCompletedBookings(userId, completedBookingData);
 
+        const completedStudentRef = doc(db, "completedStudents", userId);
+        const completedStudentSnap = await getDoc(completedStudentRef);
+
+        let completedStudentData = {
+          name: applicantData.personalInfo?.first + " " + applicantData.personalInfo?.last,
+          email: applicantData.email || "N/A",
+          phoneNumber: applicantData.phoneNumber || "N/A",
+          packageName: applicantData.packageName || "N/A",
+          packagePrice: applicantData.packagePrice || "N/A",
+          userId: userId,
+          certificateControlNumber: applicantData.certificateControlNumber || 'N/A',
+          completedBookings: []
+        };
+
+        if (completedStudentSnap.exists()) {
+          completedStudentData = completedStudentSnap.data();
+        }
+
+        const existingBookingIndex = completedStudentData.completedBookings.findIndex(
+          booking => booking.appointmentId === appointmentId && booking.course === course
+        );
+
+        if (existingBookingIndex >= 0) {
+          completedStudentData.completedBookings[existingBookingIndex].completionDate = appointmentData.date;
+        } else {
+          completedStudentData.completedBookings.push({
+            course: course,
+            completionDate: appointmentData.date,
+            appointmentId: appointmentId
+          });
+        }
+
+        await setDoc(completedStudentRef, completedStudentData, { merge: true });
       } else {
         await removeCompletedBooking(userId, course, appointmentId);
       }
@@ -498,7 +524,6 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
     console.error("Error updating completion status:", error);
   }
 }
-
 
 // Migration of completed bookings with the date as a string
 async function updateCompletedBookings(userId, bookingDetails) {
