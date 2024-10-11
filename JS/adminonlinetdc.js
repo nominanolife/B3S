@@ -1462,3 +1462,57 @@ function showNotification(message) {
     const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal')); // Initialize the modal
     notificationModal.show(); // Show the modal
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    let isFormModified = false; // Flag to check if any input has been modified
+
+    // Elements in the uploadModal that we want to track for changes
+    const videoTitleInput = document.getElementById('videoTitleInput');
+    const thumbnailUpload = document.getElementById('thumbnailUpload');
+    const videoUpload = document.getElementById('videoUpload');
+    const categorySelected = document.getElementById('selectedCategory');
+    const quizContainerInputs = document.querySelectorAll('.quiz-container input');
+
+    // Helper function to set form modified flag when input changes
+    function setFormModified() {
+        isFormModified = true;
+    }
+
+    // Add event listeners to track changes on relevant inputs
+    videoTitleInput.addEventListener('input', setFormModified);
+    thumbnailUpload.addEventListener('change', setFormModified);
+    videoUpload.addEventListener('change', setFormModified);
+    categorySelected.addEventListener('change', setFormModified);
+    quizContainerInputs.forEach(input => input.addEventListener('input', setFormModified));
+
+    // Close button behavior with discard confirmation modal
+    const closeUploadModalButton = document.querySelector('#uploadModal .close');
+    
+    if (closeUploadModalButton) {
+        closeUploadModalButton.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent default close action
+            if (isFormModified) {
+                // If form is modified, show the discard confirmation modal
+                $('#saveDraftConfirmationModal').modal('show');
+            } else {
+                // If form is not modified, close the upload modal
+                $('#uploadModal').modal('hide');
+            }
+        });
+    }
+
+    // If the user confirms discarding changes
+    document.getElementById('confirmDraftBtn').addEventListener('click', function () {
+        // Close both modals
+        $('#saveDraftConfirmationModal').modal('hide');
+        $('#uploadModal').modal('hide');
+
+        // Reset the form modified flag
+        isFormModified = false;
+    });
+
+    // Reset the flag when the upload modal is closed or reset
+    $('#uploadModal').on('hidden.bs.modal', function () {
+        isFormModified = false; // Reset when modal is closed
+    });
+});

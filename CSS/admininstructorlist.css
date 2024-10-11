@@ -598,7 +598,7 @@ input:checked + .slider .slider-label-on {
 
 .pagination-controls .bi-caret-left.disabled, .pagination-controls .bi-caret-right.disabled {
     opacity: 0.5;
-    cursor: default;
+    cursor: pointer;
 }
 
 @keyframes popOut {

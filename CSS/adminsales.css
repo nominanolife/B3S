@@ -1,8 +1,6 @@
 body {
     margin: 0;
     padding: 0;
-    scrollbar-width: thin; /* Makes the scrollbar thinner */
-    scrollbar-color: #142A74 #f1f1f1; /* Thumb color and track color */
 }
 
 .whole-page {
@@ -497,7 +495,7 @@ h2 {
 
 .pagination-controls .bi-caret-left.disabled, .pagination-controls .bi-caret-right.disabled {
     opacity: 0.5;
-    cursor: default;
+    cursor: pointer;
 }
 
 .pagination-controls .bi-caret-left:hover, .pagination-controls .bi-caret-right:hover {

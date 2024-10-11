@@ -224,26 +224,38 @@ function updatePaginationControls(type) {
 
 // Search Functionality
 function searchBookings() {
-    const searchInput = document.querySelectorAll('.search');
+    // Search for Upcoming Appointments
+    const searchUpcoming = document.querySelector('.search-upcoming');
+    searchUpcoming.addEventListener('input', () => {
+        const searchTerm = searchUpcoming.value.toLowerCase();
 
-    searchInput.forEach(input => {
-        input.addEventListener('input', () => {
-            const searchTerm = input.value.toLowerCase();
+        // Filter upcoming appointments based on the search term
+        filteredBookingsUpcoming = allBookingsUpcoming.filter(rowHtml => rowHtml.toLowerCase().includes(searchTerm));
 
-            // Filter the entire dataset based on the search term
-            filteredBookingsUpcoming = allBookingsUpcoming.filter(rowHtml => rowHtml.toLowerCase().includes(searchTerm));
-            filteredBookingsCancelled = allBookingsCancelled.filter(rowHtml => rowHtml.toLowerCase().includes(searchTerm));
+        // Reset pagination and display the filtered results for upcoming appointments
+        currentPageUpcoming = 1;
+        displayBookings('upcoming', true);
+        updatePaginationControls('upcoming');
+    });
 
-            // Reset pagination and display the filtered results
-            currentPageUpcoming = 1;
-            currentPageCancelled = 1;
-            displayBookings('upcoming', true);
-            displayBookings('cancelled', true);
-            updatePaginationControls('upcoming');
-            updatePaginationControls('cancelled');
-        });
+    // Search for Cancelled/Rescheduled Appointments
+    const searchCancelled = document.querySelector('.search-cancelled');
+    searchCancelled.addEventListener('input', () => {
+        const searchTerm = searchCancelled.value.toLowerCase();
+
+        // Filter cancelled/rescheduled appointments based on the search term
+        filteredBookingsCancelled = allBookingsCancelled.filter(rowHtml => rowHtml.toLowerCase().includes(searchTerm));
+
+        // Reset pagination and display the filtered results for cancelled appointments
+        currentPageCancelled = 1;
+        displayBookings('cancelled', true);
+        updatePaginationControls('cancelled');
     });
 }
+
+// Call the searchBookings function to initialize the search functionality
+searchBookings();
+
 
 document.addEventListener('DOMContentLoaded', function () {
     const upcomingSelectedElement = document.getElementById('courseFilterSelected');

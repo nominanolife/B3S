@@ -308,7 +308,7 @@ function renderStudents() {
             <td class="table-row-content">${student.email}</td>
             <td class="table-row-content">${student.phoneNumber || ''}</td>
             <td class="table-row-content">${student.packageName || ''}</td> <!-- Handle missing package name -->
-            <td class="table-row-content package-price">&#8369; ${student.packagePrice || ''}</td> <!-- Handle missing price -->
+            <td class="table-row-content">&#8369; ${student.packagePrice || ''}</td> <!-- Handle missing price -->
             ${renderCourseStatus('TDC', row.TDC)} <!-- Render TDC status -->
             ${renderCourseStatus('PDC-4Wheels', row['PDC-4Wheels'])} <!-- Render 4-Wheels status -->
             ${renderCourseStatus('PDC-Motors', row['PDC-Motors'])} <!-- Render Motors status -->
