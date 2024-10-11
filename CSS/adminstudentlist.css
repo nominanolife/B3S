@@ -641,6 +641,11 @@ h2 {
     background-color: #142a74ec;
 }
 
+.next-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
 .cancel-btn, .back-btn {
     font-family: Poppins;
     font-size: 14px;

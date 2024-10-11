@@ -171,6 +171,7 @@ h3 {
     font-size: 22px;
     font-weight: bold;
     color: #142A74;
+    margin: 0;
 }
 
 h2 {
@@ -178,6 +179,7 @@ h2 {
     font-size: 24px;
     font-weight: normal;
     color: #2F2E2E;
+    margin: 0;
 }
 
 .page-content {
@@ -212,6 +214,7 @@ h2 {
     font-size: 26px;
     font-weight: bold;
     color: #252641;
+    margin: 0;
 }
 
 .tdc-tile p {
@@ -220,6 +223,7 @@ h2 {
     font-weight: normal;
     width: 80%;
     color: #696984;
+    margin: 0;
 }
 
 .pdc-tile p {
@@ -228,6 +232,7 @@ h2 {
     font-weight: normal;
     width: 75%;
     color: #696984;
+    margin: 0;
 }
 
 .tdc-tile img, .pdc-tile img {
@@ -240,6 +245,7 @@ h2 {
     flex-direction: column;
     justify-content: space-evenly;
     padding: 30px 30px;
+    gap: 20px;
 }
 
 .package-title {
@@ -253,18 +259,24 @@ h2 {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-evenly;
-    padding: 30px 30px;
+    justify-content: center;
+    gap: 10px;
+}
+
+.package-container {
+    display: flex;
+    justify-content: center;
+    width: 90%;
+    height: 100%;
 }
 
 .package-tiles {
     display: flex;
     flex-direction: column;
     align-items: center;
-    display: none;
     width: 60%;
     height: 500px;
-    padding: 0px 10px 0px 10px;
+    padding: 10px;
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -274,7 +286,7 @@ h2 {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
     padding: 10px 10px;
 }
 
@@ -283,17 +295,11 @@ h2 {
     font-size: 20px;
     font-weight: normal;
     color: #142A74;
+    margin: 0;
 }
 
 .info {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-evenly;
-    margin-left: auto;
     font-size: 24px;
-    width: 60px;
-    height: 60px;
     border: none;
     background: none;
     color: #142A74;
@@ -303,9 +309,10 @@ h2 {
 .package-body {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: space-between;
-    height: 80%;
+    padding: 10px 10px;
+    gap: 20px;
+    height: 85%;
 }
 
 .package-text {
@@ -347,7 +354,8 @@ h2 {
 
 .package-footer {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    padding: 10px;
 }
 
 .fa-chevron-left, .fa-chevron-right {

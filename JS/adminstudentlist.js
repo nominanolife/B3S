@@ -38,6 +38,18 @@ function showNotification(message) {
   $('#successModal').modal('show'); // Show the modal
 }
 
+// Fetch students data on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+  const loader = document.getElementById('loader1');
+  loader.style.display = 'flex';  // Show loader while data is being fetched
+  
+  fetchAppointments().then(() => {
+      // After the appointments are fetched, trigger render to hide loader once done
+      renderStudents();
+      updatePaginationControls();
+  });
+});
+
 async function fetchAppointments() {
   try {
     const studentsMap = new Map();
@@ -629,6 +641,15 @@ function updatePaginationControls() {
   paginationControls.appendChild(nextButton);
 }
 
+
+
+
+
+
+
+
+
+
 // Fetch students on DOM load
 document.addEventListener('DOMContentLoaded', () => {
   fetchAppointments();
@@ -844,11 +865,6 @@ function calculateTotalScore() {
   // Display the total score out of 100
   const totalScoreOutOf100 = totalScore; // Adjust this if you want scaling
   document.getElementById('totalScore').textContent = `${totalScoreOutOf100} / 100`;
-
-  // Validate and display a warning if the total score exceeds 100
-  if (totalScoreOutOf100 > 100) {
-      showNotification('Total score exceeds 100. Please adjust the scores.');
-  }
 
   return totalScoreOutOf100; // Return the total score
 }
@@ -1109,9 +1125,6 @@ document.getElementById('nextBtn').addEventListener('click', async function (eve
   event.preventDefault(); // Prevent the default action, especially for form submission
   event.stopPropagation(); // Prevent the event from bubbling up to parent elements
 
-  // Calculate total score before saving
-  const totalScore = calculateTotalScore();
-
   // Save raw assessment data to session storage
   saveAssessmentDataToSession();
 
@@ -1130,13 +1143,6 @@ document.getElementById('nextBtn').addEventListener('click', async function (eve
   backBtn.classList.remove('d-none');
   nextBtn.classList.add('d-none');
   saveBtn.classList.remove('d-none');
-
-  // Show showNotification if needed after transitioning to the next modal
-  if (totalScore > 100) {
-      setTimeout(() => {
-          showNotification('Total score exceeds 100. Please adjust the scores.');
-      }, 100);
-  }
 });
 
 // Attach event listener to "Save" button on the checklist modal
@@ -1326,10 +1332,6 @@ function calculateMotorcycleTotalScore() {
 
   const totalScoreOutOf100 = totalScore; // Adjust if needed
   document.getElementById('motorcycleTotalScore').textContent = `${totalScoreOutOf100} / 100`;
-
-  if (totalScoreOutOf100 > 100) {
-    showNotification('Total score exceeds 100. Please adjust the scores.');
-  }
 
   return totalScoreOutOf100;
 }
@@ -1698,13 +1700,6 @@ document.getElementById('motorcycleNextBtn').addEventListener('click', async fun
   backBtn.classList.remove('d-none');
   nextBtn.classList.add('d-none');
   saveBtn.classList.remove('d-none');
-
-  // Show showNotification if needed after transitioning to the next modal
-  if (totalScore > 100) {
-      setTimeout(() => {
-          showNotification('Total score exceeds 100. Please adjust the scores.');
-      }, 100); // Slight delay to ensure modal transition completes first
-  }
 });
 
 // Attach event listener to "Save" button for saving all motorcycle data to Firestore
@@ -1950,14 +1945,104 @@ function checkIfDataExists(modalId) {
   return hasData;
 }
 
-// Fetch students data on DOM load
-document.addEventListener('DOMContentLoaded', () => {
-  const loader = document.getElementById('loader1');
-  loader.style.display = 'flex';  // Show loader while data is being fetched
-  
-  fetchAppointments().then(() => {
-      // After the appointments are fetched, trigger render to hide loader once done
-      renderStudents();
-      updatePaginationControls();
+// Attach popover for the next button
+function attachNextButtonPopover(nextBtn, message) {
+  // Initialize Bootstrap popover with the message
+  const popoverInstance = new bootstrap.Popover(nextBtn, {
+      content: message,
+      trigger: 'hover',
+      placement: 'top'
   });
+
+  // Manually show/hide popover based on button status (for better control)
+  nextBtn.addEventListener('mouseenter', () => {
+      if (nextBtn.disabled) {
+          popoverInstance.show();
+      }
+  });
+
+  nextBtn.addEventListener('mouseleave', () => {
+      popoverInstance.hide();
+  });
+}
+
+// Function to validate if all required fields are filled
+function validateForm(modalId) {
+  const modalElement = document.getElementById(modalId);
+  const scoreInputs = modalElement.querySelectorAll('input.numeric-input');
+  const vehicleTypeSelectedElement = modalElement.querySelector('.selected'); // Get the vehicle type dropdown label
+
+  // Check if the vehicle type label exists and get its text
+  const vehicleTypeSelected = vehicleTypeSelectedElement ? vehicleTypeSelectedElement.textContent : '';
+
+  let allScoresFilled = true;
+  let isVehicleTypeSelected = true;
+  let missingFieldsMessage = ''; // Message to display if fields are missing
+
+  // Check if all score inputs are filled
+  scoreInputs.forEach(input => {
+      const value = input.value.trim();
+      if (value === '' || parseFloat(value) < 0 || parseFloat(value) > 5) {
+          allScoresFilled = false;
+      }
+  });
+
+  // Check if vehicle type is selected (ensure it's not the default value)
+  isVehicleTypeSelected = vehicleTypeSelected !== 'Select Vehicle' && vehicleTypeSelected !== '';
+
+  // Determine the message to show in the popover
+  if (!allScoresFilled && !isVehicleTypeSelected) {
+      missingFieldsMessage = 'Please fill out both the vehicle type and score fields.';
+  } else if (!allScoresFilled) {
+      missingFieldsMessage = 'Please fill out all the score fields';
+  } else if (!isVehicleTypeSelected) {
+      missingFieldsMessage = 'Please select vehicle type';
+  }
+
+  // Enable or disable the next button based on the validation
+  const nextBtn = modalElement.querySelector('.next-btn');
+  if (nextBtn) {
+      nextBtn.disabled = !(allScoresFilled && isVehicleTypeSelected); // Disable if conditions are not met
+
+      // Attach or update popover message if button is disabled
+      if (nextBtn.disabled) {
+          attachNextButtonPopover(nextBtn, missingFieldsMessage); // Update popover with message
+      } else {
+          // Destroy existing popover if validation passes
+          const popoverInstance = bootstrap.Popover.getInstance(nextBtn);
+          if (popoverInstance) {
+              popoverInstance.dispose();
+          }
+      }
+  }
+}
+
+// Attach event listeners to score inputs and vehicle type to trigger validation
+function attachValidationListeners(modalId) {
+  const modalElement = document.getElementById(modalId);
+  const scoreInputs = modalElement.querySelectorAll('input.numeric-input');
+  const vehicleDropdown = document.getElementById('vehicleDropdown');
+
+  // Validate when any score input changes
+  scoreInputs.forEach(input => {
+      input.addEventListener('input', () => validateForm(modalId));
+  });
+
+  // Validate when vehicle type is selected
+  if (vehicleDropdown) {
+      vehicleDropdown.addEventListener('click', (e) => {
+          if (e.target.classList.contains('option')) {
+              validateForm(modalId); // Run validation after vehicle type selection
+          }
+      });
+  }
+
+  // Initial validation when the modal opens
+  validateForm(modalId);
+}
+
+// Call the function for each modal when it opens
+document.addEventListener('DOMContentLoaded', () => {
+  attachValidationListeners('edit4WheelsModal');
+  attachValidationListeners('editMotorsModal');
 });

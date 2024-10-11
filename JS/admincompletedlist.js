@@ -345,5 +345,5 @@ function exportListToPDF() {
   });
 
   // Save the PDF and trigger the download
-  doc.save('Student List.pdf');
+  doc.save('completed-student-list.pdf');
 }
