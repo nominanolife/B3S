@@ -181,27 +181,30 @@ async function fetchStudentData() {
 
       // Real-time listener for applicants collection
       const unsubscribeApplicants = onSnapshot(collection(db, "applicants"), async (applicantsSnapshot) => {
-          studentsMap.clear(); // Clear the studentsMap to avoid duplicates
+        studentsMap.clear(); // Clear the studentsMap to avoid duplicates
 
-          // Fetch appointments data to check for active bookings
-          const appointmentsSnapshot = await getDocs(collection(db, "appointments"));
-          appointmentsSnapshot.forEach(appointmentDoc => {
-              const appointmentData = appointmentDoc.data();
-              const bookings = appointmentData.bookings || [];
+        // Fetch appointments data to check for active bookings
+        const appointmentsSnapshot = await getDocs(collection(db, "appointments"));
+        appointmentsSnapshot.forEach(appointmentDoc => {
+          const appointmentData = appointmentDoc.data();
+          
+          // Ensure bookings is an array, even if undefined or null
+          const bookings = Array.isArray(appointmentData.bookings) ? appointmentData.bookings : [];
 
-              bookings.forEach(booking => {
-                  const userId = booking.userId;
+          bookings.forEach(booking => {
+            const userId = booking.userId;
 
-                  // Only add students with active bookings
-                  const applicantDoc = applicantsSnapshot.docs.find(doc => doc.id === userId);
-                  if (applicantDoc) {
-                      const applicantData = applicantDoc.data();
-                      if (applicantData.role === "student") {
-                          studentsMap.set(userId, { ...applicantData, userId, activeBooking: booking });
-                      }
-                  }
-              });
+            // Only add students with active bookings
+            const applicantDoc = applicantsSnapshot.docs.find(doc => doc.id === userId);
+            if (applicantDoc) {
+              const applicantData = applicantDoc.data();
+              if (applicantData.role === "student") {
+                studentsMap.set(userId, { ...applicantData, userId, activeBooking: booking });
+              }
+            }
           });
+        });
+
 
           // Further validate with completed status if the student has no active booking
           applicantsSnapshot.forEach(applicantDoc => {
