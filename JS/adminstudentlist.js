@@ -27,6 +27,7 @@ let filteredStudentsData = []; // Global variable to store the currently filtere
 let currentPage = 1; // Tracks the current page for pagination
 const itemsPerPage = 10; // Number of items to display per page
 let totalPages = 1; // Total number of pages
+let unsubscribeApplicants = null;
 
 function showNotification(message) {
   const successModalBody = document.getElementById('successModalBody');
@@ -40,8 +41,15 @@ async function fetchAppointments() {
   try {
     const studentsMap = new Map();
 
+    // Unsubscribe from the previous snapshot if it exists
+    if (unsubscribeApplicants) {
+      unsubscribeApplicants();
+    }
+
     // Real-time listener for applicants
-    const unsubscribeApplicants = onSnapshot(collection(db, "applicants"), async (applicantsSnapshot) => {
+    unsubscribeApplicants = onSnapshot(collection(db, "applicants"), async (applicantsSnapshot) => {
+      studentsMap.clear(); // Clear previous data to avoid duplicates
+
       for (const applicantDoc of applicantsSnapshot.docs) {
         const applicantData = applicantDoc.data();
         applicantData.id = applicantDoc.id; // Ensure this is set consistently
@@ -53,8 +61,8 @@ async function fetchAppointments() {
           applicantData.hasMotorsCourse = false; // Initialize flag for Motors
 
           if (applicantData.TDCStatus === "Completed" ||
-            applicantData["PDC-4WheelsStatus"] === "Completed" ||
-            applicantData["PDC-MotorsStatus"] === "Completed") {
+              applicantData["PDC-4WheelsStatus"] === "Completed" ||
+              applicantData["PDC-MotorsStatus"] === "Completed") {
             studentsMap.set(applicantDoc.id, applicantData);
           }
         }
@@ -163,9 +171,6 @@ async function fetchAppointments() {
       loader.style.display = 'none';
     });
 
-    return {
-      unsubscribeApplicants,
-    };
   } catch (error) {
     console.error("Error fetching appointments: ", error);
   }
@@ -365,6 +370,18 @@ async function handleStatusToggle(event) {
   // Log for debugging
   console.log(`Checkbox toggled for user ${userId}, course: ${course}, completed: ${isCompleted}`);
 
+  // Immediately update the UI without waiting for Firestore update
+  const student = studentsData.find(student => student.id === userId);
+  if (student) {
+    const booking = student.bookings.find(b => b.appointmentId === appointmentId);
+    if (booking) {
+      booking.status = isCompleted ? "Completed" : "Booked"; // Update booking status in local data
+    }
+  }
+
+  // Render only the changed checkbox state, no need to re-render the entire list.
+  event.target.checked = isCompleted;
+
   // Show confirmation message dynamically based on the checkbox state
   const confirmationMessage = isCompleted
     ? "Are you sure you want to complete the appointment of this student?"
@@ -379,20 +396,26 @@ async function handleStatusToggle(event) {
   confirmButton.onclick = null; // Clear previous listener
   confirmButton.onclick = async () => {
     confirmationModal.hide();
-    // Migrate the student data to Firestore when confirmed
-    await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
 
-    // Update the local state in studentsData for persistence
-    const student = studentsData.find(student => student.id === userId);
-    if (student) {
-      const booking = student.bookings.find(b => b.appointmentId === appointmentId);
-      if (booking) {
-        booking.status = isCompleted ? "Completed" : "Booked"; // Update booking status in local data
+    try {
+      // Send the update to Firestore
+      await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
+
+      // No re-fetching of students is necessary here. We only update the UI based on the toggle.
+
+    } catch (error) {
+      console.error("Error updating completion status in Firestore:", error);
+
+      // Revert the UI change in case of an error
+      event.target.checked = !isCompleted; // Revert the checkbox state
+      const student = studentsData.find(student => student.id === userId);
+      if (student) {
+        const booking = student.bookings.find(b => b.appointmentId === appointmentId);
+        if (booking) {
+          booking.status = !isCompleted ? "Completed" : "Booked"; // Revert booking status in local data
+        }
       }
     }
-
-    renderStudents(); // Re-render students to update UI
-    setupStatusToggleListeners(); // Re-setup listeners after rendering
   };
 
   document.getElementById('confirmationModal').querySelector('.btn-secondary').onclick = () => {
@@ -417,7 +440,6 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
     }
 
     const applicantData = applicantSnapshot.data();
-
     const docRef = doc(db, "appointments", appointmentId);
     const docSnapshot = await getDoc(docRef);
 
@@ -468,46 +490,6 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
 
         await updateCompletedBookings(userId, completedBookingData);
 
-        // Migrate to 'completedStudents' collection with the appointment date and completed bookings
-        const completedStudentRef = doc(db, "completedStudents", userId);
-        const completedStudentSnap = await getDoc(completedStudentRef);
-
-        let completedStudentData = {
-          name: applicantData.personalInfo.first + " " + applicantData.personalInfo.last,
-          email: applicantData.email || "N/A",
-          phoneNumber: applicantData.phoneNumber || "N/A",
-          packageName: applicantData.packageName || "N/A",
-          packagePrice: applicantData.packagePrice || "N/A",
-          userId: userId,
-          certificateControlNumber: 'N/A', // Initialize outside of completedBookings
-          completedBookings: [] // Initialize empty array
-        };
-
-        if (completedStudentSnap.exists()) {
-          completedStudentData = completedStudentSnap.data(); // Fetch existing data
-        }
-
-        // Check if a booking with the same appointmentId and course already exists
-        const existingBookingIndex = completedStudentData.completedBookings.findIndex(
-          booking => booking.appointmentId === appointmentId && booking.course === course
-        );
-
-        if (existingBookingIndex >= 0) {
-          // Update the existing booking with the same appointmentId and course
-          completedStudentData.completedBookings[existingBookingIndex].completionDate = appointmentData.date;
-        } else {
-          // Add the new completed booking to the array
-          completedStudentData.completedBookings.push({
-            course: course,
-            completionDate: appointmentData.date, // Store appointment date as string
-            appointmentId: appointmentId // Use the unique appointment ID to differentiate appointments
-          });
-        }
-
-        // Update the certificateControlNumber outside the completedBookings array
-        completedStudentData.certificateControlNumber = appointmentData.certificateControlNumber || 'N/A';
-
-        await setDoc(completedStudentRef, completedStudentData, { merge: true });
       } else {
         await removeCompletedBooking(userId, course, appointmentId);
       }
@@ -516,6 +498,7 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
     console.error("Error updating completion status:", error);
   }
 }
+
 
 // Migration of completed bookings with the date as a string
 async function updateCompletedBookings(userId, bookingDetails) {
