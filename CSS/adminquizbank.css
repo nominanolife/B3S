@@ -1,9 +1,7 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Poppins', sans-serif; /* Set Poppins as the default font */
-    scrollbar-width: thin; /* Makes the scrollbar thinner */
-    scrollbar-color: #142A74 #f1f1f1; /* Thumb color and track color */
+    font-family: Poppins;
 }
 
 .whole-page {
@@ -19,7 +17,7 @@ body {
     flex-direction: column;
     width: 300px;
     height: 100vh;
-    padding: 30px;
+    padding: 30px 30px;
     background-color: #ffffff;
     border-right: 1px solid #D9D9D9;
 }
@@ -48,6 +46,7 @@ body {
 }
 
 .brand-title {
+    font-family: Poppins; 
     font-size: 20px;
     font-weight: bold;
     margin: 0;
@@ -62,6 +61,7 @@ body {
 }
 
 .sidebar-dashboard a {
+    font-family: Poppins;
     font-size: 14px;
     font-weight: bold;
     text-decoration: none;
@@ -88,6 +88,7 @@ body {
 }
 
 .sidebar-menu a {
+    font-family: Poppins;
     font-size: 14px;
     font-weight: normal;
     text-decoration: none;
@@ -119,6 +120,7 @@ body {
 }
 
 .sidebar-learning a {
+    font-family: Poppins;
     font-size: 14px;
     font-weight: normal;
     text-decoration: none;
@@ -154,6 +156,7 @@ body {
 .profile, .logout {
     border: none;
     background: none;
+    font-family: Poppins;
     font-size: 14px;
     font-weight: normal;
     text-decoration: none;
@@ -171,103 +174,127 @@ body {
 .main-content {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    background-color: #f5f5f5;
     width: calc(100% - 300px);
     margin-left: 300px;
 }
 
 .page-content {
-    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    padding: 30px 30px;
     background-color: #f5f5f5;
-    height: 100vh;
-    display: flex; 
-    flex-direction: column; 
-    gap: 20px; 
-    overflow-y: auto; 
+    gap: 20px;
 }
 
 .button-container {
-    display: flex; /* Use flexbox for layout */
-    justify-content: space-between; /* Space between items to align left and right */
-    align-items: center; /* Center items vertically */
-    margin-bottom: 20px; /* Optional: space below the button container */
+    display: flex;
+    align-items: center;
 }
 
-.back-btn {
-    background: none; /* No background */
-    color: #142A74; /* Arrow color */
-    border: none; /* No border */
-    cursor: pointer; /* Pointer cursor */
-    font-size: 16px; /* Font size */
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Center items vertically */
+.button-container h3 {
+    font-size: 24px;
+    font-weight: normal;
+    color: #142A74;
+    margin: 0;
 }
 
-.back-btn i {
-    margin-right: 8px; /* Space between the icon and text */
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
 }
 
-.select-all-label {
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Center items vertically */
-    margin-left: auto; /* Push this label to the far right */
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
 }
 
-.select-all-checkbox {
-    margin-right: 8px; /* Space between checkbox and label */
-    cursor: pointer; /* Pointer cursor for checkbox */
+.custom-checkbox input + .checkbox-label {
+    position: relative;
+    padding-left: 30px;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #2F2E2E;
 }
 
-.select-all-checkbox:checked {
-    accent-color: #142A74; /* Change the checkbox color when checked */
+.custom-checkbox input + .checkbox-label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #2F2E2E;
+    border-radius: 4px;
+    background-color: #fff;
+    transition: all 0.3s ease;
 }
 
-.select-all-label span {
-    font-family: 'Poppins', sans-serif; /* Font family */
-    font-size: 16px; /* Font size */
-    color: #142A74; /* Text color */
+.custom-checkbox input:checked + .checkbox-label::before {
+    background-color: #142A74;
+    border-color: #142A74;
 }
 
+.custom-checkbox input + .checkbox-label::after {
+    content: '\2714';
+    position: absolute;
+    left: 4px;
+    top: 0px;
+    font-size: 14px;
+    color: #ffffff;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
 
-.container-box {
-    position: relative; /* Set the parent container to relative positioning */
-    background-color: #fff; /* Background color for the container */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    padding: 20px; /* Padding inside the container */
-    margin: 20px; /* Margin around the container */
-    height: 300px; /* Set a specific height */
-    overflow-y: auto; /* Enable vertical scrolling */
-    border: 1px solid #d9d9d9; /* Optional: Add a border for visibility */
-    padding: 10px; /* Optional: Add some padding */
-    border-radius: 5px; /* Optional: Rounded corners */
-    
+.custom-checkbox input:checked + .checkbox-label::after {
+    opacity: 1;
 }
 
 .container-wrapper {
-    display: flex; /* Use flexbox for layout */
-    flex-direction: column; /* Stack child elements vertically */
+    display: flex;
+    flex-direction: column;
+    gap: 100px;
+}
+
+.container-wrapper-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 30px 40px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border: 1px solid #D9D9D9;
+}
+
+.container-box {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    overflow-y: auto;
 }
 
 .header-container {
-    display: flex; /* Align items horizontally */
-    justify-content: space-between; /* Space between items to align them left and right */
-    align-items: center; /* Center items vertically */
-    margin-top: 30px; /* Adjust this value to lower the header */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .category-title {
-    margin: 0; /* Remove margin to keep it aligned */
-}
-
-.question {
-    margin-top: 10px; /* Space above the question */
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
 }
 
 h3 {
-    color: #142A74; /* Color for the category title */
-    font-family: Poppins; /* Ensure font is Poppins */
-    font-size: 20px; /* Set the desired font size */
-    margin: 0; /* Remove margin to avoid unnecessary space */
+    color: #142A74;
+    font-size: 20px;
+    margin: 0;
 }
 
 h2 {
@@ -276,14 +303,48 @@ h2 {
     color: #142A74;
 }
 
+.question {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #D9D9D9;
+    border-radius: 10px;
+    padding: 20px;
+    gap: 20px;
+}
+
 .question-header {
-    display: flex; /* Use flexbox for layout */
-    justify-content: space-between; /* Space between question text and checkbox */
-    align-items: center; /* Align items vertically centered */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.question-header p {
+    font-size: 14px;
+    font-weight: bold;
+    color: #2F2E2E;
+    margin: 0;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 20px;
+}
+
+.options p {
+    font-size: 14px;
+    font-weight: normal;
+    color: #2F2E2E;
+    margin: 0;
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .publish-btn {
-    font-family: Poppins;
     font-size: 14px;
     color: #ffffff;
     background-color: #142A74;
@@ -298,33 +359,31 @@ h2 {
     background-color: #1B3286;
 }
 
-/* Modal styles */
-.modal-header {
-    border: none;
-}
-
-.modal-body {
-    font-size: 14px;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-}
-
 .btn-primary {
-    background-color: #1B3286;
+    font-family: Poppins;
+    font-size: 14px;
     color: #ffffff;
+    background-color: #142A74;
     border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+}
+
+.btn-primary:hover {
+    background-color: #142a74ec;
 }
 
 .btn-secondary {
-    background-color: #7B1719;
+    font-family: Poppins;
+    font-size: 14px;
     color: #ffffff;
+    background-color: #B60505;
+    border-radius: 30px;
+    padding: 10px 30px;
 }
 
 .btn-secondary:hover {
-    background-color: #c9302c;
+    background-color: #b60505ec;
 }
 
 .close {
@@ -332,9 +391,22 @@ h2 {
     color: #142A74;
 }
 
-/* Additional styles for improved layout */
-.container {
-    padding: 20px; /* Space inside the container */
+@keyframes popOut {
+    0% {
+        opacity: 0;
+        transform: scale(0.5); /* Starts smaller */
+    }
+    80% {
+        transform: scale(1.05); /* Slight overshoot for a popping effect */
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1); /* Full size */
+    }
+}
+
+.modal-content {
+    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
 }
 
 .modal-header, .modal-body, .input-body, .modal-footer {
@@ -343,7 +415,6 @@ h2 {
 
 .modal-header h5{
     color: #142A74;
-    font-family: Poppins;
     font-weight: bold;
 }
 
@@ -354,7 +425,6 @@ h2 {
 }
 
 .modal-content {
-    font-family: Poppins;
     border-radius: 20px;
     padding: 20px;
 }
@@ -367,21 +437,39 @@ h2 {
 
 /* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
-    width: 12px; /* Width of the scrollbar */
-    background-color: #f1f1f1; /* Background color of the scrollbar track */
+    width: 10px; /* Width of the scrollbar */
 }
 
 ::-webkit-scrollbar-track {
     background: #f1f1f1; /* Background of the scrollbar track */
-    border-radius: 10px; /* Rounded corners for the track */
+    border-radius: 10px; /* Optional: Rounded corners for the track */
 }
 
 ::-webkit-scrollbar-thumb {
     background-color: #142A74; /* Color of the scrollbar thumb */
-    border-radius: 10px; /* Rounded corners for the thumb */
-    border: 3px solid #f1f1f1; /* Adds padding around the thumb */
+    border-radius: 10px; /* Optional: Rounded corners for the thumb */
+    border: 1px solid #f1f1f1; /* Optional: Adds padding around the thumb */
 }
 
 ::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d; /* Darker color on hover */
+}
+
+.container-box::-webkit-scrollbar {
+    width: 10px; /* Width of the scrollbar */
+}
+
+.container-box::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background of the scrollbar track */
+    border-radius: 10px; /* Optional: Rounded corners for the track */
+}
+
+.container-box::-webkit-scrollbar-thumb {
+    background-color: #142A74; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Optional: Rounded corners for the thumb */
+    border: 1px solid #f1f1f1; /* Optional: Adds padding around the thumb */
+}
+
+.container-box::-webkit-scrollbar-thumb:hover {
     background-color: #0e1d4d; /* Darker color on hover */
 }

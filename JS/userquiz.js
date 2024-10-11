@@ -23,18 +23,19 @@ let currentQuestionIndex = 0;
 let userAnswers = {};
 let userId = null; // Variable to store user ID
 
-// Fetch and Randomize Quizzes
 async function fetchAndRandomizeQuizzes() {
     try {
         const quizzesSnapshot = await getDocs(collection(db, 'quizzes'));
         quizzesSnapshot.forEach(doc => {
             const quizData = doc.data();
-            quizData.questions.forEach(question => {
-                questions.push({
-                    ...question,
-                    category: quizData.category
+            quizData.questions
+                .filter(question => question.active) // Only include active questions
+                .forEach(question => {
+                    questions.push({
+                        ...question,
+                        category: quizData.category
+                    });
                 });
-            });
         });
         questions = questions.sort(() => Math.random() - 0.5); // Shuffle questions
         renderQuestion(currentQuestionIndex); // Render the first question
@@ -49,7 +50,7 @@ async function saveUserAnswerToFirestore(index) {
     if (selectedOption && userId) {
         const correctAnswerIndex = questions[index].correctAnswer;
         const correctAnswerValue = questions[index].options[correctAnswerIndex].value;
-        
+
         userAnswers[index] = {
             question: questions[index].question,
             answer: selectedOption.value,
@@ -84,6 +85,7 @@ async function loadUserAnswersFromFirestore() {
     }
 }
 
+// Render Question
 async function renderQuestion(index) {
     await loadUserAnswersFromFirestore();  // Load answers when rendering each question
 

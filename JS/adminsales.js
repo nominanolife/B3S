@@ -303,6 +303,14 @@ function renderStudents() {
   });
 
   hideLoader(); // Hide the loader after the table has been rendered
+
+  // Attach event listener to the parent element and delegate clicks to the edit-icon
+  studentList.addEventListener('click', function (e) {
+      if (e.target && e.target.matches('.edit-icon')) {
+          const studentIndex = e.target.getAttribute('data-index');
+          openEditModal(studentIndex); // Open the modal with the correct student index
+      }
+  });
 }
 
 document.querySelector('.edit-sales-amount').addEventListener('input', function(event) {
@@ -383,10 +391,16 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
           return;
       }
 
+      // Ensure that the amountPaid does not exceed the package price
+      if (amountPaid > packagePrice) {
+          amountPaidErrorElement.textContent = `Amount paid cannot exceed the package price (₱${packagePrice.toFixed(2)}).`;
+          return;
+      }
+
       // Ensure that the amountPaid is at least 50% of the package price
       const minAllowedAmount = packagePrice * 0.5;
 
-      if (amountPaid > 0 && amountPaid < minAllowedAmount) {
+      if (amountPaid < minAllowedAmount) {
           amountPaidErrorElement.textContent = `Amount paid must be at least 50% of the package price (₱${minAllowedAmount.toFixed(2)}).`;
           return;
       } else {
