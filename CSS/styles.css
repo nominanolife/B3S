@@ -330,20 +330,21 @@ form p {
 }
 
 /* Password toggle button styles */
-#togglePassword {
+#togglePassword, #toggleNewPassword, #toggleConfirmPassword  {
     border-radius: 0 8px 8px 0;
     border: 1px solid #ced4da;
     background-color: #f8f9fa;
     transition: box-shadow 0.3s ease, background-color 0.3s ease; /* Smooth transition */
 }
 
-#togglePassword:hover {
+#togglePassword:hover, #toggleNewPassword:hover, #toggleConfirmPassword:hover {
     background-color: #142a74; /* Background color on hover */
 }
 
-#togglePassword:hover i {
+#togglePassword:hover, #toggleNewPassword:hover, #toggleConfirmPassword:hover i {
     color: #fff; /* Icon color on hover */
 }
+
 /* Back Icon Styles */
 .back-icon {
     position: absolute;
