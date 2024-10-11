@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DriveHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="CSS/adminonlinetdc.css">
+    <link rel="stylesheet" href="CSS/adminuploaddrafts.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -40,17 +40,80 @@
             </div>
         </div>
         <div class="main-content">
-            <div class="page-content">
-                <div class="quiz-bank-container">
-                    <a href="adminuploaddrafts.html" class="drafts">Drafts (5)</a>
-                    <a href="adminquizbank.html" class="quiz-bank-btn">Quiz Bank</a>
-                </div>    
-                <div class="course-content">
-                    <div class="upload-container">
-                        <div class="upload-box">
-                            <div class="upload-area">
-                                <i class="bi bi-cloud-arrow-up-fill"></i>
-                                <p>Click to Upload</p>
+            <div class="page-content"> 
+                <div class="draft-list">
+                    <div class="draft-container">
+                        <div class="draft-card">
+                            <div class="draft-image">
+                                <i class="bi bi-floppy"></i>
+                            </div>
+                            <div class="draft-details">
+                                <div class="draft-title">
+                                    <h4>Title</h4>
+                                </div>
+                                <div class="draft-delete">
+                                    <i class="bi bi-trash3"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="draft-container">
+                        <div class="draft-card">
+                            <div class="draft-image">
+                                <i class="bi bi-floppy"></i>
+                            </div>
+                            <div class="draft-details">
+                                <div class="draft-title">
+                                    <h4>Title</h4>
+                                </div>
+                                <div class="draft-delete">
+                                    <i class="bi bi-trash3"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="draft-container">
+                        <div class="draft-card">
+                            <div class="draft-image">
+                                <i class="bi bi-floppy"></i>
+                            </div>
+                            <div class="draft-details">
+                                <div class="draft-title">
+                                    <h4>Title</h4>
+                                </div>
+                                <div class="draft-delete">
+                                    <i class="bi bi-trash3"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="draft-container">
+                        <div class="draft-card">
+                            <div class="draft-image">
+                                <i class="bi bi-floppy"></i>
+                            </div>
+                            <div class="draft-details">
+                                <div class="draft-title">
+                                    <h4>Title</h4>
+                                </div>
+                                <div class="draft-delete">
+                                    <i class="bi bi-trash3"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="draft-container">
+                        <div class="draft-card">
+                            <div class="draft-image">
+                                <i class="bi bi-floppy"></i>
+                            </div>
+                            <div class="draft-details">
+                                <div class="draft-title">
+                                    <h4>Title</h4>
+                                </div>
+                                <div class="draft-delete">
+                                    <i class="bi bi-trash3"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -215,183 +278,10 @@
                 <div class="modal-footer">
                     <button type="button" class="back-btn">Back</button>
                     <button type="button" class="next-btn">Next</button>
-                    <button type="button" class="save-btn">Save</button>
+                    <button type="button" class="save-btn">Upload</button>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit Lesson</h5>
-                    <div class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <!-- Step 1: Edit Video -->
-                    <div class="modal-step" id="editstep1">
-                        <div class="progress-container">
-                            <div class="step active">
-                                <div class="bullet">1</div>
-                                <div class="title">Edit Video</div>
-                            </div>
-                            <div class="line"></div>
-                            <div class="step">
-                                <div class="bullet">2</div>
-                                <div class="title">Edit Quiz</div>
-                            </div>
-                            <div class="line"></div>
-                            <div class="step">
-                                <div class="bullet">3</div>
-                                <div class="title">Edit Preview</div>
-                            </div>
-                        </div>
-                        <div class="upload-video">
-                            <div class="category">
-                                <h5>Category</h5>
-                                <div class="selected" id="editSelectedCategory">Select a category</div>
-                                <ul class="dropdown-options">
-                                    <li class="options" data-value="1">General Knowledge</li>
-                                    <li class="options" data-value="2">Parking</li>
-                                    <li class="options" data-value="3">Traffic Laws and Regulations</li>
-                                    <li class="options" data-value="4">Driving Ethics and Safety</li>
-                                    <li class="options" data-value="5">Road Signs and Markings</li>
-                                    <li class="options" data-value="6">Vehicle Operations and Maintenance</li>
-                                </ul>
-                            </div>
-                            <div class="video-title">
-                                <h5>Title</h5>
-                                <input type="text" id="editVideoTitleInput" placeholder="Enter video title">
-                            </div>                            
-                            <div class="video-thumbnail">
-                                <h5>Edit Video Thumbnail</h5>
-                                <div class="video-thumbnail-box" id="editvideothumbnailbox">
-                                    <div class="video-thumbnail-area" id="editvideothumbnailarea">
-                                        <i class="bi bi-image-fill"></i>
-                                        <p>Add/Change Thumbnail</p>
-                                    </div>
-                                </div>
-                                <i id="editThumbnailButton">Choose a Thumbnail</i>
-                                <input type="file" id="editThumbnailUpload" accept="image/*" style="display: none;">
-                            </div>                            
-                            <div class="video-upload">
-                                <h5>Edit Video</h5>
-                                <div class="video-upload-box" id="editvideouploadbox">
-                                    <div class="video-upload-area" id="editvideouploadarea">
-                                        <i class="bi bi-file-earmark-play-fill"></i>
-                                        <p>Add/Change Video</p>
-                                    </div>
-                                </div>
-                                <i id="editVideoButton">Choose a Video</i>
-                                <input type="file" id="editVideoUpload" accept="video/*" style="display: none;">
-                            </div>                            
-                        </div>
-                    </div> 
-                    <!-- Step 2: Edit Quiz -->
-                    <div id="editstep2" class="modal-step d-none">
-                        <div class="progress-container">
-                            <div class="step active">
-                                <div class="bullet">1</div>
-                                <div class="title">Edit Video</div>
-                            </div>
-                            <div class="line completed"></div>
-                            <div class="step active">
-                                <div class="bullet">2</div>
-                                <div class="title">Edit Quiz</div>
-                            </div>
-                            <div class="line"></div>
-                            <div class="step">
-                                <div class="bullet">3</div>
-                                <div class="title">Edit Preview</div>
-                            </div>
-                        </div>
-                        <div class="edit-quiz-container">
-                            <div class="quiz-content">
-                                <h5>Quiz</h5>
-                            </div>
-                            <div class="add-question-container">
-                                <button type="button" class="add-question">Add Question</button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Step 3: Edit Preview -->
-                    <div id="editstep3" class="modal-step d-none">
-                        <div class="progress-container">
-                            <div class="step active">
-                                <div class="bullet">1</div>
-                                <div class="title">Edit Video</div>
-                            </div>
-                            <div class="line completed"></div>
-                            <div class="step active">
-                                <div class="bullet">2</div>
-                                <div class="title">Edit Quiz</div>
-                            </div>
-                            <div class="line completed"></div>
-                            <div class="step active">
-                                <div class="bullet">3</div>
-                                <div class="title">Edit Preview</div>
-                            </div>
-                        </div>
-                        <div class="preview">
-                            <h5>Preview</h5>
-                            <div class="preview-container1">
-                                <h5>Category</h5>
-                                <div id="editCategoryPreviewContainer">
-                                    <!-- Selected category will be displayed here -->
-                                </div>
-                            </div>
-                            
-                            <!-- Add the Video Title Preview -->
-                            <div class="preview-container1">
-                                <div class="video-title-preview">
-                                    <h5>Video Title</h5>
-                                    <div id="editVideoTitlePreviewContainer"></div> <!-- Dedicated space for video title -->
-                                </div>
-                            </div>
-
-                            <div class="preview-container">
-                                <!-- Video Preview -->
-                                <div class="video-preview">
-                                    <h5>Video</h5>
-                                    <div id="editVideoPreviewContainer"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="preview-container">
-                                <!-- Thumbnail Preview -->
-                                <div class="thumbnail-preview">
-                                    <h5>Video Display</h5>
-                                    <div id="editThumbnailPreviewContainer"></div>
-                                </div>
-                            </div>
-
-                            <div class="preview-container">
-                                <!-- Quiz Preview -->
-                                <div class="quiz-preview">
-                                    <h5>Quiz</h5>
-                                    <div id="editQuizPreviewContainer">
-                                        <!-- Quiz questions should dynamically load here for preview -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="back-btn">Back</button>
-                    <button type="button" class="next-btn">Next</button>
-                    <button type="button" class="editSavebtn">Save</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="loader1" class="loader1">
-        <div class="car-loader"></div>
-        <p>Saving Lesson<span class="dots"></span></p>
     </div>
 
     <!-- Delete Confirmation Modal -->
@@ -402,28 +292,11 @@
                     <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this Lesson?
+                    Are you sure you want to delete this draft?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" id="confirmDeleteBtn">Delete</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="saveDraftConfirmationModal" tabindex="-1" aria-labelledby="saveDraftConfirmationModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="saveDraftConfirmationModalLabel">Save Draft</h5>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to save this lesson as a draft?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="confirmDraftBtn">Yes</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
                 </div>
             </div>
         </div>
@@ -463,12 +336,12 @@
             </div>
         </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script type="module" src="JS/adminonlinetdc.js"></script>
+    <script type="module" src="JS/adminuploaddrafts.js"></script>
     <script type="module" src="JS/admincommon.js"></script>
-
 </body>
 </html>

@@ -214,52 +214,31 @@ h2 {
     gap: 10px;
 }
 
-.quiz-bank-container {
+.draft-list {
     display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 20px;
 }
 
-.drafts, .quiz-bank-btn {
-    font-family: Poppins;
-    font-size: 14px;
-    color: #ffffff;
-    background-color: #142a74;
-    border-radius: 10px;
-    padding: 10px 20px;
-    border: none;
-    transition: background-color 0.3s ease;
-}
-
-.drafts:hover, .quiz-bank-btn:hover {
-    background-color: #1B3286;
-    color: #ffffff;
-    text-decoration: none;
-}
-
-.course-content {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-}
-
-.course-content-list {
+.draft-container {
     flex: 0 1 calc(33.333% - 20px);
     display: flex;
     flex-direction: column;
     border-radius: 10px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
 }
 
-.course-card {
+.draft-card {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
 }
 
-.course-image {
+.draft-image {
     background-color: #142A74;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -270,15 +249,16 @@ h2 {
     flex-shrink: 0;
 }
 
-.course-image img {
-    width: 100%;
+.draft-image i {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100%;
-    object-fit: cover;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    font-size: 50px;
+    color: #ffffff;
 }
 
-.course-details {
+.draft-details {
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -289,99 +269,32 @@ h2 {
     justify-content: space-between;
 }
 
-.course-title {
+.draft-title {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-.course-title h3 {
+.draft-title h4 {
     margin: 0;
     font-size: 22px;
     font-weight: bold;
     color: #2F2E2E;
 }
 
-.course-options {
+.draft-delete {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
 }
 
-.bi-three-dots-vertical {
+.bi-trash3 {
     background: none;
     border: none;
     font-size: 20px;
-    color: #2F2E2E;
+    color: #B60505;
     cursor: pointer;
-}
-
-.triple-dot-options {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    border: 1px solid #D9D9D9;
-    border-radius: 10px;
-    z-index: 1;
-    min-width: 120px;
-}
-
-.triple-dot-options i {
-    font-family: Poppins;
-    font-size: 14px;
-    color: #2F2E2E;
-    cursor: pointer;
-    padding: 8px 12px;
-    text-decoration: none;
-    display: block;
-}
-
-.triple-dot-options i:hover {
-    background-color: #142A74;
-    color: #ffffff;
-    border-radius: 10px;
-}
-
-.upload-container {
-    flex: 0 1 calc(33.333% - 20px);
-    display: flex;
-    flex-direction: column;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-.upload-box {
-    border: 2px dashed #9CA3AF;
-    padding: 20px;
-    text-align: center;
-    border-radius: 10px;
-    background: #F3F4F6;
-    width: 100%;
-    height: 100%;
-}
-
-.upload-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
-
-.upload-area i {
-    font-size: 64px;
-    color: #9CA3AF;
-}
-
-.upload-area p {
-    font-family: Poppins;
-    font-size: 14px;
-    font-weight: normal;
-    color: #9CA3AF;
-    margin-top: 10px;
 }
 
 @keyframes popOut {
@@ -1388,4 +1301,36 @@ h2 {
 
 .modal::-webkit-scrollbar-thumb:hover {
     background-color: #0e1d4d; /* Darker color on hover */
+}
+
+.btn-primary {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #B60505;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #c9302c;
+}
+
+.btn-secondary {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #1B3286;
 }

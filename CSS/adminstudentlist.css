@@ -467,7 +467,7 @@ h2 {
 
 .pagination-controls .bi-caret-left.disabled, .pagination-controls .bi-caret-right.disabled {
     opacity: 0.5;
-    cursor: default;
+    cursor: pointer;
 }
 
 .pagination-controls .bi-caret-left:hover, .pagination-controls .bi-caret-right:hover {
@@ -790,6 +790,9 @@ h2 {
     vertical-align: middle;
 }
 
+.evaluation-table thead th {
+    text-align: center;
+}
 
 .evaluation-table td input {
     padding: 5px;
@@ -849,7 +852,7 @@ tbody tr .main-text {
     padding: 5px;
     color: #142A74;
     padding: 5px;
-    border: none;
+    border: 1px solid #D9D9D9;
     resize: none;
     overflow: hidden;
 }
@@ -1160,4 +1163,42 @@ tbody tr .main-text {
     100% {
         content: '.';
     }
+}
+
+.popover {
+    border-radius: 10px;
+    background-color: #f8f9fa; /* Light background color */
+    width: auto;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out; /* Smooth transition */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for better visibility */
+    padding: 10px; /* Adjust padding inside popover */
+}
+
+/* Popover visible state */
+.popover.show {
+    opacity: 1; /* Make it visible */
+}
+
+/* Style for the popover arrow */
+.popover .arrow {
+    border-width: 10px;
+    border-color: transparent;
+}
+
+/* Popover body style */
+.popover-body {
+    font-size: 14px; /* Adjust font size for content */
+    padding: 10px; /* Add padding to the body */
+    color: #333; /* Text color */
+}
+
+/* Optional: Add custom background color and text color for better visibility */
+.popover-header {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 10px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 16px;
+    border-radius: 10px 10px 0 0;
 }

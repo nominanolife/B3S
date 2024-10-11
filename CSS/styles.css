@@ -503,6 +503,12 @@ h5 {
     text-decoration: none; /* Remove underline */
 }
 
+#passwordRequirements {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
 .loader1 {
     display: none;
     position: fixed;

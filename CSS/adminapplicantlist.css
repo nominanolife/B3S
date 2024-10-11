@@ -425,7 +425,7 @@ h5 {
 
 .pagination-controls .bi-caret-left.disabled, .pagination-controls .bi-caret-right.disabled {
     opacity: 0.5;
-    cursor: default;
+    cursor: pointer;
 }
 
 .pagination-controls .bi-caret-left:hover, .pagination-controls .bi-caret-right:hover {
@@ -480,7 +480,7 @@ h5 {
 .close {
     font-size: 24px;
     color: #142A74;
-    cursor: default;
+    cursor: pointer;
 }
 
 #smsModal .modal-dialog {

@@ -316,28 +316,31 @@ function exportListToPDF() {
     startY: 20,
     theme: 'grid',
     headStyles: { 
-      fillColor: '#142A74',
-      textColor: '#FFFFFF',
-      fontStyle: 'bold',
+      fillColor: [255, 255, 255], // White header background
+      textColor: [0, 0, 0],       // Black text color
       halign: 'center',
       valign: 'middle',
       lineWidth: 0.5, 
     },
     bodyStyles: {
+      fillColor: [255, 255, 255], // White body background
+      textColor: [0, 0, 0],       // Black text color
       halign: 'center',
       valign: 'middle',
       lineWidth: 0.5,
     },
-    tableLineColor: '#000000',
+    tableLineColor: '#2F2E2E',
     tableLineWidth: 0.1,
     columnStyles: {
-      0: { halign: 'center' },
-      1: { halign: 'center' },
-      2: { halign: 'center' },
-      3: { halign: 'center' },
+      0: { halign: 'left' },
+      1: { halign: 'left' },
+      2: { halign: 'left' },
+      3: { halign: 'left' },
       4: { halign: 'left' },
-      5: { halign: 'center' },
-      6: { halign: 'center' },
+      5: { halign: 'left' },
+      6: { halign: 'left' },
+      7: { halign: 'left' },
+      8: { halign: 'left' }
     }
   });
 
