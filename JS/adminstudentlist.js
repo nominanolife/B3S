@@ -786,6 +786,8 @@ function openEditModal(index, modalId = 'editCcnModal') {
       saveButton.setAttribute('data-student-index', index);
   }
 
+  validateForm(modalId); 
+
   // Show the correct modal with options to prevent closing
   const modalToOpen = new bootstrap.Modal(document.getElementById(modalId), {
       backdrop: 'static',
@@ -1258,6 +1260,8 @@ if (studentData.Mchecklist) {
   saveButton.setAttribute('data-student-index', index);
 
   console.log("Setting data-student-index to:", index); // Debugging output
+
+  validateForm(modalId); 
 
   // Show the correct modal with options to prevent closing
   const modalToOpen = new bootstrap.Modal(document.getElementById(modalId), {
@@ -1947,6 +1951,12 @@ function checkIfDataExists(modalId) {
 
 // Attach popover for the next button
 function attachNextButtonPopover(nextBtn, message) {
+  // Destroy any existing popover before attaching a new one to avoid duplicates
+  const existingPopover = bootstrap.Popover.getInstance(nextBtn);
+  if (existingPopover) {
+    existingPopover.dispose();
+  }
+
   // Initialize Bootstrap popover with the message
   const popoverInstance = new bootstrap.Popover(nextBtn, {
       content: message,
@@ -1966,54 +1976,66 @@ function attachNextButtonPopover(nextBtn, message) {
   });
 }
 
-// Function to validate if all required fields are filled
 function validateForm(modalId) {
   const modalElement = document.getElementById(modalId);
   const scoreInputs = modalElement.querySelectorAll('input.numeric-input');
-  const vehicleTypeSelectedElement = modalElement.querySelector('.selected'); // Get the vehicle type dropdown label
-
-  // Check if the vehicle type label exists and get its text
-  const vehicleTypeSelected = vehicleTypeSelectedElement ? vehicleTypeSelectedElement.textContent : '';
-
+  
   let allScoresFilled = true;
   let isVehicleTypeSelected = true;
-  let missingFieldsMessage = ''; // Message to display if fields are missing
 
   // Check if all score inputs are filled
   scoreInputs.forEach(input => {
-      const value = input.value.trim();
-      if (value === '' || parseFloat(value) < 0 || parseFloat(value) > 5) {
-          allScoresFilled = false;
-      }
+    const value = input.value.trim();
+    if (value === '' || parseFloat(value) < 0 || parseFloat(value) > 5) {
+      allScoresFilled = false;
+    }
   });
 
-  // Check if vehicle type is selected (ensure it's not the default value)
-  isVehicleTypeSelected = vehicleTypeSelected !== 'Select Vehicle' && vehicleTypeSelected !== '';
-
-  // Determine the message to show in the popover
-  if (!allScoresFilled && !isVehicleTypeSelected) {
-      missingFieldsMessage = 'Please fill out both the vehicle type and score fields.';
-  } else if (!allScoresFilled) {
-      missingFieldsMessage = 'Please fill out all the score fields';
-  } else if (!isVehicleTypeSelected) {
-      missingFieldsMessage = 'Please select vehicle type';
+  // If the modal is 'edit4WheelsModal', we need to check the vehicle type selection as well
+  if (modalId === 'edit4WheelsModal') {
+    const vehicleTypeSelectedElement = modalElement.querySelector('.selected');
+    const vehicleTypeSelected = vehicleTypeSelectedElement ? vehicleTypeSelectedElement.textContent : '';
+    isVehicleTypeSelected = vehicleTypeSelected !== 'Select Vehicle' && vehicleTypeSelected !== '';
   }
 
-  // Enable or disable the next button based on the validation
+  // Determine the next button and enable or disable it based on the validation
   const nextBtn = modalElement.querySelector('.next-btn');
   if (nextBtn) {
-      nextBtn.disabled = !(allScoresFilled && isVehicleTypeSelected); // Disable if conditions are not met
+    // Reset the popover message
+    let message = '';
+    let showPopover = false;
 
-      // Attach or update popover message if button is disabled
-      if (nextBtn.disabled) {
-          attachNextButtonPopover(nextBtn, missingFieldsMessage); // Update popover with message
-      } else {
-          // Destroy existing popover if validation passes
-          const popoverInstance = bootstrap.Popover.getInstance(nextBtn);
-          if (popoverInstance) {
-              popoverInstance.dispose();
-          }
+    if (modalId === 'editMotorsModal') {
+      // In 'editMotorsModal', we only care about the scores being filled out
+      nextBtn.disabled = !allScoresFilled;
+      if (!allScoresFilled) {
+        message = 'Please fill out all the score fields';
+        showPopover = true;
       }
+    } else if (modalId === 'edit4WheelsModal') {
+      // In 'edit4WheelsModal', both the vehicle type and scores should be filled
+      nextBtn.disabled = !(allScoresFilled && isVehicleTypeSelected);
+      if (!isVehicleTypeSelected && !allScoresFilled) {
+        message = 'Please select vehicle type and fill out all the score fields';
+        showPopover = true;
+      } else if (!isVehicleTypeSelected) {
+        message = 'Please select vehicle type';
+        showPopover = true;
+      } else if (!allScoresFilled) {
+        message = 'Please fill out all the score fields';
+        showPopover = true;
+      }
+    }
+
+    if (showPopover) {
+      attachNextButtonPopover(nextBtn, message);
+    } else {
+      // Destroy existing popover if validation passes
+      const popoverInstance = bootstrap.Popover.getInstance(nextBtn);
+      if (popoverInstance) {
+        popoverInstance.dispose();
+      }
+    }
   }
 }
 
@@ -2021,20 +2043,22 @@ function validateForm(modalId) {
 function attachValidationListeners(modalId) {
   const modalElement = document.getElementById(modalId);
   const scoreInputs = modalElement.querySelectorAll('input.numeric-input');
-  const vehicleDropdown = document.getElementById('vehicleDropdown');
 
   // Validate when any score input changes
   scoreInputs.forEach(input => {
-      input.addEventListener('input', () => validateForm(modalId));
+    input.addEventListener('input', () => validateForm(modalId));
   });
 
-  // Validate when vehicle type is selected
-  if (vehicleDropdown) {
+  // For edit4WheelsModal, validate when vehicle type is selected
+  if (modalId === 'edit4WheelsModal') {
+    const vehicleDropdown = document.getElementById('vehicleDropdown');
+    if (vehicleDropdown) {
       vehicleDropdown.addEventListener('click', (e) => {
-          if (e.target.classList.contains('option')) {
-              validateForm(modalId); // Run validation after vehicle type selection
-          }
+        if (e.target.classList.contains('option')) {
+          validateForm(modalId); // Run validation after vehicle type selection
+        }
       });
+    }
   }
 
   // Initial validation when the modal opens
