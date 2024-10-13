@@ -509,6 +509,7 @@ function updateEditPreview() {
     }
 }
 
+
 document.addEventListener('DOMContentLoaded', async function () {
     fetchSavedVideosAndQuizzes();
     const uploadContainer = document.querySelector('.upload-container');
@@ -525,7 +526,235 @@ document.addEventListener('DOMContentLoaded', async function () {
     const editSelected = editCategorySelectElement.querySelector('.selected');
     const editOptionsContainer = editCategorySelectElement.querySelector('.dropdown-options');
     const editOptionsList = editOptionsContainer.querySelectorAll('.options');
-    
+
+
+// Declare a global variable for documentId
+let documentId = null;
+
+// Ensure DOM elements are selected first
+const thumbnailUploadInput = document.getElementById('thumbnailUpload');
+const videoUploadInput = document.getElementById('videoUpload');
+const videoTitleInputField = document.getElementById('videoTitleInput');
+
+// Function to handle file uploads when files are selected
+async function handleFileUpload(file, folder, docId, fileType) {
+    if (!file) {
+        console.log(`No ${fileType} file selected.`);
+        return '';
+    }
+
+    const fileRef = ref(storage, `${folder}/${docId}_${fileType}.${file.type.split('/')[1]}`);
+    console.log(`Uploading ${fileType}...`);
+    await uploadBytes(fileRef, file);
+    const fileURL = await getDownloadURL(fileRef);
+    console.log(`${fileType} uploaded successfully:`, fileURL);
+    return fileURL;
+}
+
+// Save the form data to session storage when relevant inputs change
+function saveFormDataToSession() {
+    const videoFile = videoUploadInput.files[0] ? videoUploadInput.files[0].name : '';
+    const thumbnailFile = thumbnailUploadInput.files[0] ? thumbnailUploadInput.files[0].name : '';
+    const title = videoTitleInputField.value.trim();
+    const category = document.querySelector('.category .selected') ? document.querySelector('.category .selected').textContent.trim() : '';
+
+    const draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
+    draftData.quizQuestions = draftData.quizQuestions || [];
+    const quizContainers = document.querySelectorAll('.quiz-container');
+    const quizQuestions = [];
+
+    quizContainers.forEach((container, index) => {
+        const questionText = container.querySelector('.question-input input').value.trim();
+        const options = Array.from(container.querySelectorAll('.question-options input[type="text"]')).map(input => input.value.trim());
+        const correctOption = container.querySelector('.question-options input[type="radio"]:checked');
+
+        let imageFile = sessionStorage.getItem(`quizDraftImageURL_${index}`) || ''; // Draft-specific variable name
+        quizQuestions.push({
+            question: questionText || '',
+            options: options || [],
+            correctAnswer: correctOption ? Array.from(container.querySelectorAll('.question-options input[type="radio"]')).indexOf(correctOption) : null,
+            imageFile: imageFile  // Saving the draft-specific image file
+        });
+    });
+
+    draftData.title = title;
+    draftData.category = category;
+    draftData.videoFile = videoFile;
+    draftData.thumbnailFile = thumbnailFile;
+    draftData.quizQuestions = quizQuestions;
+
+    sessionStorage.setItem('draftData', JSON.stringify(draftData));
+    console.log("Session storage updated with form data:", sessionStorage.getItem('draftData'));
+}
+
+// Attach event listeners to input fields to save form data on changes
+document.querySelectorAll('#uploadModal input, #uploadModal select').forEach(element => {
+    element.addEventListener('input', saveFormDataToSession);
+});
+
+// Immediate upload of thumbnail and video files
+thumbnailUploadInput.addEventListener('change', async function () {
+    const thumbnailFile = thumbnailUploadInput.files[0];
+
+    // If no documentId, create draft and set documentId globally
+    if (!documentId) {
+        await createDraftAndSetDocumentId();
+    }
+
+    if (thumbnailFile && documentId) {
+        const thumbnailURL = await handleFileUpload(thumbnailFile, 'dThumbnails', documentId, 'thumbnail');
+        sessionStorage.setItem('thumbnailURL', thumbnailURL);  // Save URL in session storage
+        saveFormDataToSession();  // Update session storage
+    }
+});
+
+videoUploadInput.addEventListener('change', async function () {
+    const videoFile = videoUploadInput.files[0];
+
+    // If no documentId, create draft and set documentId globally
+    if (!documentId) {
+        await createDraftAndSetDocumentId();
+    }
+
+    if (videoFile && documentId) {
+        const videoURL = await handleFileUpload(videoFile, 'dVideos', documentId, 'video');
+        sessionStorage.setItem('videoURL', videoURL);  // Save URL in session storage
+        saveFormDataToSession();  // Update session storage
+    }
+});
+
+// Handle image uploads for draft-specific quiz questions (to avoid conflicts)
+document.querySelectorAll('.quiz-container').forEach((container, index) => {
+    const imageUploadDraftInput = container.querySelector(`#imageUpload${index + 1}`); // Draft-specific variable name
+    const imageUploadDraftBox = container.querySelector('.image-upload-box .image-upload-area');
+
+    imageUploadDraftBox.addEventListener('click', function () {
+        imageUploadDraftInput.click();
+    });
+
+    imageUploadDraftInput.addEventListener('change', async function () {
+        if (imageUploadDraftInput.files.length > 0) {
+            const file = imageUploadDraftInput.files[0];
+
+            // If no documentId, create draft and set documentId globally
+            if (!documentId) {
+                await createDraftAndSetDocumentId();
+            }
+
+            if (documentId) {
+                const quizDraftImageURL = await handleFileUpload(file, 'dQuiz_images', documentId, `question_${index + 1}`);
+                if (quizDraftImageURL) {
+                    sessionStorage.setItem(`quizDraftImageURL_${index}`, quizDraftImageURL);  // Save the image URL to sessionStorage
+                    saveFormDataToSession();  // Update session storage
+                } else {
+                    console.log(`Image upload failed for draft question ${index + 1}`);
+                }
+            } else {
+                console.log('Document ID is not available for uploading quiz image.');
+            }
+        }
+    });
+});
+
+// Save the draft to Firestore and set documentId globally
+async function createDraftAndSetDocumentId() {
+    const draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
+    const draftDocRef = await addDoc(collection(db, 'onlineDrafts'), {
+        title: draftData.title || '',
+        category: draftData.category || '',
+        thumbnailURL: '',  // Placeholder for thumbnail URL
+        videoURL: '',      // Placeholder for video URL
+        status: 'draft',
+        createdAt: new Date()
+    });
+    documentId = draftDocRef.id; // Set the global documentId
+    console.log('Draft document created with ID:', documentId);
+}
+
+// Event listener for final submission to Firestore
+async function saveDraftFromSession() {
+    const draftData = JSON.parse(sessionStorage.getItem('draftData'));
+
+    toggleLoader(true);  // Show loader while saving the draft
+
+    try {
+        // If no documentId, create draft and set documentId globally
+        if (!documentId) {
+            await createDraftAndSetDocumentId();
+        }
+
+        // Upload thumbnail and video files if not done already
+        let thumbnailURL = sessionStorage.getItem('thumbnailURL') || '';
+        let videoURL = sessionStorage.getItem('videoURL') || '';
+
+        // Upload or update thumbnail file
+        if (draftData.thumbnailFile && !thumbnailURL) {
+            thumbnailURL = await handleFileUpload(thumbnailUploadInput.files[0], 'dThumbnails', documentId, 'thumbnail');
+        }
+
+        // Upload or update video file
+        if (draftData.videoFile && !videoURL) {
+            videoURL = await handleFileUpload(videoUploadInput.files[0], 'dVideos', documentId, 'video');
+        }
+
+        // Handle quiz questions and image URLs from session storage
+        const quizContainers = document.querySelectorAll('.quiz-container');
+        let quizQuestions = await Promise.all(
+            draftData.quizQuestions.map(async (question, index) => {
+                let quizImageURL = sessionStorage.getItem(`quizImageURL_${index + 1}`) || '';  // Correct index is +1 here
+                const imageUploadInput = quizContainers[index].querySelector(`#imageUpload${index + 1}`);
+
+                // If an image is re-uploaded, handle the new image upload
+                if (question.imageFile && imageUploadInput && imageUploadInput.files.length > 0 && !quizImageURL) {
+                    quizImageURL = await handleFileUpload(imageUploadInput.files[0], 'dQuiz_images', documentId, `question_${index + 1}`);
+                }
+
+                // Return the updated question object with the image URL or original image URL
+                return {
+                    ...question,
+                    imageFile: quizImageURL || question.imageFile  // Use the new URL if uploaded, otherwise keep the original
+                };
+            })
+        );
+
+        // Update Firestore document with URLs and quiz questions, ensuring no fields are deleted
+        await updateDoc(doc(db, 'onlineDrafts', documentId), {
+            thumbnailURL: thumbnailURL || draftData.thumbnailFile,
+            videoURL: videoURL || draftData.videoFile,
+            quizQuestions: quizQuestions
+        });
+
+        toggleLoader(false);
+        showNotification('Draft saved successfully.');
+        $('#uploadModal').modal('hide');  // Close the modal
+
+        // Clear session storage after saving
+        clearSessionStorage();
+    } catch (error) {
+        console.error('Error saving draft:', error);
+        toggleLoader(false);
+        showNotification('An error occurred while saving the draft. Please try again.');
+    }
+}
+
+// Helper function to clear session storage after saving
+function clearSessionStorage() {
+    sessionStorage.removeItem('draftData');
+    sessionStorage.removeItem('thumbnailURL');
+    sessionStorage.removeItem('videoURL');
+
+    // Clear all quiz image URLs
+    Object.keys(sessionStorage).forEach(key => {
+        if (key.startsWith('quizImageURL_')) {
+            sessionStorage.removeItem(key);
+        }
+    });
+}
+
+// Event listener for the "Yes" button in the confirmation modal
+document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFromSession);
+
+
     $('#uploadModal').on('shown.bs.modal', function () {
         currentStep = 0; // Reset to Step 1
         showStep(currentStep); // Ensure Step 1 is displayed
@@ -897,18 +1126,18 @@ document.addEventListener('DOMContentLoaded', async function () {
         questionCount++;
         const quizContent = document.querySelector('.quiz-content');
         const newQuestion = document.createElement('div');
-    
+        
         newQuestion.classList.add('quiz-container');
-    
-        // Ensure that optionValues is always an array (even if questionData.options is undefined)
-        const questionText = questionData?.question || '';  // Optional chaining to avoid errors
+        
+        const questionText = questionData?.question || '';
         const optionValues = questionData?.options?.length 
             ? questionData.options 
             : [{ label: '', value: '' }, { label: '', value: '' }, { label: '', value: '' }, { label: '', value: '' }];
         const correctAnswer = questionData?.correctAnswer ?? null;
     
-        newQuestion.innerHTML = 
-            `<div class="quiz-container-header">
+        // Create the new question HTML
+        newQuestion.innerHTML = `
+            <div class="quiz-container-header">
                 <h5>Question ${questionCount}</h5>
             </div>
             <div class="quiz-question">
@@ -946,7 +1175,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                 </div>
                 <div class="delete-question">
                     <button class="delete-question-btn">Delete</button>
-                </div>`;
+                </div>
+            </div>
+        `;
     
         quizContent.appendChild(newQuestion);
     
@@ -954,27 +1185,72 @@ document.addEventListener('DOMContentLoaded', async function () {
             newQuestion.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     
+        // Attach event listeners to dynamically added elements
+        const questionInput = newQuestion.querySelector('.question-input input');
+        questionInput.addEventListener('input', saveFormDataToSession);
+    
+        const optionInputs = newQuestion.querySelectorAll('.question-options input[type="text"]');
+        optionInputs.forEach(optionInput => {
+            optionInput.addEventListener('input', saveFormDataToSession);
+        });
+    
+        const radioButtons = newQuestion.querySelectorAll('.question-options input[type="radio"]');
+        radioButtons.forEach(radioButton => {
+            radioButton.addEventListener('change', saveFormDataToSession);
+        });
+    
+        // Image upload handling
         const imageUploadInput = newQuestion.querySelector(`#imageUpload${questionCount}`);
         const imageUploadBox = newQuestion.querySelector('.image-upload-box .image-upload-area');
-    
-        newQuestion.querySelector('.image-upload-box').addEventListener('click', function () {
+        
+        imageUploadBox.addEventListener('click', function () {
             imageUploadInput.click();
         });
     
-        imageUploadInput.addEventListener('change', function () {
+        imageUploadInput.addEventListener('change', async function () {
             if (imageUploadInput.files.length > 0) {
                 const file = imageUploadInput.files[0];
                 const imageUrl = URL.createObjectURL(file);
                 imageUploadBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="${file.name}">`;
+    
+                // Ensure documentId is available, create it if necessary
+                if (!documentId) {
+                    await createDraftAndSetDocumentId();  // Create the draft and set documentId if not already set
+                }
+    
+                if (documentId) {
+                    // Upload image to Firebase
+                    const quizImageURL = await handleFileUpload(file, 'dQuiz_images', documentId, `question_${questionCount}`);
+        
+                    if (quizImageURL) {
+                        // Save the image URL to sessionStorage and update draftData
+                        sessionStorage.setItem(`quizImageURL_${questionCount}`, quizImageURL);
+        
+                        const draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
+                        draftData.quizQuestions = draftData.quizQuestions || [];
+                        draftData.quizQuestions[questionCount - 1] = draftData.quizQuestions[questionCount - 1] || {};
+                        draftData.quizQuestions[questionCount - 1].imageFile = quizImageURL;
+                        sessionStorage.setItem('draftData', JSON.stringify(draftData));
+        
+                        console.log('Updated draftData with new image URL:', draftData);
+                    } else {
+                        console.log(`Image upload failed for question ${questionCount}`);
+                    }
+                } else {
+                    console.log('Document ID is not available for uploading quiz image.');
+                }
             }
         });
     
+        // Handle delete button
         const deleteButton = newQuestion.querySelector('.delete-question-btn');
         deleteButton.addEventListener('click', function () {
             quizContent.removeChild(newQuestion);
             updateQuestionNumbers();
+            saveFormDataToSession();  // Update session storage after deleting a question
         });
     }
+    
 
     addQuestion();
 
@@ -1042,6 +1318,32 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Handle image upload functionality
         const imageUploadInput = newQuestion.querySelector(`#imageUpload${currentQuestionCount + 1}`);
         const imageUploadBox = newQuestion.querySelector('.image-upload-box .image-upload-area');
+
+        // Trigger the file input when the user clicks the image upload box
+        imageUploadBox.addEventListener('click', function () {
+            imageUploadInput.click();
+        });
+
+        // Handle the image preview and save the image to sessionStorage
+        imageUploadInput.addEventListener('change', function () {
+            if (imageUploadInput.files.length > 0) {
+                const file = imageUploadInput.files[0];
+                const imageUrl = URL.createObjectURL(file);
+
+                // Display the image preview
+                imageUploadBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="${file.name}">`;
+
+                // Store the image file in sessionStorage
+                let draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
+                draftData.quizQuestions = draftData.quizQuestions || [];
+                draftData.quizQuestions[currentQuestionCount] = draftData.quizQuestions[currentQuestionCount] || {};
+                draftData.quizQuestions[currentQuestionCount].imageFile = file.name;  // Store the file name for reference
+                draftData.quizQuestions[currentQuestionCount].imageData = file;  // Store the actual file object for later upload
+
+                // Save back to sessionStorage
+                sessionStorage.setItem('draftData', JSON.stringify(draftData));
+            }
+        });
     
         // Trigger file input when clicking the upload area
         newQuestion.querySelector('.image-upload-box').addEventListener('click', function () {
@@ -1284,11 +1586,19 @@ document.addEventListener('DOMContentLoaded', async function () {
                 category: category,
                 questions: quizQuestions
             });
-            
+    
+            // Step 7: Check if a draft exists (documentId), and delete the draft if it exists
+            if (documentId) {
+                await deleteDoc(doc(db, 'onlineDrafts', documentId));
+                documentId = null;  // Reset the draft ID after deletion
+            }
+    
+            // Turn off the loader and notify the user
             toggleLoader(false);
             showNotification('Video and Quiz saved successfully.');
             $('#uploadModal').modal('hide');
     
+            // Fetch updated saved videos and quizzes after successful save
             fetchSavedVideosAndQuizzes();
     
         } catch (error) {
@@ -1296,7 +1606,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             toggleLoader(false);
             showNotification('An error occurred while saving the video and quiz. Please try again.');
         }
-    });    
+    });   
 
     editSaveBtn.addEventListener('click', async function () {
         // Start by validating the form input before enabling the loader
