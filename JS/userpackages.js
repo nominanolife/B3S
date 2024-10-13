@@ -20,12 +20,19 @@ const auth = getAuth(app);
 // Common functions and variables
 let currentIndex = 0;
 const tilesPerPage = 1;
-const packageContainer = document.querySelector('.package-container');
 let packages = [];
 let userEnrolledPackage = null; // To store the user's enrolled package
 
+const packageSection = document.querySelector('.packages'); // Select the parent element
+
+// Dynamically create the package-container
+const packageContainer = document.createElement('div');
+packageContainer.classList.add('package-container'); // Add class
+packageSection.insertBefore(packageContainer, packageSection.querySelector('.fas.fa-chevron-right')); // Insert before right arrow
+
+// Rest of your code using the dynamically created packageContainer
 function renderPackages(packagesToRender) {
-  packageContainer.innerHTML = '';
+  packageContainer.innerHTML = ''; // Now it refers to the dynamically created container
 
   if (packagesToRender.length === 0) {
     packageContainer.innerHTML = '<h3>No packages are available at the moment.</h3>';
@@ -53,7 +60,7 @@ function renderPackages(packagesToRender) {
         </form>
       </div>
     `;
-    packageContainer.insertAdjacentHTML('beforebegin', packageHtml);
+    packageContainer.insertAdjacentHTML('beforeend', packageHtml); // Append inside the dynamically created container
   });
 
   $('body').on('mouseenter', '.enroll-now-button:disabled', function () {

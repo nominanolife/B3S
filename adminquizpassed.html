@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DriveHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="CSS/adminapplicantlist.css">
+    <link rel="stylesheet" href="CSS/adminquizpassed.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -43,16 +43,16 @@
             <div class="page-content">
                 <div class="page-content-header">
                     <div class="dashboard-bttns">
-                        <a href="adminapplicantlist.html" class="button-right active">APPLICANT LIST</a>
+                        <a href="adminapplicantlist.html" class="button-right">APPLICANT LIST</a>
                         <a href="adminstudentlist.html" class="button-right">STUDENT LIST</a>
                         <a href="admininstructorlist.html" class="button-right">INSTRUCTOR LIST</a>
-                        <a href="adminquizpassed.html" class="button-right">PASSED STUDENTS</a>
+                        <a href="adminquizpassed.html" class="button-right active">PASSED STUDENTS</a>
                     </div>
                 </div>
                 <div class="page-body">
-                    <div class="upcomming-container">
+                    <div class="passed-container">
                         <div class="title-header">
-                            <h2>APPLICANT LIST</h2>
+                            <h2>PASSED STUDENTS</h2>
                             <div class="search-container">
                                 <i class="bi bi-search"></i>
                                 <input type="text" class="search" placeholder="Search">
@@ -62,17 +62,22 @@
                             <thead class="table-headers">
                                 <tr class="table-headers-title">
                                     <th>NAME</th>
-                                    <th>EMAIL</th>
-                                    <th>PHONE NUMBER</th>
-                                    <th>ACTION</th>
+                                    <th>DATE</th>
+                                    <th>PERCENTAGE</th>
+                                    <th>CERTIFICATE ID</th>
                                 </tr>
                             </thead>
-                            <tbody class="applicant-list">
-                                <!-- Applicant rows will be dynamically inserted here -->
+                            <tbody class="passed-student-list">
+                                <tr class="table-row">
+                                    <td class="table-row-content">John Doe</td>
+                                    <td class="table-row-content">September 30, 2021</td>
+                                    <td class="table-row-content">80%</td>
+                                    <td class="table-row-content">123456789</td>
+                                </tr>
                             </tbody>
                         </table>
                         <!-- Pagination controls for Applicant List -->
-                        <div class="pagination-controls applicant-pagination-controls"></div>
+                        <div class="pagination-controls quizpassed-pagination-controls"></div>
                     </div>
                 </div>                
             </div>
@@ -82,37 +87,6 @@
     <div id="loader1" class="loader1">
         <div class="car-loader"></div>
         <p>Please wait<span class="dots"></span></p>
-    </div>
-    
-    <!-- SMS Modal -->
-    <div class="modal fade" id="smsModal" tabindex="-1" aria-labelledby="smsModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="smsModalLabel">Send SMS</h5>
-                    <div class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="sms-from">From:</label>
-                        <input type="text" id="sms-from" class="form-control" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label for="sms-to">To:</label>
-                        <input type="text" id="sms-to" class="form-control" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label for="sms-message">Message:</label>
-                        <textarea id="sms-message" class="form-control" rows="4" placeholder="Type your message here"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="sendSmsBtn">Send SMS</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Logout Confirmation Modal -->
@@ -140,7 +114,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="JS/adminapplicantlist.js"></script>
+    <script src="JS/adminquizpassed.js"></script>
     <script src="JS/admincommon.js"></script>
 </body>
 </html>
