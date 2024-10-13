@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, getDocs, orderBy, query, where, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -25,7 +25,60 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchCompletedStudents();  // Fetch all students from Firestore
   setupYearDropdown();  // Setup year filtering
   setupSearch();  // Setup search functionality
+  fetchPassedTDCStudents();
 });
+
+// Fetch passed TDC students and their details from the 'applicants' collection
+async function fetchPassedTDCStudents() {
+  const passedStudentsQuerySnapshot = await getDocs(
+    query(
+      collection(db, "userResults"),
+      where("passed", "==", true),
+    )
+  );
+
+  // Loop through each passed student and fetch their personal information
+  for (const passedStudentDoc of passedStudentsQuerySnapshot.docs) {
+    const passedStudentData = passedStudentDoc.data();
+
+    // Fetch the applicant's personal details from the 'applicants' collection using the same ID
+    const applicantDoc = await getDoc(doc(db, 'applicants', passedStudentDoc.id));
+    const applicantData = applicantDoc.exists() ? applicantDoc.data() : {};
+
+    // Avoid duplicating the same student entry by checking if the student is already in `studentsData`
+    const existingStudent = studentsData.find(student => student.id === passedStudentDoc.id);
+
+    if (!existingStudent) {
+      // Add the applicant's personal info to the passed student data
+      const personalInfo = applicantData.personalInfo || {};
+
+      // Combine the data from userResults and applicants
+      studentsData.push({
+        id: passedStudentDoc.id, // Use the student ID to avoid duplicates
+        name: `${personalInfo.first || ''} ${personalInfo.middle || ''} ${personalInfo.last || ''} ${personalInfo.suffix || ''}`.trim(),
+        email: applicantData.email || 'N/A',
+        phoneNumber: applicantData.phoneNumber || 'N/A',
+        packageName: applicantData.packageName || 'N/A', // Enrolled package is from the applicants table
+        packagePrice: applicantData.packagePrice || 'N/A', // Also get package price from applicants table
+        certificateControlNumber: 'N/A', // This field is not needed as per your request
+        completedBookings: [{ 
+          course: 'TDC',  // The course will be TDC for passed students
+          completionDate: passedStudentData.timestamp, // The date they passed the exam
+        }]
+      });
+    } else {
+      // If the student already exists, append the booking info to their completedBookings array
+      existingStudent.completedBookings.push({
+        course: 'TDC',
+        completionDate: passedStudentData.timestamp, // The date they passed the exam
+      });
+    }
+  }
+
+  // Render the students after fetching the passed ones
+  renderStudents();
+  updatePaginationControls();  // Update the pagination controls after rendering students
+}
 
 // Fetch all students from Firestore once
 async function fetchCompletedStudents() {
@@ -112,6 +165,7 @@ function setupSearch() {
   });
 }
 
+// Function to render all students
 function renderStudents() {
   const studentList = document.getElementById('student-list');
   studentList.innerHTML = ''; // Clear previous data
