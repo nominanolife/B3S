@@ -37,15 +37,20 @@ async function fetchQuizQuestions() {
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             const category = data.category;
-
-            quizDocuments.push({ id: doc.id, data: data });  // Store document ID
-
-            if (!quizzes[category]) {
-                quizzes[category] = [];
+        
+            // Ensure that the 'questions' field exists in the document before proceeding
+            if (data.questions && Array.isArray(data.questions)) {
+                quizDocuments.push({ id: doc.id, data: data });  // Store document ID
+        
+                if (!quizzes[category]) {
+                    quizzes[category] = [];
+                }
+        
+                quizzes[category].push(...data.questions);
+            } else {
+                console.warn(`Quiz document ${doc.id} does not contain a valid 'questions' field.`);
             }
-
-            quizzes[category].push(...data.questions);
-        });
+        });        
 
         // Render the questions grouped by category
         quizDocuments.forEach((quizDoc, index) => {

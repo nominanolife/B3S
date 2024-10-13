@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     const querySnapshot = await getDocs(q);
 
                     // Select the appointmentCard element
-                    const appointmentCard = document.querySelector('.appointment-card .card-body');
+                    const appointmentCard = document.querySelector('.appointment-card .card-container');
 
                     if (appointmentCard) {
                         if (!querySnapshot.empty) {
@@ -272,11 +272,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 
                                     const appointmentHTML = 
                                         `<h5 class="card-title">Upcoming Appointment</h5>
-                                        <div>
+                                        <div class="card-body">
                                             <p>${appointmentDateFormatted}</p>
                                             <p style="color: green;">${formattedStartTime} to ${formattedEndTime}</p>
                                         </div>
-                                        <button class="btn btn-primary" id="myscheduleBtn">My Schedule</button>`;
+                                        <button class="card-button" id="myscheduleBtn">My Schedule</button>`;
                                     appointmentCard.innerHTML = appointmentHTML;
                                 
                                     document.getElementById("myscheduleBtn").addEventListener("click", function() {
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     }
 
                     // Display the package price in the balance card
-                    const balanceCard = document.querySelector('.balance-card .card-body');
+                    const balanceCard = document.querySelector('.balance-card .card-container');
                     
                     if (balanceCard) {
                         if (userData.packagePrice && userData.packageName) {
@@ -309,8 +309,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     
                             balanceCard.innerHTML = `
                                 <h5 class="card-title">Current Balance</h5>
-                                <p class="card-title" style="color: red; font-size: 40px;">&#8369; ${userData.packagePrice}</p>
-                                <button class="btn btn-primary" id="viewDetailsBtn">View Details</button>
+                                <p class="card-body" style="color: red; font-size: 40px;">&#8369; ${userData.packagePrice}</p>
+                                <button class="card-button" id="viewDetailsBtn">View Details</button>
                             `;
             
                             document.getElementById("viewDetailsBtn").addEventListener("click", async function() {
@@ -371,36 +371,258 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
-    function initializeRoadmap(userData) {
-        const roadmapItems = document.querySelectorAll('.roadmap-item');
+    // Select all arrows in the roadmap
+    const roadmapSteps = document.querySelectorAll('.roadmap-container .arrow');
 
-        roadmapItems.forEach(item => {
-            item.addEventListener('click', function() {
-                const step = this.getAttribute('data-step');
-                let stepDetails = "";
+    // Function to update and show modal based on step
+    function openStepModal(step) {
+        const modalTitle = document.getElementById('roadmapstepsModalLabel');
+        const modalBody = document.querySelector('#roadmapstepsModal .modal-body');
+        
+        // Update modal content based on the step
+        let stepContent = '';
+        switch (step) {
+            case '1':
+                modalTitle.textContent = "Step 1: Theoretical Driving Course";
+                stepContent = `
+                    <div class="step-container">
+                        <h3>Prepare the Required Documents</h3>
+                        <p>Make sure you have the following:</p>
+                        <ul>
+                            <li>Valid ID (e.g., Driver’s License, Passport, Student ID, etc.)</li>
+                            <li>Birth Certificate (PSA-issued or local civil registrar)</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Visit an LTO-accredited Driving School</h3>
+                        <ul>
+                            <li>Search for a driving school accredited by the Land Transportation Office (LTO) that offers the TDC.</li>
+                            <li>Contact the school to confirm course schedules, fees, and enrollment requirements.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Enroll in the Theoretical Driving Course</h3>
+                        <ul>
+                            <li>Go to the selected driving school and present your Valid ID and Birth Certificate.</li>
+                            <li>Complete the enrollment process and pay the required fees.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Attend the TDC Sessions</h3>
+                        <ul>
+                            <li>The TDC consists of 15 hours of instruction, usually spread across 2 to 3 days.</li>
+                            <li>Topics include road safety, traffic rules and regulations, and basic vehicle operations.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Take the Course Assessment</h3>
+                        <ul>
+                            <li>After completing the course, you may be asked to take a quiz or assessment to evaluate your understanding of the lessons.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Receive the TDC Certificate</h3>
+                        <ul>
+                            <li>Upon passing the assessment (if required) and completing the course, the driving school will issue your TDC Certificate.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Submit TDC Certificate to LTO</h3>
+                        <ul>
+                            <li>Bring the TDC Certificate along with other documents (if applicable) when applying for a Student Permit or upgrading to a Driver’s License at the LTO office.</li>
+                        </ul>
+                    </div>
+                    `;
+                break;
+            case '2':
+                modalTitle.textContent = "Step 2: Student Permit";
+                stepContent = `
+                            <div class="step-container">
+                        <h3>Prepare the Required Document</h3>
+                        <p>Make sure to bring the following:</p>
+                        <ul>
+                            <li>Student Permit (SP) – must be valid and issued by the LTO.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Select an LTO-accredited Driving School</h3>
+                        <ul>
+                            <li>Search for a driving school accredited by the LTO that offers the Practical Driving Course (PDC).</li>
+                            <li>Contact the school to confirm the schedules, fees, and available vehicle types (e.g., manual or automatic).</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Enroll in the Practical Driving Course</h3>
+                        <ul>
+                            <li>Go to the driving school and present your Student Permit.</li>
+                            <li>Complete the enrollment process and pay the required fees.</li>
+                            <li>Choose between manual or automatic transmission training, depending on your preference and intended license type.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Attend the PDC Sessions</h3>
+                        <ul>
+                            <li>The course duration depends on the vehicle type and the school’s curriculum (usually around 8-10 hours).</li>
+                            <li>You will receive hands-on training covering vehicle operations, traffic regulations, and safe driving techniques.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Take the Course Assessment</h3>
+                        <ul>
+                            <li>At the end of the training, you may be required to complete an assessment to demonstrate your driving skills and knowledge.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Receive the PDC Certificate</h3>
+                        <ul>
+                            <li>Upon successfully completing the course and passing the assessment, the driving school will issue your PDC Certificate.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Use the PDC Certificate to Apply for a Driver’s License</h3>
+                        <ul>
+                            <li>Bring the PDC Certificate, Student Permit, and other required documents when applying for a Non-Professional or Professional Driver’s License at the LTO office.</li>
+                        </ul>
+                    </div>
+                `;
+            break;
+            case '3':
+                modalTitle.textContent = "Step 3: Practical Driving Course";
+                stepContent = `
+                    <div class="step-container">
+                        <h3>Prepare the Required Documents</h3>
+                        <p>Ensure you have the following:</p>
+                        <ul>
+                            <li>PDC Certificate from an LTO-accredited driving school (Minimum of 8 hours of actual driving required)</li>
+                            <li>Medical Certificate from an LTO-accredited clinic</li>
+                            <li>Valid Student Permit (SP) – Must be at least 17 years old</li>
+                            <li>Other fees (for the written exam, practical test, and license processing)</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Visit an LTO-accredited Clinic for Medical Certificate</h3>
+                        <ul>
+                            <li>Find an LTO-accredited clinic near you.</li>
+                            <li>Undergo the required medical examination.</li>
+                            <li>Pay the ₱500 fee and secure your Medical Certificate.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Go to the LTO Office</h3>
+                        <ul>
+                            <li>Bring all your documents (PDC Certificate, Medical Certificate, Student Permit) to the nearest LTO office that processes Non-Pro Driver’s License applications.</li>
+                            <li>Submit your documents to the LTO evaluator for verification.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Take the Written/Computerized Exam</h3>
+                        <ul>
+                            <li>Proceed to the examination room after your documents are verified.</li>
+                            <li>Take the written or computerized exam on road rules, traffic signs, and safe driving practices.</li>
+                            <li>Passing Score: Typically, you need at least 30 out of 40 points to pass.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Take the Practical Driving Test</h3>
+                        <ul>
+                            <li>If you pass the written exam, proceed to the driving test area.</li>
+                            <li>Use the vehicle type corresponding to your license code (A for motorcycles, B for light vehicles).</li>
+                            <li>An LTO examiner will assess your driving skills and adherence to traffic rules.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Proceed with Biometrics and Photo Capture</h3>
+                        <ul>
+                            <li>After passing the practical driving test, proceed to the biometrics section.</li>
+                            <li>Your photo, fingerprint, and signature will be captured for your license card.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Pay the License Fees</h3>
+                        <ul>
+                            <li>Proceed to the cashier to pay the required fees for the Non-Professional Driver’s License.</li>
+                            <li>Fees may vary slightly depending on the LTO branch.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Receive Your Non-Professional Driver’s License</h3>
+                        <ul>
+                            <li>After completing the process, the LTO will issue your Non-Professional Driver’s License.</li>
+                            <li>Validity: Typically 5 years, or 10 years if you have a clean driving record.</li>
+                        </ul>
+                    </div>
+                `;
+            break;
+            case '4':
+                modalTitle.textContent = "Step 4: Non-Professional Driver's License";
+                stepContent = `
+                    <div class="step-container">
+                        <h3>Prepare the Required Document</h3>
+                        <p>Make sure to bring the following:</p>
+                        <ul>
+                            <li>student Permit (SP) – must be valid and issued by the LTO.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Select an LTO-accredited Driving School</h3>
+                        <ul>
+                            <li>Search for a driving school accredited by the LTO that offers the Practical Driving Course (PDC).</li>
+                            <li>Contact the school to confirm the schedules, fees, and available vehicle types (e.g., manual or automatic).</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Enroll in the Practical Driving Course</h3>
+                        <ul>
+                            <li>Go to the driving school and present your Student Permit.</li>
+                            <li>Complete the enrollment process and pay the required fees.</li>
+                            <li>Choose between manual or automatic transmission training, depending on your preference and intended license type.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Attend the PDC Sessions</h3>
+                        <ul>
+                            <li>The course duration depends on the vehicle type and the school’s curriculum (usually around 8-10 hours).</li>
+                            <li>You will receive hands-on training covering vehicle operations, traffic regulations, and safe driving techniques.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Take the Course Assessment</h3>
+                        <ul>
+                            <li>At the end of the training, you may be required to complete an assessment to demonstrate your driving skills and knowledge.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Receive the PDC Certificate</h3>
+                        <ul>
+                            <li>Upon successfully completing the course and passing the assessment, the driving school will issue your PDC Certificate.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Use the PDC Certificate to Apply for a Driver’s License</h3>
+                        <ul>
+                            <li>Bring the PDC Certificate, Student Permit, and other required documents when applying for a Non-Professional or Professional Driver’s License at the LTO office.</li>
+                        </ul>
+                    </div>
+                `;
+                break;
+            default:
+                modalTitle.textContent = "Unknown Step";
+                stepContent = '<p>No details available for this step.</p>';
+                break;
+        }
 
-                switch(step) {
-                    case '1':
-                        stepDetails = "<p>Step 1: Inquire</p><p>Details about the inquiry process...</p>";
-                        break;
-                    case '2':
-                        stepDetails = "<p>Step 2: Enroll</p><p>Details about enrollment...</p>";
-                        break;
-                    case '3':
-                        stepDetails = "<p>Step 3: Modules</p><p>Details about the modules...</p>";
-                        break;
-                    case '4':
-                        stepDetails = "<p>Step 4: Test</p><p>Details about testing...</p>";
-                        break;
-                    case '5':
-                        stepDetails = "<p>Step 5: Certification</p><p>Details about certification...</p>";
-                        break;
-                    default:
-                        stepDetails = "<p>Invalid step</p>";
-                }
+        // Insert content into the modal body
+        modalBody.innerHTML = stepContent;
 
-                document.getElementById('step-details').innerHTML = stepDetails;
-            });
-        });
+        // Show the modal using Bootstrap's modal function
+        $('#roadmapstepsModal').modal('show');
     }
+
+    // Add click event listeners to each step
+    roadmapSteps.forEach(stepElement => {
+        stepElement.addEventListener('click', function () {
+            const step = this.getAttribute('data-step'); // Get the step number from the data-step attribute
+            openStepModal(step); // Call the function to open the modal
+        });
+    });
 });

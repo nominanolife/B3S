@@ -42,57 +42,42 @@
             </div>
         </div>
         <div class="main-content">
-            <div class="header">
-                <div class="title">
-                    <h2>Dashboard</h2>
-                </div>
+            <div class="page-content">
                 <div class="notification-bell-container">
                     <i id="notification-bell" class="fas fa-bell"></i>
                     <span id="notification-indicator" class="notification-indicator hidden"></span>
                     <div id="notification-list" class="notification-list hidden">
                         <!-- Notifications will be dynamically inserted here -->
                     </div>
-                </div>                
-            </div>
-            <div class="page-content">
-                <!-- Roadmap Section -->
-                <div class="roadmap-container my-4 text-center">
-                    <h2>Driving School Roadmap</h2>
-                    <div class="roadmap d-flex justify-content-center align-items-center">
-                        <div class="roadmap-item mx-2" data-toggle="modal" data-target="#roadmapModal" data-step="1">
-                            <div class="circle">1</div>
-                            <span>Step 1</span>
-                        </div>
-                        <div class="connector"></div>
-                        <div class="roadmap-item mx-2" data-toggle="modal" data-target="#roadmapModal" data-step="2">
-                            <div class="circle">2</div>
-                            <span>Step 2</span>
-                        </div>
-                        <div class="connector"></div>
-                        <div class="roadmap-item mx-2" data-toggle="modal" data-target="#roadmapModal" data-step="3">
-                            <div class="circle">3</div>
-                            <span>Step 3</span>
-                        </div>
-                        <div class="connector"></div>
-                        <div class="roadmap-item mx-2" data-toggle="modal" data-target="#roadmapModal" data-step="4">
-                            <div class="circle">4</div>
-                            <span>Step 4</span>
-                        </div>
+                </div>
+                <div class="roadmap-container">         
+                    <img src="Assets/Blue Minimalist $ Points Timeline Road Infographic Graph.png" alt="road">
+                    <div class="arrow arrow1" data-step="1">
+                        <p>Step 1</p>
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="arrow arrow2" data-step="2">
+                        <p>Step 2</p>
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="arrow arrow3" data-step="3">
+                        <p>Step 3</p>
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="arrow arrow4" data-step="4">
+                        <p>Step 4</p>
+                        <i class="bi bi-geo-alt-fill"></i>
                     </div>
                 </div>
+                <div class="information-container">
+                    <div class="appointment-card">
+                        <div class="card-container">
 
-                <!-- Appointment and Balance Section -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="card appointment-card">
-                            <div class="card-body text-center">
-                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="card balance-card">
-                            <div class="card-body text-center">
-                            </div>
+                    <div class="balance-card">
+                        <div class="card-container">
+
                         </div>
                     </div>
                 </div>
@@ -100,37 +85,18 @@
         </div>
     </div>
 
-    <!-- Logout Confirmation Modal -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <!-- Package Modal -->
+    <div class="modal fade" id="roadmapstepsModal" tabindex="-1" role="dialog" aria-labelledby="roadmapstepsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <h5 class="modal-title" id="roadmapstepsModalLabel"></h5>
+                    <div type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="close">&times;</span>
+                    </div>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to logout?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="confirmLogoutBtn">Logout</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Roadmap Modal -->
-    <div class="modal fade" id="roadmapModal" tabindex="-1" role="dialog" aria-labelledby="roadmapModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="roadmapModalLabel">Roadmap Step Details</h5>
-                </div>
-                <div class="modal-body">
-                    <p id="step-details">Details of the selected roadmap step will be displayed here.</p>
-                    <!-- Add content dynamically based on the clicked roadmap item -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    
                 </div>
             </div>
         </div>
@@ -152,6 +118,24 @@
                         <p id="packagePrice"></p>
                         <p id="packageDescription"></p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="confirmLogoutBtn">Logout</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>

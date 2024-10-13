@@ -19,6 +19,7 @@ const db = getFirestore(app); // Firestore
 const storage = getStorage(app); // Firebase Storage
 
 // Fetch and display modules function
+// Fetch and display modules function
 async function fetchAndDisplayModules() {
     const modulesCollection = collection(db, 'modules');
     const moduleSnapshot = await getDocs(modulesCollection);
@@ -26,6 +27,12 @@ async function fetchAndDisplayModules() {
 
     const moduleContainer = document.querySelector('.module-list'); // The container for the modules
     moduleContainer.innerHTML = ''; // Clear previous content
+
+    // Check if there are no modules and display a message if true
+    if (modules.length === 0) {
+        moduleContainer.innerHTML = '<p>No module available</p>';
+        return;
+    }
 
     // Display the modules
     modules.forEach(module => {

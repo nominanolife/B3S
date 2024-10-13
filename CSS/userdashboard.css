@@ -147,35 +147,10 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
+    min-height: 100vh;
+    max-height: 100%;
     width: calc(100% - 300px);
-    height: calc(100vh - 120px);
     margin-left: 300px;
-    margin-top: 120px;
-}
-
-.main-content-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 20px 30px;
-    background-color: #ffffff;
-    border-bottom: 1px solid #D9D9D9;
-}
-
-.header {
-    position: fixed;
-    top: 0;
-    display: flex;
-    flex-direction: row;
-    width: calc(100% - 300px);
-    padding: 40px 30px;
-    background-color: #ffffff;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.title {
-    margin-left: auto;
 }
 
 h3 {
@@ -193,9 +168,303 @@ h2 {
 }
 
 .page-content {
+    display: flex;
+    flex-direction: column;
     padding: 30px 30px;
     background-color: #f5f5f5;
     height: 100%;
+    gap: 20px;
+}
+
+.notification-bell-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+#notification-bell {
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
+
+.notification-list {
+    position: absolute;
+    top: 70px;
+    right: 30px;
+    width: 300px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none;
+    padding: 10px;
+    overflow-y: auto;
+    font-family: Poppins;
+    font-size: 14px;
+    max-height: 350px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-title h2 {
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: bold;
+    color: #142A74;
+    padding-top: 10px;
+    padding-left: 10px;
+}
+
+.notification-item {
+    padding: 20px 20px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background-color: #ccc;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-list.show {
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-list.hidden {
+    display: none;
+}
+
+.notification-indicator {
+    position: absolute;
+    top: 40px;
+    right: 28px;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    display: none;
+}
+
+.notification-indicator.show {
+    display: inline-block;
+}
+
+.notification-item.unread {
+    font-weight: bold;
+    position: relative;
+}
+
+.notification-item.unread::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    transform: translateY(-50%);
+}
+
+.notification-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+#mark-all-read {
+    text-decoration: underline;
+}
+
+.roadmap-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-height: 500px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.roadmap-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    position: relative;
+}
+
+.arrow {
+    position: absolute;
+    font-size: 80px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.arrow:hover {
+    transform: translateY(-30px);
+}
+
+.arrow1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    top: 30%;
+    left: 10%;
+    color: #142A74;
+}
+
+.arrow2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    top: 50%;
+    left: 30%;
+    color: #B60505;
+}
+
+.arrow3 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    top: 40%;
+    left: 50%;
+    color: #142A74;
+}
+
+.arrow4 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    top: 50%;
+    left: 70%;
+    color: #B60505;
+}
+
+.arrow1 p, .arrow2 p, .arrow3 p, .arrow4 p {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.information-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+}
+
+.appointment-card, .balance-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 300px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-card p, .balance-card p {
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: 500;
+    color: #2F2E2E;
+}
+
+.card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-title {
+    display: flex;
+    justify-content: center;
+    font-family: Poppins;
+    font-size: 24px;
+    font-weight: bold;
+    color: #142A74;
+    margin: 0;
+}
+
+.card-title p {
+    margin: 0;
+}
+
+.card-button {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+    width: 60%;
+}
+
+.card-button:hover {
+    background-color: #142a74ec;
+}
+
+.center-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#packageModalBody {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+}
+
+#packageName {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2F2E2E;
+    margin: 0;
+}
+
+#packagePrice {
+    font-size: 14px;
+    font-weight: bold;
+    color: #B60505;
+    margin: 0;
+}
+
+#packageDescription {
+    font-size: 14px;
+    color: #2F2E2E;
+    font-weight: 500;
+    margin: 0;
 }
 
 .disabled-link {
@@ -249,6 +518,46 @@ h2 {
     font-size: 14px;
 }
 
+#roadmapstepsModal .modal-dialog {
+    top: auto;
+    left: 5%;
+    width: 100%;
+    max-width: 1000px;
+}
+
+#roadmapstepsModal .modal-content {
+    padding: 20px;
+}
+
+#roadmapstepsModal .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.step-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.step-container ul {
+    margin: 0;
+}
+
+#roadmapstepsModal .modal-body h3{
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+#roadmapstepsModal .modal-body p {
+    font-size: 14px;
+    color: #333;
+    margin: 0;
+}
+
 .close {
     font-size: 24px;
     color: #142A74;
@@ -281,247 +590,22 @@ h2 {
     background-color: #b60505ec;
 }
 
-/* Notification bell container */
-.notification-bell-container {
-    display: flex;
-    flex-direction: row;
-    margin-left: auto;
+/* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
 }
 
-/* Bell icon */
-#notification-bell {
-    font-size: 24px;
-    cursor: pointer;
-    color: #333;
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background of the scrollbar track */
+    border-radius: 10px; /* Optional: Rounded corners for the track */
 }
 
-/* Notification list (dropdown/popup) */
-.notification-list {
-    position: absolute;
-    top: 70px;
-    right: 30px;
-    width: 300px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    display: none;
-    padding: 10px;
-    overflow-y: auto;
-    font-family: Poppins;
-    font-size: 14px;
-    max-height: 350px;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
+::-webkit-scrollbar-thumb {
+    background-color: #142A74; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Optional: Rounded corners for the thumb */
+    border: 3px solid #f1f1f1; /* Optional: Adds padding around the thumb */
 }
 
-.notification-title h2 {
-    font-family: Poppins;
-    font-size: 18px;
-    font-weight: bold;
-    color: #142A74;
-    padding-top: 10px;
-    padding-left: 10px;
-}
-
-/* Individual notification item */
-.notification-item {
-    padding: 20px 20px;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-}
-
-/* Hover effect for notification items */
-.notification-item:hover {
-    background-color: #ccc;
-}
-
-/* Last item should not have a bottom border */
-.notification-item:last-child {
-    border-bottom: none;
-}
-
-/* Show/Hide the notification list */
-.notification-list.show {
-    display: flex;
-    flex-direction: column;
-}
-
-.notification-list.hidden {
-    display: none;
-}
-
-.notification-indicator {
-    position: absolute;
-    top: 40px;
-    right: 28px;
-    width: 10px;
-    height: 10px;
-    background-color: red;
-    border-radius: 50%;
-    display: none;
-}
-
-.notification-indicator.show {
-    display: inline-block;
-}
-
-/* Style for unread notifications */
-.notification-item.unread {
-    font-weight: bold; /* Make text bold */
-    position: relative; /* Relative positioning for red dot */
-}
-
-/* Red dot for unread notifications */
-.notification-item.unread::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    width: 10px;
-    height: 10px;
-    background-color: red;
-    border-radius: 50%;
-    transform: translateY(-50%);
-}
-
-.notification-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-}
-
-#mark-all-read {
-    text-decoration: underline;
-}
-
-.roadmap-container {
-    background: linear-gradient(90deg, #142A74, #ffffff);
-    padding: 20px;
-    border-radius: 8px;
-    color: white;
-}
-
-.roadmap-container h2 {
-    font-family: Poppins;
-    font-size: 24px;
-    color: #ffffff;
-}
-
-.roadmap-item {
-    display: inline-block;
-    text-align: center;
-    color: white;
-}
-
-.circle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: white; /* White circles */
-    color: #142A74; /* Button color for text */
-    line-height: 60px;
-    font-size: 24px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-.circle:hover {
-    background-color: #0056b3;
-    color: white; /* Text color changes to white on hover */
-    transform: scale(1.1);
-}
-
-.connector {
-    width: 60px;
-    height: 6px;
-    background-color: white;
-    border-radius: 3px;
-    margin: 0 16px;
-}
-
-.roadmap-item span {
-    display: block;
-    font-size: 16px;
-    color: white; /* Button color for the text below the circle */
-}
-
-.card-title {
-    font-family: Poppins;
-    font-size: 24px;
-    font-weight: bold;
-    color: #142A74;
-}
-
-.card-title h5 {
-    font-family: Poppins;
-    font-size: 18px;
-    font-weight: bold;
-    color: #414141;
-}
-
-.appointment-card, .balance-card {
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    min-height: 300px;
-}
-
-.appointment-card p, .balance-card p {
-    font-family: Poppins;
-    font-size: 18px;
-    font-weight: 500;
-    color: #2F2E2E;
-}
-
-.card-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.center-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-#packageModalBody {
-    font-size: 14px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-#packageName {
-    font-size: 18px;
-    font-weight: bold;
-    color: #2F2E2E;
-}
-
-#packagePrice {
-    font-size: 14px;
-    font-weight: bold;
-    color: #B60505;
-}
-
-#packageDescription {
-    font-size: 14px;
-    color: #2F2E2E;
-    font-weight: 500;
+::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d; /* Darker color on hover */
 }

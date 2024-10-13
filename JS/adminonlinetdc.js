@@ -244,6 +244,7 @@ async function deleteLesson(videoId) {
 
         // Step 5: Delete the video document from Firestore
         await deleteDoc(videoDocRef);
+        await updateDraftCount();
 
         showNotification("Lesson successfully deleted.");
 
@@ -659,6 +660,7 @@ document.querySelectorAll('.quiz-container').forEach((container, index) => {
 // Save the draft to Firestore and set documentId globally
 async function createDraftAndSetDocumentId() {
     const draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
+    // Add a new document for each draft
     const draftDocRef = await addDoc(collection(db, 'onlineDrafts'), {
         title: draftData.title || '',
         category: draftData.category || '',
@@ -667,32 +669,36 @@ async function createDraftAndSetDocumentId() {
         status: 'draft',
         createdAt: new Date()
     });
-    documentId = draftDocRef.id; // Set the global documentId
-    console.log('Draft document created with ID:', documentId);
+    documentId = draftDocRef.id; // Set the global documentId for this draft
+    console.log('New draft document created with ID:', documentId);
+
+    // Update draft count after creating a new draft
+    await updateDraftCount();
 }
 
 // Event listener for final submission to Firestore
 async function saveDraftFromSession() {
-    const draftData = JSON.parse(sessionStorage.getItem('draftData'));
+    const draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
+
+    // Ensure quizQuestions is always an array
+    draftData.quizQuestions = draftData.quizQuestions || [];
 
     toggleLoader(true);  // Show loader while saving the draft
 
     try {
-        // If no documentId, create draft and set documentId globally
-        if (!documentId) {
-            await createDraftAndSetDocumentId();
-        }
+        // Create a new draft document for every save
+        await createDraftAndSetDocumentId();
 
         // Upload thumbnail and video files if not done already
         let thumbnailURL = sessionStorage.getItem('thumbnailURL') || '';
         let videoURL = sessionStorage.getItem('videoURL') || '';
 
-        // Upload or update thumbnail file
+        // Upload or update thumbnail file if a new file is selected and the URL isn't already stored
         if (draftData.thumbnailFile && !thumbnailURL) {
             thumbnailURL = await handleFileUpload(thumbnailUploadInput.files[0], 'dThumbnails', documentId, 'thumbnail');
         }
 
-        // Upload or update video file
+        // Upload or update video file if a new file is selected and the URL isn't already stored
         if (draftData.videoFile && !videoURL) {
             videoURL = await handleFileUpload(videoUploadInput.files[0], 'dVideos', documentId, 'video');
         }
@@ -717,12 +723,18 @@ async function saveDraftFromSession() {
             })
         );
 
-        // Update Firestore document with URLs and quiz questions, ensuring no fields are deleted
-        await updateDoc(doc(db, 'onlineDrafts', documentId), {
-            thumbnailURL: thumbnailURL || draftData.thumbnailFile,
-            videoURL: videoURL || draftData.videoFile,
-            quizQuestions: quizQuestions
-        });
+        // Prepare the data to update the Firestore document
+        const updateData = {
+            thumbnailURL,
+            videoURL,
+            quizQuestions,
+            title: draftData.title || '',
+            category: draftData.category || '',
+            status: 'draft'
+        };
+
+        // Save the draft as a new document in Firestore
+        await setDoc(doc(db, 'onlineDrafts', documentId), updateData);
 
         toggleLoader(false);
         showNotification('Draft saved successfully.');
@@ -1378,6 +1390,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
     const optionsContainer = selectElement.querySelector('.dropdown-options');
     const optionsList = optionsContainer.querySelectorAll('.options');
 
+    // Ensure the selected category is stored in sessionStorage
     selected.addEventListener('click', () => {
         optionsContainer.style.display = optionsContainer.style.display === 'block' ? 'none' : 'block';
     });
@@ -1386,6 +1399,11 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         option.addEventListener('click', () => {
             selected.innerHTML = option.innerHTML;
             optionsContainer.style.display = 'none';
+    
+            // Update the selected category in session storage
+            const draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
+            draftData.category = option.textContent.trim();  // Save the category
+            sessionStorage.setItem('draftData', JSON.stringify(draftData));
         });
     });
 
@@ -1792,12 +1810,22 @@ document.addEventListener('DOMContentLoaded', function () {
     videoTitleInput.addEventListener('input', setFormModified);
     thumbnailUpload.addEventListener('change', setFormModified);
     videoUpload.addEventListener('change', setFormModified);
-    categorySelected.addEventListener('change', setFormModified);
+
+    // Track category selection
+    categorySelected.addEventListener('click', function () {
+        const optionsList = document.querySelectorAll('.dropdown-options .options');
+        optionsList.forEach(option => {
+            option.addEventListener('click', function () {
+                setFormModified();  // Mark form as modified when a category is selected
+            });
+        });
+    });
+
     quizContainerInputs.forEach(input => input.addEventListener('input', setFormModified));
 
     // Close button behavior with discard confirmation modal
     const closeUploadModalButton = document.querySelector('#uploadModal .close');
-    
+
     if (closeUploadModalButton) {
         closeUploadModalButton.addEventListener('click', function (event) {
             event.preventDefault(); // Prevent default close action
@@ -1825,4 +1853,26 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#uploadModal').on('hidden.bs.modal', function () {
         isFormModified = false; // Reset when modal is closed
     });
+});
+
+async function updateDraftCount() {
+    try {
+        // Query the 'onlineDrafts' collection in Firestore
+        const draftsCollection = collection(db, 'onlineDrafts');
+        const draftsSnapshot = await getDocs(draftsCollection);
+
+        // Count the number of drafts
+        const draftCount = draftsSnapshot.size;
+
+        // Update the Drafts link text with the count
+        const draftsLink = document.getElementById('draftsLink');
+        draftsLink.textContent = `Drafts (${draftCount})`;
+    } catch (error) {
+        console.error("Error fetching drafts count:", error);
+    }
+}
+
+// Call the function to update the draft count
+document.addEventListener('DOMContentLoaded', function () {
+    updateDraftCount();
 });

@@ -83,18 +83,24 @@ document.addEventListener('DOMContentLoaded', async function() {
         try {
             const draftCollectionRef = collection(db, 'onlineDrafts');
             const draftSnapshot = await getDocs(draftCollectionRef);
-
+    
             const draftListContainer = document.querySelector('.draft-list');
             draftListContainer.innerHTML = '';  // Clear previous drafts
-
+    
+            // Check if no drafts were found
+            if (draftSnapshot.empty) {
+                draftListContainer.innerHTML = `<p>No drafts available</p>`;
+                return; // Exit the function if there are no drafts
+            }
+    
             draftSnapshot.forEach(doc => {
                 const draftData = doc.data();
                 const draftId = doc.id;
-
+    
                 const draftCard = document.createElement('div');
                 draftCard.classList.add('draft-container');
                 draftCard.setAttribute('data-id', draftId);
-
+    
                 draftCard.innerHTML = `
                     <div class="draft-image">
                         <i class="bi bi-floppy"></i>
@@ -108,14 +114,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                         </div>
                     </div>
                 `;
-
+    
                 // Event listener for opening draft when clicking on the card, excluding the trash icon
                 draftCard.addEventListener('click', function(event) {
                     if (!event.target.classList.contains('bi-trash3')) {
                         openDraft(draftId, draftData);
                     }
                 });
-
+    
                 // Event listener for deleting the draft when the trash icon is clicked
                 const trashIcon = draftCard.querySelector('.bi-trash3');
                 trashIcon.addEventListener('click', function(event) {
@@ -123,13 +129,13 @@ document.addEventListener('DOMContentLoaded', async function() {
                     currentDraftId = draftId;
                     $('#deleteConfirmationModal').modal('show');
                 });
-
+    
                 draftListContainer.appendChild(draftCard);
             });
         } catch (error) {
             console.error("Error fetching drafts:", error);
         }
-    }
+    }    
 
     // Function to delete Firestore document and associated storage files
     async function deleteDraftData(draftData, draftId) {
