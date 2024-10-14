@@ -641,15 +641,6 @@ function updatePaginationControls() {
   paginationControls.appendChild(nextButton);
 }
 
-
-
-
-
-
-
-
-
-
 // Fetch students on DOM load
 document.addEventListener('DOMContentLoaded', () => {
   fetchAppointments();
@@ -1979,24 +1970,18 @@ function attachNextButtonPopover(nextBtn, message) {
 function validateForm(modalId) {
   const modalElement = document.getElementById(modalId);
   const scoreInputs = modalElement.querySelectorAll('input.numeric-input');
-  
-  let allScoresFilled = true;
-  let isVehicleTypeSelected = true;
 
-  // Check if all score inputs are filled
+  let allScoresFilled = true;
+
+  // Check if all score inputs are filled and within the correct range
   scoreInputs.forEach(input => {
     const value = input.value.trim();
-    if (value === '' || parseFloat(value) < 0 || parseFloat(value) > 5) {
+    const maxValue = parseFloat(input.getAttribute('max')) || 10; // Ensure you check the max attribute
+
+    if (value === '' || isNaN(value) || parseFloat(value) < 0 || parseFloat(value) > maxValue) {
       allScoresFilled = false;
     }
   });
-
-  // If the modal is 'edit4WheelsModal', we need to check the vehicle type selection as well
-  if (modalId === 'edit4WheelsModal') {
-    const vehicleTypeSelectedElement = modalElement.querySelector('.selected');
-    const vehicleTypeSelected = vehicleTypeSelectedElement ? vehicleTypeSelectedElement.textContent : '';
-    isVehicleTypeSelected = vehicleTypeSelected !== 'Select Vehicle' && vehicleTypeSelected !== '';
-  }
 
   // Determine the next button and enable or disable it based on the validation
   const nextBtn = modalElement.querySelector('.next-btn');
@@ -2014,6 +1999,10 @@ function validateForm(modalId) {
       }
     } else if (modalId === 'edit4WheelsModal') {
       // In 'edit4WheelsModal', both the vehicle type and scores should be filled
+      const vehicleTypeSelectedElement = modalElement.querySelector('.selected');
+      const vehicleTypeSelected = vehicleTypeSelectedElement ? vehicleTypeSelectedElement.textContent : '';
+      const isVehicleTypeSelected = vehicleTypeSelected !== 'Select Vehicle' && vehicleTypeSelected !== '';
+
       nextBtn.disabled = !(allScoresFilled && isVehicleTypeSelected);
       if (!isVehicleTypeSelected && !allScoresFilled) {
         message = 'Please select vehicle type and fill out all the score fields';

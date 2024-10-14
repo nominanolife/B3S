@@ -177,200 +177,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
-    onAuthStateChanged(auth, async function(user) {
-        if (user) {
-            try {
-                const userDocRef = doc(db, "applicants", user.uid);
-                const docSnap = await getDoc(userDocRef);
-                if (docSnap.exists()) {
-                    const userData = docSnap.data();
-                    const userRole = userData.role;
-
-                    if (userRole === "applicant") {
-                        disableLinks();
-                    }
-
-                    // If the user is a student, start the notification listener
-                    if (userRole === "student") {
-                        const notificationsRef = query(
-                            collection(db, "notifications"), 
-                            where("audience", "==", "student"),
-                            orderBy("date", "desc"), // Order by date, latest first
-                            limit(10) // Limit to the 10 most recent notifications
-                        );
-
-                        onSnapshot(notificationsRef, (snapshot) => {
-                            const notifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Include doc.id for the notification reference
-                            displayNotifications(notifications);
-                        });
-                    }
-
-                    // Fetch the user's upcoming appointment
-                    const appointmentsRef = collection(db, "appointments");
-                    const q = query(appointmentsRef, where("bookings", "!=", null)); // Query for documents with bookings array
-
-                    const querySnapshot = await getDocs(q);
-
-                    // Select the appointmentCard element
-                    const appointmentCard = document.querySelector('.appointment-card .card-container');
-
-                    if (appointmentCard) {
-                        if (!querySnapshot.empty) {
-                            let foundAppointment = false;
-                            querySnapshot.forEach(doc => {
-                                const appointmentData = doc.data();
-                                const bookingDetails = appointmentData.bookings.find(
-                                    booking => booking.userId === user.uid && booking.status === "Booked"
-                                );
-
-                                if (bookingDetails) {
-                                    // Check if the appointment date is exactly 1 day past the current date
-                                    const appointmentDate = new Date(appointmentData.date);
-                                    const currentDate = new Date();
-
-                                    const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // Milliseconds in one day
-                                    const differenceInTime = currentDate.getTime() - appointmentDate.getTime();
-                                    const differenceInDays = Math.floor(differenceInTime / oneDayInMilliseconds);
-
-                                    // Skip this booking if the appointment date is more than 1 day past the current date
-                                    if (differenceInDays > 1) {
-                                        console.log(`Appointment on ${appointmentData.date} has passed more than 1 day. Ignoring this booking.`);
-                                        return; // Skip this booking
-                                    }
-
-                                    // Remove the centering class if it exists
-                                    appointmentCard.classList.remove('center-content');
-
-                                    const appointmentDateFormatted = appointmentDate.toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric'
-                                    });
-
-                                    const appointmentTimeSlot = bookingDetails.timeSlot;
-                                    const [startTime, endTime] = appointmentTimeSlot.split(' - ');
-
-                                    function formatTimeTo12Hr(time) {
-                                        const [hours, minutes] = time.split(':');
-                                        let period = 'AM';
-                                        let hoursIn12HrFormat = parseInt(hours);
-
-                                        if (hoursIn12HrFormat >= 12) {
-                                            period = 'PM';
-                                            if (hoursIn12HrFormat > 12) {
-                                                hoursIn12HrFormat -= 12;
-                                            }
-                                        } else if (hoursIn12HrFormat === 0) {
-                                            hoursIn12HrFormat = 12;
-                                        }
-
-                                        return `${hoursIn12HrFormat}:${minutes} ${period}`;
-                                    }
-
-                                    const formattedStartTime = formatTimeTo12Hr(startTime);
-                                    const formattedEndTime = formatTimeTo12Hr(endTime);
-
-                                    const appointmentHTML = 
-                                        `<h5 class="card-title">Upcoming Appointment</h5>
-                                        <div class="card-body">
-                                            <p>${appointmentDateFormatted}</p>
-                                            <p style="color: green;">${formattedStartTime} to ${formattedEndTime}</p>
-                                        </div>
-                                        <button class="card-button" id="myscheduleBtn">My Schedule</button>`;
-                                    appointmentCard.innerHTML = appointmentHTML;
-                                
-                                    document.getElementById("myscheduleBtn").addEventListener("click", function() {
-                                        window.location.href = "usersched.html";
-                                    });
-                                
-                                    foundAppointment = true;
-                                }
-                            });
-
-                            if (!foundAppointment) {
-                                appointmentCard.classList.add('center-content');
-                                appointmentCard.innerHTML = `
-                                    <h5 class="card-title">Upcoming Appointment</h5>
-                                    <p style="color: red;">No appointment yet</p>
-                                `;
-                            }
-                        }
-                    } else {
-                        console.error("Appointment card element not found.");
-                    }
-
-                    // Display the package price in the balance card
-                    const balanceCard = document.querySelector('.balance-card .card-container');
-                    
-                    if (balanceCard) {
-                        if (userData.packagePrice && userData.packageName) {
-                            // Remove the centering class if it exists
-                            balanceCard.classList.remove('center-content');
-    
-                            balanceCard.innerHTML = `
-                                <h5 class="card-title">Current Balance</h5>
-                                <p class="card-body" style="color: red; font-size: 40px;">&#8369; ${userData.packagePrice}</p>
-                                <button class="card-button" id="viewDetailsBtn">View Details</button>
-                            `;
-            
-                            document.getElementById("viewDetailsBtn").addEventListener("click", async function() {
-                                const packagesRef = collection(db, "packages");
-                                const packageQuery = query(packagesRef, where("name", "==", userData.packageName));
-                                const packageSnapshot = await getDocs(packageQuery);
-            
-                                if (!packageSnapshot.empty) {
-                                    const packageData = packageSnapshot.docs[0].data();
-            
-                                    document.getElementById("packageName").textContent = `${packageData.name}`;
-                                    document.getElementById("packagePrice").innerHTML = `&#8369;${packageData.price}`;
-                                    document.getElementById("packageDescription").textContent = `${packageData.description}`;
-            
-                                    $('#packageModal').modal('show');
-                                } else {
-                                    console.log("Package details not found.");
-                                }
-                            });
-                        } else {
-                            balanceCard.classList.add('center-content');
-                            balanceCard.innerHTML = `
-                                <h5 class="card-title">Current Balance</h5>
-                                <p style="color: #142A74;">No balance</p>
-                            `;
-                        }
-                    } else {
-                        console.error("Balance card element not found.");
-                    }
-                    
-                } else {
-                    console.error("No such document!");
-                }
-            } catch (error) {
-                console.error("Error getting document:", error);
-            }
-        } else {
-            console.error("No user is currently signed in.");
-        }
-    });        
-
-    function disableLinks() {
-        const linksToDisable = [
-            'usermodule.html',
-            'uservideolearning.html',
-            'userquiz.html',
-            'userappointment.html'
-        ];
-
-        linksToDisable.forEach(link => {
-            const anchor = document.querySelector(`a[href="${link}"]`);
-            if (anchor) {
-                anchor.classList.add('disabled-link');
-                anchor.style.pointerEvents = 'none';
-                anchor.style.color = 'gray';
-                anchor.style.cursor = 'default';
-            }
-        });
-    }
-
     // Select all arrows in the roadmap
     const roadmapSteps = document.querySelectorAll('.roadmap-container .arrow');
 
@@ -624,5 +430,212 @@ document.addEventListener('DOMContentLoaded', async function () {
             const step = this.getAttribute('data-step'); // Get the step number from the data-step attribute
             openStepModal(step); // Call the function to open the modal
         });
+    });
+
+    onAuthStateChanged(auth, async function(user) {
+        if (user) {
+            try {
+                const userDocRef = doc(db, "applicants", user.uid);
+                const docSnap = await getDoc(userDocRef);
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    const userRole = userData.role;
+
+                    if (userRole === "applicant") {
+                        disableLinks();
+                    }
+
+                    // If the user is a student, start the notification listener
+                    if (userRole === "student") {
+                        const notificationsRef = query(
+                            collection(db, "notifications"), 
+                            where("audience", "==", "student"),
+                            orderBy("date", "desc"), // Order by date, latest first
+                            limit(10) // Limit to the 10 most recent notifications
+                        );
+
+                        onSnapshot(notificationsRef, (snapshot) => {
+                            const notifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Include doc.id for the notification reference
+                            displayNotifications(notifications);
+                        });
+                    }
+
+                    // Fetch the user's upcoming appointment
+                    const appointmentsRef = collection(db, "appointments");
+                    const q = query(appointmentsRef, where("bookings", "!=", null)); // Query for documents with bookings array
+
+                    const querySnapshot = await getDocs(q);
+
+                    // Select the appointmentCard element
+                    const appointmentCard = document.querySelector('.appointment-card .card-container');
+
+                    if (appointmentCard) {
+                        if (!querySnapshot.empty) {
+                            let foundAppointment = false;
+                            querySnapshot.forEach(doc => {
+                                const appointmentData = doc.data();
+                                const bookingDetails = appointmentData.bookings.find(
+                                    booking => booking.userId === user.uid && booking.status === "Booked"
+                                );
+
+                                if (bookingDetails) {
+                                    // Check if the appointment date is exactly 1 day past the current date
+                                    const appointmentDate = new Date(appointmentData.date);
+                                    const currentDate = new Date();
+
+                                    const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // Milliseconds in one day
+                                    const differenceInTime = currentDate.getTime() - appointmentDate.getTime();
+                                    const differenceInDays = Math.floor(differenceInTime / oneDayInMilliseconds);
+
+                                    // Skip this booking if the appointment date is more than 1 day past the current date
+                                    if (differenceInDays > 1) {
+                                        console.log(`Appointment on ${appointmentData.date} has passed more than 1 day. Ignoring this booking.`);
+                                        return; // Skip this booking
+                                    }
+
+                                    // Remove the centering class if it exists
+                                    appointmentCard.classList.remove('center-content');
+
+                                    const appointmentDateFormatted = appointmentDate.toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    });
+
+                                    const appointmentTimeSlot = bookingDetails.timeSlot;
+                                    const [startTime, endTime] = appointmentTimeSlot.split(' - ');
+
+                                    function formatTimeTo12Hr(time) {
+                                        const [hours, minutes] = time.split(':');
+                                        let period = 'AM';
+                                        let hoursIn12HrFormat = parseInt(hours);
+
+                                        if (hoursIn12HrFormat >= 12) {
+                                            period = 'PM';
+                                            if (hoursIn12HrFormat > 12) {
+                                                hoursIn12HrFormat -= 12;
+                                            }
+                                        } else if (hoursIn12HrFormat === 0) {
+                                            hoursIn12HrFormat = 12;
+                                        }
+
+                                        return `${hoursIn12HrFormat}:${minutes} ${period}`;
+                                    }
+
+                                    const formattedStartTime = formatTimeTo12Hr(startTime);
+                                    const formattedEndTime = formatTimeTo12Hr(endTime);
+
+                                    const appointmentHTML = 
+                                        `<h5 class="card-title">Upcoming Appointment</h5>
+                                        <div class="card-body">
+                                            <p>${appointmentDateFormatted}</p>
+                                            <p style="color: green;">${formattedStartTime} to ${formattedEndTime}</p>
+                                        </div>
+                                        <button class="card-button" id="myscheduleBtn">My Schedule</button>`;
+                                    appointmentCard.innerHTML = appointmentHTML;
+                                
+                                    document.getElementById("myscheduleBtn").addEventListener("click", function() {
+                                        window.location.href = "usersched.html";
+                                    });
+                                
+                                    foundAppointment = true;
+                                }
+                            });
+
+                            if (!foundAppointment) {
+                                appointmentCard.classList.add('center-content');
+                                appointmentCard.innerHTML = `
+                                    <h5 class="card-title">Upcoming Appointment</h5>
+                                    <p style="color: red;">No appointment yet</p>
+                                `;
+                            }
+                        }
+                    } else {
+                        console.error("Appointment card element not found.");
+                    }
+
+                    // Display the package price in the balance card
+                    const balanceCard = document.querySelector('.balance-card .card-container');
+                    
+                    if (balanceCard) {
+                        if (userData.packagePrice && userData.packageName) {
+                            // Remove the centering class if it exists
+                            balanceCard.classList.remove('center-content');
+    
+                            balanceCard.innerHTML = `
+                                <h5 class="card-title">Current Balance</h5>
+                                <p class="card-body" style="color: red; font-size: 40px;">&#8369; ${userData.packagePrice}</p>
+                                <button class="card-button" id="viewDetailsBtn">View Details</button>
+                            `;
+            
+                            document.getElementById("viewDetailsBtn").addEventListener("click", async function() {
+                                const packagesRef = collection(db, "packages");
+                                const packageQuery = query(packagesRef, where("name", "==", userData.packageName));
+                                const packageSnapshot = await getDocs(packageQuery);
+            
+                                if (!packageSnapshot.empty) {
+                                    const packageData = packageSnapshot.docs[0].data();
+            
+                                    document.getElementById("packageName").textContent = `${packageData.name}`;
+                                    document.getElementById("packagePrice").innerHTML = `&#8369;${packageData.price}`;
+                                    document.getElementById("packageDescription").textContent = `${packageData.description}`;
+            
+                                    $('#packageModal').modal('show');
+                                } else {
+                                    console.log("Package details not found.");
+                                }
+                            });
+                        } else {
+                            balanceCard.classList.add('center-content');
+                            balanceCard.innerHTML = `
+                                <h5 class="card-title">Current Balance</h5>
+                                <p style="color: #142A74;">No balance</p>
+                            `;
+                        }
+                    } else {
+                        console.error("Balance card element not found.");
+                    }
+                    
+                } else {
+                    console.error("No such document!");
+                }
+            } catch (error) {
+                console.error("Error getting document:", error);
+            }
+        } else {
+            console.error("No user is currently signed in.");
+        }
+    });        
+
+    function disableLinks() {
+        const linksToDisable = [
+            'usermodule.html',
+            'uservideolearning.html',
+            'userquiz.html',
+            'userappointment.html'
+        ];
+
+        linksToDisable.forEach(link => {
+            const anchor = document.querySelector(`a[href="${link}"]`);
+            if (anchor) {
+                anchor.classList.add('disabled-link');
+                anchor.style.pointerEvents = 'none';
+                anchor.style.color = 'gray';
+                anchor.style.cursor = 'default';
+            }
+        });
+    }
+
+    const wheelsButton = document.querySelector('.wheels-card .eval-container button');
+    const motorsButton = document.querySelector('.motors-card .eval-container button');
+
+    // Event listener for 4-Wheels "See more details" button
+    wheelsButton.addEventListener('click', function() {
+        $('#WheelsModal').modal('show'); // Show 4-Wheels modal
+    });
+
+    // Event listener for Motorcycle "See more details" button
+    motorsButton.addEventListener('click', function() {
+        $('#MotorsModal').modal('show'); // Show Motorcycle modal
     });
 });

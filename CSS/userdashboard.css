@@ -299,11 +299,22 @@ h2 {
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.roadmap-container h1 {
+    font-family: Poppins;
+    font-size: 24px;
+    font-weight: bold;
+    color: #142A74;
+    margin: 0;
+    position: absolute;
+    top: 5%;
+}
+
 .roadmap-container img {
     width: 100%;
     height: 100%;
     object-fit: fill;
     position: relative;
+    border-radius: 10px;
 }
 
 .arrow {
@@ -470,8 +481,168 @@ h2 {
 .disabled-link {
     pointer-events: none;
     color: gray;
-    text-decoration: none;  /* Remove underline */
-    cursor: default;  /* Change cursor to default */
+    text-decoration: none;
+    cursor: default;
+}
+
+.evaluation-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.wheels-card, .motors-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 300px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.eval-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.eval-container h3 {
+    font-family: Poppins;
+    font-size: 24px;
+    font-weight: bold;
+    color: #142A74;
+    margin: 0;
+}
+
+.eval-container p {
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: 500;
+    color: #2F2E2E;
+    margin: 0;
+}
+
+.eval-container button {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+    width: 60%;
+}
+
+.eval-container button:hover {
+    background-color: #142a74ec;
+}
+
+#WheelsModal .modal-dialog {
+    max-width: 800px;
+    width: 100%;
+    top: auto;
+}
+
+#MotorsModal .modal-dialog {
+    max-width: 800px;
+    width: 100%;
+    top: auto;
+}
+
+.evaluation-table {
+    width: auto;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.evaluation-table th, .evaluation-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    color: #2F2E2E;
+}
+
+.evaluation-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.evaluation-table td:nth-child(1) {
+    vertical-align: middle;
+}
+
+.evaluation-table thead th {
+    text-align: center;
+}
+
+.evaluation-table td input {
+    padding: 5px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.evaluation-table td textarea {
+    padding: 5px;
+    border: none;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.main {
+    font-weight: 600;
+}
+
+tbody tr .main-text {
+    padding-left: 50px;
+}
+
+.static-text-score {
+    width: 100%;
+    padding: 5px;
+    text-align: center;
+    color: #142A74;
+    border: none;
+}
+
+.score-input {
+    width: 10%;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.static-text {
+    pointer-events: none;
+    color: #2F2E2E;
+    padding: 5px;
+    width: 100%;
+    text-align: center;
+}
+
+.checkbox-checklist {
+    border: 1px solid #D9D9D9;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.checkbox-checklist h5 {
+    font-family: Poppins;
+    font-size: 20px;
+    font-weight: bold;
+    color: #2F2E2E;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 @keyframes popOut {
@@ -561,6 +732,7 @@ h2 {
 .close {
     font-size: 24px;
     color: #142A74;
+    cursor: pointer;
 }
 
 .btn-primary {
