@@ -942,11 +942,50 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
     }
 }
 
+// Real-time listener for 4-Wheels performance evaluation
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        const studentDocRef = doc(db, "applicants", user.uid);
+
+        onSnapshot(studentDocRef, (studentDoc) => {
+            if (studentDoc.exists()) {
+                const studentData = studentDoc.data();
+                const WassessmentData = studentData.WassessmentData || {};
+                const WprocessedData = studentData.WprocessedData || {};
+
+                populateWheelsModal(WassessmentData, WprocessedData);  // Dynamically update modal content
+            }
+        });
+    }
+});
+
+// Real-time listener for Motorcycle performance evaluation
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        const studentDocRef = doc(db, "applicants", user.uid);
+
+        onSnapshot(studentDocRef, (studentDoc) => {
+            if (studentDoc.exists()) {
+                const studentData = studentDoc.data();
+                const MassessmentData = studentData.MassessmentData || {};
+                const MprocessedData = studentData.MprocessedData || {};
+
+                populateMotorsModal(MassessmentData, MprocessedData);  // Dynamically update modal content
+            }
+        });
+    }
+});
+
 // Fetch the logged-in student's performance summary on page load
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        fetchAndDisplayPerformanceSummary(user.uid);
-    } else {
-        console.error("User is not logged in.");
+        const studentDocRef = doc(db, "applicants", user.uid);
+
+        onSnapshot(studentDocRef, (studentDoc) => {
+            if (studentDoc.exists()) {
+                const studentData = studentDoc.data();
+                fetchAndDisplayPerformanceSummary(user.uid);  // Dynamically update the summary
+            }
+        });
     }
 });
