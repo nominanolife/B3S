@@ -507,8 +507,9 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 40px;
     width: 100%;
+    text-align: center;
 }
 
 .eval-container h3 {
@@ -642,6 +643,10 @@ tbody tr .main-text {
     font-weight: bold;
     color: #2F2E2E;
     margin-bottom: 20px;
+    text-align: center;
+}
+
+#observationResult, #spaceManagementResult, #speedControlResult, #steeringResult, #communicationResult, #generalResult, #startTheEngine, #variousRoadUsers, #kindofJunctions {
     text-align: center;
 }
 

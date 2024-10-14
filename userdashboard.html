@@ -85,14 +85,12 @@
                 <div class="evaluation-container">
                     <div class="wheels-card">
                         <div class="eval-container">
-                            <h3>4-Wheels Performance Evaluation</h3>
-                            <button type="button">See more details</button>
+
                         </div>
                     </div>
                     <div class="motors-card">
                         <div class="eval-container">
-                            <h3>Motorcycle Performance Evaluation</h3>
-                            <button type="button">See more details</button>
+                            
                         </div>
                     </div>
                 </div>
@@ -123,7 +121,7 @@
                                 <tbody>
                                     <tr>
                                         <td class="main">Observation</td>
-                                        <td>Excellent</td>
+                                        <td id="observationResult"></td>
                                     </tr>
                                 </tbody>
                                 <tbody>
@@ -131,7 +129,7 @@
                                         <td class="main-text">Eye lead time</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="eyeLeadTime">5</div>
+                                                <div class="static-text-score" id="eyeLeadTime"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -141,7 +139,7 @@
                                         <td class="main-text">Left – Right / Scanning / Shoulder checks</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="leftRightScanning">5</div>
+                                                <div class="static-text-score" id="leftRightScanning"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -151,7 +149,7 @@
                                         <td class="main-text">Mirrors / tracking traffic</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="mirrorsTracking">5</div>
+                                                <div class="static-text-score" id="mirrorsTracking"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -167,7 +165,7 @@
                                 <tbody>
                                     <tr>
                                         <td class="main">Space Management</td>
-                                        <td>Excellent</td>
+                                        <td id="spaceManagementResult"></td>
                                     </tr>
                                 </tbody>
                                 <tbody>
@@ -175,7 +173,7 @@
                                         <td class="main-text">Following defensive distance</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="defensiveDistance">5</div>
+                                                <div class="static-text-score" id="defensiveDistance"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -185,7 +183,7 @@
                                         <td class="main-text">Space at Stops</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="spaceAtStops">5</div>
+                                                <div class="static-text-score" id="spaceAtStops"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -195,7 +193,7 @@
                                         <td class="main-text">Path of least resistance</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="leastResistance">5</div>
+                                                <div class="static-text-score" id="leastResistance"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -205,7 +203,7 @@
                                         <td class="main-text">Right-of-way</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="rightOfWay">5</div>
+                                                <div class="static-text-score" id="rightOfWay"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -221,7 +219,7 @@
                                 <tbody>
                                     <tr>
                                         <td class="main">Speed Control</td>
-                                        <td>Excellent</td>
+                                        <td id="speedControlResult"></td>
                                     </tr>
                                 </tbody>
                                 <tbody>
@@ -229,7 +227,7 @@
                                         <td class="main-text">Acceleration / Deceleration – Smoothness</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="acceleration">5</div>
+                                                <div class="static-text-score" id="acceleration"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -239,7 +237,7 @@
                                         <td class="main-text">Braking: Full Stops, smooth</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="braking">5</div>
+                                                <div class="static-text-score" id="braking"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -249,7 +247,7 @@
                                         <td class="main-text">Speed for Conditions</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="speedForConditions">5</div>
+                                                <div class="static-text-score" id="speedForConditions"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -259,7 +257,7 @@
                                         <td class="main-text">Speed and Traffic signs</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="trafficSigns">5</div>
+                                                <div class="static-text-score" id="trafficSigns"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -275,7 +273,7 @@
                                 <tbody>
                                     <tr>
                                         <td class="main">Steering</td>
-                                        <td>Excellent</td>
+                                        <td id="steeringResult"></td>
                                     </tr>
                                 </tbody>
                                 <tbody>
@@ -283,7 +281,7 @@
                                         <td class="main-text">Lane / Turn Position / set-up</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="lanePosition">5</div>
+                                                <div class="static-text-score" id="lanePosition"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -293,7 +291,7 @@
                                         <td class="main-text">Steering: hand position, smoothness</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="steering">5</div>
+                                                <div class="static-text-score" id="steering"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -309,7 +307,7 @@
                                 <tbody>
                                     <tr>
                                         <td class="main">Communication</td>
-                                        <td>Excellent</td>
+                                        <td id="communicationResult"></td>
                                     </tr>
                                 </tbody>
                                 <tbody>
@@ -317,7 +315,7 @@
                                         <td class="main-text">Signals: timing and use</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="signals">5</div>
+                                                <div class="static-text-score" id="signals"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -327,7 +325,7 @@
                                         <td class="main-text">Other: i.e horn, eye contact</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="eyeContact">5</div>
+                                                <div class="static-text-score" id="eyeContact"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -343,7 +341,7 @@
                                 <tbody>
                                     <tr>
                                         <td class="main">General</td>
-                                        <td>Excellent</td>
+                                        <td id="generalResult"></td>
                                     </tr>
                                 </tbody>
                                 <tbody>
@@ -351,7 +349,7 @@
                                         <td class="main-text">Seating, head rest position, and mirror adjustment: seatbelt use</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="seating">5</div>
+                                                <div class="static-text-score" id="seating"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -361,7 +359,7 @@
                                         <td class="main-text">Parking / Backing</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="parking">5</div>
+                                                <div class="static-text-score" id="parking"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -371,7 +369,7 @@
                                         <td class="main-text">Anticipation: Adjusts</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="anticipation">5</div>
+                                                <div class="static-text-score" id="anticipation"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -381,7 +379,7 @@
                                         <td class="main-text">Judgment: decisions</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="judgment">5</div>
+                                                <div class="static-text-score" id="judgment"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -391,7 +389,7 @@
                                         <td class="main-text">Timing: approach, Traffic interactions</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div class="static-text-score" id="timing">5</div>
+                                                <div class="static-text-score" id="timing"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -429,13 +427,13 @@
                                 <tbody>
                                     <tr>
                                         <td class="main">Start the engine</td>
-                                        <td>Excellent</td>
+                                        <td id="startTheEngine"></td>
                                     </tr>
                                     <tr>
                                         <td class="main-text">Moving off, riding ahead and stopping</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="motorcycleMovingOff" class="static-text-score">5</div>
+                                                <div id="motorcycleMovingOff" class="static-text-score"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -445,7 +443,7 @@
                                         <td class="main-text">Positioning in different environments</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="motorcyclePositioning" class="static-text-score">5</div>
+                                                <div id="motorcyclePositioning" class="static-text-score"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">5</span>
                                             </div>
@@ -460,7 +458,7 @@
                                         <td class="main">Choice of speed in different situations (low speed balancing)</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="motorcycleLowSpeedBalancing" class="static-text-score">Excellent</div>
+                                                <div id="lowSpeedBalancing" class="static-text-score"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -473,7 +471,7 @@
                                         <td class="main">Hill riding</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="motorcycleHillRiding" class="static-text-score">Excellent</div>
+                                                <div id="hillRiding" class="static-text-score"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -486,7 +484,7 @@
                                         <td class="main">Riding along a curve or bend (cornering)</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="motorcycleCornering" class="static-text-score">Excellent</div>
+                                                <div id="cornering" class="static-text-score"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -499,7 +497,7 @@
                                         <td class="main">Approaching and passing railway crossings</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="motorcycleRailwayCrossings" class="static-text-score">Excellent</div>
+                                                <div id="approaching" class="static-text-score"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -512,7 +510,7 @@
                                         <td class="main">Lane shift and choice of lanes</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="motorcycleLaneShift" class="static-text-score">Excellent</div>
+                                                <div id="laneShift" class="static-text-score"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -525,7 +523,7 @@
                                         <td class="main">Turning and lane changing</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="motorcycleTurningLaneChanging" class="static-text-score">Excellent</div>
+                                                <div id="turningLane" class="static-text-score"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -535,14 +533,14 @@
                                     </tr>
                                     <tr>
                                         <td class="main">Interaction with various road users</td>
-                                        <td>Excellent</td>
+                                        <td id="variousRoadUsers"></td>
                                     </tr>
                                     <!-- Passing stationary vehicles and pedestrians -->
                                     <tr>
                                         <td class="main-text">Passing stationary vehicles and pedestrians</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="motorcyclePassingVehicles" class="static-text-score">2</div>
+                                                <div id="motorcyclePassingVehicles" class="static-text-score"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">2</span>
                                             </div>
@@ -553,7 +551,7 @@
                                         <td class="main-text">Meeting oncoming traffic</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="motorcycleOncomingTraffic" class="static-text-score">3</div>
+                                                <div id="motorcycleOncomingTraffic" class="static-text-score"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">3</span>
                                             </div>
@@ -563,7 +561,7 @@
                                         <td class="main-text">Riding ahead of or behind other road users</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="ridingAheadorBehind" class="static-text-score">2</div>
+                                                <div id="ridingAheadorBehind" class="static-text-score"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">2</span>
                                             </div>
@@ -573,7 +571,7 @@
                                         <td class="main-text">Riding side by side</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="ridingSidebySide" class="static-text-score">3</div>
+                                                <div id="ridingSidebySide" class="static-text-score"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">3</span>
                                             </div>
@@ -587,7 +585,7 @@
                                         <td class="main">Overtaking</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="overtaking" class="static-text-score">Excellent</div>
+                                                <div id="overTaking" class="static-text-score"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -597,13 +595,13 @@
                                     </tr>
                                     <tr>
                                         <td class="main">Riding in different kinds of junctions</td>
-                                        <td>Excellent</td>
+                                        <td id="kindofJunctions"></td>
                                     </tr>
                                     <tr>
                                         <td class="main-text">Straight through</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="straightThrough" class="static-text-score">2</div>
+                                                <div id="straightThrough" class="static-text-score"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">2</span>
                                             </div>
@@ -613,7 +611,7 @@
                                         <td class="main-text">Turning Left or Right</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="turningLeftorRight" class="static-text-score">3</div>
+                                                <div id="turningLeftorRight" class="static-text-score"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">3</span>
                                             </div>
@@ -623,7 +621,7 @@
                                         <td class="main-text">With or Without obligation to give the right of way</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="obligationsToGiveRightofWay" class="static-text-score">2</div>
+                                                <div id="obligationsToGiveRightofWay" class="static-text-score"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">2</span>
                                             </div>
@@ -633,7 +631,7 @@
                                         <td class="main-text">ABC of passing junction</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="abcPassingJunction" class="static-text-score">3</div>
+                                                <div id="abcPassingJunction" class="static-text-score"></div>
                                                 <span class="static-text">/</span>
                                                 <span class="static-text">3</span>
                                             </div>
@@ -647,7 +645,7 @@
                                         <td class="main">Approaching, riding in and leaving roundabouts</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="roundabouts" class="static-text-score">Excellent</div>
+                                                <div id="leavingRoundabouts" class="static-text-score"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -659,7 +657,7 @@
                                         <td class="main">Stopping and parking</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="stoppingandParking" class="static-text-score">Excellent</div>
+                                                <div id="stoppingAndParking" class="static-text-score"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -671,7 +669,7 @@
                                         <td class="main">Riding with a back ride</td>
                                         <td class="score-input">
                                             <div class="input-container">
-                                                <div id="ridingBackRide" class="static-text-score">Excellent</div>
+                                                <div id="backRiding" class="static-text-score"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -747,5 +745,4 @@
     <script type="module" src="JS/sidebar.js"></script>
     <script type="module" src="JS/common.js"></script>
 </body>
-
 </html>
