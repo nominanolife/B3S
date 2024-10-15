@@ -557,80 +557,44 @@ document.addEventListener('DOMContentLoaded', async function () {
                     // Display the package price in the balance card
                     const balanceCard = document.querySelector('.balance-card .card-container');
                     
-                    // Function to calculate and update balance dynamically
-                    async function updateBalance(userId) {
-                        try {
-                            const salesDocRef = doc(db, "sales", userId);
-                            const salesSnapshot = await getDoc(salesDocRef);
-
-                            if (salesSnapshot.exists()) {
-                                const salesData = salesSnapshot.data();
-                                const packagePrice = parseFloat(salesData.packagePrice) || 0;
-                                const amountPaid = parseFloat(salesData.amountPaid) || 0;
-                                
-                                // Calculate balance
-                                const balance = packagePrice - amountPaid;
-
-                                if (balanceCard) {
-                                    // Update the card with the dynamic balance
-                                    if (balance > 0) {
-                                        balanceCard.innerHTML = `
-                                            <h5 class="card-title">Current Balance</h5>
-                                            <p class="card-body" style="color: red; font-size: 40px;">&#8369; ${balance.toFixed(2)}</p>
-                                            <button class="card-button" id="viewDetailsBtn">View Details</button>
-                                        `;
-
-                                        // Add event listener for 'View Details' button
-                                        document.getElementById("viewDetailsBtn").addEventListener("click", async function () {
-                                            // Fetch and display package details when button is clicked
-                                            const packagesRef = collection(db, "packages");
-                                            const packageQuery = query(packagesRef, where("name", "==", salesData.packageName));
-                                            const packageSnapshot = await getDocs(packageQuery);
-
-                                            if (!packageSnapshot.empty) {
-                                                const packageData = packageSnapshot.docs[0].data();
-
-                                                document.getElementById("packageName").textContent = `${packageData.name}`;
-                                                document.getElementById("packagePrice").innerHTML = `&#8369;${packageData.price}`;
-                                                document.getElementById("packageDescription").textContent = `${packageData.description}`;
-
-                                                $('#packageModal').modal('show');
-                                            } else {
-                                                console.log("Package details not found.");
-                                            }
-                                        });
-                                    } else {
-                                        balanceCard.innerHTML = `
-                                            <h5 class="card-title">Current Balance</h5>
-                                            <p class="card-body" style="color: green; font-size: 40px;">Fully Paid</p>
-                                        `;
-                                    }
-                                }
-                            } else {
-                                console.log("No sales data found for the user.");
-                            }
-                        } catch (error) {
-                            console.error("Error fetching sales data: ", error);
-                        }
-                    }
-
-                    // Real-time listener for balance updates
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            const userId = user.uid;
-
-                            // Listen for real-time updates to the user's sales document
-                            const salesDocRef = doc(db, "sales", userId);
-                            onSnapshot(salesDocRef, (salesSnapshot) => {
-                                if (salesSnapshot.exists()) {
-                                    // Update balance whenever sales data changes
-                                    updateBalance(userId);
+                    if (balanceCard) {
+                        if (userData.packagePrice && userData.packageName) {
+                            // Remove the centering class if it exists
+                            balanceCard.classList.remove('center-content');
+    
+                            balanceCard.innerHTML = `
+                                <h5 class="card-title">Current Balance</h5>
+                                <p class="card-body" style="color: red; font-size: 40px;">&#8369; ${userData.packagePrice}</p>
+                                <button class="card-button" id="viewDetailsBtn">View Details</button>
+                            `;
+            
+                            document.getElementById("viewDetailsBtn").addEventListener("click", async function() {
+                                const packagesRef = collection(db, "packages");
+                                const packageQuery = query(packagesRef, where("name", "==", userData.packageName));
+                                const packageSnapshot = await getDocs(packageQuery);
+            
+                                if (!packageSnapshot.empty) {
+                                    const packageData = packageSnapshot.docs[0].data();
+            
+                                    document.getElementById("packageName").textContent = `${packageData.name}`;
+                                    document.getElementById("packagePrice").innerHTML = `&#8369;${packageData.price}`;
+                                    document.getElementById("packageDescription").textContent = `${packageData.description}`;
+            
+                                    $('#packageModal').modal('show');
+                                } else {
+                                    console.log("Package details not found.");
                                 }
                             });
                         } else {
-                            console.log("No user is currently signed in.");
+                            balanceCard.classList.add('center-content');
+                            balanceCard.innerHTML = `
+                                <h5 class="card-title">Current Balance</h5>
+                                <p style="color: #142A74;">No balance</p>
+                            `;
                         }
-                    });
+                    } else {
+                        console.error("Balance card element not found.");
+                    }
                     
                 } else {
                     console.error("No such document!");
@@ -641,7 +605,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         } else {
             console.error("No user is currently signed in.");
         }
-    });        
+    });
 
     function disableLinks() {
         const linksToDisable = [
@@ -662,17 +626,39 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
-    const wheelsButton = document.querySelector('.wheels-card .eval-container button');
-    const motorsButton = document.querySelector('.motors-card .eval-container button');
+    function addEventListenersForButtons() {
+        const wheelsButton = document.querySelector('.wheels-card .eval-container button');
+        const motorsButton = document.querySelector('.motors-card .eval-container button');
+    
+        if (wheelsButton) {
+            wheelsButton.addEventListener('click', function() {
+                $('#WheelsModal').modal('show');
+            });
+        } else {
+            console.error("Wheels button not found in the DOM.");
+        }
+    
+        if (motorsButton) {
+            motorsButton.addEventListener('click', function() {
+                $('#MotorsModal').modal('show');
+            });
+        } else {
+            console.error("Motors button not found in the DOM.");
+        }
+    }
+    
+    // Add the event listeners when the DOM is fully loaded or after dynamic content has been loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(addEventListenersForButtons, 500); // Adjust timeout based on dynamic loading if necessary
+    });    
 
-    // Event listener for 4-Wheels "See more details" button
-    wheelsButton.addEventListener('click', function() {
-        $('#WheelsModal').modal('show'); // Show 4-Wheels modal
-    });
-
-    // Event listener for Motorcycle "See more details" button
-    motorsButton.addEventListener('click', function() {
-        $('#MotorsModal').modal('show'); // Show Motorcycle modal
+    // Fetch and display performance summary
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            fetchAndDisplayPerformanceSummary(user.uid);
+        } else {
+            console.error("User is not logged in.");
+        }
     });
 });
 
@@ -878,11 +864,12 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
         if (studentDoc.exists()) {
             const studentData = studentDoc.data();
 
-            // Check if the user is enrolled in PDC
-            const hasPDC = studentData.packageType && studentData.packageType.includes("PDC");
+            // Check if the user is enrolled in 4-wheels or motorcycle courses based on packageType
+            const packageTypes = studentData.packageType || [];
 
-            const isEnrolledIn4Wheels = studentData.has4WheelsCourse || false;
-            const isEnrolledInMotorcycle = studentData.hasMotorsCourse || false;
+            const isEnrolledIn4Wheels = packageTypes.includes("PDC");
+            const isEnrolledInMotorcycle = packageTypes.includes("PDC");
+
             const WprocessedData = studentData.WprocessedData || {};
             const MprocessedData = studentData.MprocessedData || {};
 
@@ -890,7 +877,7 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
             const motorsCard = document.querySelector('.motors-card .eval-container');
 
             // Handle 4-Wheels Performance Evaluation
-            if (!isEnrolledIn4Wheels && !hasPDC) {
+            if (!isEnrolledIn4Wheels) {
                 wheelsCard.innerHTML = `
                     <h3>4-Wheels Performance Evaluation</h3>
                     <p style="color: red;">You did not enroll in any 4-Wheel course, so there is no evaluation form available.</p>
@@ -906,7 +893,7 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
                     $('#WheelsModal').modal('show'); // Show 4-Wheels modal
                 });
             } else {
-                // Show "No performance yet" if enrolled in PDC but no evaluation data yet
+                // Show "No performance yet" if no data exists
                 wheelsCard.innerHTML = `
                     <h3>4-Wheels Performance Evaluation</h3>
                     <p style="color: red;">No performance evaluation yet</p>
@@ -914,7 +901,7 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
             }
 
             // Handle Motorcycle Performance Evaluation
-            if (!isEnrolledInMotorcycle && !hasPDC) {
+            if (!isEnrolledInMotorcycle) {
                 motorsCard.innerHTML = `
                     <h3>Motorcycle Performance Evaluation</h3>
                     <p style="color: red;">You did not enroll in any Motorcycle course, so there is no evaluation form available.</p>
@@ -930,7 +917,7 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
                     $('#MotorsModal').modal('show'); // Show Motorcycle modal
                 });
             } else {
-                // Show "No performance yet" if enrolled in PDC but no evaluation data yet
+                // Show "No performance yet" if no data exists
                 motorsCard.innerHTML = `
                     <h3>Motorcycle Performance Evaluation</h3>
                     <p style="color: red;">No performance evaluation yet</p>
@@ -944,50 +931,11 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
     }
 }
 
-// Real-time listener for 4-Wheels performance evaluation
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        const studentDocRef = doc(db, "applicants", user.uid);
-
-        onSnapshot(studentDocRef, (studentDoc) => {
-            if (studentDoc.exists()) {
-                const studentData = studentDoc.data();
-                const WassessmentData = studentData.WassessmentData || {};
-                const WprocessedData = studentData.WprocessedData || {};
-
-                populateWheelsModal(WassessmentData, WprocessedData);  // Dynamically update modal content
-            }
-        });
-    }
-});
-
-// Real-time listener for Motorcycle performance evaluation
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        const studentDocRef = doc(db, "applicants", user.uid);
-
-        onSnapshot(studentDocRef, (studentDoc) => {
-            if (studentDoc.exists()) {
-                const studentData = studentDoc.data();
-                const MassessmentData = studentData.MassessmentData || {};
-                const MprocessedData = studentData.MprocessedData || {};
-
-                populateMotorsModal(MassessmentData, MprocessedData);  // Dynamically update modal content
-            }
-        });
-    }
-});
-
 // Fetch the logged-in student's performance summary on page load
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        const studentDocRef = doc(db, "applicants", user.uid);
-
-        onSnapshot(studentDocRef, (studentDoc) => {
-            if (studentDoc.exists()) {
-                const studentData = studentDoc.data();
-                fetchAndDisplayPerformanceSummary(user.uid);  // Dynamically update the summary
-            }
-        });
+        fetchAndDisplayPerformanceSummary(user.uid);
+    } else {
+        console.error("User is not logged in.");
     }
 });

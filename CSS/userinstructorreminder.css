@@ -444,6 +444,14 @@ h2 {
     background-color: #b60505ec;
 }
 
+#findMatchBtn:disabled {
+    background-color: #d3d3d3;
+    color: #a9a9a9;
+    border: 1px solid #a9a9a9;
+    cursor: not-allowed;
+    opacity: 0.7;      
+}
+
 @keyframes popOut {
     0% {
         opacity: 0;

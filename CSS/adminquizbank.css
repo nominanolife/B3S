@@ -1,7 +1,6 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: Poppins;
 }
 
 .whole-page {
@@ -198,6 +197,7 @@ body {
 }
 
 .button-container h3 {
+    font-family: Poppins;
     font-size: 24px;
     font-weight: normal;
     color: #142A74;
@@ -295,12 +295,14 @@ body {
 }
 
 h3 {
+    font-family: Poppins;
     color: #142A74;
     font-size: 20px;
     margin: 0;
 }
 
 h2 {
+    font-family: Poppins;
     font-size: 24px;
     font-weight: normal;
     color: #142A74;
@@ -322,6 +324,7 @@ h2 {
 }
 
 .question-header p {
+    font-family: Poppins;
     font-size: 14px;
     font-weight: bold;
     color: #2F2E2E;
@@ -336,6 +339,7 @@ h2 {
 }
 
 .options p {
+    font-family: Poppins;
     font-size: 14px;
     font-weight: normal;
     color: #2F2E2E;
@@ -348,6 +352,7 @@ h2 {
 }
 
 .publish-btn {
+    font-family: Poppins;
     font-size: 14px;
     color: #ffffff;
     background-color: #142A74;
