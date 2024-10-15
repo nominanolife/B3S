@@ -68,12 +68,12 @@
                                     <th>EMAIL</th>
                                     <th>PHONE NUMBER</th>
                                     <th>ENROLLED PACKAGE</th>
-                                    <th class="package-price">PACKAGE PRICE</th>
+                                    <th>PACKAGE PRICE</th>
                                     <th>COURSE</th>
                                     <th>STATUS</th>
-
                                     <th>CERTIFICATE CONTROL NUMBER</th>
-                                    <th>APPOINTMENT DATE</th> <!-- New column for completion date -->
+                                    <th>APPOINTMENT DATE</th>
+                                    <th>ACTION</th>
                                 </tr>
                             </thead>
                             <tbody class="student-list" id="student-list">
@@ -87,6 +87,27 @@
             </div>
         </div>
     </div>
+
+    <!-- Edit Certificate Control Number Modal -->
+    <div class="modal fade" id="editCcnModal" tabindex="-1" role="dialog" aria-labelledby="editCcnModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCcnModalLabel">Edit Certificate Control Number</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="input-body">
+                        <input type="text" class="edit-cert-number" id="certificateControlNumberInput" placeholder="Certificate Control Number" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="saveChangesBtn">Confirm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  
 
     <!-- Notification Modal -->
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">

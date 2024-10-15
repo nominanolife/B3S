@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, orderBy, query, where, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, getDocs, orderBy, query, where, getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -99,6 +99,7 @@ async function fetchCompletedStudents() {
     console.error("Error fetching completed students:", error);
   }
 }
+
 function setupYearDropdown() {
     const startYear = 2024;  // Start from 2024
     const currentYear = new Date().getFullYear();
@@ -206,16 +207,80 @@ function renderStudents() {
             <td class="table-row-content">${student.phoneNumber || 'N/A'}</td>
             <td class="table-row-content">${student.packageName || 'N/A'}</td>
             <td class="table-row-content package-price">${student.packagePrice || 'N/A'}</td>
-            <td class="table-row-content">${booking.course || 'N/A'}</td> <!-- Course name -->
-            <td class="table-row-content">Completed</td> <!-- Automatically labeled as Completed -->
-            <td class="table-row-content">${certificateControlNumber}</td> <!-- CTC from outside the array -->
-            <td class="table-row-content">${formattedCompletionDate}</td> <!-- Completion Date -->
+            <td class="table-row-content">${booking.course || 'N/A'}</td>
+            <td class="table-row-content">Completed</td>
+            <td class="table-row-content">${certificateControlNumber}</td>
+            <td class="table-row-content">${formattedCompletionDate}</td>
+            <td class="table-row-content"><i class="bi bi-pencil-square edit-cert-btn" data-student-id="${student.id}" data-certificate-number="${certificateControlNumber}"></i></td>
           </tr>
         `;
       });
     }
   });
 }
+
+// Add click event listener to each pencil icon
+const editButtons = document.querySelectorAll('.edit-cert-btn');
+editButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const studentId = button.getAttribute('data-student-id');
+    const certNumber = button.getAttribute('data-certificate-number');
+
+    // Populate the modal's input field with the current certificate number
+    document.getElementById('certificateControlNumberInput').value = certNumber;
+
+    // Save the studentId to a global or local variable so you can use it later
+    document.getElementById('saveChangesBtn').setAttribute('data-student-id', studentId);
+
+    // Open the modal
+    $('#editCcnModal').modal('show');
+  });
+});
+
+document.getElementById('saveChangesBtn').addEventListener('click', async () => {
+  const newCertNumber = document.getElementById('certificateControlNumberInput').value;
+  const studentId = document.getElementById('saveChangesBtn').getAttribute('data-student-id');
+
+  // Update the Firestore document with the new certificate control number
+  try {
+    const studentDocRef = doc(db, 'completedStudents', studentId);
+    await updateDoc(studentDocRef, {
+      certificateControlNumber: newCertNumber
+    });
+
+    // Show success modal or notification
+    document.getElementById('successModalBody').innerHTML = 'Certificate Control Number updated successfully!';
+    $('#successModal').modal('show');
+
+    // Close the edit modal
+    $('#editCcnModal').modal('hide');
+
+    // Optionally, re-fetch or update the list to reflect the change
+    fetchCompletedStudents();
+  } catch (error) {
+    console.error('Error updating certificate control number:', error);
+    // Show error modal or notification
+    document.getElementById('successModalBody').innerHTML = 'Failed to update the Certificate Control Number.';
+    $('#successModal').modal('show');
+  }
+});
+
+// Use event delegation to handle click events on dynamically created elements
+document.addEventListener('click', function(event) {
+  if (event.target && event.target.classList.contains('edit-cert-btn')) {
+    const studentId = event.target.getAttribute('data-student-id');
+    const certNumber = event.target.getAttribute('data-certificate-number');
+
+    // Populate the modal's input field with the current certificate number
+    document.getElementById('certificateControlNumberInput').value = certNumber;
+
+    // Save the studentId to a global or local variable so you can use it later
+    document.getElementById('saveChangesBtn').setAttribute('data-student-id', studentId);
+
+    // Open the modal using jQuery
+    $('#editCcnModal').modal('show');
+  }
+});
 
 function filterByYear(selectedYear) {
   // Reset the current page to 1 when filtering
