@@ -684,6 +684,261 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     });
 
+    // Select all arrows in the roadmap
+    const roadmapSteps = document.querySelectorAll('.roadmap-container .arrow');
+
+    // Function to update and show modal based on step
+    function openStepModal(step) {
+        const modalTitle = document.getElementById('roadmapstepsModalLabel');
+        const modalBody = document.querySelector('#roadmapstepsModal .modal-body');
+        
+        // Update modal content based on the step
+        let stepContent = '';
+        switch (step) {
+            case '1':
+                modalTitle.textContent = "Step 1: Theoretical Driving Course";
+                stepContent = `
+                    <div class="step-container">
+                        <h3>Prepare the Required Documents</h3>
+                        <p>Make sure you have the following:</p>
+                        <ul>
+                            <li>Valid ID (e.g., Driver’s License, Passport, Student ID, etc.)</li>
+                            <li>Birth Certificate (PSA-issued or local civil registrar)</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Visit an LTO-accredited Driving School</h3>
+                        <ul>
+                            <li>Search for a driving school accredited by the Land Transportation Office (LTO) that offers the TDC.</li>
+                            <li>Contact the school to confirm course schedules, fees, and enrollment requirements.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Enroll in the Theoretical Driving Course</h3>
+                        <ul>
+                            <li>Go to the selected driving school and present your Valid ID and Birth Certificate.</li>
+                            <li>Complete the enrollment process and pay the required fees.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Attend the TDC Sessions</h3>
+                        <ul>
+                            <li>The TDC consists of 15 hours of instruction, usually spread across 2 to 3 days.</li>
+                            <li>Topics include road safety, traffic rules and regulations, and basic vehicle operations.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Take the Course Assessment</h3>
+                        <ul>
+                            <li>After completing the course, you may be asked to take a quiz or assessment to evaluate your understanding of the lessons.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Receive the TDC Certificate</h3>
+                        <ul>
+                            <li>Upon passing the assessment (if required) and completing the course, the driving school will issue your TDC Certificate.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Submit TDC Certificate to LTO</h3>
+                        <ul>
+                            <li>Bring the TDC Certificate along with other documents (if applicable) when applying for a Student Permit or upgrading to a Driver’s License at the LTO office.</li>
+                        </ul>
+                    </div>
+                    `;
+                break;
+            case '2':
+                modalTitle.textContent = "Step 2: Student Permit";
+                stepContent = `
+                            <div class="step-container">
+                        <h3>Prepare the Required Document</h3>
+                        <p>Make sure to bring the following:</p>
+                        <ul>
+                            <li>Student Permit (SP) – must be valid and issued by the LTO.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Select an LTO-accredited Driving School</h3>
+                        <ul>
+                            <li>Search for a driving school accredited by the LTO that offers the Practical Driving Course (PDC).</li>
+                            <li>Contact the school to confirm the schedules, fees, and available vehicle types (e.g., manual or automatic).</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Enroll in the Practical Driving Course</h3>
+                        <ul>
+                            <li>Go to the driving school and present your Student Permit.</li>
+                            <li>Complete the enrollment process and pay the required fees.</li>
+                            <li>Choose between manual or automatic transmission training, depending on your preference and intended license type.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Attend the PDC Sessions</h3>
+                        <ul>
+                            <li>The course duration depends on the vehicle type and the school’s curriculum (usually around 8-10 hours).</li>
+                            <li>You will receive hands-on training covering vehicle operations, traffic regulations, and safe driving techniques.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Take the Course Assessment</h3>
+                        <ul>
+                            <li>At the end of the training, you may be required to complete an assessment to demonstrate your driving skills and knowledge.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Receive the PDC Certificate</h3>
+                        <ul>
+                            <li>Upon successfully completing the course and passing the assessment, the driving school will issue your PDC Certificate.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Use the PDC Certificate to Apply for a Driver’s License</h3>
+                        <ul>
+                            <li>Bring the PDC Certificate, Student Permit, and other required documents when applying for a Non-Professional or Professional Driver’s License at the LTO office.</li>
+                        </ul>
+                    </div>
+                `;
+            break;
+            case '3':
+                modalTitle.textContent = "Step 3: Practical Driving Course";
+                stepContent = `
+                    <div class="step-container">
+                        <h3>Prepare the Required Documents</h3>
+                        <p>Ensure you have the following:</p>
+                        <ul>
+                            <li>PDC Certificate from an LTO-accredited driving school (Minimum of 8 hours of actual driving required)</li>
+                            <li>Medical Certificate from an LTO-accredited clinic</li>
+                            <li>Valid Student Permit (SP) – Must be at least 17 years old</li>
+                            <li>Other fees (for the written exam, practical test, and license processing)</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Visit an LTO-accredited Clinic for Medical Certificate</h3>
+                        <ul>
+                            <li>Find an LTO-accredited clinic near you.</li>
+                            <li>Undergo the required medical examination.</li>
+                            <li>Pay the ₱500 fee and secure your Medical Certificate.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Go to the LTO Office</h3>
+                        <ul>
+                            <li>Bring all your documents (PDC Certificate, Medical Certificate, Student Permit) to the nearest LTO office that processes Non-Pro Driver’s License applications.</li>
+                            <li>Submit your documents to the LTO evaluator for verification.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Take the Written/Computerized Exam</h3>
+                        <ul>
+                            <li>Proceed to the examination room after your documents are verified.</li>
+                            <li>Take the written or computerized exam on road rules, traffic signs, and safe driving practices.</li>
+                            <li>Passing Score: Typically, you need at least 30 out of 40 points to pass.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Take the Practical Driving Test</h3>
+                        <ul>
+                            <li>If you pass the written exam, proceed to the driving test area.</li>
+                            <li>Use the vehicle type corresponding to your license code (A for motorcycles, B for light vehicles).</li>
+                            <li>An LTO examiner will assess your driving skills and adherence to traffic rules.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Proceed with Biometrics and Photo Capture</h3>
+                        <ul>
+                            <li>After passing the practical driving test, proceed to the biometrics section.</li>
+                            <li>Your photo, fingerprint, and signature will be captured for your license card.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Pay the License Fees</h3>
+                        <ul>
+                            <li>Proceed to the cashier to pay the required fees for the Non-Professional Driver’s License.</li>
+                            <li>Fees may vary slightly depending on the LTO branch.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Receive Your Non-Professional Driver’s License</h3>
+                        <ul>
+                            <li>After completing the process, the LTO will issue your Non-Professional Driver’s License.</li>
+                            <li>Validity: Typically 5 years, or 10 years if you have a clean driving record.</li>
+                        </ul>
+                    </div>
+                `;
+            break;
+            case '4':
+                modalTitle.textContent = "Step 4: Non-Professional Driver's License";
+                stepContent = `
+                    <div class="step-container">
+                        <h3>Prepare the Required Document</h3>
+                        <p>Make sure to bring the following:</p>
+                        <ul>
+                            <li>student Permit (SP) – must be valid and issued by the LTO.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Select an LTO-accredited Driving School</h3>
+                        <ul>
+                            <li>Search for a driving school accredited by the LTO that offers the Practical Driving Course (PDC).</li>
+                            <li>Contact the school to confirm the schedules, fees, and available vehicle types (e.g., manual or automatic).</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Enroll in the Practical Driving Course</h3>
+                        <ul>
+                            <li>Go to the driving school and present your Student Permit.</li>
+                            <li>Complete the enrollment process and pay the required fees.</li>
+                            <li>Choose between manual or automatic transmission training, depending on your preference and intended license type.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Attend the PDC Sessions</h3>
+                        <ul>
+                            <li>The course duration depends on the vehicle type and the school’s curriculum (usually around 8-10 hours).</li>
+                            <li>You will receive hands-on training covering vehicle operations, traffic regulations, and safe driving techniques.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Take the Course Assessment</h3>
+                        <ul>
+                            <li>At the end of the training, you may be required to complete an assessment to demonstrate your driving skills and knowledge.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Receive the PDC Certificate</h3>
+                        <ul>
+                            <li>Upon successfully completing the course and passing the assessment, the driving school will issue your PDC Certificate.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
+                        <h3>Use the PDC Certificate to Apply for a Driver’s License</h3>
+                        <ul>
+                            <li>Bring the PDC Certificate, Student Permit, and other required documents when applying for a Non-Professional or Professional Driver’s License at the LTO office.</li>
+                        </ul>
+                    </div>
+                `;
+                break;
+            default:
+                modalTitle.textContent = "Unknown Step";
+                stepContent = '<p>No details available for this step.</p>';
+                break;
+        }
+
+        // Insert content into the modal body
+        modalBody.innerHTML = stepContent;
+
+        // Show the modal using Bootstrap's modal function
+        $('#roadmapstepsModal').modal('show');
+    }
+
+    // Add click event listeners to each step
+    roadmapSteps.forEach(stepElement => {
+        stepElement.addEventListener('click', function () {
+            const step = this.getAttribute('data-step'); // Get the step number from the data-step attribute
+            openStepModal(step); // Call the function to open the modal
+        });
+    });
+
     onAuthStateChanged(auth, async function(user) {
         if (user) {
             try {
@@ -914,346 +1169,36 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
-    const wheelsButton = document.querySelector('.wheels-card .eval-container button');
-    const motorsButton = document.querySelector('.motors-card .eval-container button');
+    function initializeRoadmap(userData) {
+        const roadmapItems = document.querySelectorAll('.roadmap-item');
 
-    // Event listener for 4-Wheels "See more details" button
-    wheelsButton.addEventListener('click', function() {
-        $('#WheelsModal').modal('show'); // Show 4-Wheels modal
-    });
+        roadmapItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const step = this.getAttribute('data-step');
+                let stepDetails = "";
 
-    // Event listener for Motorcycle "See more details" button
-    motorsButton.addEventListener('click', function() {
-        $('#MotorsModal').modal('show'); // Show Motorcycle modal
-    });
-});
-
-async function fetchAndDisplayPerformance(studentId) {
-    try {
-        // Fetch the student's performance data from Firestore
-        const studentDocRef = doc(db, "applicants", studentId);
-        const studentDoc = await getDoc(studentDocRef);
-
-        if (studentDoc.exists()) {
-            const studentData = studentDoc.data();
-
-            const WassessmentData = studentData.WassessmentData || {};
-            const WprocessedData = studentData.WprocessedData || {};  // Get WprocessedData
-            
-            // Populate the WheelsModal with both score and performance data
-            populateWheelsModal(WassessmentData, WprocessedData);
-        }
-    } catch (error) {
-        console.error("Error fetching performance data:", error);
-    }
-}
-
-function populateWheelsModal(assessmentData, WprocessedData) {
-    const sentenceToFieldIdMap = {
-        "Eye lead time": "eyeLeadTime",
-        "Left – Right / Scanning / Shoulder checks": "leftRightScanning",
-        "Mirrors / tracking traffic": "mirrorsTracking",
-        "Following defensive distance": "defensiveDistance",
-        "Space at Stops": "spaceAtStops",
-        "Path of least resistance": "leastResistance",
-        "Right-of-way": "rightOfWay",
-        "Acceleration / Deceleration – Smoothness": "acceleration",
-        "Braking: Full Stops, smooth": "braking",
-        "Speed for Conditions": "speedForConditions",
-        "Speed and Traffic signs": "trafficSigns",
-        "Lane / Turn Position / set-up": "lanePosition",
-        "Steering: hand position, smoothness": "steering",
-        "Signals: timing and use": "signals",
-        "Other: i.e horn, eye contact": "eyeContact",
-        "Seating, head rest position, and mirror adjustment: seatbelt use": "seating",
-        "Parking / Backing": "parking",
-        "Anticipation: Adjusts": "anticipation",
-        "Judgment: decisions": "judgment",
-        "Timing: approach, Traffic interactions": "timing"
-    };
-
-    const categoryMapping = {
-        'Observation': 'observationResult',
-        'Space Management': 'spaceManagementResult',
-        'Speed Control': 'speedControlResult',
-        'Steering': 'steeringResult',
-        'Communication': 'communicationResult',
-        'General': 'generalResult'
-    };
-
-    // Populate scores in the modal fields
-    assessmentData.categories.forEach(category => {
-        category.items.forEach(item => {
-            const fieldId = sentenceToFieldIdMap[item.sentence];
-            if (fieldId) {
-                const scoreElement = document.getElementById(fieldId);
-                if (scoreElement) {
-                    scoreElement.textContent = item.score; // Populate the score
+                switch(step) {
+                    case '1':
+                        stepDetails = "<p>Step 1: Inquire</p><p>Details about the inquiry process...</p>";
+                        break;
+                    case '2':
+                        stepDetails = "<p>Step 2: Enroll</p><p>Details about enrollment...</p>";
+                        break;
+                    case '3':
+                        stepDetails = "<p>Step 3: Modules</p><p>Details about the modules...</p>";
+                        break;
+                    case '4':
+                        stepDetails = "<p>Step 4: Test</p><p>Details about testing...</p>";
+                        break;
+                    case '5':
+                        stepDetails = "<p>Step 5: Certification</p><p>Details about certification...</p>";
+                        break;
+                    default:
+                        stepDetails = "<p>Invalid step</p>";
                 }
-            }
-        });
-    });
 
-    // Populate performance data (e.g., "Excellent", "Great", "Poor") and set the color
-    Object.keys(categoryMapping).forEach(category => {
-        const resultElementId = categoryMapping[category];
-        const performanceResult = WprocessedData[category] || 'N/A'; // Fallback to 'N/A' if no data
-
-        // Update the relevant category result and apply color
-        const resultElement = document.getElementById(resultElementId);
-        if (resultElement) {
-            resultElement.textContent = performanceResult; // Set the performance result
-            if (performanceResult === 'Poor') {
-                resultElement.style.color = '#B60505'; // Set color to red for 'Poor'
-            } else if (performanceResult === 'Great') {
-                resultElement.style.color = '#142A74'; // Set color to green for 'Great'
-            } else if (performanceResult === 'Excellent') {
-                resultElement.style.color = 'green'; // Set color to green for 'Excellent'
-            } else {
-                resultElement.style.color = ''; // Default color for 'N/A' or unknown
-            }
-        }
-    });
-}
-
-$('#WheelsModal').on('show.bs.modal', function () {
-    const loggedInStudentId = auth.currentUser.uid; // Get the logged-in student's ID
-    fetchAndDisplayPerformance(loggedInStudentId);  // Fetch and display the performance data
-});
-
-// Fetch and display motorcycle performance data
-async function fetchAndDisplayMotorPerformance(studentId) {
-    try {
-        const studentDocRef = doc(db, "applicants", studentId); // Fetch the correct document
-        const studentDoc = await getDoc(studentDocRef);
-
-        if (studentDoc.exists()) {
-            const studentData = studentDoc.data();
-
-            // Fetch the MassessmentData and MprocessedData if they exist in the document
-            const MassessmentData = studentData.MassessmentData || {}; 
-            const MprocessedData = studentData.MprocessedData || {};  
-
-            // Check if data is available
-            if (Object.keys(MassessmentData).length === 0) {
-                console.error("MassessmentData is empty");
-            }
-
-            if (Object.keys(MprocessedData).length === 0) {
-                console.error("MprocessedData is empty");
-            }
-
-            // Populate the modal with the fetched data
-            populateMotorsModal(MassessmentData, MprocessedData);
-        } else {
-            console.error("No such document exists for the student.");
-        }
-    } catch (error) {
-        console.error("Error fetching motorcycle performance data:", error);
-    }
-}
-
-function populateMotorsModal(assessmentData, processedData) {
-    const sentenceToFieldIdMap = {
-        "Moving off, riding ahead and stopping": "motorcycleMovingOff",
-        "Positioning in different environments": "motorcyclePositioning",
-        "Passing stationary vehicles and pedestrians": "motorcyclePassingVehicles",
-        "Meeting oncoming traffic": "motorcycleOncomingTraffic",
-        "Riding ahead of or behind other road users": "ridingAheadorBehind",
-        "Riding side by side": "ridingSidebySide",
-        "Straight through": "straightThrough",
-        "Turning Left or Right": "turningLeftorRight",
-        "With or Without obligation to give the right of way": "obligationsToGiveRightofWay",
-        "ABC of passing junction": "abcPassingJunction"
-    };
-
-    const categoryMapping = {
-        'Approaching and passing railway crossings': 'approaching',
-        'Approaching, riding in and leaving roundabouts': 'leavingRoundabouts',
-        'Choice of speed in different situations (low speed balancing)': 'lowSpeedBalancing',
-        'Hill riding':'hillRiding',
-        'Interaction with various road users': 'variousRoadUsers',
-        'Lane shift and choice of lanes': 'laneShift',
-        'Overtaking': 'overTaking',
-        'Riding along a curve or bend (cornering)': 'cornering',
-        'Riding different kinds of junctions': 'kindofJunctions',
-        'Riding with a back ride': 'backRiding',
-        'Start the engine': 'startTheEngine',
-        'Stopping and parking': 'stoppingAndParking',
-        'Turning and lane changing': 'turningLane',
-    };
-
-    // Populate numeric scores
-    assessmentData.categories.forEach(category => {
-        category.items.forEach(item => {
-            const fieldId = sentenceToFieldIdMap[item.sentence];
-            if (fieldId) {
-                const scoreElement = document.getElementById(fieldId);
-                if (scoreElement) {
-                    scoreElement.textContent = item.score;  // Set the numeric score
-                }
-            }
-        });
-    });
-
-    // Populate performance data (e.g., "Excellent", "Great", "Poor") and set the color
-    Object.keys(categoryMapping).forEach(category => {
-        const performanceResult = processedData[category] || 'N/A'; // Fallback to 'N/A' if no data
-        const resultElement = document.getElementById(categoryMapping[category]);
-
-        if (resultElement) {
-            resultElement.textContent = performanceResult; // Set the performance result
-            if (performanceResult === 'Poor') {
-                resultElement.style.color = '#B60505'; // Set color to red for 'Poor'
-            } else if (performanceResult === 'Great') {
-                resultElement.style.color = '#142A74'; // Set color to green for 'Great'
-            } else if (performanceResult === 'Excellent') {
-                resultElement.style.color = 'green'; // Set color to green for 'Excellent'
-            } else {
-                resultElement.style.color = ''; // Default color for 'N/A' or unknown
-            }
-        }
-    });
-}
-
-$('#MotorsModal').on('show.bs.modal', function () {
-    const loggedInStudentId = auth.currentUser.uid; // Get the logged-in student's ID
-    fetchAndDisplayMotorPerformance(loggedInStudentId); // Fetch and display the motor performance data
-});
-
-// Function to display performance data or "No performance yet" message
-async function fetchAndDisplayPerformanceSummary(studentId) {
-    try {
-        const studentDocRef = doc(db, "applicants", studentId);
-        const studentDoc = await getDoc(studentDocRef);
-
-        if (studentDoc.exists()) {
-            const studentData = studentDoc.data();
-
-            // Check if the user is enrolled in PDC
-            const hasPDC = studentData.packageType && studentData.packageType.includes("PDC");
-
-            const isEnrolledIn4Wheels = studentData.has4WheelsCourse || false;
-            const isEnrolledInMotorcycle = studentData.hasMotorsCourse || false;
-            const WprocessedData = studentData.WprocessedData || {};
-            const MprocessedData = studentData.MprocessedData || {};
-
-            const wheelsCard = document.querySelector('.wheels-card .eval-container');
-            const motorsCard = document.querySelector('.motors-card .eval-container');
-
-            // Handle 4-Wheels Performance Evaluation
-            if (!isEnrolledIn4Wheels && !hasPDC) {
-                wheelsCard.innerHTML = `
-                    <h3>4-Wheels Performance Evaluation</h3>
-                    <p style="color: red;">You did not enroll in any 4-Wheel course, so there is no evaluation form available.</p>
-                `;
-            } else if (Object.keys(WprocessedData).length > 0) {
-                // Show "See more details" button if data exists
-                wheelsCard.innerHTML = `
-                    <h3>4-Wheels Performance Evaluation</h3>
-                    <button type="button">See more details</button>
-                `;
-
-                wheelsCard.querySelector('button').addEventListener('click', function () {
-                    $('#WheelsModal').modal('show'); // Show 4-Wheels modal
-                });
-            } else {
-                // Show "No performance yet" if enrolled in PDC but no evaluation data yet
-                wheelsCard.innerHTML = `
-                    <h3>4-Wheels Performance Evaluation</h3>
-                    <p style="color: red;">No performance evaluation yet</p>
-                `;
-            }
-
-            // Handle Motorcycle Performance Evaluation
-            if (!isEnrolledInMotorcycle && !hasPDC) {
-                motorsCard.innerHTML = `
-                    <h3>Motorcycle Performance Evaluation</h3>
-                    <p style="color: red;">You did not enroll in any Motorcycle course, so there is no evaluation form available.</p>
-                `;
-            } else if (Object.keys(MprocessedData).length > 0) {
-                // Show "See more details" button if data exists
-                motorsCard.innerHTML = `
-                    <h3>Motorcycle Performance Evaluation</h3>
-                    <button type="button">See more details</button>
-                `;
-
-                motorsCard.querySelector('button').addEventListener('click', function () {
-                    $('#MotorsModal').modal('show'); // Show Motorcycle modal
-                });
-            } else {
-                // Show "No performance yet" if enrolled in PDC but no evaluation data yet
-                motorsCard.innerHTML = `
-                    <h3>Motorcycle Performance Evaluation</h3>
-                    <p style="color: red;">No performance evaluation yet</p>
-                `;
-            }
-        } else {
-            console.error("No student document found.");
-        }
-    } catch (error) {
-        console.error("Error fetching performance data:", error);
-    }
-}
-
-// Real-time listener for 4-Wheels performance evaluation
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        const studentDocRef = doc(db, "applicants", user.uid);
-
-        onSnapshot(studentDocRef, (studentDoc) => {
-            if (studentDoc.exists()) {
-                const studentData = studentDoc.data();
-                const WassessmentData = studentData.WassessmentData || {};
-                const WprocessedData = studentData.WprocessedData || {};
-
-                populateWheelsModal(WassessmentData, WprocessedData);  // Dynamically update modal content
-            }
-        });
-    }
-    
-    // Add the event listeners when the DOM is fully loaded or after dynamic content has been loaded
-    document.addEventListener('DOMContentLoaded', function () {
-        setTimeout(addEventListenersForButtons, 500); // Adjust timeout based on dynamic loading if necessary
-    });    
-
-    // Fetch and display performance summary
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            fetchAndDisplayPerformanceSummary(user.uid);
-        } else {
-            console.error("User is not logged in.");
-        }
-    });
-});
-
-// Real-time listener for Motorcycle performance evaluation
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        const studentDocRef = doc(db, "applicants", user.uid);
-
-        onSnapshot(studentDocRef, (studentDoc) => {
-            if (studentDoc.exists()) {
-                const studentData = studentDoc.data();
-                const MassessmentData = studentData.MassessmentData || {};
-                const MprocessedData = studentData.MprocessedData || {};
-
-                populateMotorsModal(MassessmentData, MprocessedData);  // Dynamically update modal content
-            }
-        });
-    }
-});
-
-// Fetch the logged-in student's performance summary on page load
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        const studentDocRef = doc(db, "applicants", user.uid);
-
-        onSnapshot(studentDocRef, (studentDoc) => {
-            if (studentDoc.exists()) {
-                const studentData = studentDoc.data();
-                fetchAndDisplayPerformanceSummary(user.uid);  // Dynamically update the summary
-            }
+                document.getElementById('step-details').innerHTML = stepDetails;
+            });
         });
     }
 });
