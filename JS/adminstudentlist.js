@@ -38,6 +38,18 @@ function showNotification(message) {
   $('#successModal').modal('show'); // Show the modal
 }
 
+// Fetch students data on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+  const loader = document.getElementById('loader1');
+  loader.style.display = 'flex';  // Show loader while data is being fetched
+  
+  fetchAppointments().then(() => {
+      // After the appointments are fetched, trigger render to hide loader once done
+      renderStudents();
+      updatePaginationControls();
+  });
+});
+
 async function fetchAppointments() {
   try {
     const studentsMap = new Map();
@@ -646,6 +658,15 @@ function openEditModal(index, modalId = 'editCcnModal') {
   selectedStudentIndex = index; // Store the selected student's index or ID
   const studentData = studentsData[index]; // Retrieve student data using the index
 
+  // Check if there's existing assessment data for 4-Wheels
+  if (modalId === 'edit4WheelsModal' && studentData.WassessmentData) {
+    setTimeout(() => {
+      showNotification('This student already has an existing 4-Wheels assessment data. If you proceed to change it, the existing data will be overwritten.');
+    }, 500);
+  }
+
+  resetModalFields(modalId);
+
   // Function to convert 24-hour time to 12-hour format
   function convertTo12HourFormat(time24) {
       let [hours, minutes] = time24.split(':');
@@ -765,6 +786,8 @@ function openEditModal(index, modalId = 'editCcnModal') {
       saveButton.setAttribute('data-student-index', index);
   }
 
+  validateForm(modalId); 
+
   // Show the correct modal with options to prevent closing
   const modalToOpen = new bootstrap.Modal(document.getElementById(modalId), {
       backdrop: 'static',
@@ -844,11 +867,6 @@ function calculateTotalScore() {
   // Display the total score out of 100
   const totalScoreOutOf100 = totalScore; // Adjust this if you want scaling
   document.getElementById('totalScore').textContent = `${totalScoreOutOf100} / 100`;
-
-  // Validate and display a warning if the total score exceeds 100
-  if (totalScoreOutOf100 > 100) {
-      showNotification('Total score exceeds 100. Please adjust the scores.');
-  }
 
   return totalScoreOutOf100; // Return the total score
 }
@@ -1109,9 +1127,6 @@ document.getElementById('nextBtn').addEventListener('click', async function (eve
   event.preventDefault(); // Prevent the default action, especially for form submission
   event.stopPropagation(); // Prevent the event from bubbling up to parent elements
 
-  // Calculate total score before saving
-  const totalScore = calculateTotalScore();
-
   // Save raw assessment data to session storage
   saveAssessmentDataToSession();
 
@@ -1130,13 +1145,6 @@ document.getElementById('nextBtn').addEventListener('click', async function (eve
   backBtn.classList.remove('d-none');
   nextBtn.classList.add('d-none');
   saveBtn.classList.remove('d-none');
-
-  // Show showNotification if needed after transitioning to the next modal
-  if (totalScore > 100) {
-      setTimeout(() => {
-          showNotification('Total score exceeds 100. Please adjust the scores.');
-      }, 100);
-  }
 });
 
 // Attach event listener to "Save" button on the checklist modal
@@ -1148,6 +1156,15 @@ document.getElementById('saveBtn').addEventListener('click', function() {
 function openMotorcycleEditModal(index, modalId = 'editMotorsModal') {
   selectedStudentIndex = index; // Store the selected student's index or ID
   const studentData = studentsData[index]; // Retrieve student data using the index
+
+  // Check if there's existing assessment data for Motorcycle
+  if (modalId === 'editMotorsModal' && studentData.MassessmentData) {
+    setTimeout(() => {
+      showNotification('This student already has an existing Motorcycle assessment data. If you proceed to change it, the existing data will be overwritten.');
+    }, 500);
+  }
+
+  resetModalFields(modalId);
 
   // Function to convert 24-hour time to 12-hour format
   function convertTo12HourFormat(time24) {
@@ -1253,6 +1270,8 @@ if (studentData.Mchecklist) {
 
   console.log("Setting data-student-index to:", index); // Debugging output
 
+  validateForm(modalId); 
+
   // Show the correct modal with options to prevent closing
   const modalToOpen = new bootstrap.Modal(document.getElementById(modalId), {
       backdrop: 'static',
@@ -1326,10 +1345,6 @@ function calculateMotorcycleTotalScore() {
 
   const totalScoreOutOf100 = totalScore; // Adjust if needed
   document.getElementById('motorcycleTotalScore').textContent = `${totalScoreOutOf100} / 100`;
-
-  if (totalScoreOutOf100 > 100) {
-    showNotification('Total score exceeds 100. Please adjust the scores.');
-  }
 
   return totalScoreOutOf100;
 }
@@ -1698,13 +1713,6 @@ document.getElementById('motorcycleNextBtn').addEventListener('click', async fun
   backBtn.classList.remove('d-none');
   nextBtn.classList.add('d-none');
   saveBtn.classList.remove('d-none');
-
-  // Show showNotification if needed after transitioning to the next modal
-  if (totalScore > 100) {
-      setTimeout(() => {
-          showNotification('Total score exceeds 100. Please adjust the scores.');
-      }, 100); // Slight delay to ensure modal transition completes first
-  }
 });
 
 // Attach event listener to "Save" button for saving all motorcycle data to Firestore
@@ -1896,7 +1904,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function resetModalFields(modalId) {
   const modal = document.getElementById(modalId);
 
-  // Reset all text inputs and text areas to empty
+  // Reset all text inputs, number inputs, and text areas to empty
   modal.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
       input.value = '';
   });
@@ -1911,8 +1919,14 @@ function resetModalFields(modalId) {
       span.textContent = '';
   });
 
+  // Reset the selected vehicle type back to "Select Vehicle"
+  const vehicleTypeElement = modal.querySelector('.selected');
+  if (vehicleTypeElement) {
+      vehicleTypeElement.textContent = 'Select Vehicle';
+  }
+
   // Reset total score display
-  const totalScoreDisplay = modal.querySelector('#motorcycleTotalScore');
+  const totalScoreDisplay = modal.querySelector('#totalScore');
   if (totalScoreDisplay) {
       totalScoreDisplay.textContent = '0 / 100';
   }
@@ -1950,14 +1964,122 @@ function checkIfDataExists(modalId) {
   return hasData;
 }
 
-// Fetch students data on DOM load
-document.addEventListener('DOMContentLoaded', () => {
-  const loader = document.getElementById('loader1');
-  loader.style.display = 'flex';  // Show loader while data is being fetched
-  
-  fetchAppointments().then(() => {
-      // After the appointments are fetched, trigger render to hide loader once done
-      renderStudents();
-      updatePaginationControls();
+// Attach popover for the next button
+function attachNextButtonPopover(nextBtn, message) {
+  // Destroy any existing popover before attaching a new one to avoid duplicates
+  const existingPopover = bootstrap.Popover.getInstance(nextBtn);
+  if (existingPopover) {
+    existingPopover.dispose();
+  }
+
+  // Initialize Bootstrap popover with the message
+  const popoverInstance = new bootstrap.Popover(nextBtn, {
+      content: message,
+      trigger: 'hover',
+      placement: 'top'
   });
+
+  // Manually show/hide popover based on button status (for better control)
+  nextBtn.addEventListener('mouseenter', () => {
+      if (nextBtn.disabled) {
+          popoverInstance.show();
+      }
+  });
+
+  nextBtn.addEventListener('mouseleave', () => {
+      popoverInstance.hide();
+  });
+}
+
+function validateForm(modalId) {
+  const modalElement = document.getElementById(modalId);
+  const scoreInputs = modalElement.querySelectorAll('input.numeric-input');
+
+  let allScoresFilled = true;
+
+  // Check if all score inputs are filled and within the correct range
+  scoreInputs.forEach(input => {
+    const value = input.value.trim();
+    const maxValue = parseFloat(input.getAttribute('max')) || 10; // Ensure you check the max attribute
+
+    if (value === '' || isNaN(value) || parseFloat(value) < 0 || parseFloat(value) > maxValue) {
+      allScoresFilled = false;
+    }
+  });
+
+  // Determine the next button and enable or disable it based on the validation
+  const nextBtn = modalElement.querySelector('.next-btn');
+  if (nextBtn) {
+    // Reset the popover message
+    let message = '';
+    let showPopover = false;
+
+    if (modalId === 'editMotorsModal') {
+      // In 'editMotorsModal', we only care about the scores being filled out
+      nextBtn.disabled = !allScoresFilled;
+      if (!allScoresFilled) {
+        message = 'Please fill out all the score fields';
+        showPopover = true;
+      }
+    } else if (modalId === 'edit4WheelsModal') {
+      // In 'edit4WheelsModal', both the vehicle type and scores should be filled
+      const vehicleTypeSelectedElement = modalElement.querySelector('.selected');
+      const vehicleTypeSelected = vehicleTypeSelectedElement ? vehicleTypeSelectedElement.textContent : '';
+      const isVehicleTypeSelected = vehicleTypeSelected !== 'Select Vehicle' && vehicleTypeSelected !== '';
+
+      nextBtn.disabled = !(allScoresFilled && isVehicleTypeSelected);
+      if (!isVehicleTypeSelected && !allScoresFilled) {
+        message = 'Please select vehicle type and fill out all the score fields';
+        showPopover = true;
+      } else if (!isVehicleTypeSelected) {
+        message = 'Please select vehicle type';
+        showPopover = true;
+      } else if (!allScoresFilled) {
+        message = 'Please fill out all the score fields';
+        showPopover = true;
+      }
+    }
+
+    if (showPopover) {
+      attachNextButtonPopover(nextBtn, message);
+    } else {
+      // Destroy existing popover if validation passes
+      const popoverInstance = bootstrap.Popover.getInstance(nextBtn);
+      if (popoverInstance) {
+        popoverInstance.dispose();
+      }
+    }
+  }
+}
+
+// Attach event listeners to score inputs and vehicle type to trigger validation
+function attachValidationListeners(modalId) {
+  const modalElement = document.getElementById(modalId);
+  const scoreInputs = modalElement.querySelectorAll('input.numeric-input');
+
+  // Validate when any score input changes
+  scoreInputs.forEach(input => {
+    input.addEventListener('input', () => validateForm(modalId));
+  });
+
+  // For edit4WheelsModal, validate when vehicle type is selected
+  if (modalId === 'edit4WheelsModal') {
+    const vehicleDropdown = document.getElementById('vehicleDropdown');
+    if (vehicleDropdown) {
+      vehicleDropdown.addEventListener('click', (e) => {
+        if (e.target.classList.contains('option')) {
+          validateForm(modalId); // Run validation after vehicle type selection
+        }
+      });
+    }
+  }
+
+  // Initial validation when the modal opens
+  validateForm(modalId);
+}
+
+// Call the function for each modal when it opens
+document.addEventListener('DOMContentLoaded', () => {
+  attachValidationListeners('edit4WheelsModal');
+  attachValidationListeners('editMotorsModal');
 });

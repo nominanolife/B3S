@@ -122,6 +122,23 @@ async function fetchCourseAndAppointmentDateForStudent(studentId) {
     }
 }
 
+// Function to fetch student traits from Firestore
+async function fetchStudentTraits(studentId) {
+    try {
+        const studentDoc = await getDoc(doc(db, 'applicants', studentId));
+        if (studentDoc.exists()) {
+            const studentData = studentDoc.data();
+            return studentData.traits || [];
+        } else {
+            console.warn('No student document found for ID:', studentId);
+            return [];
+        }
+    } catch (error) {
+        console.error('Error fetching student traits:', error);
+        return [];
+    }
+}
+
 // Render the list of students with their match details
 async function renderStudents(students) {
     showLoader(); // Show loader before starting the rendering process
@@ -136,6 +153,9 @@ async function renderStudents(students) {
             fetchCourseAndAppointmentDateForStudent(studentId)
         ]);
 
+        // Fetch student traits
+        const studentTraits = await fetchStudentTraits(studentId); // New function to get traits
+
         return {
             studentId,
             instructorId,
@@ -143,7 +163,8 @@ async function renderStudents(students) {
             studentName: studentDetails.studentName,
             instructorName: studentDetails.instructorName,
             course: courseDetails.course,
-            appointmentDate: courseDetails.appointmentDate
+            appointmentDate: courseDetails.appointmentDate,
+            traits: studentTraits // Include traits in the object
         };
     });
 
@@ -152,7 +173,12 @@ async function renderStudents(students) {
 
     // Now render all students
     studentDataList.forEach((studentData) => {
-        const { studentId, instructorId, matchedAt, studentName, instructorName, course, appointmentDate } = studentData;
+        const { studentId, instructorId, matchedAt, studentName, instructorName, course, appointmentDate, traits } = studentData;
+
+        // Create the trait list for the popover content
+        const traitList = traits.length > 0 
+            ? `<ul class='trait-list'>${traits.map(trait => `<li>${trait}</li>`).join('')}</ul>`
+            : 'No traits available';
 
         const studentRow = `
             <tr>
@@ -162,12 +188,25 @@ async function renderStudents(students) {
                 <td>${new Date(matchedAt.seconds * 1000).toLocaleDateString('en-US', dateOptions)}</td>
                 <td>${appointmentDate}</td>
                 <td>
+                    <i class="bi bi-info-circle"
+                        data-toggle="popover"
+                        data-html="true"
+                        data-trigger="hover"
+                        data-placement="right"
+                        data-delay='{"show":100, "hide":100}'
+                        data-content="${traitList}">
+                    </i>
+                </td>
+                <td>
                     <button class="btn custom-btn" data-student-id="${studentId}" data-instructor-id="${instructorId}">See Instructor</button>
                 </td>
             </tr>
         `;
         studentListContainer.innerHTML += studentRow;
     });
+
+    // Reattach popovers for student traits after rendering
+    reattachStudentListPopovers(); // Initialize popovers for student list
 
     // Attach event listeners for the "See Instructor" buttons
     document.querySelectorAll('.custom-btn').forEach(function(button) {
@@ -181,6 +220,12 @@ async function renderStudents(students) {
     hideLoader(); // Hide the loader after rendering is done
 }
 
+// Function to reinitialize popovers for student list after closing the modal
+function reattachStudentListPopovers() {
+    // Reattach popovers for the student list
+    $('[data-toggle="popover"]').popover();  // Initialize all popovers again
+}
+
 // Initialize modal hidden event to clear the modal content
 $('#assigninstructormodal').on('hidden.bs.modal', function () {
     // Clear instructor list
@@ -191,8 +236,11 @@ $('#assigninstructormodal').on('hidden.bs.modal', function () {
         button.removeEventListener('click', handleReassignClick);
     });
 
-    // Remove any active popovers
-    $('[data-toggle="popover"]').popover('dispose');
+    // Dispose of all popovers in the modal and outside
+    $('[data-toggle="popover"]').popover('dispose');  // Clear all popovers
+
+    // Reinitialize the popovers in the student list when modal is closed
+    reattachStudentListPopovers();
 });
 
 // Function to handle instructor reassignment button click

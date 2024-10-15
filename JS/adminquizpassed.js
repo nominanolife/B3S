@@ -41,6 +41,9 @@ async function renderApplicants() {
                 const suffix = personalInfo.suffix ? ` ${personalInfo.suffix}` : '';  // Add space before suffix
                 const fullName = `${firstName}${middleName} ${lastName}${suffix}`.trim();
 
+                // Store fullName in the student object
+                student.fullName = fullName;
+
                 // Create a new row for the table
                 const row = document.createElement('tr');
 
@@ -51,7 +54,7 @@ async function renderApplicants() {
                 // Date cell
                 const dateCell = document.createElement('td');
                 const timestamp = student.timestamp ? new Date(student.timestamp.seconds * 1000) : null;
-                dateCell.textContent = timestamp ? timestamp.toLocaleDateString() : '';
+                dateCell.textContent = timestamp ? timestamp.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 
                 // Percentage cell (based on totalScore)
                 const percentageCell = document.createElement('td');
@@ -78,8 +81,6 @@ async function renderApplicants() {
         }
     }
 }
-
-
 
 // Function to update pagination controls
 function updatePaginationControls() {
@@ -148,9 +149,11 @@ function setupRealTimeListener() {
 // Search functionality for filtering passed students based on input
 function searchApplicants() {
     const searchInput = document.querySelector('.search').value.toLowerCase();
+    
+    // Filter the passedStudentsData based on fullName or certificateID
     const filteredStudents = passedStudentsData.filter(student => {
-        const name = `${student.personalInfo.first} ${student.personalInfo.last}`.toLowerCase();
-        const certificateID = student.certificateID.toLowerCase();
+        const name = student.fullName.toLowerCase();
+        const certificateID = student.certificateID ? student.certificateID.toLowerCase() : '';
 
         return name.includes(searchInput) || certificateID.includes(searchInput);
     });
@@ -164,9 +167,22 @@ function searchApplicants() {
 
 // Render filtered students
 function renderFilteredApplicants(filteredStudents) {
-    const passedStudentsTable = document.querySelector('.passed-students-list');
+    const passedStudentsTable = document.querySelector('.passed-student-list'); 
     passedStudentsTable.innerHTML = ''; // Clear the table before rendering
 
+    // If no students are found, display "No student/s found" message
+    if (filteredStudents.length === 0) {
+        const row = document.createElement('tr');
+        const noDataCell = document.createElement('td');
+        noDataCell.setAttribute('colspan', '4'); // Span all columns
+        noDataCell.textContent = 'No student/s found';
+        noDataCell.style.textAlign = 'center'; // Center the message
+        row.appendChild(noDataCell);
+        passedStudentsTable.appendChild(row);
+        return;
+    }
+
+    // If students are found, render them
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const currentItems = filteredStudents.slice(start, end);
@@ -179,10 +195,14 @@ function renderFilteredApplicants(filteredStudents) {
         const percentageCell = document.createElement('td');
         const certificateIdCell = document.createElement('td');
 
-        nameCell.textContent = `${student.personalInfo.first} ${student.personalInfo.last}`;
-        dateCell.textContent = new Date(student.timestamp.seconds * 1000).toLocaleDateString();
-        percentageCell.textContent = `${student.percentage}%`;
-        certificateIdCell.textContent = student.certificateID;
+        // Name already computed in renderApplicants()
+        nameCell.textContent = student.fullName;
+
+        const timestamp = student.timestamp ? new Date(student.timestamp.seconds * 1000) : null;
+        dateCell.textContent = timestamp ? timestamp.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+
+        percentageCell.textContent = `${student.totalScore || '0.00'}%`;
+        certificateIdCell.textContent = student.certificateID || '';
 
         row.appendChild(nameCell);
         row.appendChild(dateCell);

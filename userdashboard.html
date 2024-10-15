@@ -42,57 +42,83 @@
             </div>
         </div>
         <div class="main-content">
-            <div class="header">
-                <div class="title">
-                    <h2>Dashboard</h2>
-                </div>
+            <div class="page-content">
                 <div class="notification-bell-container">
                     <i id="notification-bell" class="fas fa-bell"></i>
                     <span id="notification-indicator" class="notification-indicator hidden"></span>
                     <div id="notification-list" class="notification-list hidden">
                         <!-- Notifications will be dynamically inserted here -->
                     </div>
-                </div>                
-            </div>
-            <div class="page-content">
-                <!-- Roadmap Section -->
-                <div class="roadmap-container my-4 text-center">
-                    <h2>Driving School Roadmap</h2>
-                    <div class="roadmap d-flex justify-content-center align-items-center">
-                        <div class="roadmap-item mx-2" data-toggle="modal" data-target="#roadmapModal" data-step="1">
-                            <div class="circle">1</div>
-                            <span>Step 1</span>
+                </div>
+                <div class="roadmap-container">
+                    <h1>My Roadmap</h1>    
+                    <img src="Assets/Blue Minimalist $ Points Timeline Road Infographic Graph.png" alt="road">
+                    <div class="arrow arrow1" data-step="1">
+                        <p>Theoretical Driving Course</p>
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="arrow arrow2" data-step="2">
+                        <p>Student Permit</p>
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="arrow arrow3" data-step="3">
+                        <p>Practical Driving Course</p>
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="arrow arrow4" data-step="4">
+                        <p>Non-Professional Driver's License</p>
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                </div>
+                <div class="information-container">
+                    <div class="appointment-card">
+                        <div class="card-container">
+
+                </div>
+                <div class="roadmap-container">
+                    <h1>My Roadmap</h1>    
+                    <img src="Assets/Blue Minimalist $ Points Timeline Road Infographic Graph.png" alt="road">
+                    <div class="arrow arrow1" data-step="1">
+                        <p>Theoretical Driving Course</p>
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="arrow arrow2" data-step="2">
+                        <p>Student Permit</p>
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="arrow arrow3" data-step="3">
+                        <p>Practical Driving Course</p>
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="arrow arrow4" data-step="4">
+                        <p>Non-Professional Driver's License</p>
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                </div>
+                <div class="information-container">
+                    <div class="appointment-card">
+                        <div class="card-container">
+
                         </div>
-                        <div class="connector"></div>
-                        <div class="roadmap-item mx-2" data-toggle="modal" data-target="#roadmapModal" data-step="2">
-                            <div class="circle">2</div>
-                            <span>Step 2</span>
-                        </div>
-                        <div class="connector"></div>
-                        <div class="roadmap-item mx-2" data-toggle="modal" data-target="#roadmapModal" data-step="3">
-                            <div class="circle">3</div>
-                            <span>Step 3</span>
-                        </div>
-                        <div class="connector"></div>
-                        <div class="roadmap-item mx-2" data-toggle="modal" data-target="#roadmapModal" data-step="4">
-                            <div class="circle">4</div>
-                            <span>Step 4</span>
+                    </div>
+                    <div class="balance-card">
+                        <div class="card-container">
+
                         </div>
                     </div>
                 </div>
+                <div class="evaluation-container">
+                    <div class="wheels-card">
+                        <div class="eval-container">
 
-                <!-- Appointment and Balance Section -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="card appointment-card">
-                            <div class="card-body text-center">
-                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="card balance-card">
-                            <div class="card-body text-center">
-                            </div>
+                    <div class="motors-card">
+                        <div class="eval-container">
+                            
+                    <div class="motors-card">
+                        <div class="eval-container">
+                            
                         </div>
                     </div>
                 </div>
@@ -100,37 +126,602 @@
         </div>
     </div>
 
-    <!-- Logout Confirmation Modal -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="WheelsModal">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <h5 class="modal-title">4-Wheels Performance Result</h5>
+                    <div class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </div>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to logout?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="confirmLogoutBtn">Logout</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                    <div class="input-body">
+                        <div class="checkbox-checklist">
+                            <h5>Evaluation</h5>
+                            <table class="evaluation-table">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="main">Observation</td>
+                                        <td id="observationResult"></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main-text">Eye lead time</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="eyeLeadTime"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Left – Right / Scanning / Shoulder checks</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="leftRightScanning"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Mirrors / tracking traffic</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="mirrorsTracking"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main">Space Management</td>
+                                        <td id="spaceManagementResult"></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main-text">Following defensive distance</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="defensiveDistance"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Space at Stops</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="spaceAtStops"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Path of least resistance</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="leastResistance"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Right-of-way</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="rightOfWay"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main">Speed Control</td>
+                                        <td id="speedControlResult"></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main-text">Acceleration / Deceleration – Smoothness</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="acceleration"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Braking: Full Stops, smooth</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="braking"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Speed for Conditions</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="speedForConditions"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Speed and Traffic signs</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="trafficSigns"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main">Steering</td>
+                                        <td id="steeringResult"></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main-text">Lane / Turn Position / set-up</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="lanePosition"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Steering: hand position, smoothness</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="steering"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main">Communication</td>
+                                        <td id="communicationResult"></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main-text">Signals: timing and use</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="signals"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Other: i.e horn, eye contact</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="eyeContact"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main">General</td>
+                                        <td id="generalResult"></td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="main-text">Seating, head rest position, and mirror adjustment: seatbelt use</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="seating"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Parking / Backing</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="parking"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Anticipation: Adjusts</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="anticipation"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Judgment: decisions</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="judgment"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Timing: approach, Traffic interactions</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div class="static-text-score" id="timing"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Roadmap Modal -->
-    <div class="modal fade" id="roadmapModal" tabindex="-1" role="dialog" aria-labelledby="roadmapModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="MotorsModal">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="roadmapModalLabel">Roadmap Step Details</h5>
+                    <h5 class="modal-title">Motorcycle Performance Result</h5>
+                    <div class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </div>
+                </div>
+                <div class="modal-body first-section">
+                    <div class="input-body">
+                        <div class="checkbox-checklist">
+                            <h5>Evaluation</h5>
+                            <table class="evaluation-table">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="main">Start the engine</td>
+                                        <td id="startTheEngine"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Moving off, riding ahead and stopping</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="motorcycleMovingOff" class="static-text-score"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Positioning in different environments</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="motorcyclePositioning" class="static-text-score"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">5</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                     <!-- Choice of speed in different situations (low speed balancing) -->
+                                    <tr>
+                                        <td class="main">Choice of speed in different situations (low speed balancing)</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="lowSpeedBalancing" class="static-text-score"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <!-- Hill riding -->
+                                    <tr>
+                                        <td class="main">Hill riding</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="hillRiding" class="static-text-score"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                      <!-- Riding along a curve or bend (cornering) -->
+                                    <tr>
+                                        <td class="main">Riding along a curve or bend (cornering)</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="cornering" class="static-text-score"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                     <!-- Approaching and passing railway crossings -->
+                                    <tr>
+                                        <td class="main">Approaching and passing railway crossings</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="approaching" class="static-text-score"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                     <!-- Lane shift and choice of lanes -->
+                                    <tr>
+                                        <td class="main">Lane shift and choice of lanes</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="laneShift" class="static-text-score"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                     <!-- Turning and lane changing -->
+                                    <tr>
+                                        <td class="main">Turning and lane changing</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="turningLane" class="static-text-score"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Interaction with various road users</td>
+                                        <td id="variousRoadUsers"></td>
+                                    </tr>
+                                    <!-- Passing stationary vehicles and pedestrians -->
+                                    <tr>
+                                        <td class="main-text">Passing stationary vehicles and pedestrians</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="motorcyclePassingVehicles" class="static-text-score"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">2</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                     <!-- Meeting oncoming traffic -->
+                                    <tr>
+                                        <td class="main-text">Meeting oncoming traffic</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="motorcycleOncomingTraffic" class="static-text-score"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">3</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Riding ahead of or behind other road users</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="ridingAheadorBehind" class="static-text-score"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">2</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Riding side by side</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="ridingSidebySide" class="static-text-score"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">3</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Overtaking</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="overTaking" class="static-text-score"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Riding in different kinds of junctions</td>
+                                        <td id="kindofJunctions"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Straight through</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="straightThrough" class="static-text-score"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">2</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">Turning Left or Right</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="turningLeftorRight" class="static-text-score"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">3</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">With or Without obligation to give the right of way</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="obligationsToGiveRightofWay" class="static-text-score"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">2</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main-text">ABC of passing junction</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="abcPassingJunction" class="static-text-score"></div>
+                                                <span class="static-text">/</span>
+                                                <span class="static-text">3</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Approaching, riding in and leaving roundabouts</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="leavingRoundabouts" class="static-text-score"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Stopping and parking</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="stoppingAndParking" class="static-text-score"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="main">Riding with a back ride</td>
+                                        <td class="score-input">
+                                            <div class="input-container">
+                                                <div id="backRiding" class="static-text-score"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Package Modal -->
+    <div class="modal fade" id="roadmapstepsModal" tabindex="-1" role="dialog" aria-labelledby="roadmapstepsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roadmapstepsModalLabel"></h5>
+                    <div type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="close">&times;</span>
+                    </div>
                 </div>
                 <div class="modal-body">
-                    <p id="step-details">Details of the selected roadmap step will be displayed here.</p>
-                    <!-- Add content dynamically based on the clicked roadmap item -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    
                 </div>
             </div>
         </div>
@@ -157,6 +748,24 @@
         </div>
     </div>
 
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="confirmLogoutBtn">Logout</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -164,5 +773,4 @@
     <script type="module" src="JS/sidebar.js"></script>
     <script type="module" src="JS/common.js"></script>
 </body>
-
 </html>

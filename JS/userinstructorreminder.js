@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, query, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, query, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Firebase configuration
@@ -28,12 +28,13 @@ function showNotification(message) {
 // Ensure the modal is initialized at the global level, not inside DOMContentLoaded
 const personalityTraitsModal = new bootstrap.Modal(document.getElementById('personalityTraitsModal'), { backdrop: 'static', keyboard: false });
 
-// Function to check if traits are saved and show modal if not
-function checkAndShowTraitsModal(savedTraits) {
-    if (savedTraits.length === 0) {
-        // If no traits saved, show the traits modal
-        personalityTraitsModal.show();
-    }
+const findMatchBtn = document.getElementById('findMatchBtn');
+
+// Check if button was previously enabled
+if (sessionStorage.getItem('findMatchEnabled') === 'true') {
+    findMatchBtn.disabled = false;
+} else {
+    findMatchBtn.disabled = true;
 }
 
 // Authentication check to store the user ID and ensure it's correctly assigned
@@ -45,18 +46,35 @@ onAuthStateChanged(auth, async (user) => {
         // Fetch traits once and use them in both functions
         const userDocRef = doc(db, 'applicants', studentId);
         const userDoc = await getDoc(userDocRef);
-        
+
         if (userDoc.exists()) {
             const savedTraits = userDoc.data().traits || [];
-            
             // Load traits into checkboxes
             loadSavedTraits(savedTraits);
-            
-            // Check if modal should be shown
-            checkAndShowTraitsModal(savedTraits);
+
+            // If no traits are saved, show the personality traits modal
+            if (savedTraits.length === 0) {
+                personalityTraitsModal.show();
+                return;
+            }
+
+            // Check if the user has a confirmed PDC appointment
+            const hasPDCAppointment = await checkPDCAppointment(studentId);
+
+            // Enable or disable the "Find your match" button based on the appointment status
+            if (hasPDCAppointment) {
+                findMatchBtn.disabled = false;  // Enable the button if a valid appointment exists
+                sessionStorage.setItem('findMatchEnabled', 'true');  // Store button state in sessionStorage
+            } else {
+                showNotification("You must have a confirmed PDC appointment before matching with an instructor.");
+                findMatchBtn.disabled = true;  // Keep the button disabled if no appointment is found
+                sessionStorage.removeItem('findMatchEnabled');  // Remove stored state if no appointment
+            }
         } else {
-            // No document exists for the user
-            checkAndShowTraitsModal([]);
+            showNotification("You must be logged in to continue.");
+            $('#notificationModal').on('hidden.bs.modal', function () {
+                window.location.href = 'login.html';  // Redirect after modal is closed
+            });
         }
     } else {
         showNotification("You must be logged in to continue.");
@@ -310,7 +328,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Function to fetch and display saved traits from Firestore
-// Function to fetch and display saved traits
 function loadSavedTraits(savedTraits) {
     // Get the container that holds all the form groups
     const formGroupAll = document.querySelector('.form-group-all');
@@ -365,6 +382,7 @@ function loadSavedTraits(savedTraits) {
     });
 }
 
+// Function to check if the user has a confirmed PDC appointment
 async function checkPDCAppointment(studentId) {
     try {
         const appointmentsRef = collection(db, 'appointments');
