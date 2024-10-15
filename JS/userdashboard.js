@@ -684,9 +684,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     });
 
-    // Select all arrows in the roadmap
-    const roadmapSteps = document.querySelectorAll('.roadmap-container .arrow');
-
     // Function to update and show modal based on step
     function openStepModal(step) {
         const modalTitle = document.getElementById('roadmapstepsModalLabel');
