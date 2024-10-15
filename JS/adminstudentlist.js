@@ -658,6 +658,15 @@ function openEditModal(index, modalId = 'editCcnModal') {
   selectedStudentIndex = index; // Store the selected student's index or ID
   const studentData = studentsData[index]; // Retrieve student data using the index
 
+  // Check if there's existing assessment data for 4-Wheels
+  if (modalId === 'edit4WheelsModal' && studentData.WassessmentData) {
+    setTimeout(() => {
+      showNotification('This student already has an existing 4-Wheels assessment data. If you proceed to change it, the existing data will be overwritten.');
+    }, 500);
+  }
+
+  resetModalFields(modalId);
+
   // Function to convert 24-hour time to 12-hour format
   function convertTo12HourFormat(time24) {
       let [hours, minutes] = time24.split(':');
@@ -1147,6 +1156,15 @@ document.getElementById('saveBtn').addEventListener('click', function() {
 function openMotorcycleEditModal(index, modalId = 'editMotorsModal') {
   selectedStudentIndex = index; // Store the selected student's index or ID
   const studentData = studentsData[index]; // Retrieve student data using the index
+
+  // Check if there's existing assessment data for Motorcycle
+  if (modalId === 'editMotorsModal' && studentData.MassessmentData) {
+    setTimeout(() => {
+      showNotification('This student already has an existing Motorcycle assessment data. If you proceed to change it, the existing data will be overwritten.');
+    }, 500);
+  }
+
+  resetModalFields(modalId);
 
   // Function to convert 24-hour time to 12-hour format
   function convertTo12HourFormat(time24) {
@@ -1886,7 +1904,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function resetModalFields(modalId) {
   const modal = document.getElementById(modalId);
 
-  // Reset all text inputs and text areas to empty
+  // Reset all text inputs, number inputs, and text areas to empty
   modal.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
       input.value = '';
   });
@@ -1901,8 +1919,14 @@ function resetModalFields(modalId) {
       span.textContent = '';
   });
 
+  // Reset the selected vehicle type back to "Select Vehicle"
+  const vehicleTypeElement = modal.querySelector('.selected');
+  if (vehicleTypeElement) {
+      vehicleTypeElement.textContent = 'Select Vehicle';
+  }
+
   // Reset total score display
-  const totalScoreDisplay = modal.querySelector('#motorcycleTotalScore');
+  const totalScoreDisplay = modal.querySelector('#totalScore');
   if (totalScoreDisplay) {
       totalScoreDisplay.textContent = '0 / 100';
   }

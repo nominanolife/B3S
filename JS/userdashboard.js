@@ -878,7 +878,9 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
         if (studentDoc.exists()) {
             const studentData = studentDoc.data();
 
-            // Check if the user is enrolled in 4-wheels or motorcycle courses
+            // Check if the user is enrolled in PDC
+            const hasPDC = studentData.packageType && studentData.packageType.includes("PDC");
+
             const isEnrolledIn4Wheels = studentData.has4WheelsCourse || false;
             const isEnrolledInMotorcycle = studentData.hasMotorsCourse || false;
             const WprocessedData = studentData.WprocessedData || {};
@@ -888,7 +890,7 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
             const motorsCard = document.querySelector('.motors-card .eval-container');
 
             // Handle 4-Wheels Performance Evaluation
-            if (!isEnrolledIn4Wheels) {
+            if (!isEnrolledIn4Wheels && !hasPDC) {
                 wheelsCard.innerHTML = `
                     <h3>4-Wheels Performance Evaluation</h3>
                     <p style="color: red;">You did not enroll in any 4-Wheel course, so there is no evaluation form available.</p>
@@ -904,15 +906,15 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
                     $('#WheelsModal').modal('show'); // Show 4-Wheels modal
                 });
             } else {
-                // Show "No performance yet" if no data exists
+                // Show "No performance yet" if enrolled in PDC but no evaluation data yet
                 wheelsCard.innerHTML = `
                     <h3>4-Wheels Performance Evaluation</h3>
-                    <p style="color: red;">No performance yet</p>
+                    <p style="color: red;">No performance evaluation yet</p>
                 `;
             }
 
             // Handle Motorcycle Performance Evaluation
-            if (!isEnrolledInMotorcycle) {
+            if (!isEnrolledInMotorcycle && !hasPDC) {
                 motorsCard.innerHTML = `
                     <h3>Motorcycle Performance Evaluation</h3>
                     <p style="color: red;">You did not enroll in any Motorcycle course, so there is no evaluation form available.</p>
@@ -928,10 +930,10 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
                     $('#MotorsModal').modal('show'); // Show Motorcycle modal
                 });
             } else {
-                // Show "No performance yet" if no data exists
+                // Show "No performance yet" if enrolled in PDC but no evaluation data yet
                 motorsCard.innerHTML = `
                     <h3>Motorcycle Performance Evaluation</h3>
-                    <p style="color: red;">No performance yet</p>
+                    <p style="color: red;">No performance evaluation yet</p>
                 `;
             }
         } else {
