@@ -582,7 +582,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     
                             // Display the calculated remaining balance in the balance card
                             balanceCard.innerHTML = `
-                                <h5 class="card-title">Amount to Pay</h5>
+                                <h5 class="card-title">Current Balance</h5>
                                 <p class="card-body" style="color: red; font-size: 40px;">&#8369; ${remainingBalance.toFixed(2)}</p>
                                 <button class="card-button" id="viewDetailsBtn">View Details</button>
                             `;
@@ -956,5 +956,71 @@ onAuthStateChanged(auth, (user) => {
         fetchAndDisplayPerformanceSummary(user.uid);
     } else {
         console.error("User is not logged in.");
+    }
+});
+
+// Function to check if the user has a matched instructor
+async function checkForInstructorMatch(userId) {
+    const matchesRef = collection(db, "matches");
+    const q = query(matchesRef, where("studentId", "==", userId));
+
+    try {
+        const snapshot = await getDocs(q);
+        return !snapshot.empty; // Return true if there's at least one match
+    } catch (error) {
+        console.error("Error checking instructor match:", error);
+        return false; // Default to no match in case of an error
+    }
+}
+
+// Function to show notice 3 days before the appointment
+async function showNoticeIfAppointmentIsNear(appointmentDate) {
+    const currentDate = new Date();
+    const timeDifference = new Date(appointmentDate) - currentDate; // Time difference in milliseconds
+    const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24)); // Convert to days
+
+    const user = auth.currentUser; // Get the current user
+    if (user) {
+        const hasInstructorMatch = await checkForInstructorMatch(user.uid); // Check if the user has a matched instructor
+
+        if (!hasInstructorMatch && daysDifference <= 3 && daysDifference >= 0) {
+            document.querySelector('.notice').style.display = 'block'; // Show the notice
+        } else {
+            document.querySelector('.notice').style.display = 'none'; // Hide the notice
+        }
+    }
+}
+
+// Add an event listener to close the notice when the "X" button is clicked
+document.querySelector('.notice .close').addEventListener('click', function () {
+    document.querySelector('.notice').style.display = 'none'; // Hide the notice
+});
+
+// Example: If the appointment is fetched successfully
+onAuthStateChanged(auth, async function (user) {
+    if (user) {
+        try {
+            const appointmentsRef = collection(db, "appointments");
+            const q = query(appointmentsRef, where("bookings", "!=", null)); // Query for documents with bookings array
+            const querySnapshot = await getDocs(q);
+
+            querySnapshot.forEach(doc => {
+                const appointmentData = doc.data();
+                const bookingDetails = appointmentData.bookings.find(
+                    booking => booking.userId === user.uid && booking.status === "Booked"
+                );
+
+                if (bookingDetails) {
+                    const appointmentDate = new Date(appointmentData.date);
+
+                    // Call the function to check if the appointment is near and show/hide the notice accordingly
+                    showNoticeIfAppointmentIsNear(appointmentDate);
+                }
+            });
+        } catch (error) {
+            console.error("Error fetching appointment data:", error);
+        }
+    } else {
+        console.error("No user is currently signed in.");
     }
 });

@@ -59,16 +59,26 @@ async function fetchInstructors() {
 
 // Render instructors in the table
 function renderInstructors() {
-  instructorList.innerHTML = '';
+  instructorList.innerHTML = ''; // Clear the list before rendering
 
+  // Case when there are no instructors in the database
+  if (instructors.length === 0) {
+    instructorList.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center">No instructor/s yet</td>
+      </tr>
+    `;
+    return; // Exit since there is nothing to render
+  }
+
+  // Case when search results return no matches
   if (filteredInstructors.length === 0) {
-    // If no instructors are found, display a message
     instructorList.innerHTML = `
       <tr>
         <td colspan="4" class="text-center">No instructor/s found</td>
       </tr>
     `;
-    return; // Stop further execution since there's nothing to render
+    return; // Exit since there is nothing to render
   }
 
   const start = (currentPage - 1) * itemsPerPage;
@@ -76,7 +86,6 @@ function renderInstructors() {
   const paginatedInstructors = filteredInstructors.slice(start, end);
 
   paginatedInstructors.forEach(instructor => {
-    // Join courses array into a string, handling cases where it might be undefined or empty
     const courses = Array.isArray(instructor.courses) ? instructor.courses.join(' || ') : 'No courses assigned';
 
     const row = document.createElement('tr');
@@ -106,7 +115,7 @@ function renderInstructors() {
   });
 
   handleDropdowns();
-  handleSliderSwitch(); // Handles the slider switch functionality
+  handleSliderSwitch();
 }
 
 // Handle dropdown functionality

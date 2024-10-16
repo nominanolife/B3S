@@ -19,6 +19,17 @@ function renderApplicants() {
     const contentElement = document.querySelector('.applicant-list');
     contentElement.innerHTML = '';
 
+    if (applicantsData.length === 0) {
+        const noDataHtml = `
+            <tr class="table-row">
+                <td colspan="4" class="table-row-content text-center">No student/s yet</td>
+            </tr>
+        `;
+        contentElement.insertAdjacentHTML('beforeend', noDataHtml);
+        document.getElementById('loader1').style.display = 'none';
+        return;
+    }
+
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const paginatedApplicants = applicantsData.slice(start, end);
@@ -56,7 +67,7 @@ function renderApplicants() {
             // Show the modal
             $('#smsModal').modal('show');
         });
-    });    
+    });
 
     document.getElementById('loader1').style.display = 'none';
 }
@@ -127,7 +138,7 @@ function renderFilteredApplicants(filteredApplicants) {
     const contentElement = document.querySelector('.applicant-list');
     contentElement.innerHTML = '';
 
-    // Check if there are no matching students
+    // Check if there are no matching students after search
     if (filteredApplicants.length === 0) {
         const noResultsHtml = `
             <tr class="table-row">

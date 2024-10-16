@@ -25,6 +25,19 @@ async function renderApplicants() {
     const passedStudentsTable = document.querySelector('.passed-student-list'); 
     passedStudentsTable.innerHTML = ''; // Clear the table before rendering
 
+    // Check if there are no passed students
+    if (passedStudentsData.length === 0) {
+        // Display the message when there are no students
+        const row = document.createElement('tr');
+        const noDataCell = document.createElement('td');
+        noDataCell.setAttribute('colspan', '4'); // Span all columns
+        noDataCell.textContent = 'No passed student/s yet';
+        noDataCell.style.textAlign = 'center'; // Center the message
+        row.appendChild(noDataCell);
+        passedStudentsTable.appendChild(row);
+        return; // Exit the function since there's no data to render
+    }
+
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const currentItems = passedStudentsData.slice(start, end);
@@ -149,7 +162,14 @@ function setupRealTimeListener() {
 // Search functionality for filtering passed students based on input
 function searchApplicants() {
     const searchInput = document.querySelector('.search').value.toLowerCase();
-    
+
+    // If the search input is cleared, re-render the full list of passed students
+    if (searchInput.trim() === '') {
+        renderApplicants();  // Re-render the full list
+        updatePaginationControls(); // Update the pagination controls
+        return; // Exit the function
+    }
+
     // Filter the passedStudentsData based on fullName or certificateID
     const filteredStudents = passedStudentsData.filter(student => {
         const name = student.fullName.toLowerCase();

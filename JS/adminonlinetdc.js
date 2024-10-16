@@ -596,37 +596,27 @@ document.querySelectorAll('#uploadModal input, #uploadModal select').forEach(ele
 // Immediate upload of thumbnail and video files
 thumbnailUploadInput.addEventListener('change', async function () {
     const thumbnailFile = thumbnailUploadInput.files[0];
-
-    // If no documentId, create draft and set documentId globally
-    if (!documentId) {
-        await createDraftAndSetDocumentId();
-    }
-
-    if (thumbnailFile && documentId) {
-        const thumbnailURL = await handleFileUpload(thumbnailFile, 'dThumbnails', documentId, 'thumbnail');
-        sessionStorage.setItem('thumbnailURL', thumbnailURL);  // Save URL in session storage
-        saveFormDataToSession();  // Update session storage
+    if (thumbnailFile) {
+        toggleLoader(true, 'Uploading Thumbnail');  // Show loader with "Uploading Thumbnail"
+        const thumbnailURL = await handleFileUpload(thumbnailFile, 'dThumbnails', documentId || 'tempId', 'thumbnail');
+        sessionStorage.setItem('thumbnailURL', thumbnailURL);  // Save thumbnail URL in session storage for later use
+        toggleLoader(false);  // Hide loader after upload
     }
 });
 
 videoUploadInput.addEventListener('change', async function () {
     const videoFile = videoUploadInput.files[0];
-
-    // If no documentId, create draft and set documentId globally
-    if (!documentId) {
-        await createDraftAndSetDocumentId();
-    }
-
-    if (videoFile && documentId) {
-        const videoURL = await handleFileUpload(videoFile, 'dVideos', documentId, 'video');
-        sessionStorage.setItem('videoURL', videoURL);  // Save URL in session storage
-        saveFormDataToSession();  // Update session storage
+    if (videoFile) {
+        toggleLoader(true, 'Uploading Video');  // Show loader with "Uploading Video"
+        const videoURL = await handleFileUpload(videoFile, 'dVideos', documentId || 'tempId', 'video');
+        sessionStorage.setItem('videoURL', videoURL);  // Save video URL in session storage for later use
+        toggleLoader(false);  // Hide loader after upload
     }
 });
 
 // Handle image uploads for draft-specific quiz questions (to avoid conflicts)
 document.querySelectorAll('.quiz-container').forEach((container, index) => {
-    const imageUploadDraftInput = container.querySelector(`#imageUpload${index + 1}`); // Draft-specific variable name
+    const imageUploadDraftInput = container.querySelector(`#imageUpload${index + 1}`); 
     const imageUploadDraftBox = container.querySelector('.image-upload-box .image-upload-area');
 
     imageUploadDraftBox.addEventListener('click', function () {
@@ -646,7 +636,6 @@ document.querySelectorAll('.quiz-container').forEach((container, index) => {
                 const quizDraftImageURL = await handleFileUpload(file, 'dQuiz_images', documentId, `question_${index + 1}`);
                 if (quizDraftImageURL) {
                     sessionStorage.setItem(`quizDraftImageURL_${index}`, quizDraftImageURL);  // Save the image URL to sessionStorage
-                    saveFormDataToSession();  // Update session storage
                 } else {
                     console.log(`Image upload failed for draft question ${index + 1}`);
                 }
@@ -683,7 +672,7 @@ async function saveDraftFromSession() {
     // Ensure quizQuestions is always an array
     draftData.quizQuestions = draftData.quizQuestions || [];
 
-    toggleLoader(true);  // Show loader while saving the draft
+    toggleLoader(true, 'Draft Saving');  // Show loader while saving the draft
 
     try {
         // Create a new draft document for every save
@@ -692,16 +681,6 @@ async function saveDraftFromSession() {
         // Upload thumbnail and video files if not done already
         let thumbnailURL = sessionStorage.getItem('thumbnailURL') || '';
         let videoURL = sessionStorage.getItem('videoURL') || '';
-
-        // Upload or update thumbnail file if a new file is selected and the URL isn't already stored
-        if (draftData.thumbnailFile && !thumbnailURL) {
-            thumbnailURL = await handleFileUpload(thumbnailUploadInput.files[0], 'dThumbnails', documentId, 'thumbnail');
-        }
-
-        // Upload or update video file if a new file is selected and the URL isn't already stored
-        if (draftData.videoFile && !videoURL) {
-            videoURL = await handleFileUpload(videoUploadInput.files[0], 'dVideos', documentId, 'video');
-        }
 
         // Handle quiz questions and image URLs from session storage
         const quizContainers = document.querySelectorAll('.quiz-container');
@@ -715,7 +694,6 @@ async function saveDraftFromSession() {
                     quizImageURL = await handleFileUpload(imageUploadInput.files[0], 'dQuiz_images', documentId, `question_${index + 1}`);
                 }
 
-                // Return the updated question object with the image URL or original image URL
                 return {
                     ...question,
                     imageFile: quizImageURL || question.imageFile  // Use the new URL if uploaded, otherwise keep the original
@@ -749,6 +727,9 @@ async function saveDraftFromSession() {
     }
 }
 
+// Save the draft only when 'confirmDraftBtn' is clicked
+document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFromSession);
+
 // Helper function to clear session storage after saving
 function clearSessionStorage() {
     sessionStorage.removeItem('draftData');
@@ -765,7 +746,6 @@ function clearSessionStorage() {
 
 // Event listener for the "Yes" button in the confirmation modal
 document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFromSession);
-
 
     $('#uploadModal').on('shown.bs.modal', function () {
         currentStep = 0; // Reset to Step 1
@@ -1225,11 +1205,6 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                 const imageUrl = URL.createObjectURL(file);
                 imageUploadBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="${file.name}">`;
     
-                // Ensure documentId is available, create it if necessary
-                if (!documentId) {
-                    await createDraftAndSetDocumentId();  // Create the draft and set documentId if not already set
-                }
-    
                 if (documentId) {
                     // Upload image to Firebase
                     const quizImageURL = await handleFileUpload(file, 'dQuiz_images', documentId, `question_${questionCount}`);
@@ -1528,7 +1503,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         }
     
         // Turn on loader only after fields are validated
-        toggleLoader(true);
+        toggleLoader(true, 'Uploading Lesson');
     
         try {
             // Step 1: Save video metadata first to generate videoId
@@ -1775,9 +1750,12 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
     }
 });
 
-function toggleLoader(show) {
+function toggleLoader(show, message = '') {
     const loader = document.getElementById('loader1');
+    const loaderTitle = loader.querySelector('.loader-title');
+    
     if (show) {
+        loaderTitle.textContent = message; // Set the loader message
         loader.style.display = 'flex';
     } else {
         loader.style.display = 'none';
@@ -1821,7 +1799,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    quizContainerInputs.forEach(input => input.addEventListener('input', setFormModified));
+    // Add event listener to question inputs inside quiz container
+    function addQuizInputListeners() {
+        const quizContainers = document.querySelectorAll('.quiz-container input');
+        quizContainers.forEach(input => {
+            input.addEventListener('input', setFormModified);
+        });
+    }
+
+    // Call this function whenever quiz content is updated (for example, when a new question is added)
+    addQuizInputListeners();
 
     // Close button behavior with discard confirmation modal
     const closeUploadModalButton = document.querySelector('#uploadModal .close');

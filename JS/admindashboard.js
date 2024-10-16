@@ -147,12 +147,12 @@ function displayBookings(type, isFiltered = false) {
     list.innerHTML = '';
 
     if (allBookings.length === 0) {
-        const noResultsHtml = `
+        const noDataHtml = `
             <tr>
-                <td colspan="4" class="text-center">No student/s found</td>
+                <td colspan="4" class="text-center">${isFiltered ? 'No student/s found' : 'No student/s yet'}</td>
             </tr>
         `;
-        list.insertAdjacentHTML('beforeend', noResultsHtml);
+        list.insertAdjacentHTML('beforeend', noDataHtml);
         return; // Exit the function since there's nothing more to display
     }
 
@@ -227,7 +227,14 @@ function searchBookings() {
     // Search for Upcoming Appointments
     const searchUpcoming = document.querySelector('.search-upcoming');
     searchUpcoming.addEventListener('input', () => {
-        const searchTerm = searchUpcoming.value.toLowerCase();
+        const searchTerm = searchUpcoming.value.toLowerCase().trim();
+
+        // If the search input is empty, reset the filtered list and show all bookings
+        if (searchTerm === '') {
+            displayBookings('upcoming');  // Show all bookings
+            updatePaginationControls('upcoming'); // Reset pagination controls
+            return; // Exit the function since we don't need to filter
+        }
 
         // Filter upcoming appointments based on the search term
         filteredBookingsUpcoming = allBookingsUpcoming.filter(rowHtml => rowHtml.toLowerCase().includes(searchTerm));
@@ -241,7 +248,14 @@ function searchBookings() {
     // Search for Cancelled/Rescheduled Appointments
     const searchCancelled = document.querySelector('.search-cancelled');
     searchCancelled.addEventListener('input', () => {
-        const searchTerm = searchCancelled.value.toLowerCase();
+        const searchTerm = searchCancelled.value.toLowerCase().trim();
+
+        // If the search input is empty, reset the filtered list and show all bookings
+        if (searchTerm === '') {
+            displayBookings('cancelled');  // Show all bookings
+            updatePaginationControls('cancelled'); // Reset pagination controls
+            return; // Exit the function since we don't need to filter
+        }
 
         // Filter cancelled/rescheduled appointments based on the search term
         filteredBookingsCancelled = allBookingsCancelled.filter(rowHtml => rowHtml.toLowerCase().includes(searchTerm));
@@ -255,7 +269,6 @@ function searchBookings() {
 
 // Call the searchBookings function to initialize the search functionality
 searchBookings();
-
 
 document.addEventListener('DOMContentLoaded', function () {
     const upcomingSelectedElement = document.getElementById('courseFilterSelected');

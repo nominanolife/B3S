@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             </td>
         `;
         document.getElementById("slots-table-body").appendChild(row);
-    }    
+    }        
 
     // Event delegation for edit and delete buttons
     document.getElementById("slots-table-body").addEventListener("click", async function(event) {
@@ -283,16 +283,27 @@ async function populateFormForEdit(id) {
         const querySnapshot = await getDocs(q);
         const tableBody = document.getElementById("slots-table-body");
         tableBody.innerHTML = "";
-        
+    
         // Extract and sort appointments by date
         const appointments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         appointments.sort((a, b) => new Date(a.date) - new Date(b.date));  // Sort by closest date
-        
+    
+        // Check if there are no appointments and show a message
+        if (appointments.length === 0) {
+            const noDataHtml = `
+                <tr>
+                    <td colspan="6" class="text-center">No appointment/s yet</td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', noDataHtml);
+            return; // Exit the function since there's nothing more to display
+        }
+    
         // Add sorted appointments to the table
         for (const appointment of appointments) {
             addTableRow(appointment);
         }
-    }   
+    }      
 
     // Update the table with real-time changes
     async function updateTable() {

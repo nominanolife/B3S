@@ -277,15 +277,25 @@ document.getElementById('saveBtn').addEventListener('click', async function() {
 
 function renderStudents() {
   const studentList = document.getElementById('student-list');
-  studentList.innerHTML = ''; // Clear the list before rendering new data
-  
+  studentList.innerHTML = '';  // Clear the list before rendering new data
+
+  // If there's no data to render, show "No student/s yet"
+  if (studentsData.length === 0) {
+    studentList.innerHTML = `
+      <tr>
+        <td colspan="10" class="text-center">No student/s yet</td>
+      </tr>
+    `;
+    return;
+  }
+
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
-  const paginatedStudents = filteredStudentsData.slice(start, end); // Paginated data
+  const paginatedStudents = filteredStudentsData.slice(start, end);  // Paginated data
 
   paginatedStudents.forEach((student, index) => {
-    const personalInfo = student.personalInfo || {}; // Fallback if personalInfo is missing
-    const certificateControlNumber = student.certificateControlNumber || ''; // Default to empty string if undefined
+    const personalInfo = student.personalInfo || {};  // Fallback if personalInfo is missing
+    const certificateControlNumber = student.certificateControlNumber || '';  // Default to empty string if undefined
 
     // Create an array of rows for the student
     let rows = [];
@@ -300,7 +310,7 @@ function renderStudents() {
       // If the course already exists in the current row, push the current row and start a new one
       if (currentRow[course]) {
         rows.push(currentRow);
-        currentRow = { TDC: null, 'PDC-4Wheels': null, 'PDC-Motors': null }; // New row
+        currentRow = { TDC: null, 'PDC-4Wheels': null, 'PDC-Motors': null };  // New row
       }
 
       // Fill the appropriate course in the current row
@@ -337,11 +347,11 @@ function renderStudents() {
         </tr>
       `;
 
-      studentList.insertAdjacentHTML('beforeend', studentHtml); // Append the generated HTML to the list
+      studentList.insertAdjacentHTML('beforeend', studentHtml);  // Append the generated HTML to the list
     });
   });
 
-  setupStatusToggleListeners(); // Call this after rendering the student list
+  setupStatusToggleListeners();  // Call this after rendering the student list
 }
 
 function renderCourseStatus(course, booking) {
@@ -1810,10 +1820,21 @@ document.addEventListener('input', function (event) {
 });
 
 function filterStudents(searchTerm) {
+  // If there's no data in the studentsData array, show "No student/s yet"
+  if (studentsData.length === 0) {
+    document.getElementById('student-list').innerHTML = `
+      <tr>
+        <td colspan="10" class="text-center">No student/s yet</td>
+      </tr>
+    `;
+    return;
+  }
+
   filteredStudentsData = studentsData.filter(student => {
     const fullName = `${student.personalInfo.first || ''} ${student.personalInfo.last || ''}`.toLowerCase();
     return fullName.startsWith(searchTerm);
   });
+
   currentPage = 1;
   totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
 
