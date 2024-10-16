@@ -440,11 +440,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
                     const userRole = userData.role;
-
+    
+                    console.log("User Data:", userData); // Log userData to check if it's retrieved properly
+    
                     if (userRole === "applicant") {
                         disableLinks();
                     }
-
+    
                     // If the user is a student, start the notification listener
                     if (userRole === "student") {
                         const notificationsRef = query(
@@ -453,22 +455,21 @@ document.addEventListener('DOMContentLoaded', async function () {
                             orderBy("date", "desc"), // Order by date, latest first
                             limit(10) // Limit to the 10 most recent notifications
                         );
-
+    
                         onSnapshot(notificationsRef, (snapshot) => {
                             const notifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Include doc.id for the notification reference
                             displayNotifications(notifications);
                         });
                     }
-
+    
                     // Fetch the user's upcoming appointment
                     const appointmentsRef = collection(db, "appointments");
                     const q = query(appointmentsRef, where("bookings", "!=", null)); // Query for documents with bookings array
-
                     const querySnapshot = await getDocs(q);
-
+    
                     // Select the appointmentCard element
                     const appointmentCard = document.querySelector('.appointment-card .card-container');
-
+    
                     if (appointmentCard) {
                         if (!querySnapshot.empty) {
                             let foundAppointment = false;
@@ -477,39 +478,39 @@ document.addEventListener('DOMContentLoaded', async function () {
                                 const bookingDetails = appointmentData.bookings.find(
                                     booking => booking.userId === user.uid && booking.status === "Booked"
                                 );
-
+    
                                 if (bookingDetails) {
                                     // Check if the appointment date is exactly 1 day past the current date
                                     const appointmentDate = new Date(appointmentData.date);
                                     const currentDate = new Date();
-
+    
                                     const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // Milliseconds in one day
                                     const differenceInTime = currentDate.getTime() - appointmentDate.getTime();
                                     const differenceInDays = Math.floor(differenceInTime / oneDayInMilliseconds);
-
+    
                                     // Skip this booking if the appointment date is more than 1 day past the current date
                                     if (differenceInDays > 1) {
                                         console.log(`Appointment on ${appointmentData.date} has passed more than 1 day. Ignoring this booking.`);
                                         return; // Skip this booking
                                     }
-
+    
                                     // Remove the centering class if it exists
                                     appointmentCard.classList.remove('center-content');
-
+    
                                     const appointmentDateFormatted = appointmentDate.toLocaleDateString('en-US', {
                                         year: 'numeric',
                                         month: 'long',
                                         day: 'numeric'
                                     });
-
+    
                                     const appointmentTimeSlot = bookingDetails.timeSlot;
                                     const [startTime, endTime] = appointmentTimeSlot.split(' - ');
-
+    
                                     function formatTimeTo12Hr(time) {
                                         const [hours, minutes] = time.split(':');
                                         let period = 'AM';
                                         let hoursIn12HrFormat = parseInt(hours);
-
+    
                                         if (hoursIn12HrFormat >= 12) {
                                             period = 'PM';
                                             if (hoursIn12HrFormat > 12) {
@@ -518,13 +519,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                                         } else if (hoursIn12HrFormat === 0) {
                                             hoursIn12HrFormat = 12;
                                         }
-
+    
                                         return `${hoursIn12HrFormat}:${minutes} ${period}`;
                                     }
-
+    
                                     const formattedStartTime = formatTimeTo12Hr(startTime);
                                     const formattedEndTime = formatTimeTo12Hr(endTime);
-
+    
                                     const appointmentHTML = 
                                         `<h5 class="card-title">Upcoming Appointment</h5>
                                         <div class="card-body">
@@ -541,7 +542,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                                     foundAppointment = true;
                                 }
                             });
-
+    
                             if (!foundAppointment) {
                                 appointmentCard.classList.add('center-content');
                                 appointmentCard.innerHTML = `
@@ -553,33 +554,51 @@ document.addEventListener('DOMContentLoaded', async function () {
                     } else {
                         console.error("Appointment card element not found.");
                     }
-
-                    // Display the package price in the balance card
+    
+                    // Display the package price and remaining balance in the balance card
                     const balanceCard = document.querySelector('.balance-card .card-container');
-                    
+    
                     if (balanceCard) {
                         if (userData.packagePrice && userData.packageName) {
                             // Remove the centering class if it exists
                             balanceCard.classList.remove('center-content');
     
+                            // Fetch the admin override price if available, otherwise use the original package price
+                            let packagePrice = userData.adminOverridePrice ? userData.adminOverridePrice : userData.packagePrice;
+                            
+                            // Fetch total amount paid by the user from the 'sales' collection using the user's UID
+                            const salesDocRef = doc(db, "sales", user.uid);  // Use user's UID directly
+                            const salesDocSnap = await getDoc(salesDocRef);
+    
+                            let totalPaid = 0;
+    
+                            if (salesDocSnap.exists()) {
+                                const salesData = salesDocSnap.data();
+                                totalPaid = parseFloat(salesData.amountPaid);  // Get the total amount paid
+                            }
+    
+                            // Calculate remaining balance: packagePrice - totalPaid
+                            const remainingBalance = packagePrice - totalPaid;
+    
+                            // Display the calculated remaining balance in the balance card
                             balanceCard.innerHTML = `
-                                <h5 class="card-title">Current Balance</h5>
-                                <p class="card-body" style="color: red; font-size: 40px;">&#8369; ${userData.packagePrice}</p>
+                                <h5 class="card-title">Amount to Pay</h5>
+                                <p class="card-body" style="color: red; font-size: 40px;">&#8369; ${remainingBalance.toFixed(2)}</p>
                                 <button class="card-button" id="viewDetailsBtn">View Details</button>
                             `;
-            
+    
                             document.getElementById("viewDetailsBtn").addEventListener("click", async function() {
                                 const packagesRef = collection(db, "packages");
                                 const packageQuery = query(packagesRef, where("name", "==", userData.packageName));
                                 const packageSnapshot = await getDocs(packageQuery);
-            
+    
                                 if (!packageSnapshot.empty) {
                                     const packageData = packageSnapshot.docs[0].data();
-            
+    
                                     document.getElementById("packageName").textContent = `${packageData.name}`;
                                     document.getElementById("packagePrice").innerHTML = `&#8369;${packageData.price}`;
                                     document.getElementById("packageDescription").textContent = `${packageData.description}`;
-            
+    
                                     $('#packageModal').modal('show');
                                 } else {
                                     console.log("Package details not found.");
@@ -595,7 +614,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                     } else {
                         console.error("Balance card element not found.");
                     }
-                    
                 } else {
                     console.error("No such document!");
                 }
@@ -606,6 +624,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             console.error("No user is currently signed in.");
         }
     });
+    
 
     function disableLinks() {
         const linksToDisable = [
