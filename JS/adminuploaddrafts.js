@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const draftData = await fetchDraftData(currentDraftId);
 
                 // Delete the draft and related files
-                await deleteDraftData(draftData, currentDraftId);
+                await deleteDraftInfo(draftData, currentDraftId);
 
                 // Remove the draft card from the UI
                 const draftCard = document.querySelector(`.draft-container[data-id="${currentDraftId}"]`);
@@ -78,29 +78,26 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // Fetch all drafts and populate the draft list
     async function fetchDrafts() {
         try {
             const draftCollectionRef = collection(db, 'onlineDrafts');
             const draftSnapshot = await getDocs(draftCollectionRef);
-    
             const draftListContainer = document.querySelector('.draft-list');
-            draftListContainer.innerHTML = '';  // Clear previous drafts
-    
-            // Check if no drafts were found
+            draftListContainer.innerHTML = ''; 
+
             if (draftSnapshot.empty) {
                 draftListContainer.innerHTML = `<p>No drafts available</p>`;
-                return; // Exit the function if there are no drafts
+                return;
             }
-    
+
             draftSnapshot.forEach(doc => {
                 const draftData = doc.data();
                 const draftId = doc.id;
-    
+
                 const draftCard = document.createElement('div');
                 draftCard.classList.add('draft-container');
                 draftCard.setAttribute('data-id', draftId);
-    
+
                 draftCard.innerHTML = `
                     <div class="draft-image">
                         <i class="bi bi-floppy"></i>
@@ -110,35 +107,33 @@ document.addEventListener('DOMContentLoaded', async function() {
                             <h4>${draftData.title || 'Untitled Draft'}</h4>
                         </div>
                         <div class="draft-delete">
-                            <i class="bi bi-trash3" data-id="${draftId}"></i> <!-- Trash icon with data-id -->
+                            <i class="bi bi-trash3" data-id="${draftId}"></i>
                         </div>
                     </div>
                 `;
-    
-                // Event listener for opening draft when clicking on the card, excluding the trash icon
+
                 draftCard.addEventListener('click', function(event) {
                     if (!event.target.classList.contains('bi-trash3')) {
                         openDraft(draftId, draftData);
                     }
                 });
-    
-                // Event listener for deleting the draft when the trash icon is clicked
+
                 const trashIcon = draftCard.querySelector('.bi-trash3');
                 trashIcon.addEventListener('click', function(event) {
-                    event.stopPropagation(); // Prevent the card click event from firing
+                    event.stopPropagation();
                     currentDraftId = draftId;
                     $('#deleteConfirmationModal').modal('show');
                 });
-    
+
                 draftListContainer.appendChild(draftCard);
             });
         } catch (error) {
             console.error("Error fetching drafts:", error);
         }
-    }    
+    }
 
     // Function to delete Firestore document and associated storage files
-    async function deleteDraftData(draftData, draftId) {
+    async function deleteDraftInfo(draftData, draftId) {
         try {
             if (!draftId) {
                 throw new Error("Draft ID is undefined");
@@ -588,8 +583,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (saveButton) saveButton.style.display = stepIndex === steps.length - 1 ? 'inline-block' : 'none';
     }
 
-     // Save button handler for final saving
-     saveButton.addEventListener('click', async function () {
+    saveButton.addEventListener('click', async function () {
         console.log('Draft Data being used for saving:', window.draftData);
 
         const title = videoTitleInput.value.trim() || window.draftData?.title || '';  
@@ -601,27 +595,33 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
 
         try {
-            // Step 1: Create the Final Document in Firestore and Get the Document ID
             const videoDocRef = doc(collection(db, 'videos'));
             const videoDocId = videoDocRef.id;
 
-            // Step 2: Re-upload Video File to Final Folder
-            let videoURL = window.draftData?.videoURL || '';
-            if (window.draftData?.videoURL && window.draftData?.videoURL.includes('dVideos')) {
+            let videoURL = '';
+            if (videoUpload.files.length > 0) {
+                const finalVideoRef = ref(storage, `videos/${videoDocId}`);
+                const file = videoUpload.files[0];
+                await uploadBytes(finalVideoRef, file);
+                videoURL = await getDownloadURL(finalVideoRef);
+            } else if (window.draftData?.videoURL && window.draftData.videoURL.includes('dVideos')) {
                 const finalVideoRef = ref(storage, `videos/${videoDocId}`);
                 await reuploadUsingDraftFile(window.draftData.videoURL, finalVideoRef);
                 videoURL = await getDownloadURL(finalVideoRef);
             }
 
-            // Step 3: Re-upload Thumbnail File to Final Folder
-            let thumbnailURL = window.draftData?.thumbnailURL || '';
-            if (window.draftData?.thumbnailURL && window.draftData?.thumbnailURL.includes('dThumbnails')) {
+            let thumbnailURL = '';
+            if (thumbnailUpload.files.length > 0) {
+                const finalThumbnailRef = ref(storage, `thumbnails/${videoDocId}`);
+                const file = thumbnailUpload.files[0];
+                await uploadBytes(finalThumbnailRef, file);
+                thumbnailURL = await getDownloadURL(finalThumbnailRef);
+            } else if (window.draftData?.thumbnailURL && window.draftData.thumbnailURL.includes('dThumbnails')) {
                 const finalThumbnailRef = ref(storage, `thumbnails/${videoDocId}`);
                 await reuploadUsingDraftFile(window.draftData.thumbnailURL, finalThumbnailRef);
                 thumbnailURL = await getDownloadURL(finalThumbnailRef);
             }
 
-            // Step 4: Process Quiz Questions and Structure Correctly
             const quizContainers = document.querySelectorAll('.quiz-container');
             let questions = [];
 
@@ -630,8 +630,13 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const options = container.querySelectorAll('.question-options input[type="text"]');
                 const correctOption = container.querySelector('.question-options input[type="radio"]:checked');
 
-                let questionImageURL = window.draftData?.quizQuestions?.[index]?.imageFile || '';
-                if (window.draftData?.quizQuestions?.[index]?.imageFile && window.draftData?.quizQuestions?.[index]?.imageFile.includes('dQuiz_images')) {
+                let questionImageURL = '';
+                if (container.querySelector(`#imageUpload${index + 1}`).files.length > 0) {
+                    const finalImageRef = ref(storage, `quiz_images/${videoDocId}_${index}`);
+                    const file = container.querySelector(`#imageUpload${index + 1}`).files[0];
+                    await uploadBytes(finalImageRef, file);
+                    questionImageURL = await getDownloadURL(finalImageRef);
+                } else if (window.draftData?.quizQuestions?.[index]?.imageFile && window.draftData.quizQuestions[index].imageFile.includes('dQuiz_images')) {
                     const finalImageRef = ref(storage, `quiz_images/${videoDocId}_${index}`);
                     await reuploadUsingDraftFile(window.draftData.quizQuestions[index].imageFile, finalImageRef);
                     questionImageURL = await getDownloadURL(finalImageRef);
@@ -650,7 +655,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 });
             }
 
-            // Step 5: Save the Final Video and Quiz Data in Firestore
             await setDoc(videoDocRef, {
                 title: title,
                 category: category,
@@ -667,8 +671,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 createdAt: new Date(),
             });
 
-            // Step 6: Delete the Draft Files and Document in Firestore
-            await deleteDraftData(window.draftData);
+            await deleteDraftData(window.draftData, currentDraftId);
 
             console.log('Final Video and Quiz Data saved successfully.');
         } catch (error) {

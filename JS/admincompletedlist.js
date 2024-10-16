@@ -33,16 +33,21 @@ async function fetchPassedTDCStudents() {
   const passedStudentsQuerySnapshot = await getDocs(
     query(
       collection(db, "userResults"),
-      where("passed", "==", true),
+      where("passed", "==", true)
     )
   );
 
-  // Loop through each passed student and fetch their personal information
-  for (const passedStudentDoc of passedStudentsQuerySnapshot.docs) {
-    const passedStudentData = passedStudentDoc.data();
+  // Get a list of passed student IDs
+  const passedStudentIds = passedStudentsQuerySnapshot.docs.map(doc => doc.id);
 
-    // Fetch the applicant's personal details from the 'applicants' collection using the same ID
-    const applicantDoc = await getDoc(doc(db, 'applicants', passedStudentDoc.id));
+  // Fetch all applicants in batch using their IDs
+  const applicantDocsPromises = passedStudentIds.map(id => getDoc(doc(db, 'applicants', id)));
+  const applicantDocs = await Promise.all(applicantDocsPromises);
+
+  // Loop through each passed student and their corresponding applicant data
+  passedStudentsQuerySnapshot.docs.forEach((passedStudentDoc, index) => {
+    const passedStudentData = passedStudentDoc.data();
+    const applicantDoc = applicantDocs[index];
     const applicantData = applicantDoc.exists() ? applicantDoc.data() : {};
 
     // Avoid duplicating the same student entry by checking if the student is already in `studentsData`
@@ -60,25 +65,26 @@ async function fetchPassedTDCStudents() {
         phoneNumber: applicantData.phoneNumber || 'N/A',
         packageName: applicantData.packageName || 'N/A', // Enrolled package is from the applicants table
         packagePrice: applicantData.packagePrice || 'N/A', // Also get package price from applicants table
-        certificateControlNumber: 'N/A', // This field is not needed as per your request
+        certificateControlNumber: applicantData.certificateControlNumber || 'N/A', // Fetch from applicants
         completedBookings: [{ 
           course: 'TDC',  // The course will be TDC for passed students
-          completionDate: passedStudentData.timestamp, // The date they passed the exam
+          completionDate: formatCompletionDate(passedStudentData.timestamp) || 'N/A', // Format the completion date
         }]
       });
     } else {
       // If the student already exists, append the booking info to their completedBookings array
       existingStudent.completedBookings.push({
         course: 'TDC',
-        completionDate: passedStudentData.timestamp, // The date they passed the exam
+        completionDate: formatCompletionDate(passedStudentData.timestamp) || 'N/A', // Format the completion date
       });
     }
-  }
+  });
 
   // Render the students after fetching the passed ones
   renderStudents();
   updatePaginationControls();  // Update the pagination controls after rendering students
 }
+
 
 // Fetch all students from Firestore once
 async function fetchCompletedStudents() {
@@ -166,7 +172,7 @@ function setupSearch() {
   });
 }
 
-// Function to render all students
+// Render students and ensure certificate control number is fetched from applicants
 function renderStudents() {
   const studentList = document.getElementById('student-list');
   studentList.innerHTML = ''; // Clear previous data
@@ -174,17 +180,25 @@ function renderStudents() {
   // Use either the filtered data or all students if no search term is applied
   const studentsToRender = filteredStudentsData.length > 0 ? filteredStudentsData : studentsData;
 
-  // Render students according to the current page
-  const start = (currentPage - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  const studentsOnPage = studentsToRender.slice(start, end);
+  studentsToRender.forEach(async student => {
+    const completedBookings = student.completedBookings || [];
+    
+    // Fetch certificate control number from applicants if not present in student data
+    let certificateControlNumber = student.certificateControlNumber || 'N/A';
+    
+    if (certificateControlNumber === 'N/A') {
+      try {
+        const applicantDoc = await getDoc(doc(db, 'applicants', student.id));
+        if (applicantDoc.exists()) {
+          certificateControlNumber = applicantDoc.data().certificateControlNumber || 'N/A';
+        }
+      } catch (error) {
+        console.error(`Error fetching certificate number for student ${student.name}:`, error);
+      }
+    }
 
-  studentsOnPage.forEach(student => {
-    const completedBookings = student.completedBookings || []; // Get the completed bookings array
-    const certificateControlNumber = student.certificateControlNumber || 'N/A'; // Get the CTC outside the array
-
+    // Proceed with rendering the table row
     if (completedBookings.length === 0) {
-      // If no bookings, show a single row with 'N/A'
       studentList.innerHTML += `
         <tr class="table-row">
           <td class="table-row-content">${student.name || 'N/A'}</td>
@@ -196,9 +210,8 @@ function renderStudents() {
         </tr>
       `;
     } else {
-      // Loop through each booking and render a row for each completed booking
       completedBookings.forEach(booking => {
-        const formattedCompletionDate = formatCompletionDate(booking.completionDate); // Format date
+        const formattedCompletionDate = formatCompletionDate(booking.completionDate);
 
         studentList.innerHTML += `
           <tr class="table-row">
@@ -219,53 +232,27 @@ function renderStudents() {
   });
 }
 
-// Add click event listener to each pencil icon
+
+
 const editButtons = document.querySelectorAll('.edit-cert-btn');
 editButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const studentId = button.getAttribute('data-student-id');
-    const certNumber = button.getAttribute('data-certificate-number');
+    button.addEventListener('click', () => {
+        const studentId = button.getAttribute('data-student-id');
+        const certNumber = button.getAttribute('data-certificate-number');
 
-    // Populate the modal's input field with the current certificate number
-    document.getElementById('certificateControlNumberInput').value = certNumber;
+        // Populate the modal's input field with the current certificate number
+        document.getElementById('certificateControlNumberInput').value = certNumber;
 
-    // Save the studentId to a global or local variable so you can use it later
-    document.getElementById('saveChangesBtn').setAttribute('data-student-id', studentId);
+        // Save the studentId to a global or local variable so you can use it later
+        document.getElementById('saveChangesBtn').setAttribute('data-student-id', studentId);
 
-    // Open the modal
-    $('#editCcnModal').modal('show');
-  });
-});
-
-document.getElementById('saveChangesBtn').addEventListener('click', async () => {
-  const newCertNumber = document.getElementById('certificateControlNumberInput').value;
-  const studentId = document.getElementById('saveChangesBtn').getAttribute('data-student-id');
-
-  // Update the Firestore document with the new certificate control number
-  try {
-    const studentDocRef = doc(db, 'completedStudents', studentId);
-    await updateDoc(studentDocRef, {
-      certificateControlNumber: newCertNumber
+        // Open the modal
+        $('#editCcnModal').modal('show');
     });
-
-    // Show success modal or notification
-    document.getElementById('successModalBody').innerHTML = 'Certificate Control Number updated successfully!';
-    $('#successModal').modal('show');
-
-    // Close the edit modal
-    $('#editCcnModal').modal('hide');
-
-    // Optionally, re-fetch or update the list to reflect the change
-    fetchCompletedStudents();
-  } catch (error) {
-    console.error('Error updating certificate control number:', error);
-    // Show error modal or notification
-    document.getElementById('successModalBody').innerHTML = 'Failed to update the Certificate Control Number.';
-    $('#successModal').modal('show');
-  }
 });
 
-// Use event delegation to handle click events on dynamically created elements
+
+// Event delegation to handle click events on dynamically created elements
 document.addEventListener('click', function(event) {
   if (event.target && event.target.classList.contains('edit-cert-btn')) {
     const studentId = event.target.getAttribute('data-student-id');
@@ -279,6 +266,37 @@ document.addEventListener('click', function(event) {
 
     // Open the modal using jQuery
     $('#editCcnModal').modal('show');
+  }
+});
+
+// Saving the new certificate number and updating the `applicants` table
+document.getElementById('saveChangesBtn').addEventListener('click', async () => {
+  const newCertNumber = document.getElementById('certificateControlNumberInput').value;
+  const studentId = document.getElementById('saveChangesBtn').getAttribute('data-student-id');
+
+  console.log('Updating applicant:', studentId, 'with new certificate number:', newCertNumber);
+
+  // Update the Firestore document in the `applicants` collection with the new certificate control number
+  try {
+      const applicantDocRef = doc(db, 'applicants', studentId); // Change the collection to 'applicants'
+      await updateDoc(applicantDocRef, {
+          certificateControlNumber: newCertNumber
+      });
+
+      // Show success modal or notification
+      document.getElementById('successModalBody').innerHTML = 'Certificate Control Number updated successfully!';
+      $('#successModal').modal('show');
+
+      // Close the edit modal
+      $('#editCcnModal').modal('hide');
+
+      // Optionally, re-fetch or update the list to reflect the change
+      fetchCompletedStudents(); // You can also adjust this function if needed to refresh the display
+  } catch (error) {
+      console.error('Error updating certificate control number in applicants table:', error);
+      // Show error modal or notification
+      document.getElementById('successModalBody').innerHTML = 'Failed to update the Certificate Control Number.';
+      $('#successModal').modal('show');
   }
 });
 
