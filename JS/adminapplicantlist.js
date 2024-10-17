@@ -45,27 +45,47 @@ function renderApplicants() {
                 <td class="table-row-content">${applicant.email}</td>
                 <td class="table-row-content">${applicant.phoneNumber}</td>
                 <td class="table-row-content">
-                    <button class="btn btn-primary btn-sm send-sms-btn" data-phone="${applicant.phoneNumber}">Send SMS</button>
+                    <button class="btn btn-primary btn-sm send-sms-btn" data-email="${applicant.email}">Send Email</button>
                 </td>
             </tr>
         `;
         contentElement.insertAdjacentHTML('beforeend', rowHtml);
     });
 
-    // Add event listeners for "Send SMS" buttons
+    // Add event listeners for "Send Email" buttons
     document.querySelectorAll('.send-sms-btn').forEach(button => {
         button.addEventListener('click', function() {
-            const phoneNumber = this.getAttribute('data-phone');
-            const fromValue = "DriveHub"; // You can set this value dynamically or keep it static
-    
+            const email = this.getAttribute('data-email');
+            const fromValue = "DriveHub"; // Static 'From' value
+            const toName = this.closest('tr').querySelector('td').innerText; // Assuming the first 'td' contains the recipient's name
+
             // Set the "From" field with the value "DriveHub"
             document.getElementById('sms-from').value = fromValue;
-    
-            // Set the "To" field with the selected phone number
-            document.getElementById('sms-to').value = phoneNumber;
-    
+
+            // Set the "To" field with the selected email
+            document.getElementById('sms-to').value = email;
+
             // Show the modal
             $('#smsModal').modal('show');
+
+            // Add event listener to the "Send Email" button in the modal
+            document.getElementById('sendSmsBtn').addEventListener('click', function() {
+                const message = document.getElementById('sms-message').value;
+
+                // Send email using EmailJS
+                emailjs.send('service_1qj2kjd', 'template_4f786fk', {
+                    from_name: fromValue,  // From 'DriveHub'
+                    to_name: toName,       // To recipient's name
+                    to_email: email,       // To recipient's email
+                    message: message       // The message from the modal
+                })
+                .then(function(response) {
+                    alert('Email sent successfully!', response.status, response.text);
+                    $('#smsModal').modal('hide'); // Close the modal after success
+                }, function(err) {
+                    alert('Failed to send email. Error: ' + JSON.stringify(err));
+                });
+            }, { once: true }); // Ensure event listener is only added once
         });
     });
 

@@ -89,7 +89,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="smsModalLabel">Send SMS</h5>
+                    <h5 class="modal-title" id="smsModalLabel">Send Email</h5>
                     <div class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </div>
@@ -109,7 +109,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="sendSmsBtn">Send SMS</button>
+                    <button type="button" class="btn btn-primary" id="sendSmsBtn">Send Email</button>
                 </div>
             </div>
         </div>
@@ -142,5 +142,15 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="JS/adminapplicantlist.js"></script>
     <script src="JS/admincommon.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+    </script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init({
+                publicKey:"TDjmbGi86MKR7nbWd",
+            });  // Replace with your actual Public Key
+        })();
+    </script>
 </body>
 </html>
