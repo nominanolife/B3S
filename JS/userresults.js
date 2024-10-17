@@ -75,7 +75,7 @@ async function fetchUserQuizProgress(userId) {
 // Predict performance and fetch insights from Flask API
 async function predictPerformanceAndFetchInsights(studentId, category, percentage) {
     try {
-        const response = await fetch('https://quiz-dot-authentication-d6496.df.r.appspot.com/quiz', {
+        const response = await fetch('https://quiz-performance-api-dot-authentication-d6496.df.r.appspot.com/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

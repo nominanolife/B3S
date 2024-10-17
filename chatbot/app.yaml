@@ -1,0 +1,16 @@
+runtime: python39  # Use Python 3.9 runtime
+
+service: questions  # Unique service name for the 4-wheels AI
+
+entrypoint: gunicorn -b :$PORT quesa:app  # Correct entry point with gunicorn to bind to the correct app
+
+env_variables:
+  GOOGLE_APPLICATION_CREDENTIALS: "authentication-d6496-firebase-adminsdk-zoywr-32ecaa91eb.json"  # Path to your Firebase key JSON
+
+instance_class: F2  # Use an appropriate instance class depending on the traffic and requirements
+
+# This specifies the resources needed to run your application. Adjust as necessary.
+automatic_scaling:
+  target_cpu_utilization: 0.65
+  min_instances: 1
+  max_instances: 3

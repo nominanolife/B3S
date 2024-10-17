@@ -12,7 +12,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Load the dataset and preprocess
-data = pd.read_csv('QuizPerformance/quizperf.csv')
+data = pd.read_csv('quizperf.csv')
 
 # Assuming the data has columns: category, performance, percentage, and any other relevant columns
 # Encoding categorical features like 'category' and 'performance'
@@ -46,8 +46,8 @@ def get_insights(category, performance):
     else:
         return "No specific insights available for this category and performance."
 
-@app.route('/predict_and_insights', methods=['POST'])
-def predict_and_insights():
+@app.route('/quiz', methods=['POST'])
+def quiz():
     try:
         # Get the input data from the request
         data = request.json

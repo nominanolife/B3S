@@ -1,0 +1,15 @@
+runtime: python39  # Specifies the Python 3.9 runtime
+
+service: quiz-performance-api  # Optional: unique service name for the API
+
+entrypoint: gunicorn -b :$PORT quiz:app  # Use gunicorn to serve 'quiz.py' where 'app' is your Flask instance
+
+env_variables:
+  GOOGLE_APPLICATION_CREDENTIALS: "authentication-d6496-firebase-adminsdk-zoywr-32ecaa91eb.json"  # Path to your Firebase JSON credentials
+
+instance_class: F2  # Choose an instance class based on traffic and resource needs
+
+automatic_scaling:
+  target_cpu_utilization: 0.65
+  min_instances: 1
+  max_instances: 3
