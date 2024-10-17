@@ -97,7 +97,6 @@ async function fetchCompletedStudents() {
       ...doc.data()
     }));
 
-    // After fetching, render the students and set up pagination
     renderStudents();
   } catch (error) {
     console.error("Error fetching completed students:", error);
@@ -399,7 +398,7 @@ function exportListToPDF() {
 
   // Calculate the center of the page for the title text
   const pageWidth = doc.internal.pageSize.getWidth();
-  const titleText = "LIST OF GRADUTES";
+  const titleText = "LIST OF GRADUATES";
   const textWidth = doc.getTextWidth(titleText);
   const textX = (pageWidth - textWidth) / 2;
 

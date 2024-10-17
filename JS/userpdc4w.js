@@ -87,19 +87,32 @@ function renderCalendar(month, year) {
     const dayDiv = document.createElement("div");
     dayDiv.classList.add("day");
     const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-    const appointment = appointments.find(app => app.date === fullDate && app.course === 'PDC-4Wheels');
+    
+    // Find all appointments for the current date
+    const appointmentsForDate = appointments.filter(app => app.date === fullDate && app.course === 'PDC-4Wheels');
 
-    if (appointment) {
-      const totalSlots = appointment.slots;
-      const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
+    if (appointmentsForDate.length > 0) {
+      let hasAvailableSlots = false;
+      
+      // Loop through all appointments to check for any available slots
+      for (const appointment of appointmentsForDate) {
+        const totalSlots = appointment.slots;
+        const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
 
-      dayDiv.style.backgroundColor = bookedSlots >= totalSlots ? "red" : "green";
+        if (bookedSlots < totalSlots) {
+          hasAvailableSlots = true;
+          break;  // Stop checking further if there's availability
+        }
+      }
+
+      // Set the background color based on availability
+      dayDiv.style.backgroundColor = hasAvailableSlots ? "green" : "red";
 
       const appointmentDate = new Date(fullDate);
       if (appointmentDate.toDateString() === today.toDateString()) {
         // Disable the tile if it's the day of the appointment
-        dayDiv.style.pointerEvents = 'none'; // Disable click events
-        dayDiv.style.opacity = '0.5'; // Dim the tile to indicate it's disabled
+        dayDiv.style.pointerEvents = 'none';  // Disable click events
+        dayDiv.style.opacity = '0.5';  // Dim the tile to indicate it's disabled
         dayDiv.title = 'Booking not allowed on the day of the appointment';
       } else {
         dayDiv.addEventListener('click', () => showAppointmentDetails(fullDate));
@@ -138,7 +151,7 @@ async function updateTimeSection(date) {
 
   let userHasBooked = false;
 
-  selectedAppointments.forEach(appointment => {
+  selectedAppointments.forEach((appointment, index) => {
     const { timeStart, timeEnd, slots, bookings } = appointment;
     const availableSlots = slots - (bookings ? bookings.length : 0);
     const currentDate = new Date();
@@ -166,13 +179,18 @@ async function updateTimeSection(date) {
     radioInput.type = 'radio';
     radioInput.name = 'time-slot';
     radioInput.value = `${timeStart} - ${timeEnd}`;
-    radioInput.id = `${timeStart}-${timeEnd}`;
+    
+    // Use a unique id for each radio input
+    radioInput.id = `time-slot-${index}-${timeStart}-${timeEnd}`;
+    
     radioInput.dataset.date = date;
     radioInput.dataset.appointmentId = appointment.id;
 
     // Apply the custom-radio class to the radio input's parent label
     const label = document.createElement('label');
     label.classList.add('custom-radio');
+    
+    // Ensure the label's `for` attribute matches the radio input's unique `id`
     label.htmlFor = radioInput.id;
 
     // Create the custom radio button styling
@@ -194,10 +212,10 @@ async function updateTimeSection(date) {
 
     // Add an event listener for the radio input
     radioInput.addEventListener('click', () => {
-        if (userHasBooked) {
-            showNotification('You have already booked this slot.');
-            radioInput.checked = false;
-        }
+      if (userHasBooked) {
+        showNotification('You have already booked this slot.');
+        radioInput.checked = false;
+      }
     });
   });
 

@@ -18,7 +18,7 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 let draftData = {}; // Initialize draftData globally
-let autosaveInterval = null; // Define interval for autosave
+let autosaveInterval = null; 
 
 document.addEventListener('DOMContentLoaded', async function() {
     const draftListContainer = document.querySelector('.draft-list');
@@ -45,6 +45,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.querySelector('#confirmDeleteBtn').addEventListener('click', async function() {
         try {
             if (currentDraftId) {
+                // Stop autosave before deleting the draft
+                if (autosaveInterval) {
+                    clearInterval(autosaveInterval); // Stop autosave
+                    console.log('Autosave stopped to delete draft.');
+                }
+
                 // Close the confirmation modal
                 $('#deleteConfirmationModal').modal('hide');
 
@@ -133,18 +139,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // Function to start autosave
     function startAutosave() {
         if (autosaveInterval) {
             clearInterval(autosaveInterval); // Clear previous interval to avoid multiple autosaves
         }
-        autosaveInterval = setInterval(autosaveDraft, 5000); // Autosave every 30 seconds
+        autosaveInterval = setInterval(autosaveDraft, 500); // Autosave every 30 seconds
     }
-
-    // Autosave when the modal is closed or the page is navigated away from
-    $('#uploadModal').on('hide.bs.modal', autosaveDraft); // Trigger autosave on modal close
-    window.addEventListener('beforeunload', autosaveDraft); // Trigger autosave when leaving page
-
 
     // Function to delete Firestore document and associated storage files
     async function deleteDraftInfo(draftData, draftId) {
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log("Draft data being passed to openDraft:", draftData);
         currentDraftId = draftId; // Assign the draftId to the global variable
         questionCount = 0;  // Ensure question count is reset
-        startAutosave(); // Start autosave only when draft is opened
+        startAutosave();
         
         // Update the global draftData so it's accessible in other functions
         window.draftData = draftData;
@@ -253,10 +253,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         $('#uploadModal').modal('show');
         
         // Call updatePreview and pass draftData to use it there explicitly
-        updatePreview(draftData);
+        updatePreview(draftData);    
     }
 
-    // Autosave draft data function
     async function autosaveDraft() {
         try {
             const title = document.getElementById('videoTitleInput').value.trim() || window.draftData?.title || '';
@@ -302,7 +301,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.log('Draft autosaved successfully.');
         } catch (error) {
             console.error('Error during autosaving draft:', error);
-        }
+        }await fetchDrafts();
     }
 
     // Ensure modal steps are properly initialized and managed
@@ -649,19 +648,22 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     saveButton.addEventListener('click', async function () {
         console.log('Draft Data being used for saving:', window.draftData);
-
+    
         const title = videoTitleInput.value.trim() || window.draftData?.title || '';  
         const category = document.querySelector('.category .selected').textContent.trim() || window.draftData?.category || ''; 
-
+    
         if (!title || !category) {
             console.log("Missing required fields: Title or Category.");
             return;
         }
-
+    
+        // Show loader
+        document.getElementById('loader1').style.display = 'flex';
+    
         try {
             const videoDocRef = doc(collection(db, 'videos'));
             const videoDocId = videoDocRef.id;
-
+    
             let videoURL = '';
             if (videoUpload.files.length > 0) {
                 const finalVideoRef = ref(storage, `videos/${videoDocId}`);
@@ -673,7 +675,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 await reuploadUsingDraftFile(window.draftData.videoURL, finalVideoRef);
                 videoURL = await getDownloadURL(finalVideoRef);
             }
-
+    
             let thumbnailURL = '';
             if (thumbnailUpload.files.length > 0) {
                 const finalThumbnailRef = ref(storage, `thumbnails/${videoDocId}`);
@@ -685,15 +687,15 @@ document.addEventListener('DOMContentLoaded', async function() {
                 await reuploadUsingDraftFile(window.draftData.thumbnailURL, finalThumbnailRef);
                 thumbnailURL = await getDownloadURL(finalThumbnailRef);
             }
-
+    
             const quizContainers = document.querySelectorAll('.quiz-container');
             let questions = [];
-
+    
             for (const [index, container] of quizContainers.entries()) {
                 const questionText = container.querySelector('.question-input input').value.trim() || window.draftData?.quizQuestions?.[index]?.question;
                 const options = container.querySelectorAll('.question-options input[type="text"]');
                 const correctOption = container.querySelector('.question-options input[type="radio"]:checked');
-
+    
                 let questionImageURL = '';
                 if (container.querySelector(`#imageUpload${index + 1}`).files.length > 0) {
                     const finalImageRef = ref(storage, `quiz_images/${videoDocId}_${index}`);
@@ -705,12 +707,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                     await reuploadUsingDraftFile(window.draftData.quizQuestions[index].imageFile, finalImageRef);
                     questionImageURL = await getDownloadURL(finalImageRef);
                 }
-
+    
                 const formattedOptions = Array.from(options).map((option, optIndex) => ({
                     label: `Option ${optIndex + 1}`,
                     value: option.value.trim()
                 }));
-
+    
                 questions.push({
                     question: questionText,
                     options: formattedOptions,
@@ -718,7 +720,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     imageURL: questionImageURL || null,
                 });
             }
-
+    
             await setDoc(videoDocRef, {
                 title: title,
                 category: category,
@@ -726,7 +728,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 thumbnailURL: thumbnailURL,
                 createdAt: new Date(),
             });
-
+    
             const quizDocRef = doc(db, 'quizzes', videoDocId);
             await setDoc(quizDocRef, {
                 questions: questions,
@@ -734,14 +736,31 @@ document.addEventListener('DOMContentLoaded', async function() {
                 videoId: videoDocId,
                 createdAt: new Date(),
             });
-
+    
             await deleteDraftData(window.draftData, currentDraftId);
-
+    
+            // Remove the draft card from the UI after successful save and deletion
+            const draftCard = document.querySelector(`.draft-container[data-id="${currentDraftId}"]`);
+            if (draftCard) draftCard.remove();
+    
             console.log('Final Video and Quiz Data saved successfully.');
+    
+            // Hide loader and close modal
+            document.getElementById('loader1').style.display = 'none';
+            $('#uploadModal').modal('hide');  // Close modal
+    
+            // Show success notification
+            document.getElementById('notificationModalBody').innerText = "Uploaded successfully!";
+            $('#notificationModal').modal('show');
+    
+            // Optionally, you can also refetch the drafts list to update it dynamically
+            await fetchDrafts();  // Refresh the drafts list to reflect changes
         } catch (error) {
             console.error('Error during saving and file processing:', error);
+            // Hide loader in case of error
+            document.getElementById('loader1').style.display = 'none';
         }
-    });
+    });        
 
     // Helper function to re-upload a file using the existing draft file URL
     async function reuploadUsingDraftFile(draftURL, finalRef) {
@@ -756,62 +775,62 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     // Function to delete Firestore document and associated storage files
-async function deleteDraftData(draftData, draftId) {
-    try {
-        // Log draftId and draftData for debugging
-        console.log('Draft ID before deletion:', draftId);
-        console.log('Draft Data before deletion:', draftData);
+    async function deleteDraftData(draftData, draftId) {
+        try {
+            // Log draftId and draftData for debugging
+            console.log('Draft ID before deletion:', draftId);
+            console.log('Draft Data before deletion:', draftData);
 
-        if (!draftId) {
-            throw new Error("Draft ID is undefined or null");
-        }
+            if (!draftId) {
+                throw new Error("Draft ID is undefined or null");
+            }
 
-        // Log to ensure draftData is defined and contains expected properties
-        if (!draftData) {
-            throw new Error("Draft data is undefined or invalid");
-        }
+            // Log to ensure draftData is defined and contains expected properties
+            if (!draftData) {
+                throw new Error("Draft data is undefined or invalid");
+            }
 
-        // Delete draft video file if it exists in storage and is a valid string
-        if (draftData.videoURL && typeof draftData.videoURL === 'string' && draftData.videoURL.includes('dVideos')) {
-            const draftVideoRef = ref(storage, draftData.videoURL);
-            await deleteObject(draftVideoRef);
-            console.log('Draft video file deleted:', draftData.videoURL);
-        }
+            // Delete draft video file if it exists in storage and is a valid string
+            if (draftData.videoURL && typeof draftData.videoURL === 'string' && draftData.videoURL.includes('dVideos')) {
+                const draftVideoRef = ref(storage, draftData.videoURL);
+                await deleteObject(draftVideoRef);
+                console.log('Draft video file deleted:', draftData.videoURL);
+            }
 
-        // Delete draft thumbnail file if it exists in storage and is a valid string
-        if (draftData.thumbnailURL && typeof draftData.thumbnailURL === 'string' && draftData.thumbnailURL.includes('dThumbnails')) {
-            const draftThumbnailRef = ref(storage, draftData.thumbnailURL);
-            await deleteObject(draftThumbnailRef);
-            console.log('Draft thumbnail file deleted:', draftData.thumbnailURL);
-        }
+            // Delete draft thumbnail file if it exists in storage and is a valid string
+            if (draftData.thumbnailURL && typeof draftData.thumbnailURL === 'string' && draftData.thumbnailURL.includes('dThumbnails')) {
+                const draftThumbnailRef = ref(storage, draftData.thumbnailURL);
+                await deleteObject(draftThumbnailRef);
+                console.log('Draft thumbnail file deleted:', draftData.thumbnailURL);
+            }
 
-        // Delete draft quiz images if they exist in storage and are valid strings
-        if (draftData.quizQuestions && Array.isArray(draftData.quizQuestions)) {
-            for (const question of draftData.quizQuestions) {
-                if (question.imageFile && typeof question.imageFile === 'string' && question.imageFile.includes('dQuiz_images')) {
-                    const draftImageRef = ref(storage, question.imageFile);
-                    await deleteObject(draftImageRef);
-                    console.log('Draft quiz image file deleted:', question.imageFile);
+            // Delete draft quiz images if they exist in storage and are valid strings
+            if (draftData.quizQuestions && Array.isArray(draftData.quizQuestions)) {
+                for (const question of draftData.quizQuestions) {
+                    if (question.imageFile && typeof question.imageFile === 'string' && question.imageFile.includes('dQuiz_images')) {
+                        const draftImageRef = ref(storage, question.imageFile);
+                        await deleteObject(draftImageRef);
+                        console.log('Draft quiz image file deleted:', question.imageFile);
+                    }
                 }
             }
-        }
 
-        // Check if document still exists before attempting to delete it
-        const draftDocRef = doc(db, 'onlineDrafts', draftId);
-        const draftSnapshot = await getDoc(draftDocRef);
+            // Check if document still exists before attempting to delete it
+            const draftDocRef = doc(db, 'onlineDrafts', draftId);
+            const draftSnapshot = await getDoc(draftDocRef);
 
-        if (draftSnapshot.exists()) {
-            await deleteDoc(draftDocRef);
-            console.log('Draft document deleted from Firestore:', draftId);
-        } else {
-            console.error('Draft document does not exist or was already deleted:', draftId);
-        }
+            if (draftSnapshot.exists()) {
+                await deleteDoc(draftDocRef);
+                console.log('Draft document deleted from Firestore:', draftId);
+            } else {
+                console.error('Draft document does not exist or was already deleted:', draftId);
+            }
 
-    } catch (error) {
-        console.error('Error deleting draft data:', error);
-        throw error;
+        } catch (error) {
+            console.error('Error deleting draft data:', error);
+            throw error;
+        } await fetchDrafts();
     }
-}
 
     // Fetch initial drafts
     fetchDrafts();
