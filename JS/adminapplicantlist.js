@@ -80,12 +80,17 @@ function renderApplicants() {
                     message: message       // The message from the modal
                 })
                 .then(function(response) {
-                    alert('Email sent successfully!', response.status, response.text);
-                    $('#smsModal').modal('hide'); // Close the modal after success
+                    // Instead of alert, show notification modal on success
+                    document.getElementById('notificationModalBody').innerText = 'Email sent successfully!';
+                    $('#notificationModal').modal('show'); // Show the modal
+                    $('#smsModal').modal('hide'); // Close the SMS modal after success
                 }, function(err) {
-                    alert('Failed to send email. Error: ' + JSON.stringify(err));
+                    // Instead of alert, show notification modal on error
+                    document.getElementById('notificationModalBody').innerText = 'Failed to send email. Error: ' + JSON.stringify(err);
+                    $('#notificationModal').modal('show'); // Show the modal
                 });
             }, { once: true }); // Ensure event listener is only added once
+
         });
     });
 

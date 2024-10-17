@@ -581,11 +581,19 @@ document.addEventListener('DOMContentLoaded', async function () {
                             const remainingBalance = packagePrice - totalPaid;
     
                             // Display the calculated remaining balance in the balance card
-                            balanceCard.innerHTML = `
-                                <h5 class="card-title">Current Balance</h5>
-                                <p class="card-body" style="color: red; font-size: 40px;">&#8369; ${remainingBalance.toFixed(2)}</p>
-                                <button class="card-button" id="viewDetailsBtn">View Details</button>
-                            `;
+                            if (remainingBalance === 0) {
+                                balanceCard.innerHTML = `
+                                    <h5 class="card-title">Current Balance</h5>
+                                    <p style="color: green; font-size: 24px;">Fully Paid</p>
+                                `;
+                            } else {
+                                // Otherwise, show the remaining balance as normal
+                                balanceCard.innerHTML = `
+                                    <h5 class="card-title">Current Balance</h5>
+                                    <p class="card-body" style="color: red; font-size: 40px;">&#8369; ${remainingBalance.toFixed(2)}</p>
+                                    <button class="card-button" id="viewDetailsBtn">View Details</button>
+                                `;
+                            }
     
                             document.getElementById("viewDetailsBtn").addEventListener("click", async function() {
                                 const packagesRef = collection(db, "packages");

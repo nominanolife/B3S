@@ -670,11 +670,114 @@ footer .container:last-child {
     }
 }
 
-#chatbot {
+.red-indicator-badge {
+    display: none;
+    position: absolute;
+    top: -3px;
+    right: 1px;
+    width: 15px;
+    height: 15px;
+    background-color: red;
+    border-radius: 50%;
+    z-index: 1;
+    border: 2px solid white;
+}
+
+.chat-bot-container {
     position: fixed;
     bottom: 20px;
     right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: #2441ad;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.chat-bot-container i {
+    color: white;
+    font-size: 24px;
+}
+
+.chat-bot-container:hover {
+    background-color: #092A73;
+}
+
+
+
+.chat-bubble {
+    position: fixed;
+    bottom: 70px;
+    right: 65px;
+    max-width: 300px;
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-bottom-left-radius: 15px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+
+.chat-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    right: 30px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: #007bff transparent transparent transparent;
+}
+
+.bubble-content {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+
+.bubble-content img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+.bubble-content p {
+    margin: 0;
+    padding-right: 10px;
+}
+
+.bubble-content::before {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.chat-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    right: 30px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: #007bff transparent transparent transparent;
+}
+
+#chatbot {
+    position: fixed;
+    bottom: 20px;
+    right: 90px;
     width: 300px;
+    height: 100%;
     max-height: 400px;
     border: 1px solid #ccc;
     border-radius: 10px;
@@ -692,6 +795,11 @@ footer .container:last-child {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.chatbot-header span {
+    font-size: 14px;
+    margin: 0;
 }
 
 .close-chatbot {
@@ -757,4 +865,23 @@ footer .container:last-child {
 .message.bot .bubble {
     background-color: #f1f1f1;
     color: black;
+}
+
+::-webkit-scrollbar {
+    width: 10px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background of the scrollbar track */
+    border-radius: 10px; /* Optional: Rounded corners for the track */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #142A74; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Optional: Rounded corners for the thumb */
+    border: 1px solid #f1f1f1; /* Optional: Adds padding around the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d; /* Darker color on hover */
 }

@@ -77,8 +77,32 @@ document.addEventListener('DOMContentLoaded', function () {
     const sendBtn = document.getElementById('sendBtn');
     const chatInput = document.getElementById('chatInput');
     const chatbotMessages = document.getElementById('chatbotMessages');
+    const chatBubble = document.getElementById('chatBubble');
+    const redIndicatorBadge = document.querySelector('.red-indicator-badge'); // Reference to the red badge
 
     if (chatbot && closeChatbot && sendBtn && chatInput && chatbotMessages) {
+        // Toggle chatbot visibility on click
+        const chatBotContainer = document.querySelector('.chat-bot-container');
+        
+        chatBotContainer.addEventListener('click', function() {
+            // Toggle chatbot visibility
+            if (chatbot.style.display === 'none' || chatbot.style.display === '') {
+                chatbot.style.display = 'flex'; // Show chatbot
+                
+                // Hide the chat bubble when the chatbot opens
+                if (chatBubble) {
+                    chatBubble.style.display = 'none';
+                }
+
+                // Hide the red indicator badge
+                if (redIndicatorBadge) {
+                    redIndicatorBadge.style.display = 'none';
+                }
+            } else {
+                chatbot.style.display = 'none'; // Hide chatbot
+            }
+        });
+
         closeChatbot.addEventListener('click', function () {
             chatbot.style.display = 'none';
         });
@@ -134,7 +158,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 appendMessage('bot', 'Sorry, there was an error processing your request.');
             });
         }
+    }
 
+    // Delay showing the chat bubble and the red badge
+    setTimeout(function () {
+        const chatBubble = document.getElementById('chatBubble');
+        if (chatBubble) {
+            chatBubble.style.display = 'block';
+            if (redIndicatorBadge) {
+                redIndicatorBadge.style.display = 'block'; // Show red indicator badge when chat bubble is visible
+            }
+        }
+    }, 2500); // 1 second delay
 
+    // Close chat bubble on click
+    if (chatBubble) {
+        chatBubble.addEventListener('click', function () {
+            chatBubble.style.display = 'none';
+            
+            // Hide the red indicator badge when the chat bubble is clicked
+            if (redIndicatorBadge) {
+                redIndicatorBadge.style.display = 'none';
+            }
+        });
     }
 });
