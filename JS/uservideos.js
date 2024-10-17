@@ -519,3 +519,60 @@ document.getElementById('toggle-chat').addEventListener('click', function () {
         toggleChatIcon.classList.add('bi-chevron-up');
     }
 });
+
+document.querySelector('.message').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    // Get the user input message
+    const userMessage = document.getElementById('chat-message').value.trim();
+
+    if (userMessage === '') return;  // Don't submit if message is empty
+
+    // Display user message in the chat
+    displayMessage(userMessage, 'user-message');
+
+    // Clear the input field
+    document.getElementById('chat-message').value = '';
+
+    // Send the user message to the chatbot API
+    try {
+        const response = await fetch('https://questions-dot-authentication-d6496.df.r.appspot.com/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query: userMessage })  // Adjust the payload to match your API
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Display the bot response in the chat
+            displayMessage(data.response, 'bot-message');
+        } else {
+            // If there's an error, display a fallback response
+            displayMessage("Sorry, I couldn't process your request. Please try again.", 'bot-message');
+        }
+    } catch (error) {
+        // Handle fetch errors (e.g., network issues)
+        displayMessage("There was an error connecting to the chatbot.", 'bot-message');
+        console.error("Error connecting to the chatbot:", error);
+    }
+});
+
+// Function to display messages in the chat
+function displayMessage(message, className) {
+    const chatBody = document.querySelector('.chat-body');
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('chat-body-message', className);
+
+    const messageContent = document.createElement('div');
+    messageContent.classList.add('chat-body-message-content');
+    messageContent.innerHTML = `<p>${message}</p>`;
+    
+    messageElement.appendChild(messageContent);
+    chatBody.appendChild(messageElement);
+
+    // Scroll to the bottom of the chat
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
