@@ -28,17 +28,30 @@ async function fetchAndRandomizeQuizzes() {
         const quizzesSnapshot = await getDocs(collection(db, 'quizzes'));
         quizzesSnapshot.forEach(doc => {
             const quizData = doc.data();
-            quizData.questions
-                .filter(question => question.active) // Only include active questions
-                .forEach(question => {
-                    questions.push({
-                        ...question,
-                        category: quizData.category
+
+            // Check if the 'questions' field exists and is an array
+            if (quizData.questions && Array.isArray(quizData.questions)) {
+                quizData.questions
+                    .filter(question => question.active) // Only include active questions
+                    .forEach(question => {
+                        questions.push({
+                            ...question,
+                            category: quizData.category
+                        });
                     });
-                });
+            } else {
+                console.warn(`Quiz document with ID ${doc.id} does not have a valid 'questions' field.`);
+            }
         });
-        questions = questions.sort(() => Math.random() - 0.5); // Shuffle questions
-        renderQuestion(currentQuestionIndex); // Render the first question
+        
+        // Shuffle questions after filtering
+        questions = questions.sort(() => Math.random() - 0.5);
+        
+        if (questions.length > 0) {
+            renderQuestion(currentQuestionIndex); // Render the first question
+        } else {
+            console.warn("No active questions found.");
+        }
     } catch (error) {
         console.error("Error fetching quizzes:", error);
     }
