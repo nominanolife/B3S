@@ -82,7 +82,6 @@ async function fetchPassedTDCStudents() {
 
   // Render the students after fetching the passed ones
   renderStudents();
-  updatePaginationControls();  // Update the pagination controls after rendering students
 }
 
 
@@ -100,7 +99,6 @@ async function fetchCompletedStudents() {
 
     // After fetching, render the students and set up pagination
     renderStudents();
-    updatePaginationControls();
   } catch (error) {
     console.error("Error fetching completed students:", error);
   }
@@ -159,7 +157,6 @@ function filterStudents(searchTerm) {
     `;
   } else {
     renderStudents();  // Render the filtered students
-    updatePaginationControls();  // Update the pagination controls
   }
 }
 
@@ -323,50 +320,7 @@ function filterByYear(selectedYear) {
     `;
   } else {
     renderStudents();  // Re-render the filtered students
-    updatePaginationControls();  // Update pagination controls
   }
-}
-
-// Update pagination controls
-function updatePaginationControls() {
-  const paginationControls = document.querySelector('.pagination-controls');
-  paginationControls.innerHTML = '';
-
-  const prevButton = document.createElement('i');
-  prevButton.className = 'bi bi-caret-left';
-  if (currentPage === 1) {
-    prevButton.classList.add('disabled');
-    prevButton.style.opacity = '0.5';
-  }
-  prevButton.addEventListener('click', () => {
-    if (currentPage > 1) {
-      currentPage--;
-      renderStudents();  // Re-render students on the previous page
-      updatePaginationControls();
-    }
-  });
-
-  const nextButton = document.createElement('i');
-  nextButton.className = 'bi bi-caret-right';
-  if (currentPage === totalPages) {
-    nextButton.classList.add('disabled');
-    nextButton.style.opacity = '0.5';
-  }
-  nextButton.addEventListener('click', () => {
-    if (currentPage < totalPages) {
-      currentPage++;
-      renderStudents();  // Re-render students on the next page
-      updatePaginationControls();
-    }
-  });
-
-  const pageNumberDisplay = document.createElement('span');
-  pageNumberDisplay.className = 'page-number';
-  pageNumberDisplay.textContent = `Page ${currentPage} of ${totalPages}`;
-
-  paginationControls.appendChild(prevButton);
-  paginationControls.appendChild(pageNumberDisplay);
-  paginationControls.appendChild(nextButton);
 }
 
 // Format the completion date for display

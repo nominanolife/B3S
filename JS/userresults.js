@@ -75,7 +75,7 @@ async function fetchUserQuizProgress(userId) {
 // Predict performance and fetch insights from Flask API
 async function predictPerformanceAndFetchInsights(studentId, category, percentage) {
     try {
-        const response = await fetch('https://quiz-performance-api-dot-authentication-d6496.df.r.appspot.com/chat', {
+        const response = await fetch('https://quiz-performance-api-dot-authentication-d6496.df.r.appspot.com/quiz', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -167,17 +167,22 @@ async function saveUserAttemptToFirestore(userId, totalScore, evaluation, evalua
         };
 
         if (userAttemptDoc.exists()) {
-            // Append new attempt to existing array
+            const existingAttempts = userAttemptDoc.data().attempts;
+        
+            // Check if the 'attempts' field is an array. If not, initialize it as an empty array.
+            const attemptsArray = Array.isArray(existingAttempts) ? existingAttempts : [];
+        
+            // Append new attempt to the existing array
             await updateDoc(userAttemptRef, {
-                attempts: [...userAttemptDoc.data().attempts, newAttempt]
+                attempts: [...attemptsArray, newAttempt]  // Ensure that attempts is always an array
             });
         } else {
-            // Create new document with the first attempt
+            // If the document doesn't exist, create it with the first attempt
             await setDoc(userAttemptRef, {
-                attempts: [newAttempt]
+                attempts: [newAttempt]  // Initialize 'attempts' as an array with the first attempt
             });
         }
-
+        
         console.log("User attempt data saved successfully.");
     } catch (error) {
         console.error("Error saving user attempt data:", error);
