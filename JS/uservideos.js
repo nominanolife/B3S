@@ -534,6 +534,9 @@ document.querySelector('.message').addEventListener('submit', async function (e)
     // Clear the input field
     document.getElementById('chat-message').value = '';
 
+    // Show the typing indicator
+    showTypingIndicator();
+
     // Send the user message to the chatbot API
     try {
         const response = await fetch('https://questions-dot-authentication-d6496.df.r.appspot.com/chat', {
@@ -546,6 +549,9 @@ document.querySelector('.message').addEventListener('submit', async function (e)
 
         const data = await response.json();
 
+        // Remove the typing indicator once the response is received
+        removeTypingIndicator();
+
         if (response.ok) {
             // Display the bot response in the chat
             displayMessage(data.response, 'bot-message');
@@ -554,11 +560,54 @@ document.querySelector('.message').addEventListener('submit', async function (e)
             displayMessage("Sorry, I couldn't process your request. Please try again.", 'bot-message');
         }
     } catch (error) {
+        // Remove the typing indicator if there's an error
+        removeTypingIndicator();
+
         // Handle fetch errors (e.g., network issues)
         displayMessage("There was an error connecting to the chatbot.", 'bot-message');
         console.error("Error connecting to the chatbot:", error);
     }
 });
+
+// Function to display the typing indicator
+function showTypingIndicator() {
+    const chatBody = document.querySelector('.chat-body');
+    const typingIndicator = document.createElement('div');
+    typingIndicator.classList.add('chat-body-message', 'typing-indicator');
+
+    // Add the bot's image
+    const botImage = document.createElement('img');
+    botImage.src = 'Assets/logo.png'; // Replace with the actual path to the bot's image
+    botImage.alt = 'DriveHub Logo';
+    typingIndicator.appendChild(botImage);
+
+    // Add the animated dots for typing
+    const typingContent = document.createElement('div');
+    typingContent.classList.add('chat-body-message-content');
+    
+    const dotContainer = document.createElement('div');
+    dotContainer.classList.add('dot-container');
+    dotContainer.innerHTML = `
+        <div class="dot dot1"></div>
+        <div class="dot dot2"></div>
+        <div class="dot dot3"></div>
+    `;
+    
+    typingContent.appendChild(dotContainer);
+    typingIndicator.appendChild(typingContent);
+    chatBody.appendChild(typingIndicator);
+
+    // Scroll to the bottom of the chat
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// Function to remove the typing indicator
+function removeTypingIndicator() {
+    const typingIndicator = document.querySelector('.typing-indicator');
+    if (typingIndicator) {
+        typingIndicator.remove();
+    }
+}
 
 // Function to display messages in the chat
 function displayMessage(message, className) {
@@ -566,10 +615,18 @@ function displayMessage(message, className) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('chat-body-message', className);
 
+    if (className === 'bot-message') {
+        // Add the bot's image when it's a bot message
+        const botImage = document.createElement('img');
+        botImage.src = 'Assets/logo.png'; // Replace with the actual path to the bot's image
+        botImage.alt = 'DriveHub Logo';
+        messageElement.appendChild(botImage);
+    }
+
     const messageContent = document.createElement('div');
     messageContent.classList.add('chat-body-message-content');
     messageContent.innerHTML = `<p>${message}</p>`;
-    
+
     messageElement.appendChild(messageContent);
     chatBody.appendChild(messageElement);
 
