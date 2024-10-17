@@ -109,15 +109,15 @@ document.addEventListener('DOMContentLoaded', function () {
             chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
         }
 
-        const RASA_SERVER_URL = 'http://localhost:5005/webhooks/rest/webhook'; // or http://0.0.0.0:5005/webhooks/rest/webhook
+        const AI_SERVER_URL = 'https://chatbot-195867894399.asia-southeast1.run.app/chatbot'; // Updated URL for AI model
 
-        function sendMessageToBot(message) {
-            fetch(RASA_SERVER_URL, {
+        function sendMessageToBot(userMessage) {
+            fetch(AI_SERVER_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ sender: 'user', message: message }) // 'sender' is required for Rasa
+                body: JSON.stringify({ query: userMessage }) // Sending 'query' for the new AI
             })
             .then(response => {
                 if (!response.ok) {
@@ -126,14 +126,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(data => {
-                const botMessage = data[0].text; // Adjust according to your Rasa response structure
-                appendMessage('bot', botMessage);
+                const aiResponse = data.response; // Assuming the response structure has 'response'
+                appendMessage('bot', aiResponse);
             })
             .catch(error => {
                 console.error('Error:', error);
                 appendMessage('bot', 'Sorry, there was an error processing your request.');
             });
         }
+
 
     }
 });
