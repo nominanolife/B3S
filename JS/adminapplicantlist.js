@@ -76,7 +76,7 @@ function renderApplicants() {
                 emailjs.send('service_1qj2kjd', 'template_4f786fk', {
                     from_name: fromValue,  // From 'DriveHub'
                     to_name: toName,       // To recipient's name
-                    to_email: email,       // To recipient's email
+                    to_email: email,       // To recipient's email (dynamically passed)
                     message: message       // The message from the modal
                 })
                 .then(function(response) {
