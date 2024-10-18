@@ -143,6 +143,16 @@ function updatePaginationControls() {
 // Function to filter applicants based on search input
 function searchApplicants() {
     const searchInput = document.querySelector('.search').value.toLowerCase();
+
+    if (searchInput.trim() === '') {
+        // If search input is empty, revert to the full list of applicants
+        totalPages = Math.ceil(applicantsData.length / itemsPerPage);
+        currentPage = 1; // Reset to the first page
+        renderApplicants(); // Render the full list of applicants
+        updatePaginationControls(); // Update the pagination controls for the full list
+        return; // Exit the function early since there's no filtering needed
+    }
+
     const filteredApplicants = applicantsData.filter(applicant => {
         const name = `${applicant.personalInfo?.first || ''} ${applicant.personalInfo?.last || ''}`.toLowerCase();
         const email = applicant.email.toLowerCase();

@@ -282,8 +282,8 @@ async function populateFormForEdit(id) {
         const q = query(collection(db, "appointments"));
         const querySnapshot = await getDocs(q);
         const tableBody = document.getElementById("slots-table-body");
-        tableBody.innerHTML = "";
-    
+        tableBody.innerHTML = ""; // Clear the table before populating
+        
         // Extract and sort appointments by date
         const appointments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         appointments.sort((a, b) => new Date(a.date) - new Date(b.date));  // Sort by closest date
@@ -303,7 +303,7 @@ async function populateFormForEdit(id) {
         for (const appointment of appointments) {
             addTableRow(appointment);
         }
-    }      
+    }          
 
     // Update the table with real-time changes
     async function updateTable() {
@@ -387,18 +387,27 @@ async function populateFormForEdit(id) {
         // Clear current table rows
         const tableBody = document.getElementById("slots-table-body");
         tableBody.innerHTML = "";
-
+    
         // Update global appointments array
         appointments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); 
-
-        // Update the table and calendar
-        for (const appointment of appointments) {
-            addTableRow(appointment); // Add rows to the table directly
+    
+        if (appointments.length === 0) {
+            const noDataHtml = `
+                <tr>
+                    <td colspan="6" class="text-center">No appointment/s yet</td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', noDataHtml);
+        } else {
+            // Update the table and calendar
+            for (const appointment of appointments) {
+                addTableRow(appointment); // Add rows to the table directly
+            }
         }
-
+    
         await updateTable(); // Fetch bookings count if needed
         renderCalendar();
-    });
+    });    
 
     // Initialize the calendar and fetch appointments on load
     renderCalendar();
