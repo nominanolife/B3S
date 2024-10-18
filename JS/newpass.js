@@ -1,10 +1,42 @@
+// Import Firebase functions
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import { getAuth, verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+    authDomain: "authentication-d6496.firebaseapp.com",
+    projectId: "authentication-d6496",
+    storageBucket: "authentication-d6496.appspot.com",
+    messagingSenderId: "195867894399",
+    appId: "1:195867894399:web:596fb109d308aea8b6154a"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+function showNotification(message) {
+    const notificationMessage = document.getElementById('notificationMessage');
+    notificationMessage.textContent = message;
+    $('#notificationModal').modal('show'); // Use jQuery to show the modal
+}
+
+// Get the oobCode from the URL
+const urlParams = new URLSearchParams(window.location.search);
+const oobCode = urlParams.get('oobCode'); // Extract the reset code from the URL
+
+// DOM elements
 const passwordInput = document.getElementById('newPassword');
 const confirmPasswordInput = document.getElementById('confirmPassword');
 const confirmPasswordIcon = document.getElementById('confirmPasswordIcon').querySelector('i');
 
+// Validation elements
 const minLengthRequirement = document.getElementById('minLength');
 const lettersRequirement = document.getElementById('letters');
 const numbersSymbolsRequirement = document.getElementById('numbersSymbols');
+
+// Toggle password visibility elements
 const toggleNewPassword = document.getElementById('toggleNewPassword');
 const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
 
@@ -16,7 +48,7 @@ function togglePasswordVisibility(inputField, icon) {
     icon.classList.toggle('fa-eye');
 }
 
-// Add event listeners for the password visibility toggle
+// Add event listeners for password visibility toggle
 toggleNewPassword.addEventListener('click', () => {
     togglePasswordVisibility(passwordInput, toggleNewPassword.querySelector('i'));
 });
@@ -25,11 +57,11 @@ toggleConfirmPassword.addEventListener('click', () => {
     togglePasswordVisibility(confirmPasswordInput, toggleConfirmPassword.querySelector('i'));
 });
 
-// Function to check the password requirements
+// Function to check password requirements
 function checkPasswordRequirements() {
     const password = passwordInput.value;
 
-    // Check Minimum Length
+    // Check minimum length (8 characters)
     if (password.length >= 8) {
         minLengthRequirement.classList.remove('invalid');
         minLengthRequirement.classList.add('valid');
@@ -42,7 +74,7 @@ function checkPasswordRequirements() {
         minLengthRequirement.querySelector('i').classList.remove('fa-check');
     }
 
-    // Check Uppercase and Lowercase
+    // Check for both uppercase and lowercase letters
     const hasUppercase = /[A-Z]/.test(password);
     const hasLowercase = /[a-z]/.test(password);
     if (hasUppercase && hasLowercase) {
@@ -57,7 +89,7 @@ function checkPasswordRequirements() {
         lettersRequirement.querySelector('i').classList.remove('fa-check');
     }
 
-    // Check for Numbers and Symbols
+    // Check for numbers and symbols
     const hasNumber = /\d/.test(password);
     const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
     if (hasNumber && hasSymbol) {
@@ -87,10 +119,42 @@ function checkPasswordsMatch() {
     }
 }
 
-// Add event listener for input on the password fields
+// Event listeners for password input fields
 passwordInput.addEventListener('input', () => {
     checkPasswordRequirements();
     checkPasswordsMatch();
 });
 
 confirmPasswordInput.addEventListener('input', checkPasswordsMatch);
+
+// Function to handle password reset
+async function handlePasswordReset() {
+    const newPassword = passwordInput.value;
+
+    try {
+        // Directly confirm the password reset without checking the email
+        await confirmPasswordReset(auth, oobCode, newPassword);
+        showNotification('Password has been reset successfully!');
+
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        showNotification('Failed to reset password. Please try again or the link may have expired.');
+    }
+}
+
+const resetButton = document.getElementById('cnfrmButton');
+resetButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    
+    // Check if all password validation passes
+    const allValid = minLengthRequirement.classList.contains('valid') &&
+                     lettersRequirement.classList.contains('valid') &&
+                     numbersSymbolsRequirement.classList.contains('valid') &&
+                     passwordInput.value === confirmPasswordInput.value;
+
+    if (allValid) {
+        handlePasswordReset();
+    } else {
+        showNotification('Please make sure your password meets all the requirements and both passwords match.');
+    }
+});

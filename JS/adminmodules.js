@@ -19,7 +19,6 @@ const db = getFirestore(app); // Firestore
 const storage = getStorage(app); // Firebase Storage
 
 // Fetch and display modules function
-// Fetch and display modules function
 async function fetchAndDisplayModules() {
     const modulesCollection = collection(db, 'modules');
     const moduleSnapshot = await getDocs(modulesCollection);

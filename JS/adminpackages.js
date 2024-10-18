@@ -251,6 +251,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                 type: packageType
             });
 
+            // Remove the "No package available" message if it exists
+            const noPackagesMessage = document.getElementById("noPackagesMessage");
+            if (noPackagesMessage) {
+                noPackagesMessage.remove();
+            }
+
             addPackageToDOM(docRef.id, packageName, packagePrice, packageDescription, packageType);
             showNotificationModal("Package Added Successfully!", "success");
         } catch (e) {
@@ -472,7 +478,24 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Function to render packages based on the filter
     function renderPackages(packages) {
-        packageList.innerHTML = "";
+        packageList.innerHTML = ""; // Clear the package list
+        
+        // Check if there are any packages
+        if (packages.length === 0) {
+            // Create the "No package available" message dynamically
+            const noPackagesMessage = document.createElement("div");
+            noPackagesMessage.id = "noPackagesMessage";
+            noPackagesMessage.style.textAlign = "center";
+            noPackagesMessage.style.fontFamily = "Poppins";
+            noPackagesMessage.style.fontSize = "18px";
+            noPackagesMessage.style.color = "#2F2E2E";
+            noPackagesMessage.textContent = "No package available";
+            
+            // Append the message to the package list container
+            packageList.appendChild(noPackagesMessage);
+        }
+
+        // Render the packages if they exist
         packages.forEach((pkg) => {
             addPackageToDOM(pkg.id, pkg.name, pkg.price, pkg.description, pkg.type || []);
         });

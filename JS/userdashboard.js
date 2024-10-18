@@ -471,7 +471,15 @@ document.addEventListener('DOMContentLoaded', async function () {
                     const appointmentCard = document.querySelector('.appointment-card .card-container');
     
                     if (appointmentCard) {
-                        if (!querySnapshot.empty) {
+                        const isEnrolled = userData.packageType && userData.packageType.length > 0; // Check if the user is enrolled
+                        if (!isEnrolled) {
+                            // Show "Not yet enrolled" if the user is not enrolled
+                            appointmentCard.classList.add('center-content');
+                            appointmentCard.innerHTML = `
+                                <h5 class="card-title">Upcoming Appointment</h5>
+                                <p style="color: red;">Not yet enrolled</p>
+                            `;
+                        } else if (!querySnapshot.empty) {
                             let foundAppointment = false;
                             querySnapshot.forEach(doc => {
                                 const appointmentData = doc.data();
@@ -550,6 +558,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                                     <p style="color: red;">No appointment yet</p>
                                 `;
                             }
+                        } else {
+                            // If no appointment is found but the user is enrolled, show "No appointment yet"
+                            appointmentCard.classList.add('center-content');
+                            appointmentCard.innerHTML = `
+                                <h5 class="card-title">Upcoming Appointment</h5>
+                                <p style="color: red;">No appointment yet</p>
+                            `;
                         }
                     } else {
                         console.error("Appointment card element not found.");

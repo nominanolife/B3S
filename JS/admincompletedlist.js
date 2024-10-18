@@ -140,6 +140,14 @@ function setupYearDropdown() {
 
 // Function to filter students based on the search input
 function filterStudents(searchTerm) {
+  // If the search term is empty, reset to display all students
+  if (searchTerm === '') {
+    filteredStudentsData = []; // Clear filtered data
+    renderStudents();  // Re-render the full student list
+    return; // Exit the function
+  }
+
+  // Otherwise, filter based on the search term
   filteredStudentsData = studentsData.filter(student => {
     const fullName = `${student.name || ''}`.toLowerCase();  // Adjust based on your Firestore structure
     return fullName.startsWith(searchTerm);
@@ -176,12 +184,23 @@ function renderStudents() {
   // Use either the filtered data or all students if no search term is applied
   const studentsToRender = filteredStudentsData.length > 0 ? filteredStudentsData : studentsData;
 
+  // Check if there are any students to render
+  if (studentsToRender.length === 0) {
+    studentList.innerHTML = `
+      <tr>
+        <td colspan="10" class="text-center">No complete student/s yet</td>
+      </tr>
+    `;
+    return; // Exit the function early if no students to render
+  }
+
+  // If there are students, render them in the table
   studentsToRender.forEach(async student => {
     const completedBookings = student.completedBookings || [];
-    
+
     // Fetch certificate control number from applicants if not present in student data
     let certificateControlNumber = student.certificateControlNumber || 'N/A';
-    
+
     if (certificateControlNumber === 'N/A') {
       try {
         const applicantDoc = await getDoc(doc(db, 'applicants', student.id));
@@ -227,8 +246,6 @@ function renderStudents() {
     }
   });
 }
-
-
 
 const editButtons = document.querySelectorAll('.edit-cert-btn');
 editButtons.forEach(button => {

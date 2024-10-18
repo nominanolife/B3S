@@ -293,6 +293,15 @@ function renderStudents() {
   const end = start + itemsPerPage;
   const paginatedStudents = filteredStudentsData.slice(start, end);  // Paginated data
 
+  if (paginatedStudents.length === 0) {
+    studentList.innerHTML = `
+      <tr>
+        <td colspan="10" class="text-center">No student/s found</td>
+      </tr>
+    `;
+    return;
+  }
+
   paginatedStudents.forEach((student, index) => {
     const personalInfo = student.personalInfo || {};  // Fallback if personalInfo is missing
     const certificateControlNumber = student.certificateControlNumber || '';  // Default to empty string if undefined

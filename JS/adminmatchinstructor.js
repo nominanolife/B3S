@@ -145,6 +145,18 @@ async function renderStudents(students) {
     const studentListContainer = document.querySelector('.student-list');
     studentListContainer.innerHTML = ''; // Clear any existing data
 
+    if (students.length === 0) {
+        // Display "No student/s yet" when there are no students
+        const noDataMessage = `
+            <tr>
+                <td colspan="7" class="text-center">No student/s yet</td>
+            </tr>
+        `;
+        studentListContainer.innerHTML = noDataMessage;
+        hideLoader(); // Hide loader since there's no data to load
+        return; // Exit the function early since there is nothing to render
+    }
+
     // Array to hold all the promises
     const studentPromises = students.map(async (student) => {
         const { studentId, instructorId, matchedAt } = student;
