@@ -995,7 +995,6 @@ async function checkForInstructorMatch(userId) {
         return false; // Default to no match in case of an error
     }
 }
-
 // Function to show notice 3 days before the appointment
 async function showNoticeIfAppointmentIsNear(appointmentDate) {
     const currentDate = new Date();
@@ -1029,17 +1028,22 @@ onAuthStateChanged(auth, async function (user) {
 
             querySnapshot.forEach(doc => {
                 const appointmentData = doc.data();
-                const bookingDetails = appointmentData.bookings.find(
-                    booking => booking.userId === user.uid && booking.status === "Booked"
-                );
 
-                if (bookingDetails) {
-                    const appointmentDate = new Date(appointmentData.date);
+                // Filter for PDC-4Wheels or PDC-Motors only
+                if (appointmentData.course === "PDC-4Wheels" || appointmentData.course === "PDC-Motors") {
+                    const bookingDetails = appointmentData.bookings.find(
+                        booking => booking.userId === user.uid && booking.status === "Booked"
+                    );
 
-                    // Call the function to check if the appointment is near and show/hide the notice accordingly
-                    showNoticeIfAppointmentIsNear(appointmentDate);
+                    if (bookingDetails) {
+                        const appointmentDate = new Date(appointmentData.date);
+
+                        // Call the function to check if the appointment is near and show/hide the notice accordingly
+                        showNoticeIfAppointmentIsNear(appointmentDate);
+                    }
                 }
             });
+
         } catch (error) {
             console.error("Error fetching appointment data:", error);
         }
