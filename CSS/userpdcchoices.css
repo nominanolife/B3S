@@ -300,3 +300,10 @@ h2 {
 .btn-secondary:hover {
     background-color: #b60505ec;
 }
+
+/* Styling for disabled state */
+.disabled {
+    pointer-events: none; /* Disable click events */
+    opacity: 0.5; /* Make it look grayed out */
+    cursor: not-allowed; /* Show a "not-allowed" cursor on hover */
+}
