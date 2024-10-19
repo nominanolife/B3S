@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js';
 
 const firebaseConfig = {
@@ -158,13 +158,61 @@ function handleDropdowns() {
 
 function handleFeedbacks() {
   document.querySelectorAll('.feedback-btn').forEach(button => {
-    button.addEventListener('click', function () {
-      const instructorId = this.dataset.id;
-      // Optionally, you can load the instructor's feedback data here using instructorId.
-      // For now, just show the modal
-      const feedbackOverviewModal = new bootstrap.Modal(document.getElementById('feedbackOverviewModal'));
-      feedbackOverviewModal.show();
-    });
+      button.addEventListener('click', async function () {
+          const instructorId = this.dataset.id;
+
+          // Show the feedback modal
+          const feedbackOverviewModal = new bootstrap.Modal(document.getElementById('feedbackOverviewModal'));
+          feedbackOverviewModal.show();
+
+          // Clear previous feedback data
+          const modalBody = document.querySelector('#feedbackOverviewModal .modal-body');
+          modalBody.innerHTML = ''; // Clear previous content
+
+          try {
+              // Fetch instructor data from Firestore
+              const instructorRef = doc(db, 'instructors', instructorId);
+              const instructorSnap = await getDoc(instructorRef);
+
+              if (instructorSnap.exists()) {
+                  const instructorData = instructorSnap.data();
+                  const feedbacks = instructorData.comments || []; // Get comments (feedback)
+
+                  if (feedbacks.length === 0) {
+                      modalBody.innerHTML = '<p class="text-center">No feedbacks available</p>';
+                  } else {
+                      feedbacks.forEach((feedback, index) => {
+                          // Create HTML for each feedback entry
+                          const commentDate = new Date(feedback.timestamp).toLocaleDateString();
+                          let starsHtml = '';
+                          for (let i = 0; i < feedback.rating; i++) {
+                              starsHtml += '<i class="bi bi-star-fill"></i>';
+                          }
+                          for (let i = feedback.rating; i < 5; i++) {
+                              starsHtml += '<i class="bi bi-star"></i>';
+                          }
+
+                          const feedbackHtml = `
+                              <div class="comment">
+                                  <div class="feedback-section">
+                                      <p>by Student ${index + 1} ${starsHtml}</p>
+                                      <p class="feedback-date">${commentDate}</p>
+                                  </div>
+                                  <span>${feedback.comment}</span>
+                                  <hr>
+                              </div>
+                          `;
+                          modalBody.insertAdjacentHTML('beforeend', feedbackHtml); // Insert the feedback
+                      });
+                  }
+              } else {
+                  modalBody.innerHTML = '<p class="text-center">Instructor data not found</p>';
+              }
+          } catch (error) {
+              console.error("Error fetching feedbacks:", error);
+              modalBody.innerHTML = '<p class="text-center">An error occurred while loading feedbacks</p>';
+          }
+      });
   });
 }
 
@@ -618,3 +666,4 @@ function showNotification(message) {
   const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal')); // Initialize the modal
   notificationModal.show(); // Show the modal
 }
+

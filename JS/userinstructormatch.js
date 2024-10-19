@@ -338,6 +338,7 @@ document.querySelector('.feedback-form').addEventListener('submit', async functi
 
         // Fetch updated instructor data and refresh the UI
         await updateRatingUI(instructorId);
+        window.location.href = 'userdashboard.html';
 
     } else {
         console.error("Instructor not found.");
@@ -473,6 +474,26 @@ function addCommentToUI(commentObj, commentIndex) {
     commentsSection.appendChild(commentElement);
 }
 
+// Wait for the DOM to fully load before running any script
+document.addEventListener('DOMContentLoaded', () => {
+    // Disable the "Give Feedback" button initially
+    const feedbackButton = document.getElementById('giveFeedbackBtn');
+    feedbackButton.disabled = true;
+
+    // Check authentication state and then check appointment progress
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log('User is logged in:', user.uid);
+            studentId = user.uid;
+            checkAppointmentProgress(studentId);
+        } else {
+            console.error('No user is logged in.');
+            hideLoader(); // Ensure the loader is hidden
+        }
+    });
+});
+
+
 async function checkAppointmentProgress(studentId) {
     const appointmentsRef = collection(db, 'appointments');
     const querySnapshot = await getDocs(appointmentsRef);
@@ -480,38 +501,49 @@ async function checkAppointmentProgress(studentId) {
     const currentDate = new Date();
     let feedbackButtonEnabled = false;
 
-    // Iterate over each document
+    // Iterate over each document in the appointments collection
     for (const doc of querySnapshot.docs) {
         const appointmentData = doc.data();
 
+        // Fetch the appointment date from the main document (not inside bookings array)
+        const appointmentDate = new Date(appointmentData.date);  // Get the date outside bookings
+
+        // Check if bookings is an array and contains valid data
         if (appointmentData.bookings && Array.isArray(appointmentData.bookings)) {
             for (const booking of appointmentData.bookings) {
-                if (booking.userId === studentId && booking.progress === "Completed") {
-                    const appointmentDate = new Date(booking.date);
+                console.log('Checking booking:', booking);
 
-                    // Calculate the difference in time
+                // Check if the booking matches the student ID and is completed
+                if (booking.userId === studentId && booking.progress === "Completed") {
+                    console.log('Appointment Date:', appointmentDate);
+
+                    // Calculate the difference in time between current date and appointment date
                     const timeDifference = currentDate.getTime() - appointmentDate.getTime();
                     const daysDifference = timeDifference / (1000 * 3600 * 24);
 
                     // Enable feedback if appointment was within the last 24 hours
                     if (daysDifference <= 1) {
                         feedbackButtonEnabled = true;
+                        console.log('Feedback button should be enabled');
                         break; // Stop further iteration once the condition is met
                     }
                 }
             }
         }
 
-        if (feedbackButtonEnabled) break; // Exit outer loop as well if condition is met
+        if (feedbackButtonEnabled) break; // Exit outer loop if feedback condition is met
     }
 
-    // Update button status based on condition
+    // Update button status based on the condition
     const feedbackButton = document.getElementById('giveFeedbackBtn');
     feedbackButton.disabled = !feedbackButtonEnabled;
-}
 
-// Call this function when the page loads or when you need to update the button state
-checkAppointmentProgress(studentId);
+    if (!feedbackButtonEnabled) {
+        console.log('Feedback button remains disabled');
+    } else {
+        console.log('Feedback button is enabled');
+    }
+}
 
 // Fetch and update the UI with the latest rating distribution
 async function updateRatingUI(instructorId) {
@@ -558,19 +590,7 @@ async function updateRatingUI(instructorId) {
     }
 }
 
-// Call checkAppointmentProgress on page load or when attempting to find a new instructor
-document.addEventListener('DOMContentLoaded', () => {
-    // Disable the "Give Feedback" button initially
-    const feedbackButton = document.getElementById('giveFeedbackBtn');
-    feedbackButton.disabled = true;
 
-    // Run auth state check to see if we need to update the button state
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            checkAppointmentProgress(user.uid);
-        }
-    });
-});
 
 
 function showNotification(message) {
