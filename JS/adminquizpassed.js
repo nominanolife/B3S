@@ -31,7 +31,7 @@ async function renderApplicants() {
         const row = document.createElement('tr');
         const noDataCell = document.createElement('td');
         noDataCell.setAttribute('colspan', '4'); // Span all columns
-        noDataCell.textContent = 'No passed student/s yet';
+        noDataCell.textContent = 'No pass student/s yet';
         noDataCell.style.textAlign = 'center'; // Center the message
         row.appendChild(noDataCell);
         passedStudentsTable.appendChild(row);

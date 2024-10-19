@@ -96,8 +96,9 @@ function renderInstructors() {
         <div class="dropdown">
           <i class="bi bi-three-dots"></i>
           <div class="dropdown-content">
-            <i class="dropdown-item" data-id="${instructor.id}">Edit</i>
-            <i class="dropdown-item" data-id="${instructor.id}">Delete</i>
+            <i class="dropdown-item feedback-btn" data-id="${instructor.id}">Feedbacks</i>
+            <i class="dropdown-item edit-btn" data-id="${instructor.id}">Edit</i>
+            <i class="dropdown-item delete-btn" data-id="${instructor.id}">Delete</i>
           </div>
         </div>
       </td>
@@ -116,6 +117,7 @@ function renderInstructors() {
 
   handleDropdowns();
   handleSliderSwitch();
+  handleFeedbacks(); // Add this line to handle feedback modal functionality
 }
 
 // Handle dropdown functionality
@@ -151,6 +153,18 @@ function handleDropdowns() {
     if (!event.target.closest('.dropdown')) {
       closeAllDropdowns();
     }
+  });
+}
+
+function handleFeedbacks() {
+  document.querySelectorAll('.feedback-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      const instructorId = this.dataset.id;
+      // Optionally, you can load the instructor's feedback data here using instructorId.
+      // For now, just show the modal
+      const feedbackOverviewModal = new bootstrap.Modal(document.getElementById('feedbackOverviewModal'));
+      feedbackOverviewModal.show();
+    });
   });
 }
 
