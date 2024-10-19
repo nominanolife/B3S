@@ -131,7 +131,19 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("User is not authenticated.");
         }
     });
+
+    displayInitialBotMessages();
 });
+
+function displayInitialBotMessages() {
+    // First bot message
+    displayMessage("Hi! I'm DriveHub's Chatbot. I can only answer simple questions about the lectures. Please make your questions direct and concise.", 'bot-message');
+
+    // Second bot message after a short delay (optional for a more natural chat flow)
+    setTimeout(() => {
+        displayMessage('For example, you can ask "What is the definition of this sign?"', 'bot-message');
+    }, 500); // 500ms delay between messages
+}
 
 async function renderVideoDetails(videoId, videos, userId) {
     const videoPlayer = document.getElementById('lesson-video');
