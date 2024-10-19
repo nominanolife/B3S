@@ -563,3 +563,11 @@ h2 {
 .btn-secondary:hover {
     background-color: #b60505ec;
 }
+
+.disabled-link {
+    pointer-events: none;
+    opacity: 0.65;
+    color: gray;
+    text-decoration: none;
+    cursor: default;
+}

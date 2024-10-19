@@ -369,3 +369,11 @@ h2 {
         content: '.';
     }
 }
+
+.disabled-link {
+    pointer-events: none;
+    opacity: 0.65;
+    color: gray;
+    text-decoration: none;
+    cursor: default;
+}

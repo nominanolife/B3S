@@ -151,7 +151,7 @@ function checkUserRole() {
                         }
 
                         // Enable or disable 'userinstructorreminder.html' based on 'PDC' in packageType
-                        if (packageType && packageType.includes('PDC')) {
+                        if (packageType && (packageType.includes('PDC-4Wheels') || packageType.includes('PDC-Motors'))) {
                             enableLink('userinstructorreminder.html');
                         } else {
                             disableLink('userinstructorreminder.html');

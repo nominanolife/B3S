@@ -385,6 +385,14 @@ h2 {
   border-color: #ccc;
 }
 
+.disabled-link {
+    pointer-events: none;
+    opacity: 0.65;
+    color: gray;
+    text-decoration: none;
+    cursor: default;
+}
+
 @keyframes popOut {
     0% {
         opacity: 0;
@@ -467,6 +475,13 @@ h2 {
 
 .btn-secondary:hover {
     background-color: #b60505ec;
+}
+
+.disabled-link {
+    pointer-events: none;
+    color: gray;
+    text-decoration: none;
+    cursor: default;
 }
 
 /* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */

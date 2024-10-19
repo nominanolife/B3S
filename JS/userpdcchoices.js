@@ -40,25 +40,66 @@ async function fetchApplicantData(applicantId) {
     }
 }
 
-// Function to enable cards based on the packageType (can be string or array)
+// Function to enable or disable cards based on the packageType (can be string or array)
 function enableCard(packageType) {
     // Ensure packageType is treated as an array if it isn't already
     const packageArray = Array.isArray(packageType) ? packageType : [packageType];
 
-    // Enable the 4-WHEELS card if "PDC-4Wheels" is in the packageType array
+    // Handle the 4-WHEELS card based on the package type
+    const fourWheelsCard = document.querySelector('.tdc'); // Assuming '.tdc' represents 4-WHEELS
     if (packageArray.includes("PDC-4Wheels")) {
-        const fourWheelsCard = document.querySelector('.tdc'); // Assuming '.tdc' represents 4-WHEELS
         fourWheelsCard.removeAttribute('disabled'); // Enable the 4-WHEELS card
         fourWheelsCard.classList.remove('disabled'); // Optionally remove the 'disabled' class
+        localStorage.setItem('pdc4WheelsState', 'enabled'); // Store the state in localStorage
+    } else {
+        fourWheelsCard.setAttribute('disabled', 'disabled'); // Disable the 4-WHEELS card
+        fourWheelsCard.classList.add('disabled'); // Optionally add the 'disabled' class
+        localStorage.setItem('pdc4WheelsState', 'disabled'); // Update localStorage state
     }
 
-    // Enable the MOTORCYCLE card if "PDC-Motors" is in the packageType array
+    // Handle the MOTORCYCLE card based on the package type
+    const motorcycleCard = document.querySelector('.pdc'); // Assuming '.pdc' represents MOTORCYCLE
     if (packageArray.includes("PDC-Motors")) {
-        const motorcycleCard = document.querySelector('.pdc'); // Assuming '.pdc' represents MOTORCYCLE
         motorcycleCard.removeAttribute('disabled'); // Enable the MOTORCYCLE card
         motorcycleCard.classList.remove('disabled'); // Optionally remove the 'disabled' class
+        localStorage.setItem('pdcMotorsState', 'enabled'); // Store the state in localStorage
+    } else {
+        motorcycleCard.setAttribute('disabled', 'disabled'); // Disable the MOTORCYCLE card
+        motorcycleCard.classList.add('disabled'); // Optionally add the 'disabled' class
+        localStorage.setItem('pdcMotorsState', 'disabled'); // Update localStorage state
     }
 }
+
+// Function to apply stored card states from localStorage
+function applyStoredCardStates() {
+    const pdc4WheelsState = localStorage.getItem('pdc4WheelsState');
+    const pdcMotorsState = localStorage.getItem('pdcMotorsState');
+
+    // Apply the state for the 4-WHEELS card
+    const fourWheelsCard = document.querySelector('.tdc');
+    if (pdc4WheelsState === 'enabled') {
+        fourWheelsCard.removeAttribute('disabled');
+        fourWheelsCard.classList.remove('disabled');
+    } else {
+        fourWheelsCard.setAttribute('disabled', 'disabled');
+        fourWheelsCard.classList.add('disabled');
+    }
+
+    // Apply the state for the MOTORCYCLE card
+    const motorcycleCard = document.querySelector('.pdc');
+    if (pdcMotorsState === 'enabled') {
+        motorcycleCard.removeAttribute('disabled');
+        motorcycleCard.classList.remove('disabled');
+    } else {
+        motorcycleCard.setAttribute('disabled', 'disabled');
+        motorcycleCard.classList.add('disabled');
+    }
+}
+
+// Apply the stored states as soon as the page loads
+document.addEventListener("DOMContentLoaded", () => {
+    applyStoredCardStates();
+});
 
 // Listen for the currently logged-in user
 onAuthStateChanged(auth, (user) => {

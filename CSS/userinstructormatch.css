@@ -674,6 +674,14 @@ h2 {
     cursor: not-allowed;
 }
 
+.disabled-link {
+    pointer-events: none;
+    opacity: 0.65;
+    color: gray;
+    text-decoration: none;
+    cursor: default;
+}
+
 .loader1 {
     display: none;
     position: fixed;

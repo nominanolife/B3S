@@ -200,19 +200,19 @@ async function determinePDCAndTDCStatus(userId) {
     (booking) => booking.course === "TDC" && booking.progress === "Completed"
   );
 
-  // Check if both PDC and TDC are part of the package
-  const hasPDCInPackage = packageType.includes("PDC");
-  const hasTDCInPackage = packageType.includes("TDC");
+  // Check if either PDC-4Wheels or PDC-Motors is part of the package
+  const hasPDC4Wheels = packageType.includes("PDC-4Wheels");
+  const hasPDCMotors = packageType.includes("PDC-Motors");
 
-  // Enable PDC if TDC is completed or user has a PDC package
-  if (hasCompletedTDC || hasPDCInPackage) {
+  // Enable PDC if TDC is completed or user has either PDC-4Wheels or PDC-Motors package
+  if (hasCompletedTDC || hasPDC4Wheels || hasPDCMotors) {
     updatePDCState(true);
   } else {
     updatePDCState(false);
   }
 
   // Enable TDC if the package includes TDC or if TDC has been completed
-  if (hasTDCInPackage || hasCompletedTDC) {
+  if (packageType.includes("TDC") || hasCompletedTDC) {
     updateTDCState(true);
   } else {
     updateTDCState(false);
