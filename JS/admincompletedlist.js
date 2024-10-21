@@ -342,13 +342,14 @@ function formatCompletionDate(completionDate) {
 }
 
 document.getElementById('exportListBtn').addEventListener('click', () => {
-  if (studentsData.length === 0 && filteredStudentsData.length === 0) {
-    // If there are no students, display a notification or message
-    alert('No students to export!'); // You can replace this with your modal or notification system
+  // Check if the filtered list (filteredStudentsData) is empty based on the current year
+  if (filteredStudentsData.length === 0) {
+    // If there are no students in the filtered list, display a notification or message
+    alert('No students to export for the selected year!'); // Replace this with your custom notification if needed
     return; // Prevent the export function from proceeding
   }
 
-  // Proceed with the export function if there are students
+  // Proceed with the export function if there are students in the current filter
   exportListToPDF();
 });
 

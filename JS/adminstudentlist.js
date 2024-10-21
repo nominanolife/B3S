@@ -40,8 +40,6 @@ function showNotification(message) {
 
 // Fetch students data on DOM load
 document.addEventListener('DOMContentLoaded', () => {
-  const loader = document.getElementById('loader1');
-  loader.style.display = 'flex';  // Show loader while data is being fetched
   
   fetchAppointments().then(() => {
       // After the appointments are fetched, trigger render to hide loader once done
