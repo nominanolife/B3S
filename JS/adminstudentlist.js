@@ -453,9 +453,7 @@ async function handleStatusToggle(event) {
   };
 }
 
-// Existing Firestore update function (unchanged)
 async function toggleCompletionStatus(userId, course, isCompleted, appointmentId) {
-  // Your existing logic for updating Firestore remains intact here
   try {
     const applicantDocRef = doc(db, "applicants", userId);
     const applicantSnapshot = await getDoc(applicantDocRef);
@@ -532,12 +530,14 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
           completedStudentData = completedStudentSnap.data();
         }
 
+        // Add validation to prevent duplicate completion for the same appointment
         const existingBookingIndex = completedStudentData.completedBookings.findIndex(
-          booking => booking.appointmentId === appointmentId && booking.course === course
+          booking => booking.appointmentId === appointmentId && booking.completionDate === appointmentData.date && booking.course === course
         );
 
         if (existingBookingIndex >= 0) {
-          completedStudentData.completedBookings[existingBookingIndex].completionDate = appointmentData.date;
+          // If the same appointment date exists, don't duplicate
+          console.log("Completion for this appointment date already exists, skipping duplicate entry.");
         } else {
           completedStudentData.completedBookings.push({
             course: course,
