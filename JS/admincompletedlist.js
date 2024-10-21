@@ -43,7 +43,7 @@ async function fetchPassedTDCStudents() {
   const passedStudentsQuerySnapshot = await getDocs(
     query(
       collection(db, "userResults"),
-      where("passed", "==", true)
+      where("status", "==", "Pass")
     )
   );
 

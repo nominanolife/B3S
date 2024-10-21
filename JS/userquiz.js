@@ -152,8 +152,17 @@ async function renderQuestion(index) {
             optionsContainer.innerHTML = '';
         }
 
+        // Store the correct answer value before shuffling
+        const correctAnswerValue = questionData.options[questionData.correctAnswer].value;
+
         // Shuffle the options array before rendering
         const shuffledOptions = shuffleOptions(questionData.options);
+
+        // Find the new index of the correct answer after shuffling
+        const newCorrectAnswerIndex = shuffledOptions.findIndex(option => option.value === correctAnswerValue);
+
+        // Update the question object with the new correct answer index
+        questionData.correctAnswer = newCorrectAnswerIndex;
 
         // Populate new shuffled options
         shuffledOptions.forEach((option, i) => {

@@ -64,14 +64,23 @@ async function renderApplicants() {
                 const nameCell = document.createElement('td');
                 nameCell.textContent = fullName;
 
-                // Date cell
+                // Date cell (Handling both Firestore Timestamp and ISO string)
                 const dateCell = document.createElement('td');
-                const timestamp = student.timestamp ? new Date(student.timestamp.seconds * 1000) : null;
-                dateCell.textContent = timestamp ? timestamp.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+                let date;
+                
+                if (student.date && student.date.toDate) {
+                    // If it's a Firestore Timestamp
+                    date = student.date.toDate();
+                } else if (student.date && typeof student.date === 'string') {
+                    // If it's a string (e.g., ISO format)
+                    date = new Date(student.date);
+                }
+                
+                dateCell.textContent = date ? date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Invalid Date';
 
-                // Percentage cell (based on totalScore)
+                // Percentage cell
                 const percentageCell = document.createElement('td');
-                const percentage = student.totalScore || '0.00';
+                const percentage = student.percentage || '0.00';
                 percentageCell.textContent = `${percentage}%`;
 
                 // Certificate ID cell
@@ -141,7 +150,7 @@ function updatePaginationControls() {
 // Set up real-time listener to fetch passed students
 function setupRealTimeListener() {
     const userResultsCollection = collection(db, 'userResults');
-    const passedStudentsQuery = query(userResultsCollection, where('passed', '==', true));
+    const passedStudentsQuery = query(userResultsCollection, where('status', '==', "Pass"));
 
     // Real-time listener for passed students
     onSnapshot(passedStudentsQuery, (snapshot) => {
