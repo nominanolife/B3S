@@ -839,8 +839,22 @@ footer .container:last-child {
     cursor: pointer;
 }
 
+.chatbot-footer {
+    background-color: #142a76;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chatbot-footer p {
+    font-size: 10px;
+    margin: 0;
+}
+
 .message {
-    margin: 5px 0;
+    margin: 10px 0;
 }
 
 .message.user {
@@ -855,16 +869,63 @@ footer .container:last-child {
     display: inline-block;
     padding: 10px;
     border-radius: 15px;
+    margin: 0;
 }
 
 .message.user .bubble {
     background-color: #142a76;
     color: white;
+    margin: 0;
 }
 
 .message.bot .bubble {
     background-color: #f1f1f1;
     color: black;
+}
+
+.bot-message-container {
+    display: flex;
+    align-items: center;
+}
+
+.chatbot-logo {
+    width: 40px;
+    height: 40px;
+}
+
+/* Typing dots animation */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 20px;
+}
+
+.typing-indicator .dot {
+    background-color: #999;
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    margin: 0 2px;
+    opacity: 0.5;
+    animation: bounce 1s infinite alternate;
+}
+
+.typing-indicator .dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator .dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-5px);
+    }
 }
 
 ::-webkit-scrollbar {

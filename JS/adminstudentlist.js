@@ -390,7 +390,6 @@ function setupStatusToggleListeners() {
   });
 }
 
-
 async function handleStatusToggle(event) {
   event.preventDefault(); // Prevent default checkbox behavior
 
@@ -428,19 +427,28 @@ async function handleStatusToggle(event) {
   // Proceed with Firestore update on confirmation
   document.getElementById('confirmButton').onclick = async () => {
     confirmationModal.hide();
+
+    // Show the loader after confirmation
+    const loader = document.getElementById('loader1');
+    loader.style.display = 'flex';  // Show loader after confirmation
+
     isUpdatingFirestore = true; // Set flag to avoid repopulation
 
     try {
       // Perform Firestore update
       await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
-      
-      // Optional: Reload page after Firestore update
-      window.location.reload();  // Comment this out if you don't want a reload
+
+      // Reload the page after a successful update to simulate a "refresher"
+      window.location.reload();
+
     } catch (error) {
       console.error("Error updating completion status in Firestore:", error);
 
       // If update fails, revert the checkbox state
       event.target.checked = !isCompleted;
+
+      // Hide the loader if there's an error
+      loader.style.display = 'none';
     } finally {
       isUpdatingFirestore = false; // Reset flag after Firestore update
     }

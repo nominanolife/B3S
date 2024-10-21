@@ -162,6 +162,16 @@ function setupCheckboxListeners() {
     });
 }
 
+// Function to display the notification modal
+function showNotificationModal(message) {
+    const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal')); // Initialize modal
+    const modalBody = document.getElementById('notificationModalBody'); // Get the modal body element
+
+    modalBody.innerText = message;  // Set the custom message
+
+    notificationModal.show();  // Show the notification modal
+}
+
 // Batch update to Firestore on publish
 async function applyChangesToFirestore() {
     const batch = writeBatch(db);  // Initialize batch
@@ -194,6 +204,9 @@ async function applyChangesToFirestore() {
 
     // Reset tracking
     changesToApply = {};
+
+    // Show the notification modal with success message
+    showNotificationModal('Publish successfully!');
 }
 
 // Function to dynamically add the footer and publish button
