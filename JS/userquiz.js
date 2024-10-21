@@ -98,7 +98,12 @@ async function loadUserAnswersFromFirestore() {
     }
 }
 
-// Render Question
+// Shuffle function to randomize the options array
+function shuffleOptions(options) {
+    return options.sort(() => Math.random() - 0.5);
+}
+
+// Render Question with Shuffled Options
 async function renderQuestion(index) {
     await loadUserAnswersFromFirestore();  // Load answers when rendering each question
 
@@ -147,19 +152,20 @@ async function renderQuestion(index) {
             optionsContainer.innerHTML = '';
         }
 
-        // Populate new options from the nested options array
-        if (questionData.options && Array.isArray(questionData.options) && optionsContainer) {
-            questionData.options.forEach((option, i) => {
-                const optionElement = document.createElement('div');
-                optionElement.className = 'option';
-                optionElement.innerHTML = `
-                    <input type="radio" name="questionanswer" id="option${i}" value="${option.value}">
-                    <span class="option-answer">${String.fromCharCode(65 + i)}.</span>
-                    <p>${option.value}</p>
-                `;
-                optionsContainer.appendChild(optionElement);
-            });
-        }
+        // Shuffle the options array before rendering
+        const shuffledOptions = shuffleOptions(questionData.options);
+
+        // Populate new shuffled options
+        shuffledOptions.forEach((option, i) => {
+            const optionElement = document.createElement('div');
+            optionElement.className = 'option';
+            optionElement.innerHTML = `
+                <input type="radio" name="questionanswer" id="option${i}" value="${option.value}">
+                <span class="option-answer">${String.fromCharCode(65 + i)}.</span>
+                <p>${option.value}</p>
+            `;
+            optionsContainer.appendChild(optionElement);
+        });
 
         // Load saved answer from Firestore if available
         const savedAnswer = userAnswers[index];
