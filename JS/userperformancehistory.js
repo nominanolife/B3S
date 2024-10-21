@@ -128,12 +128,14 @@ function showPerformanceEvaluation(attempt) {
         performanceBlock.className = 'performance-evaluation';
 
         const statusColor = item.status === 'Poor' ? 'red' : (item.status === 'Great' ? 'green' : 'blue');
-        const insights = `<p><strong>Insights:</strong> ${item.insights}</p>`;
         
+        // Clean the insights text by removing <a> tags using regex
+        let cleanedInsights = item.insights.replace(/<a\b[^>]*>(.*?)<\/a>/gi, "");
+
         let additionalResources = '';
         if (item.status === 'Poor') {
             additionalResources = `
-                <p><a href="uservideos.html?category=${encodeURIComponent(item.category)}" style="color:${statusColor}; text-decoration:underline;">
+                <p><a href="uservideos.html?category=${encodeURIComponent(item.category)}" style="color:red; text-decoration:underline;">
                     Click here to watch the video for ${item.category} improvement
                 </a></p>
             `;
@@ -143,23 +145,14 @@ function showPerformanceEvaluation(attempt) {
             <p><strong>${item.category}:</strong> 
                 <span class="status" style="color:${statusColor};">${item.status}</span>
             </p>
-            ${insights}
+            <p><strong>Insights:</strong> ${cleanedInsights}</p>
             ${additionalResources}
         `;
 
         performanceBody.appendChild(performanceBlock);
     });
-
-    // Add back button to close the modal
-    const backButton = document.createElement('button');
-    backButton.className = 'result-button';
-    backButton.innerHTML = 'Back';
-    performanceBody.appendChild(backButton);
-
-    backButton.addEventListener('click', () => {
-        $('#performanceEvaluationModal').modal('hide');
-    });
 }
+
 
 // Helper function to color-code table rows based on status
 function applyRowStyles() {

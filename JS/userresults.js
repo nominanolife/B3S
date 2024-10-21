@@ -226,16 +226,20 @@ async function handleSavingResults(categoryScores) {
     const evaluationDetails = await Promise.all(Object.keys(categoryScores).map(async (category) => {
         const score = categoryScores[category];
         const result = await predictPerformanceAndFetchInsights(currentUser.uid, category, score);
+        const videoLink = result.predicted_performance === 'Poor' ? 
+            `<a href="uservideos.html?category=${encodeURIComponent(category)}">Click here to watch the video for ${category} improvement</a>` : 
+            '';
+
         return {
             category,
             score,
             status: result.predicted_performance,
-            insights: result.insights
+            insights: `${result.insights} ${videoLink}`  // Add video link if the performance is poor
         };
     }));
 
     // Save in userAttempt regardless of pass or fail
-    await saveUserAttemptToFirestore(currentUser.uid, fullName, totalScore, evaluation, evaluationDetails);
+    await saveUserAttemptToFirestore(currentUser.uid, totalScore, evaluation, evaluationDetails);
 
     // If passed, save final results to userResults
     if (passed) {
@@ -243,7 +247,6 @@ async function handleSavingResults(categoryScores) {
         await saveFinalUserResultsToFirestore(currentUser.uid, fullName, totalScore, certificateID, evaluationDetails); // Save result in userResults
     }
 }
-
 // In the button click handler (for fetching and calculating results)
 document.getElementById('seeResultsBtn').addEventListener('click', async function () {
     if (!currentUser) {
