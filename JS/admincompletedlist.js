@@ -17,9 +17,8 @@ const db = getFirestore(app);
 
 let studentsData = [];  // Global array to hold fetched student data
 let filteredStudentsData = [];  // Array to hold filtered student data
-let currentPage = 1;
 const itemsPerPage = 10;
-let totalPages = 1;
+document.getElementById('exportListBtn').disabled = true; 
 
 document.addEventListener('DOMContentLoaded', () => {
   fetchCompletedStudents();  // Fetch all students from Firestore
@@ -183,6 +182,20 @@ function renderStudents() {
 
   // Use either the filtered data or all students if no search term is applied
   const studentsToRender = filteredStudentsData.length > 0 ? filteredStudentsData : studentsData;
+
+  // Enable the export button if there are students, otherwise disable it
+  const exportListBtn = document.getElementById('exportListBtn');
+  if (studentsToRender.length === 0) {
+    studentList.innerHTML = `
+      <tr>
+        <td colspan="10" class="text-center">No complete student/s yet</td>
+      </tr>
+    `;
+    exportListBtn.disabled = true;  // Disable the export button if no students
+    return;
+  } else {
+    exportListBtn.disabled = false;  // Enable the export button if students are available
+  }
 
   // Check if there are any students to render
   if (studentsToRender.length === 0) {
@@ -359,7 +372,15 @@ function formatCompletionDate(completionDate) {
   });
 }
 
-document.getElementById('exportListBtn').addEventListener('click', exportListToPDF);
+document.getElementById('exportListBtn').addEventListener('click', () => {
+  const studentsToRender = filteredStudentsData.length > 0 ? filteredStudentsData : studentsData;
+  if (studentsToRender.length === 0) {
+    alert('No students available to export.');
+    return;
+  }
+
+  exportListToPDF();  // Proceed with export if students are available
+});
 
 function exportListToPDF() {
   const { jsPDF } = window.jspdf;
