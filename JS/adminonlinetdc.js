@@ -294,13 +294,13 @@ function populateQuizFields(questions) {
         // Create option labels (A, B, C, D)
         const optionLabels = ['A', 'B', 'C', 'D'];
 
-        // Determine if there's an existing image for the question
+        // Check if an image URL is available for the question
         const questionImage = question.imageURL || '';  // Assuming imageURL contains the image path, if available
 
         // Build question and options UI
         const questionHTML = `
             <div class="quiz-container-header">
-                <h5>Question ${questionCount}</h5>  <!-- Use questionCount -->
+                <h5>Question ${questionCount}</h5>
             </div>
             <div class="quiz-question">
                 <div class="question-input">
@@ -316,6 +316,7 @@ function populateQuizFields(questions) {
                         </div>
                         <input type="file" id="imageUpload${questionCount}" accept="image/*" style="display: none;">
                     </div>
+                    <i class="image-upload-delete">Delete image</i>
                 </div>
                 <div class="question-options">
                     ${question.options.map((option, i) => `
@@ -326,6 +327,10 @@ function populateQuizFields(questions) {
                         </div>
                     `).join('')}
                 </div>
+                <div class="delete-question">
+                    <button class="delete-question-btn">Delete</button>
+                </div>
+            </div>
         `;
 
         // Insert the question and its options into the container
@@ -363,6 +368,50 @@ function populateQuizFields(questions) {
                 const imageUrl = URL.createObjectURL(file);
                 imageUploadBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="${file.name}">`;
             }
+        });
+
+        // Add delete image functionality
+        const imageDeleteIcon = questionContainer.querySelector('.image-upload-delete');
+        imageDeleteIcon.addEventListener('click', async function () {
+            // Remove the image preview
+            imageUploadBox.innerHTML = `<i class="bi bi-image-fill"></i><p>Add Image</p>`;
+            imageUploadInput.value = ''; // Clear the file input
+
+            // Delete the image from Firebase Storage
+            if (question.imageURL) {
+                const imageRef = ref(storage, question.imageURL); // Get a reference to the image in Firebase Storage
+                try {
+                    await deleteObject(imageRef); // Delete the image from Firebase Storage
+                    console.log(`Image deleted from Firebase Storage: ${question.imageURL}`);
+                } catch (error) {
+                    console.error("Error deleting image from Firebase Storage:", error);
+                }
+            }
+
+            // Optionally, remove the image URL from session storage or quizQuestions array
+            quizQuestions[index].imageURL = null; // Update the quizQuestions array to reflect the deleted image
+            console.log(`Image deleted for question ${questionCount}`);
+        });
+
+        // Handle delete question
+        const deleteButton = questionContainer.querySelector('.delete-question-btn');
+        deleteButton.addEventListener('click', async function () {
+            quizContent.removeChild(questionContainer); // Remove the question from the DOM
+            quizQuestions.splice(index, 1); // Remove the question from the quizQuestions array
+
+            // Optionally delete the quiz question document from Firebase
+            if (question.id) {
+                try {
+                    const quizDocRef = doc(db, 'quizzes', question.id); // Assuming each question has an ID
+                    await deleteDoc(quizDocRef); // Delete the question document from Firestore
+                    console.log(`Question deleted from Firestore: ${question.id}`);
+                } catch (error) {
+                    console.error("Error deleting question from Firestore:", error);
+                }
+            }
+
+            console.log(`Question deleted for index ${index}`);
+            updateQuestionNumbers(); // Re-number remaining questions
         });
     });
 }
@@ -1130,7 +1179,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         // Create the new question HTML
         newQuestion.innerHTML = `
             <div class="quiz-container-header">
-                <h5>Question ${questionCount}</h5>
+                <h5>Question ${questionCount}</h5>  <!-- Initially set question number -->
             </div>
             <div class="quiz-question">
                 <div class="question-input">
@@ -1145,6 +1194,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                         </div>
                         <input type="file" id="imageUpload${questionCount}" accept="image/*" style="display: none;">
                     </div>
+                    <i class="image-upload-delete">Delete image</i>
                 </div>
                 <div class="question-options">
                     <h5>Enter the options. Mark the correct answer.</h5>
@@ -1194,31 +1244,32 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         // Image upload handling
         const imageUploadInput = newQuestion.querySelector(`#imageUpload${questionCount}`);
         const imageUploadBox = newQuestion.querySelector('.image-upload-box .image-upload-area');
-        
+        const imageDeleteIcon = newQuestion.querySelector('.image-upload-delete');
+
         imageUploadBox.addEventListener('click', function () {
             imageUploadInput.click();
         });
-    
+
         imageUploadInput.addEventListener('change', async function () {
             if (imageUploadInput.files.length > 0) {
                 const file = imageUploadInput.files[0];
                 const imageUrl = URL.createObjectURL(file);
                 imageUploadBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="${file.name}">`;
-    
+
                 if (documentId) {
                     // Upload image to Firebase
                     const quizImageURL = await handleFileUpload(file, 'dQuiz_images', documentId, `question_${questionCount}`);
-        
+
                     if (quizImageURL) {
                         // Save the image URL to sessionStorage and update draftData
                         sessionStorage.setItem(`quizImageURL_${questionCount}`, quizImageURL);
-        
+
                         const draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
                         draftData.quizQuestions = draftData.quizQuestions || [];
                         draftData.quizQuestions[questionCount - 1] = draftData.quizQuestions[questionCount - 1] || {};
                         draftData.quizQuestions[questionCount - 1].imageFile = quizImageURL;
                         sessionStorage.setItem('draftData', JSON.stringify(draftData));
-        
+
                         console.log('Updated draftData with new image URL:', draftData);
                     } else {
                         console.log(`Image upload failed for question ${questionCount}`);
@@ -1228,16 +1279,55 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                 }
             }
         });
+
+        // Handle image delete
+        imageDeleteIcon.addEventListener('click', function () {
+            // Remove the image preview
+            imageUploadBox.innerHTML = `
+                <i class="bi bi-image-fill"></i>
+                <p>Add Image</p>
+            `;
+
+            // Clear the file input
+            imageUploadInput.value = '';
+
+            // Optionally remove from sessionStorage or draftData if needed
+            sessionStorage.removeItem(`quizImageURL_${questionCount}`);
+            
+            const draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
+            if (draftData.quizQuestions && draftData.quizQuestions[questionCount - 1]) {
+                delete draftData.quizQuestions[questionCount - 1].imageFile;
+                sessionStorage.setItem('draftData', JSON.stringify(draftData));
+            }
+
+            console.log(`Image deleted for question ${questionCount}`);
+        });
     
-        // Handle delete button
+        // Add delete question functionality
         const deleteButton = newQuestion.querySelector('.delete-question-btn');
         deleteButton.addEventListener('click', function () {
             quizContent.removeChild(newQuestion);
-            updateQuestionNumbers();
+            quizQuestions.splice(index, 1); // Remove from the array if needed
+            renumberQuestions(); // Call the renumbering function after a question is deleted
             saveFormDataToSession();  // Update session storage after deleting a question
         });
+
+        // Call the renumbering function after adding a question
+        renumberQuestions();
     }
-    
+
+    // Function to renumber all questions
+    function renumberQuestions() {
+        const quizContainers = document.querySelectorAll('.quiz-container');
+
+        quizContainers.forEach((container, index) => {
+            const header = container.querySelector('.quiz-container-header h5');
+            header.textContent = `Question ${index + 1}`;  // Update the displayed question number
+        });
+
+        // Update questionCount to reflect the current number of questions
+        questionCount = quizContainers.length;
+    }
 
     addQuestion();
 
@@ -1247,7 +1337,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
     
         const newQuestion = document.createElement('div');
         newQuestion.classList.add('quiz-container');
-        
+    
         // If questionData exists, populate with existing data, otherwise use empty defaults
         const questionText = questionData ? questionData.question : '';
         const optionValues = questionData && questionData.options ? questionData.options : [
@@ -1275,6 +1365,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                         </div>
                         <input type="file" id="imageUpload${currentQuestionCount + 1}" accept="image/*" style="display: none;">
                     </div>
+                    <i class="image-upload-delete">Delete image</i>
                 </div>
                 <div class="question-options">
                     <h5>Enter the options. Mark the correct answer.</h5>
@@ -1287,7 +1378,9 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                 </div>
                 <div class="delete-question">
                     <button class="delete-question-btn">Delete</button>
-                </div>`;
+                </div>
+            </div>
+        `;
     
         // Append the new question to the quiz content area
         quizContent.appendChild(newQuestion);
@@ -1305,50 +1398,36 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         // Handle image upload functionality
         const imageUploadInput = newQuestion.querySelector(`#imageUpload${currentQuestionCount + 1}`);
         const imageUploadBox = newQuestion.querySelector('.image-upload-box .image-upload-area');
-
+    
         // Trigger the file input when the user clicks the image upload box
         imageUploadBox.addEventListener('click', function () {
             imageUploadInput.click();
         });
-
+    
         // Handle the image preview and save the image to sessionStorage
         imageUploadInput.addEventListener('change', function () {
             if (imageUploadInput.files.length > 0) {
                 const file = imageUploadInput.files[0];
                 const imageUrl = URL.createObjectURL(file);
-
+    
                 // Display the image preview
                 imageUploadBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="${file.name}">`;
-
+    
                 // Store the image file in sessionStorage
                 let draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
                 draftData.quizQuestions = draftData.quizQuestions || [];
                 draftData.quizQuestions[currentQuestionCount] = draftData.quizQuestions[currentQuestionCount] || {};
                 draftData.quizQuestions[currentQuestionCount].imageFile = file.name;  // Store the file name for reference
                 draftData.quizQuestions[currentQuestionCount].imageData = file;  // Store the actual file object for later upload
-
+    
                 // Save back to sessionStorage
                 sessionStorage.setItem('draftData', JSON.stringify(draftData));
             }
         });
     
-        // Trigger file input when clicking the upload area
-        newQuestion.querySelector('.image-upload-box').addEventListener('click', function () {
-            imageUploadInput.click();
-        });
-    
-        // Display image thumbnail when an image is uploaded
-        imageUploadInput.addEventListener('change', function () {
-            if (imageUploadInput.files.length > 0) {
-                const file = imageUploadInput.files[0];
-                const imageUrl = URL.createObjectURL(file);
-                imageUploadBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="${file.name}">`;
-            }
-        });
-    
         // After adding a question, update the numbering
         updateQuestionNumbers();
-    }
+    }    
     
     function updateQuestionNumbers() {
         const quizContainers = document.querySelectorAll('#editModal .quiz-container');
