@@ -112,8 +112,12 @@ async function renderQuestion(index) {
         const optionsContainer = document.querySelector('.question-options');
         const questionImageContainer = document.querySelector('.quiz-image');  // Select the image container
         const categoryElement = document.querySelector('.quiz-category');
+        const nextBtn = document.querySelector('.next-btn'); // Get the next button
 
         const questionData = questions[index];
+
+        // Disable the next button by default
+        nextBtn.disabled = true;
 
         // Update question text
         if (questionElement) {
@@ -176,12 +180,21 @@ async function renderQuestion(index) {
             optionsContainer.appendChild(optionElement);
         });
 
+        // Add event listener to enable the next button when a choice is selected
+        const radioButtons = document.querySelectorAll('input[name="questionanswer"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', () => {
+                nextBtn.disabled = false; // Enable the next button when an option is selected
+            });
+        });
+
         // Load saved answer from Firestore if available
         const savedAnswer = userAnswers[index];
         if (savedAnswer) {
             const optionToSelect = document.querySelector(`input[name="questionanswer"][value="${savedAnswer.answer}"]`);
             if (optionToSelect) {
                 optionToSelect.checked = true;
+                nextBtn.disabled = false; // Enable the next button if an answer was previously saved
             }
         }
 

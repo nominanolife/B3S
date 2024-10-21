@@ -464,7 +464,7 @@ async function generateCertificate(fullName, totalScore, certificateID, completi
 
     // Add the user's name dynamically
     doc.setFont("Helvetica");
-    doc.setFontSize(85);
+    doc.setFontSize(32);
     doc.text(fullName, pageWidth / 2, 115, { align: 'center' });
 
     // Add quiz completion details dynamically (total score and certificate ID)
@@ -473,10 +473,6 @@ async function generateCertificate(fullName, totalScore, certificateID, completi
     doc.text(`Has successfully passed the theoretical driving course on ${completionDate}`, pageWidth / 2, 130, { align: 'center' });
     doc.text(`with a quiz result of ${totalScore}%, earning Quiz Passing ID ${certificateID}`, pageWidth / 2, 140, { align: 'center' });
 
-    // Add the signature and line for admin signature
-    doc.setFont("Helvetica");
-    doc.setFontSize(24);
-    doc.text("Aaron Loeb", 195, 170);
     doc.line(195, 172, 239, 172);  // Signature line
     doc.setFont("Helvetica");
     doc.setFontSize(17);

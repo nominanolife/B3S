@@ -289,6 +289,12 @@ h2 {
     display: none; /* Hide buttons on page load */
 }
 
+.next-btn:disabled {
+    background-color: #D9D9D9;
+    color: #ffffff;
+    cursor: not-allowed;
+}
+
 @keyframes popOut {
     0% {
         opacity: 0;
