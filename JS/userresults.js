@@ -408,3 +408,61 @@ async function showPerformanceEvaluation(evaluationData) {
         });
     }
 }
+
+async function generateCertificate(fullName, totalScore, certificateID, completionDate) {
+    const { jsPDF } = window.jspdf;
+
+    // Create a new PDF document
+    const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
+    });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Add background image (cover entire page)
+    const backgroundBase64 = 'Assets/TDC Cert.png'; // Path to your background image or base64 string
+    doc.addImage(backgroundBase64, 'PNG', 0, 0, pageWidth, pageHeight);
+
+    // Set the title of the certificate with default fonts
+    doc.setFont("Times");
+    doc.setFontSize(66);
+
+    // Add logo and adjust size
+    const logoBase64 = 'Assets/logo.png';  // Path to your logo image or base64 string
+    doc.addImage(logoBase64, 'PNG', 130, 13, 30, 30);
+
+    // Center the text manually by calculating the width
+    doc.text("CERTIFICATE", pageWidth / 2, 60, { align: 'center' });
+    doc.setFontSize(26);
+    doc.text("OF COMPLETION", pageWidth / 2, 75, { align: 'center' });
+
+    // Add certificate content text
+    doc.setFontSize(16);
+    doc.text("This is to certify that", pageWidth / 2, 85, { align: 'center' });
+
+    // Add the user's name dynamically
+    doc.setFont("Helvetica");
+    doc.setFontSize(85);
+    doc.text(fullName, pageWidth / 2, 115, { align: 'center' });
+
+    // Add quiz completion details dynamically (total score and certificate ID)
+    doc.setFont("Helvetica");
+    doc.setFontSize(15);
+    doc.text(`Has successfully passed the theoretical driving course on ${completionDate}`, pageWidth / 2, 130, { align: 'center' });
+    doc.text(`with a quiz result of ${totalScore}%, earning Quiz Passing ID ${certificateID}`, pageWidth / 2, 140, { align: 'center' });
+
+    // Add the signature and line for admin signature
+    doc.setFont("Helvetica");
+    doc.setFontSize(24);
+    doc.text("Aaron Loeb", 195, 170);
+    doc.line(195, 172, 239, 172);  // Signature line
+    doc.setFont("Helvetica");
+    doc.setFontSize(17);
+    doc.text("Admin", 208, 180);
+
+    // Save the PDF with the dynamically added details
+    doc.save("Certificate_of_Completion.pdf");
+}
