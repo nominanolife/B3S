@@ -125,17 +125,53 @@ document.addEventListener('DOMContentLoaded', function () {
         function appendMessage(sender, message) {
             const messageElem = document.createElement('div');
             messageElem.classList.add('message', sender);
-            const bubble = document.createElement('div');
-            bubble.classList.add('bubble');
-            bubble.textContent = message;
-            messageElem.appendChild(bubble);
+        
+            if (sender === 'bot') {
+                messageElem.innerHTML = `
+                    <div class="bot-message-container">
+                        <img src="Assets/logo.png" alt="Chatbot Logo" class="chatbot-logo">
+                        <p class="bubble">${message}</p>
+                    </div>`;
+            } else {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                bubble.textContent = message;
+                messageElem.appendChild(bubble);
+            }
+        
             chatbotMessages.appendChild(messageElem);
             chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-        }
+        }        
 
         const AI_SERVER_URL = 'https://chatbot-195867894399.asia-southeast1.run.app/chatbot'; // Updated URL for AI model
 
+        // Append typing indicator (triple dot animation)
+        function appendTypingIndicator() {
+            const typingIndicator = document.createElement('div');
+            typingIndicator.classList.add('message', 'bot', 'typing-indicator-container');
+            typingIndicator.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>`;
+            chatbotMessages.appendChild(typingIndicator);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        // Remove typing indicator
+        function removeTypingIndicator() {
+            const typingIndicator = document.querySelector('.typing-indicator-container');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        // Send message to bot and show typing indicator
         function sendMessageToBot(userMessage) {
+            // Show typing indicator
+            appendTypingIndicator();
+
             fetch(AI_SERVER_URL, {
                 method: 'POST',
                 headers: {
@@ -150,11 +186,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(data => {
+                // Remove typing indicator
+                removeTypingIndicator();
+
                 const aiResponse = data.response; // Assuming the response structure has 'response'
                 appendMessage('bot', aiResponse);
             })
             .catch(error => {
                 console.error('Error:', error);
+                removeTypingIndicator();
                 appendMessage('bot', 'Sorry, there was an error processing your request.');
             });
         }
@@ -169,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 redIndicatorBadge.style.display = 'block'; // Show red indicator badge when chat bubble is visible
             }
         }
-    }, 2500); // 1 second delay
+    }, 1000); // 1 second delay
 
     // Close chat bubble on click
     if (chatBubble) {
@@ -182,4 +222,28 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    
+    // Append initial bot message
+    const initialMessage = document.createElement('div');
+    initialMessage.classList.add('message', 'bot');
+    initialMessage.innerHTML = `
+        <div class="bot-message-container">
+            <img src="Assets/logo.png" alt="Chatbot Logo" class="chatbot-logo">
+            <p class="bubble">Hi! I\'m DriveHub\'s Chatbot. How can I help you today?</p>
+        </div>`;
+    chatbotMessages.appendChild(initialMessage);
+
+    // Append additional message below the initial one
+    const additionalMessage = document.createElement('div');
+    additionalMessage.classList.add('message', 'bot');
+    additionalMessage.innerHTML = `
+        <div class="bot-message-container">
+            <img src="Assets/logo.png" alt="Chatbot Logo" class="chatbot-logo">
+            <p class="bubble">For example, you can ask "What is your available packages?"</p>
+        </div>`;
+    chatbotMessages.appendChild(additionalMessage);
+
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight; // Scroll to the bottom
+
+
 });
