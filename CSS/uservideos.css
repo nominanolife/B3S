@@ -364,6 +364,7 @@ h2 {
     gap: 10px;
     overflow-y: auto;
     max-height: 400px;
+    height: 100%;
 }
 
 .chat-body-message {
@@ -423,6 +424,19 @@ h2 {
     margin: 0;
 }
 
+.chat-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-footer p {
+    font-family: Poppins;
+    font-size: 11px;
+    color: #2f2e2e81;
+    margin: 0;
+}
+
 .message {
     display: flex;
     align-items: center;
@@ -449,6 +463,10 @@ h2 {
     border: none;
     border-radius: 10px;
     font-size: 12px;
+}
+
+.message-container input::placeholder {
+    color: #2f2e2e7e;
 }
 
 .send {
