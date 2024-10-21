@@ -409,6 +409,25 @@ async function showPerformanceEvaluation(evaluationData) {
     }
 }
 
+async function getCertificateData(userId) {
+    try {
+        const userResultDoc = await getDoc(doc(db, 'userResults', userId));
+        
+        if (userResultDoc.exists()) {
+            const userResultData = userResultDoc.data();
+            const certificateID = userResultData.certificateID || 'N/A';  // Use 'N/A' if certificateID is missing
+            const totalScore = userResultData.percentage || 0;  // Use 0 if totalScore is missing
+            return { certificateID, totalScore };
+        } else {
+            console.error("No user result data found for user:", userId);
+            return { certificateID: 'N/A', totalScore: 0 };  // Return default values if no result is found
+        }
+    } catch (error) {
+        console.error("Error fetching certificate data:", error);
+        return { certificateID: 'N/A', totalScore: 0 };  // Return default values in case of error
+    }
+}
+
 async function generateCertificate(fullName, totalScore, certificateID, completionDate) {
     const { jsPDF } = window.jspdf;
 
