@@ -137,6 +137,7 @@ async function fetchSavedVideosAndQuizzes() {
 
 async function editLesson(videoId) {
     editingVideoId = videoId;  // Set the editingVideoId
+
     try {
         // Fetch video data
         const videoDocRef = doc(db, 'videos', videoId);
@@ -365,8 +366,8 @@ function populateQuizFields(questions) {
         imageUploadInput.addEventListener('change', function () {
             if (imageUploadInput.files.length > 0) {
                 const file = imageUploadInput.files[0];
-                const imageUrl = URL.createObjectURL(file);
-                imageUploadBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="${file.name}">`;
+                const imageURL = URL.createObjectURL(file);
+                imageUploadBox.innerHTML = `<img src="${imageURL}" class="img-thumbnail" alt="${file.name}">`;
             }
         });
 
@@ -413,6 +414,16 @@ function populateQuizFields(questions) {
             console.log(`Question deleted for index ${index}`);
             updateQuestionNumbers(); // Re-number remaining questions
         });
+    });
+}
+
+function updateQuestionNumbers() {
+    const quizContainers = document.querySelectorAll('#editModal .quiz-container');
+
+    // Loop through each container and update the question header to reflect the correct number
+    quizContainers.forEach((container, index) => {
+        const header = container.querySelector('.quiz-container-header h5');
+        header.textContent = `Question ${index + 1}`;  // Set the question number based on its position
     });
 }
 
@@ -495,7 +506,7 @@ function updateEditPreview() {
                 const imageFile = imageUploadInput ? imageUploadInput.files[0] : null;
 
                 // Fetch the stored image URL if present
-                const savedImageUrl = quizQuestions[index].imageURL || null;
+                const savedImageUrl = quizQuestions[index].imageUrl || null;
 
                 // Use newly uploaded image URL or fallback to saved image URL
                 let imageUrl = imageFile ? URL.createObjectURL(imageFile) : savedImageUrl;
@@ -511,9 +522,9 @@ function updateEditPreview() {
                     questionPreview.textContent = `Question ${index + 1}. ${questionText}`;
                     quizPreviewItem.appendChild(questionPreview);
 
-                    if (imageUrl) {
+                    if (imageURL) {
                         const imagePreview = document.createElement('img');
-                        imagePreview.src = imageUrl;
+                        imagePreview.src = imageURL;
                         imagePreview.classList.add('img-thumbnail');
                         imagePreview.alt = 'Uploaded Question Image';
                         quizPreviewItem.appendChild(imagePreview);
@@ -831,6 +842,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
     // Add Event Listener for when the uploadModal is hidden (closed)
     $('#uploadModal').on('hidden.bs.modal', function () {
         // Pause all videos within the upload modal
+        quizQuestions = [];  // Clear the quizQuestions array
         const uploadModalElement = document.getElementById('uploadModal');
         const videos = uploadModalElement.querySelectorAll('video');
         videos.forEach(video => {
@@ -885,6 +897,9 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
     });
 
     $('#editModal').on('hidden.bs.modal', function () {
+        quizQuestions = [];  // Reset the quizQuestions array for the edit modal
+        const quizContent = document.querySelector('.edit-quiz-container .quiz-content');
+        quizContent.innerHTML = '';  // Clear any existing quiz questions
         // Pause all videos within the edit modal
         const editModalElement = document.getElementById('editModal');
         const videos = editModalElement.querySelectorAll('video');
@@ -918,16 +933,16 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
     editThumbnailUpload.addEventListener('change', function () {
         if (editThumbnailUpload.files.length > 0) {
             const file = editThumbnailUpload.files[0];
-            const imageUrl = URL.createObjectURL(file);
+            const imageURL = URL.createObjectURL(file);
 
             // Update thumbnail preview in Step 1 (the video-thumbnail-box in Step 1)
             const thumbnailBoxInStep1 = document.querySelector('#editvideothumbnailbox #editvideothumbnailarea');
-            thumbnailBoxInStep1.innerHTML = `<img src="${imageUrl}" class="img-thumbnail">`;
+            thumbnailBoxInStep1.innerHTML = `<img src="${imageURL}" class="img-thumbnail">`;
 
             // Also update the preview in Step 3 (if needed)
             const thumbnailPreviewContainer = document.getElementById('editThumbnailPreviewContainer');
             thumbnailPreviewContainer.innerHTML = `<div class="image-thumbnail">
-                <img src="${imageUrl}" class="img-thumbnail">
+                <img src="${imageURL}" class="img-thumbnail">
             </div>`;
         }
     });
@@ -958,8 +973,8 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         thumbnailUpload.addEventListener('change', function () {
             if (thumbnailUpload.files.length > 0) {
                 const file = thumbnailUpload.files[0];
-                const imageUrl = URL.createObjectURL(file);
-                thumbnailBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail">`;
+                const imageURL = URL.createObjectURL(file);
+                thumbnailBox.innerHTML = `<img src="${imageURL}" class="img-thumbnail">`;
             }
         });
     }
@@ -1131,12 +1146,12 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         thumbnailUpload.addEventListener('change', function () {
             if (thumbnailUpload.files.length > 0) {
                 const file = thumbnailUpload.files[0];
-                const imageUrl = URL.createObjectURL(file);
-                thumbnailBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail">`;
+                const imageURL = URL.createObjectURL(file);
+                thumbnailBox.innerHTML = `<img src="${imageURL}" class="img-thumbnail">`;
 
                 // Update course image dynamically
                 if (courseImage) {
-                    courseImage.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="Course Image">`;
+                    courseImage.innerHTML = `<img src="${imageURL}" class="img-thumbnail" alt="Course Image">`;
                 }
             } else {
                 // Reset to default icon if no image is selected
@@ -1253,8 +1268,8 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         imageUploadInput.addEventListener('change', async function () {
             if (imageUploadInput.files.length > 0) {
                 const file = imageUploadInput.files[0];
-                const imageUrl = URL.createObjectURL(file);
-                imageUploadBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="${file.name}">`;
+                const imageURL = URL.createObjectURL(file);
+                imageUploadBox.innerHTML = `<img src="${imageURL}" class="img-thumbnail" alt="${file.name}">`;
 
                 if (documentId) {
                     // Upload image to Firebase
@@ -1408,10 +1423,10 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         imageUploadInput.addEventListener('change', function () {
             if (imageUploadInput.files.length > 0) {
                 const file = imageUploadInput.files[0];
-                const imageUrl = URL.createObjectURL(file);
+                const imageURL = URL.createObjectURL(file);
     
                 // Display the image preview
-                imageUploadBox.innerHTML = `<img src="${imageUrl}" class="img-thumbnail" alt="${file.name}">`;
+                imageUploadBox.innerHTML = `<img src="${imageURL}" class="img-thumbnail" alt="${file.name}">`;
     
                 // Store the image file in sessionStorage
                 let draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
@@ -1529,9 +1544,9 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
             // Add question image preview if an image was uploaded
             if (imageUploadInput && imageUploadInput.files.length > 0) {
                 const file = imageUploadInput.files[0];
-                const imageUrl = URL.createObjectURL(file);
+                const imageURL = URL.createObjectURL(file);
                 const imagePreview = document.createElement('img');
-                imagePreview.src = imageUrl;
+                imagePreview.src = imageURL;
                 imagePreview.classList.add('img-thumbnail');
                 imagePreview.alt = 'Uploaded Question Image';
                 quizPreviewItem.appendChild(imagePreview);
@@ -1623,20 +1638,20 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
     
                 // Handle quiz image upload with custom file name using videoId and question index
                 const imageFileInput = container.querySelector('.image-upload input[type="file"]');
-                let imageUrl = null;
+                let imageURL = null;
                 if (imageFileInput && imageFileInput.files.length > 0) {
                     const imageFile = imageFileInput.files[0];
                     const customFileName = `${videoId}_question_${index + 1}.${imageFile.type.split('/')[1]}`;
                     const imageRef = ref(storage, `quiz_images/${customFileName}`);
                     await uploadBytes(imageRef, imageFile);
-                    imageUrl = await getDownloadURL(imageRef); // Get the URL for the quiz image
+                    imageURL = await getDownloadURL(imageRef); // Get the URL for the quiz image
                 }
     
                 let quizQuestion = {
                     question: questionText,
                     options: [],
                     correctAnswer: null,  // Will store the correct answer index
-                    imageUrl: imageUrl  // Store the quiz image URL if available
+                    imageURL: imageURL  // Store the quiz image URL if available
                 };
     
                 options.forEach((option, optIndex) => {
@@ -1799,13 +1814,13 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
     
             // Handle quiz image upload
             const imageFileInput = container.querySelector('.image-upload input[type="file"]');
-            let imageUrl = null;
+            let imageURL = null;
             if (imageFileInput && imageFileInput.files.length > 0) {
                 const imageFile = imageFileInput.files[0];
-                imageUrl = await uploadFileToFirebase(imageFile, `quiz_images/${editingVideoId}_${questionText}_image.${imageFile.type.split('/')[1]}`);  // Use videoId and question text to name the image
+                imageURL = await uploadFileToFirebase(imageFile, `quiz_images/${editingVideoId}_${questionText}_image.${imageFile.type.split('/')[1]}`);  // Use videoId and question text to name the image
             } else {
                 // If no new image, use existing image URL from preview (if available)
-                imageUrl = container.querySelector('.image-upload-area img')?.src || null;
+                imageURL = container.querySelector('.image-upload-area img')?.src || null;
             }
     
             if (questionText && options.length > 0) {
@@ -1813,7 +1828,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                     question: questionText,
                     options: options.map((option, idx) => ({ label: `Option ${idx + 1}`, value: option })),
                     correctAnswer: correctOptionIndex,
-                    imageURL: imageUrl
+                    imageURL: imageURL
                 });
             }
         }
