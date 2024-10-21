@@ -17,15 +17,26 @@ const db = getFirestore(app);
 
 let studentsData = [];  // Global array to hold fetched student data
 let filteredStudentsData = [];  // Array to hold filtered student data
+let currentPage = 1;
 const itemsPerPage = 10;
-document.getElementById('exportListBtn').disabled = true; 
+let totalPages = 1;
 
 document.addEventListener('DOMContentLoaded', () => {
-  fetchCompletedStudents();  // Fetch all students from Firestore
+  fetchAllStudents();  // Fetch both completed and passed TDC students
   setupYearDropdown();  // Setup year filtering
   setupSearch();  // Setup search functionality
-  fetchPassedTDCStudents();
 });
+
+// Fetch both passed TDC and completed students
+async function fetchAllStudents() {
+  studentsData = [];  // Reset the array before fetching data
+  
+  // Fetch passed TDC students and completed students concurrently
+  await Promise.all([fetchPassedTDCStudents(), fetchCompletedStudents()]);
+
+  // Once both are fetched, render the students
+  renderStudents();
+}
 
 // Fetch passed TDC students and their details from the 'applicants' collection
 async function fetchPassedTDCStudents() {
@@ -36,7 +47,6 @@ async function fetchPassedTDCStudents() {
     )
   );
 
-  // Get a list of passed student IDs
   const passedStudentIds = passedStudentsQuerySnapshot.docs.map(doc => doc.id);
 
   // Fetch all applicants in batch using their IDs
@@ -49,121 +59,89 @@ async function fetchPassedTDCStudents() {
     const applicantDoc = applicantDocs[index];
     const applicantData = applicantDoc.exists() ? applicantDoc.data() : {};
 
-    // Avoid duplicating the same student entry by checking if the student is already in `studentsData`
-    const existingStudent = studentsData.find(student => student.id === passedStudentDoc.id);
+    const personalInfo = applicantData.personalInfo || {};
 
-    if (!existingStudent) {
-      // Add the applicant's personal info to the passed student data
-      const personalInfo = applicantData.personalInfo || {};
+    // Combine the data from userResults and applicants
+    studentsData.push({
+      id: passedStudentDoc.id,
+      name: `${personalInfo.first || ''} ${personalInfo.middle || ''} ${personalInfo.last || ''} ${personalInfo.suffix || ''}`.trim(),
+      email: applicantData.email || 'N/A',
+      phoneNumber: applicantData.phoneNumber || 'N/A',
+      packageName: applicantData.packageName || 'N/A',  // Enrolled package is from the applicants table
+      packagePrice: applicantData.packagePrice || 'N/A', // Also get package price from applicants table
+      certificateControlNumber: applicantData.certificateControlNumber || 'N/A',
+      completedBookings: [{ 
+        course: 'TDC',  // The course will be TDC for passed students
+        completionDate: formatCompletionDate(passedStudentData.timestamp) || 'N/A',
+      }]
+    });
+  });
+}
 
-      // Combine the data from userResults and applicants
-      studentsData.push({
-        id: passedStudentDoc.id, // Use the student ID to avoid duplicates
-        name: `${personalInfo.first || ''} ${personalInfo.middle || ''} ${personalInfo.last || ''} ${personalInfo.suffix || ''}`.trim(),
-        email: applicantData.email || 'N/A',
-        phoneNumber: applicantData.phoneNumber || 'N/A',
-        packageName: applicantData.packageName || 'N/A', // Enrolled package is from the applicants table
-        packagePrice: applicantData.packagePrice || 'N/A', // Also get package price from applicants table
-        certificateControlNumber: applicantData.certificateControlNumber || 'N/A', // Fetch from applicants
-        completedBookings: [{ 
-          course: 'TDC',  // The course will be TDC for passed students
-          completionDate: formatCompletionDate(passedStudentData.timestamp) || 'N/A', // Format the completion date
-        }]
-      });
-    } else {
-      // If the student already exists, append the booking info to their completedBookings array
-      existingStudent.completedBookings.push({
-        course: 'TDC',
-        completionDate: formatCompletionDate(passedStudentData.timestamp) || 'N/A', // Format the completion date
-      });
-    }
+// Fetch completed students from the 'completedStudents' collection
+async function fetchCompletedStudents() {
+  const querySnapshot = await getDocs(query(collection(db, "completedStudents"), orderBy("name")));
+
+  querySnapshot.docs.forEach(doc => {
+    const studentData = doc.data();
+    studentsData.push({
+      id: doc.id,
+      ...studentData
+    });
+  });
+}
+
+// Year Dropdown Setup
+function setupYearDropdown() {
+  const startYear = 2024;  // Starting from 2024
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - startYear + 5 }, (_, i) => startYear + i); // Range of years
+
+  // Populate the year dropdown
+  const yearDropdownFilter = document.getElementById('yearDropdownFilter');
+  const yearOptionsFilter = document.getElementById('yearOptionsFilter');
+  const yearSelectedFilter = document.getElementById('yearSelectedFilter');
+
+  years.forEach(year => {
+    const li = document.createElement('li');
+    li.className = 'option';  // Add "option" class for styling
+    li.textContent = year;
+    li.addEventListener('click', () => {
+      yearSelectedFilter.textContent = year;  // Update selected text
+      filterByYear(year);  // Call the filtering function
+      yearDropdownFilter.classList.remove('open');  // Hide the dropdown after selection
+    });
+    yearOptionsFilter.appendChild(li);
   });
 
-  // Render the students after fetching the passed ones
-  renderStudents();
-}
+  // Toggle dropdown visibility on click
+  yearSelectedFilter.addEventListener('click', () => {
+    yearDropdownFilter.classList.toggle('open');  // Toggle "open" class
+  });
 
-
-// Fetch all students from Firestore once
-async function fetchCompletedStudents() {
-  const studentList = document.getElementById('student-list');
-  studentList.innerHTML = ''; // Clear list before rendering new data
-
-  try {
-    const querySnapshot = await getDocs(query(collection(db, "completedStudents"), orderBy("name")));
-    studentsData = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    renderStudents();
-  } catch (error) {
-    console.error("Error fetching completed students:", error);
-  }
-}
-
-function setupYearDropdown() {
-    const startYear = 2024;  // Start from 2024
-    const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: currentYear - startYear + 5 }, (_, i) => startYear + i); // Years from 2024 to the current year
-
-    // Populate the year dropdown
-    const yearDropdownFilter = document.getElementById('yearDropdownFilter');
-    const yearOptionsFilter = document.getElementById('yearOptionsFilter');
-    const yearSelectedFilter = document.getElementById('yearSelectedFilter');
-
-    years.forEach(year => {
-        const li = document.createElement('li');
-        li.className = 'option'; // Add "option" class for styling
-        li.textContent = year;
-        li.addEventListener('click', () => {
-            yearSelectedFilter.textContent = year; // Update selected text
-            filterByYear(year); // Call the filtering function
-            yearDropdownFilter.classList.remove('open'); // Hide the dropdown after selection
-        });
-        yearOptionsFilter.appendChild(li);
-    });
-
-    // Toggle dropdown visibility on click
-    yearSelectedFilter.addEventListener('click', () => {
-        yearDropdownFilter.classList.toggle('open'); // Toggle the "open" class
-    });
-
-    // Close the dropdown if clicked outside
-    document.addEventListener('click', (event) => {
-        if (!yearDropdownFilter.contains(event.target)) {
-            yearDropdownFilter.classList.remove('open'); // Close dropdown when clicked outside
-        }
-    });
+  // Close the dropdown if clicked outside
+  document.addEventListener('click', (event) => {
+    if (!yearDropdownFilter.contains(event.target)) {
+      yearDropdownFilter.classList.remove('open');  // Close dropdown when clicked outside
+    }
+  });
 }
 
 // Function to filter students based on the search input
 function filterStudents(searchTerm) {
-  // If the search term is empty, reset to display all students
   if (searchTerm === '') {
-    filteredStudentsData = []; // Clear filtered data
+    filteredStudentsData = [];  // Reset filtered data
     renderStudents();  // Re-render the full student list
-    return; // Exit the function
+    return;
   }
 
-  // Otherwise, filter based on the search term
+  // Filter based on the search term
   filteredStudentsData = studentsData.filter(student => {
     const fullName = `${student.name || ''}`.toLowerCase();  // Adjust based on your Firestore structure
     return fullName.startsWith(searchTerm);
   });
 
-  currentPage = 1;
-  totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
-
-  if (filteredStudentsData.length === 0) {
-    document.getElementById('student-list').innerHTML = `
-      <tr>
-        <td colspan="10" class="text-center">No student/s found</td>
-      </tr>
-    `;
-  } else {
-    renderStudents();  // Render the filtered students
-  }
+  renderStudents();  // Render the filtered students
 }
 
 // Setup search functionality
@@ -176,42 +154,23 @@ function setupSearch() {
 }
 
 // Render students and ensure certificate control number is fetched from applicants
-function renderStudents() {
+async function renderStudents() {
   const studentList = document.getElementById('student-list');
-  studentList.innerHTML = ''; // Clear previous data
+  studentList.innerHTML = '';  // Clear previous data
 
-  // Use either the filtered data or all students if no search term is applied
   const studentsToRender = filteredStudentsData.length > 0 ? filteredStudentsData : studentsData;
 
-  // Enable the export button if there are students, otherwise disable it
-  const exportListBtn = document.getElementById('exportListBtn');
   if (studentsToRender.length === 0) {
     studentList.innerHTML = `
       <tr>
         <td colspan="10" class="text-center">No complete student/s yet</td>
       </tr>
     `;
-    exportListBtn.disabled = true;  // Disable the export button if no students
     return;
-  } else {
-    exportListBtn.disabled = false;  // Enable the export button if students are available
   }
 
-  // Check if there are any students to render
-  if (studentsToRender.length === 0) {
-    studentList.innerHTML = `
-      <tr>
-        <td colspan="10" class="text-center">No complete student/s yet</td>
-      </tr>
-    `;
-    return; // Exit the function early if no students to render
-  }
-
-  // If there are students, render them in the table
-  studentsToRender.forEach(async student => {
-    const completedBookings = student.completedBookings || [];
-
-    // Fetch certificate control number from applicants if not present in student data
+  // Fetch all certificate control numbers first, if needed
+  const studentsWithCertificates = await Promise.all(studentsToRender.map(async (student) => {
     let certificateControlNumber = student.certificateControlNumber || 'N/A';
 
     if (certificateControlNumber === 'N/A') {
@@ -225,7 +184,16 @@ function renderStudents() {
       }
     }
 
-    // Proceed with rendering the table row
+    return {
+      ...student,
+      certificateControlNumber
+    };
+  }));
+
+  // Proceed with rendering the table rows
+  studentsWithCertificates.forEach(student => {
+    const completedBookings = student.completedBookings || [];
+    
     if (completedBookings.length === 0) {
       studentList.innerHTML += `
         <tr class="table-row">
@@ -240,7 +208,7 @@ function renderStudents() {
     } else {
       completedBookings.forEach(booking => {
         const formattedCompletionDate = formatCompletionDate(booking.completionDate);
-
+        
         studentList.innerHTML += `
           <tr class="table-row">
             <td class="table-row-content">${student.name || 'N/A'}</td>
@@ -250,15 +218,16 @@ function renderStudents() {
             <td class="table-row-content package-price">${student.packagePrice || 'N/A'}</td>
             <td class="table-row-content">${booking.course || 'N/A'}</td>
             <td class="table-row-content">Completed</td>
-            <td class="table-row-content">${certificateControlNumber}</td>
+            <td class="table-row-content">${student.certificateControlNumber}</td>
             <td class="table-row-content">${formattedCompletionDate}</td>
-            <td class="table-row-content"><i class="bi bi-pencil-square edit-cert-btn" data-student-id="${student.id}" data-certificate-number="${certificateControlNumber}"></i></td>
+            <td class="table-row-content"><i class="bi bi-pencil-square edit-cert-btn" data-student-id="${student.id}" data-certificate-number="${student.certificateControlNumber}"></i></td>
           </tr>
         `;
       });
     }
   });
 }
+
 
 const editButtons = document.querySelectorAll('.edit-cert-btn');
 editButtons.forEach(button => {
@@ -373,13 +342,14 @@ function formatCompletionDate(completionDate) {
 }
 
 document.getElementById('exportListBtn').addEventListener('click', () => {
-  const studentsToRender = filteredStudentsData.length > 0 ? filteredStudentsData : studentsData;
-  if (studentsToRender.length === 0) {
-    alert('No students available to export.');
-    return;
+  if (studentsData.length === 0 && filteredStudentsData.length === 0) {
+    // If there are no students, display a notification or message
+    alert('No students to export!'); // You can replace this with your modal or notification system
+    return; // Prevent the export function from proceeding
   }
 
-  exportListToPDF();  // Proceed with export if students are available
+  // Proceed with the export function if there are students
+  exportListToPDF();
 });
 
 function exportListToPDF() {
