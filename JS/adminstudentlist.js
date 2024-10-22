@@ -820,21 +820,26 @@ function openEditModal(index, modalId = 'editCcnModal') {
   });
 
   // Reset and show the appropriate sections for non-CCN modals
-  if (modalId !== 'editCcnModal') {
-      const modalElement = document.getElementById(modalId);
-      const [firstSection, secondSection] = modalElement.querySelectorAll('.modal-body');
-      const [backBtn, nextBtn, saveBtn] = modalElement.querySelectorAll('.back-btn, .next-btn, .save-btn');
+if (modalId !== 'editCcnModal') {
+    const modalElement = document.getElementById(modalId);
 
-      if (firstSection && secondSection && backBtn && nextBtn && saveBtn) {
-          firstSection.classList.remove('d-none');
-          secondSection.classList.add('d-none');
-          backBtn.classList.add('d-none');
-          nextBtn.classList.remove('d-none');
-          saveBtn.classList.add('d-none');
-      } else {
-          console.error('One or more elements are missing in the modal:', { firstSection, secondSection, backBtn, nextBtn, saveBtn });
-      }
-  }
+    if (modalElement) {
+        const [firstSection, secondSection] = modalElement.querySelectorAll('.modal-body');
+        const [backBtn, nextBtn, saveBtn] = modalElement.querySelectorAll('.back-btn, .next-btn, .save-btn');
+
+        console.log('Modal Element:', modalElement);
+        console.log({ firstSection, secondSection, backBtn, nextBtn, saveBtn });
+
+        // Use conditional checks to avoid undefined errors
+        if (firstSection) firstSection.classList.remove('d-none');
+        if (secondSection) secondSection.classList.add('d-none');
+        if (backBtn) backBtn.classList.add('d-none');
+        if (nextBtn) nextBtn.classList.remove('d-none');
+        if (saveBtn) saveBtn.classList.add('d-none');
+    } else {
+        console.error('Modal element not found for ID:', modalId);
+    }
+}
 
   modalToOpen.show();
 }
@@ -1762,10 +1767,15 @@ function setupModalListeners() {
       const index = event.target.getAttribute('data-index');
       const studentData = studentsData[index]; // Retrieve student data using the correct index
 
-      // Always show the "Certificate Control Number" option
-      // No need to hide it based on TDCStatus
+      // Conditionally show or hide the "Certificate Control Number" option
+      const editCcnOption = options.querySelector('[data-modal="editCcnModal"]');
+      if (studentData.TDCStatus && studentData.TDCStatus === "Completed") {
+        editCcnOption.style.display = 'block'; // Show if TDC is completed
+      } else {
+        editCcnOption.style.display = 'none'; // Hide if TDC is not completed
+      }
 
-      // Hide options based on student data for the other modals
+      // Handle visibility of the other modals based on student data
       const edit4WheelsOption = options.querySelector('[data-modal="edit4WheelsModal"]');
       const editMotorsOption = options.querySelector('[data-modal="editMotorsModal"]');
 

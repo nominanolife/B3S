@@ -72,7 +72,7 @@ async function fetchPassedTDCStudents() {
       certificateControlNumber: applicantData.certificateControlNumber || 'N/A',
       completedBookings: [{ 
         course: 'TDC',  // The course will be TDC for passed students
-        completionDate: formatCompletionDate(passedStudentData.timestamp) || 'N/A',
+        completionDate: formatCompletionDate(passedStudentData.date) || 'N/A',
       }]
     });
   });
