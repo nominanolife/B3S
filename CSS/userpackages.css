@@ -1,4 +1,4 @@
-h1body {
+body {
     margin: 0;
     padding: 0;
 }
@@ -146,11 +146,18 @@ h1body {
 .main-content {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: auto;
     min-height: 100vh;
     max-height: 100%;
+    width: calc(100% - 300px);
     margin-left: 300px;
-    background-color: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        width: 100%;
+        margin-left: 0;
+    }
 }
 
 .header {
@@ -165,12 +172,25 @@ h1body {
     z-index: 1000;
 }
 
+@media (max-width: 768px) {
+    .header {
+        width: 100%;
+        padding: 20px;
+    }
+}
+
 h3 {
     font-family: Poppins;
     font-size: 22px;
     font-weight: bold;
     color: #142A74;
     margin: 0;
+}
+
+@media (max-width: 768px) {
+    h3 {
+        font-size: 18px;
+    }
 }
 
 h2 {
@@ -181,11 +201,23 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    h2 {
+        font-size: 20px;
+    }
+}
+
 .page-content {
     display: flex;
     flex-direction: column;
     padding: 30px 30px;
     background-color: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+    .page-content {
+        padding: 20px;
+    }
 }
 
 .course-section {
@@ -194,6 +226,14 @@ h2 {
     align-items: center;
     justify-content: space-evenly;
     padding: 30px 30px;
+}
+
+@media (max-width: 768px) {
+    .course-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
 }
 
 .tdc-tile, .pdc-tile {
@@ -208,6 +248,13 @@ h2 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 768px) {
+    .tdc-tile, .pdc-tile {
+        width: 80%;
+        padding: 30px;
+    }
+}
+
 .tdc-tile h3, .pdc-tile h3 {
     font-family: Poppins;
     font-size: 26px;
@@ -216,6 +263,11 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .tdc-tile h3, .pdc-tile h3 {
+        font-size: 20px;
+    }
+}
 .tdc-tile p {
     font-family: Poppins;
     font-size: 14px;
@@ -223,6 +275,12 @@ h2 {
     width: 80%;
     color: #696984;
     margin: 0;
+}
+
+@media (max-width: 768px) {
+    .tdc-tile p {
+        width: 90%;
+    }
 }
 
 .pdc-tile p {
@@ -234,9 +292,22 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .pdc-tile p {
+        width: 90%;
+    }
+}
+
 .tdc-tile img, .pdc-tile img {
     width: 90%;
     height: 50%;
+}
+
+@media (max-width: 768px) {
+    .tdc-tile img, .pdc-tile img {
+        width: 100%;
+        height: auto;
+    }
 }
 
 .package-section {
@@ -247,11 +318,25 @@ h2 {
     gap: 20px;
 }
 
+@media (max-width: 768px) {
+    .package-section {
+        padding: 20px;
+        gap: 15px;
+    }
+}
+
 .package-title {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .package-title {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 .packages {
@@ -262,11 +347,24 @@ h2 {
     gap: 10px;
 }
 
+@media (max-width: 768px) {
+    .packages {
+        display: flex;
+        gap: 20px;
+    }
+}
+
 .package-container {
     display: flex;
     justify-content: center;
     width: 90%;
     height: 100%;
+}
+
+@media (max-width: 768px) {
+    .package-container {
+        width: 100%;
+    }
 }
 
 .package-tiles {
@@ -281,12 +379,27 @@ h2 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 768px) {
+    .package-tiles {
+        width: 100%;
+        height: auto;
+    }
+}
+
 .package-header {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     padding: 10px 10px;
+}
+
+@media (max-width: 768px) {
+    .package-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
 }
 
 .package-header h1 {
@@ -297,12 +410,24 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .package-header h1 {
+        font-size: 18px;
+    }
+}
+
 .info {
     font-size: 24px;
     border: none;
     background: none;
     color: #142A74;
     cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .info {
+        font-size: 20px;
+    }
 }
 
 .package-body {
@@ -314,12 +439,25 @@ h2 {
     height: 85%;
 }
 
+@media (max-width: 768px) {
+    .package-body {
+        gap: 15px;
+        height: auto;
+    }
+}
+
 .package-text {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .package-text {
+        gap: 15px;
+    }
 }
 
 .package-text h2 {
@@ -329,6 +467,12 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .package-text h2 {
+        font-size: 14px;
+    }
+}
+
 .package-text span {
     font-family: Poppins;
     font-size: 14px;
@@ -336,11 +480,23 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .package-text span {
+        font-size: 12px;
+    }
+}
+
 .package-text h3 {
     font-family: Poppins;
     font-size: 24px;
     color: #2F2E2E;
     margin: 0;
+}
+
+@media (max-width: 768px) {
+    .package-text h3 {
+        font-size: 20px;
+    }
 }
 
 .package-text h4 {
@@ -351,10 +507,22 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .package-text h4 {
+        font-size: 16px;
+    }
+}
+
 .package-footer {
     display: flex;
     justify-content: center;
     padding: 10px;
+}
+
+@media (max-width: 768px) {
+    .package-footer {
+        padding: 5px;
+    }
 }
 
 .fa-chevron-left, .fa-chevron-right {
@@ -363,6 +531,11 @@ h2 {
     cursor: pointer;
 }
 
+@media (max-width: 768px) {
+    .fa-chevron-left, .fa-chevron-right {
+        font-size: 20px;
+    }
+}
 .enroll-now-button {
     padding: 10px 40px;
     font-family: Poppins;
@@ -373,16 +546,22 @@ h2 {
     border-radius: 30px;
 }
 
+@media (max-width: 768px) {
+    .enroll-now-button {
+        padding: 8px 30px;
+        font-size: 16px;
+    }
+}
+
 .enroll-now-button:hover {
     background-color: #142A74;
     color: #ffffff;
 }
 
-.enroll-now-button:disabled {
-  cursor: not-allowed;
-  color: #ffffff;
-  background-color: #ccc;
-  border-color: #ccc;
+@media (max-width: 768px) {
+    .enroll-now-button:hover {
+        font-size: 16px;
+    }
 }
 
 .disabled-link {
@@ -392,6 +571,20 @@ h2 {
     text-decoration: none;
     cursor: default;
 }
+
+.enroll-now-button:disabled {
+    cursor: not-allowed;
+    color: #ffffff;
+    background-color: #ccc;
+    border-color: #ccc;
+}
+
+@media (max-width: 768px) {
+    .enroll-now-button:disabled {
+        font-size: 16px;
+    }
+}
+
 
 @keyframes popOut {
     0% {
@@ -477,13 +670,6 @@ h2 {
     background-color: #b60505ec;
 }
 
-.disabled-link {
-    pointer-events: none;
-    color: gray;
-    text-decoration: none;
-    cursor: default;
-}
-
 /* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
     width: 12px; /* Width of the scrollbar */
@@ -540,4 +726,68 @@ h2 {
     border-bottom: 1px solid #e9ecef;
     font-size: 16px;
     border-radius: 10px 10px 0 0;
+}
+
+.sidebar-toggle-btn {
+    display: none;
+}
+
+/* Hide sidebar by default on smaller screens */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -300px;
+        top: 0;
+        width: 300px;
+        height: 100vh;
+        transition: left 0.3s ease; /* Sidebar slides in and out */
+        z-index: 1000;
+    }
+
+    /* Main content shifts when sidebar is shown */
+    .main-content {
+        margin-left: 0;
+        transition: margin-left 0.3s ease;
+    }
+
+    /* When the sidebar is active (visible) */
+    .sidebar.active {
+        left: 0; /* Slide in the sidebar */
+    }
+
+    .main-content.active {
+        margin-left: 300px; /* Shift content when sidebar is active */
+    }
+
+    /* Toggle button styles */
+    .sidebar-toggle-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: #142A74;
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 5px;
+        z-index: 1100;
+        cursor: pointer;
+        display: block;
+    }
+
+    /* Sidebar item adjustments */
+    .sidebar-dashboard a, .sidebar-menu a, .profile, .logout {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    /* Video cards responsive layout */
+    .video-card {
+        flex: 0 1 calc(50% - 10px);
+    }
+
+    /* For very small screens */
+    @media (max-width: 576px) {
+        .video-card {
+            flex: 0 1 calc(100% - 10px);
+        }
+    }
 }

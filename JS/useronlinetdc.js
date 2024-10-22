@@ -165,3 +165,12 @@ confirmStartQuizBtn.addEventListener('click', function () {
     // Redirect to the exam page when the confirm button is clicked
     window.location.href = 'userquiz.html';
 });
+// JavaScript for sidebar toggle
+document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+
+    // Toggle the 'active' class to show or hide the sidebar
+    sidebar.classList.toggle('active');
+    mainContent.classList.toggle('active');
+});

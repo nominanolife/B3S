@@ -427,6 +427,15 @@ async function getCertificateData(userId) {
         return { certificateID: 'N/A', totalScore: 0 };  // Return default values in case of error
     }
 }
+// JavaScript for sidebar toggle
+document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+
+    // Toggle the 'active' class to show or hide the sidebar
+    sidebar.classList.toggle('active');
+    mainContent.classList.toggle('active');
+});
 
 async function generateCertificate(fullName, totalScore, certificateID, completionDate) {
     const { jsPDF } = window.jspdf;
@@ -473,6 +482,7 @@ async function generateCertificate(fullName, totalScore, certificateID, completi
     doc.text(`Has successfully passed the theoretical driving course on ${completionDate}`, pageWidth / 2, 130, { align: 'center' });
     doc.text(`with a quiz result of ${totalScore}%, earning Quiz Passing ID ${certificateID}`, pageWidth / 2, 140, { align: 'center' });
 
+    // Add the signature and line for admin signature
     doc.line(195, 172, 239, 172);  // Signature line
     doc.setFont("Helvetica");
     doc.setFontSize(17);

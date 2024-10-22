@@ -3,16 +3,33 @@ body {
     padding: 0;
 }
 
+@media (max-width: 768px) {
+    body {
+        font-size: 14px; 
+    }
+}
+
 .whole-page {
     display: flex;
     flex-direction: row;
 }
 
+@media (max-width: 768px) {
+    .whole-page {
+        flex-direction: column; 
+    }
+}
 .main-content {
     display: flex;
     flex-direction: column;
     width: 100%;
     height: 100vh;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        height: auto; 
+    }
 }
 
 .header {
@@ -26,6 +43,12 @@ body {
     z-index: 1000;
 }
 
+@media (max-width: 768px) {
+    .header {
+        padding: 20px 15px; 
+    }
+}
+
 h3 {
     font-family: Poppins;
     font-size: 22px;
@@ -33,11 +56,22 @@ h3 {
     color: #142A74;
 }
 
+@media (max-width: 768px) {
+    h3 {
+        font-size: 18px; 
+    }
+}
 h2 {
     font-family: Poppins;
     font-size: 24px;
     font-weight: normal;
     color: #2F2E2E;
+}
+
+@media (max-width: 768px) {
+    h2 {
+        font-size: 20px; 
+    }
 }
 
 .page-content {
@@ -51,12 +85,25 @@ h2 {
     gap: 10px;
 }
 
+@media (max-width: 768px) {
+    .page-content {
+        padding: 20px; 
+        gap: 5px; 
+    }
+}
+
 .progress-bar {
     width: 70%;
     height: 20px;
     background-color: #e0e0e0;
     border-radius: 10px;
     overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .progress-bar {
+        width: 90%; 
+    }
 }
 
 .progress-bar-fill {
@@ -67,6 +114,12 @@ h2 {
     transition: width 0.4s ease;
 }
 
+@media (max-width: 768px) {
+    .progress-bar-fill {
+        height: 15px;
+    }
+}
+
 .quiz-category {
     font-family: Poppins;
     font-size: 20px;
@@ -74,6 +127,11 @@ h2 {
     color: #2F2E2E;
 }
 
+@media (max-width: 768px) {
+    .quiz-category {
+        font-size: 16px; 
+    }
+}
 .quiz-container {
     display: flex;
     flex-direction: column;
@@ -81,6 +139,13 @@ h2 {
     border-radius: 10px;
     width: 70%;
     height: 90%;
+}
+
+@media (max-width: 768px) {
+    .quiz-container {
+        width: 90%; 
+        height: auto; 
+    }
 }
 
 .quiz-container-header {
@@ -93,6 +158,12 @@ h2 {
     padding: 10px;
 }
 
+@media (max-width: 768px) {
+    .quiz-container-header {
+        padding: 5px; 
+    }
+}
+
 .quiz-container-header h5 {
     font-family: Poppins;
     font-size: 14px;
@@ -101,12 +172,23 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .quiz-container-header h5 {
+        font-size: 12px; 
+    }
+}
 .quiz-progress {
     font-family: Poppins;
     font-size: 14px;
     font-weight: bold;
     color: #ffffff;
     margin: 0;
+}
+
+@media (max-width: 768px) {
+    .quiz-progress {
+        font-size: 12px; 
+    }
 }
 
 .quiz-question {
@@ -121,11 +203,24 @@ h2 {
     background-color: #ffffff;
 }
 
+@media (max-width: 768px) {
+    .quiz-question {
+        padding: 10px; 
+        gap: 20px; 
+    }
+}
+
 .quiz-image img {
     width: 100%;
     height: 300px;
     object-fit: scale-down;
     margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .quiz-image img {
+        height: 200px; 
+    }
 }
 
 .quiz-question-body {
@@ -134,18 +229,35 @@ h2 {
     gap: 10px;
 }
 
+@media (max-width: 768px) {
+    .quiz-question-body {
+        gap: 5px; 
+    }
+}
+
 .questions-and-answer {
     display: flex;
     flex-direction: column;
     margin-left: 20px;
 }
 
+@media (max-width: 768px) {
+    .questions-and-answer {
+        margin-left: 10px; 
+    }
+}
 .questions-and-answer h4 {
     font-family: Poppins;
     font-size: 16px;
     font-weight: 500;
     color: #2F2E2E;
     margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .questions-and-answer h4 {
+        font-size: 14px; 
+    }
 }
 
 .question-options {
@@ -155,11 +267,25 @@ h2 {
     margin-left: 20px;
 }
 
+@media (max-width: 768px) {
+    .question-options {
+        gap: 10px; 
+        margin-left: 10px;
+    }
+}
+
 .option {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .option {
+        flex-direction: row; 
+        gap: 10px;
+    }
 }
 
 .option span {
@@ -170,11 +296,23 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .option span {
+        font-size: 16px; 
+    }
+}
+
 .option p {
     font-size: 17px;
     font-weight: normal;
     color: #2F2E2E;
     margin: 0;
+}
+
+@media (max-width: 768px) {
+    .option p {
+        font-size: 15px; 
+    }
 }
 
 .option input {
@@ -185,6 +323,13 @@ h2 {
     border-radius: 10px;
     padding: 10px;
     width: 100%;
+}
+
+@media (max-width: 768px) {
+    .option input {
+        font-size: 12px; 
+        padding: 8px; 
+    }
 }
 
 .option input[type="radio"] {
@@ -198,6 +343,13 @@ h2 {
     cursor: pointer;
     outline: none;
     transition: all 0.2s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .option input[type="radio"] {
+        width: 16px; 
+        height: 16px;
+    }
 }
 
 .option input[type="radio"]:checked {
@@ -219,6 +371,13 @@ h2 {
     transition: transform 0.2s ease-in-out;
 }
 
+@media (max-width: 768px) {
+    .option input[type="radio"]::after {
+        width: 10px; 
+        height: 10px;
+    }
+}
+
 .option input[type="radio"]:checked::after {
     transform: translate(-50%, -50%) scale(1);
 }
@@ -230,10 +389,24 @@ h2 {
     width: 100%;
 }
 
+@media (max-width: 768px) {
+    .buttons {
+        flex-direction: column; 
+        align-items: stretch; 
+    }
+}
+
 .right-buttons {
     display: flex;
     gap: 10px;
     margin-left: auto;
+}
+
+@media (max-width: 768px) {
+    .right-buttons {
+        margin-left: 0; 
+        justify-content: center;
+    }
 }
 
 .back-btn {
@@ -247,13 +420,20 @@ h2 {
     cursor: pointer;
     transition: background-color 0.3s;
 }
+@media (max-width: 768px) {
+    .back-btn {
+        font-size: 12px; 
+        padding: 8px 20px; 
+    }
+}
 
 .back-btn:hover {
     background-color: #c9302c;
     color: #ffffff;
 }
 
-.next-btn, .save-btn {
+.next-btn,
+.save-btn {
     font-family: Poppins;
     font-size: 14px;
     color: #ffffff;
@@ -263,6 +443,14 @@ h2 {
     padding: 10px 30px;
     cursor: pointer;
     transition: background-color 0.3s;
+}
+
+@media (max-width: 768px) {
+    .next-btn,
+    .save-btn {
+        font-size: 12px; 
+        padding: 8px 20px; 
+    }
 }
 
 .next-btn:hover, .save-btn:hover {
@@ -295,6 +483,12 @@ h2 {
     cursor: not-allowed;
 }
 
+@media (max-width: 768px) {
+    .back-btn, .next-btn, .save-btn {
+        display: flex; 
+    }
+}
+
 @keyframes popOut {
     0% {
         opacity: 0;
@@ -310,41 +504,82 @@ h2 {
 }
 
 .modal-content {
-    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
-}
-
-.modal-header, .modal-body, .modal-footer {
-    border: none;
-}
-
-.modal-dialog {
-    top: 30%;
-    left: 5%;
-    border-radius: 20px;
-}
-
-.modal-content {
+    animation: popOut 0.4s ease;
     justify-content: space-evenly;
     font-family: Poppins;
     border-radius: 20px;
     padding: 20px;
-}
-
-.modal-title {
+  }
+  
+  @media (max-width: 768px) {
+    .modal-content {
+      padding: 10px;
+    }
+  }
+  
+  .modal-header, .modal-body, .modal-footer {
+    border: none;
+  }
+  
+  @media (max-width: 768px) {
+    .modal-header, .modal-body, .modal-footer {
+      padding: 10px;
+    }
+  }
+  
+  .modal-dialog {
+    top: 30%;
+    left: 5%;
+    border-radius: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .modal-dialog {
+      top: 10%;
+      left: 2%;
+      width: 95%;
+    }
+  }
+  .modal-content {
+    justify-content: space-evenly;
+    font-family: Poppins;
+    border-radius: 20px;
+    padding: 20px;
+  }
+  
+  .modal-title {
     font-weight: bold;
     color: #142A74;
-}
-
-.modal-body {
+  }
+  
+  @media (max-width: 768px) {
+    .modal-title {
+      font-size: 1.2rem;
+    }
+  }
+  
+  .modal-body {
     font-size: 14px;
-}
-
-.close {
+  }
+  
+  @media (max-width: 768px) {
+    .modal-body {
+      font-size: 12px;
+    }
+  }
+  
+  .close {
     font-size: 24px;
     color: #142A74;
-}
-
-.btn-primary {
+  }
+  
+  @media (max-width: 768px) {
+    .close {
+      font-size: 20px;
+    }
+  }
+  
+  .btn-primary {
     font-family: Poppins;
     font-size: 14px;
     color: #ffffff;
@@ -352,21 +587,35 @@ h2 {
     border: none;
     border-radius: 30px;
     padding: 10px 30px;
-}
-
-.btn-primary:hover {
+  }
+  
+  @media (max-width: 768px) {
+    .btn-primary {
+      font-size: 12px;
+      padding: 8px 20px;
+    }
+  }
+  
+  .btn-primary:hover {
     background-color: #142a74ec;
-}
-
-.btn-secondary {
+  }
+  
+  .btn-secondary {
     font-family: Poppins;
     font-size: 14px;
     color: #ffffff;
     background-color: #B60505;
     border-radius: 30px;
     padding: 10px 30px;
-}
-
-.btn-secondary:hover {
+  }
+  
+  @media (max-width: 768px) {
+    .btn-secondary {
+      font-size: 12px;
+      padding: 8px 20px;
+    }
+  }
+  
+  .btn-secondary:hover {
     background-color: #b60505ec;
-}
+  }

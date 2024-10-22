@@ -3,10 +3,24 @@ body {
     padding: 0;
 }
 
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+}
+
+
 .whole-page {
     display: flex;
     flex-direction: row;
 }
+
+@media (max-width: 768px) {
+    .whole-page {
+        flex-direction: column;
+    }
+}
+
 
 .sidebar {
     position: fixed;
@@ -19,47 +33,47 @@ body {
     padding: 30px 30px;
     background-color: #ffffff;
     border-right: 1px solid #D9D9D9;
-}
-
-.sidebar-content {
+  }
+  
+  .sidebar-content {
     align-items: center;
-}
-
-.logo {
+  }
+  
+  .logo {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-}
-
-.b3slogo {
+  }
+  
+  .b3slogo {
     width: 55px;
     height: 55px;
-}
-
-.brand-name {
+  }
+  
+  .brand-name {
     display: flex;
     flex-direction: column;
     align-items: center;
     color: #2F2E2E;
-}
-
-.brand-title {
+  }
+  
+  .brand-title {
     font-family: Poppins; 
     font-size: 20px;
     font-weight: bold;
     margin: 0;
     padding-left: 10px;
-}
-
-.sidebar-dashboard {
+  }
+  
+  .sidebar-dashboard {
     display: flex;
     flex-direction: column;
     margin-top: 20px;
     padding: 20px 0;
-}
-
-.sidebar-dashboard a {
+  }
+  
+  .sidebar-dashboard a {
     font-family: Poppins;
     font-size: 14px;
     font-weight: normal;
@@ -67,27 +81,27 @@ body {
     color: #2F2E2E;
     margin-top: 20px;
     padding: 20px 30px;
-}
-
-.sidebar-dashboard a:hover {
+  }
+  
+  .sidebar-dashboard a:hover {
     background-color: #142A74;
     border-radius: 10px;
     color: #ffffff;
-}
-
-.sidebar-dashboard::after {
+  }
+  
+  .sidebar-dashboard::after {
     content: "";
     display: block;
     margin-top: 20px;
     border-bottom: 1px solid #D9D9D9;
-}
-
-.sidebar-menu {
+  }
+  
+  .sidebar-menu {
     display: flex;
     flex-direction: column;
-}
-
-.sidebar-menu a {
+  }
+  
+  .sidebar-menu a {
     font-family: Poppins;
     font-size: 14px;
     font-weight: normal;
@@ -95,39 +109,35 @@ body {
     color: #2F2E2E;
     margin-top: 20px;
     padding: 20px 30px;
-}
-
-.sidebar-menu a:hover {
+  }
+  
+  .sidebar-menu a:hover {
     background-color: #142A74;
     border-radius: 10px;
     color: #ffffff;
-}
-
-.sidebar-menu::after {
+  }
+  
+  .sidebar-menu::after {
     content: "";
     display: block;
     margin-top: 20px;
     border-bottom: 1px solid #D9D9D9;
-}
-
-.sidebar-dashboard i, .sidebar-menu i, .sidebar-account i {
+  }
+  
+  .sidebar-dashboard i, .sidebar-menu i, .sidebar-account i {
     margin-right: 10px;
-}
-
-.top-info i {
-    margin-left: 10px;
-}
-
-.sidebar-account {
+  }
+  
+  .sidebar-account {
     display: flex;
     flex-direction: column;
-}
-
-.sidebar a.active, .sidebar button.active {
+  }
+  
+  .sidebar a.active, .sidebar button.active {
     background-color: #142A74;
     border-radius: 10px;
     color: #ffffff;
-}
+  }
 
 .profile, .logout {
     border: none;
@@ -139,6 +149,13 @@ body {
     text-align: left;
     margin-top: 20px;
     padding: 20px 30px;
+}
+
+@media (max-width: 768px) {
+    .profile, .logout {
+        padding: 15px 20px;
+        font-size: 12px;
+    }
 }
 
 .profile:hover, .logout:hover {
@@ -156,6 +173,13 @@ body {
     margin-left: 300px;
 }
 
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
 .header {
     position: fixed;
     top: 0;
@@ -168,11 +192,24 @@ body {
     z-index: 1000;
 }
 
+@media (max-width: 768px) {
+    .header {
+        width: 100%;
+        padding: 20px 15px;
+    }
+}
+
 h3 {
     font-family: Poppins;
     font-size: 22px;
     font-weight: bold;
     color: #2F2E2E;
+}
+
+@media (max-width: 768px) {
+    h3 {
+        font-size: 18px;
+    }
 }
 
 h2 {
@@ -182,12 +219,23 @@ h2 {
     color: #2F2E2E;
 }
 
+@media (max-width: 768px) {
+    h2 {
+        font-size: 20px;
+    }
+}
 .page-content {
     display: flex;
     align-items: center;
     padding: 30px 30px;
     background-color: #f5f5f5;
     height: 100%;
+}
+
+@media (max-width: 768px) {
+    .page-content {
+        padding: 20px;
+    }
 }
 
 .profile-container {
@@ -198,6 +246,13 @@ h2 {
     height: 85%;
 }
 
+@media (max-width: 768px) {
+    .profile-container {
+        height: auto;
+        margin-bottom: 20px;
+    }
+}
+
 .container-header {
     display: flex;
     flex-direction: column;
@@ -205,6 +260,12 @@ h2 {
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     height: 180px;
+}
+
+@media (max-width: 768px) {
+    .container-header {
+        height: 150px;
+    }
 }
 
 .profile-pic {
@@ -218,7 +279,23 @@ h2 {
     border-radius: 50%;
     object-fit: cover;
     object-position: center;
-    background-color: #dfe4ea; 
+    background-color: #dfe4ea;
+}
+
+@media (max-width: 768px) {
+    .profile-pic {
+        width: 150px; /* Reduce the size for medium screens */
+        height: 150px;
+        min-width: 200px;
+        min-height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-pic {
+        width: 100px; /* Further reduce for smaller screens */
+        height: 100px;
+    }
 }
 
 .container-body {
@@ -227,11 +304,22 @@ h2 {
     padding: 20px;
 }
 
+@media (max-width: 768px) {
+    .container-body {
+        padding: 10px;
+    }
+}
 .top-info {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 130px;
+}
+
+@media (max-width: 768px) {
+    .top-info {
+        margin-top: 50px;
+    }
 }
 
 .name {
@@ -241,12 +329,24 @@ h2 {
     color: #2F2E2E;
 }
 
+@media (max-width: 768px) {
+    .name {
+        font-size: 24px;
+    }
+}
+
 .email {
     font-family: Poppins;
     font-size: 14px;
     font-weight: normal;
     color: #2f2e2ea2;
     margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .email {
+        font-size: 12px;
+    }
 }
 
 .edit {
@@ -262,6 +362,13 @@ h2 {
     background-color: #142A74;
 }
 
+@media (max-width: 768px) {
+    .edit {
+        font-size: 12px;
+        padding: 8px 20px;
+    }
+}
+
 .edit:hover {
     background-color: #142a74ec;
 }
@@ -272,12 +379,25 @@ h2 {
     margin-top: 20px;
 }
 
-.three-info{
+@media (max-width: 768px) {
+    .bottom-info {
+        margin-top: 10px;
+    }
+}
+
+.three-info {
     display: flex;
     flex-direction: row;
     justify-content: center;
     margin-top: 20px;
     gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .three-info {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
 
 .two-info {
@@ -288,11 +408,24 @@ h2 {
     gap: 20px;
 }
 
+@media (max-width: 768px) {
+    .two-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
 .label {
     font-family: Poppins;
     font-size: 14px;
     font-weight: bold;
     color: #2F2E2E;
+}
+
+@media (max-width: 768px) {
+    .label {
+        font-size: 12px;
+    }
 }
 
 .info-block {
@@ -301,8 +434,13 @@ h2 {
     align-items: left;
 }
 
+@media (max-width: 768px) {
+    .info-block {
+        align-items: center;
+    }
+}
 /* Ensure placeholders have consistent styling */
-.info-block span.input-label1{
+.info-block span.input-label1 {
     display: inline-block;
     min-width: 475px;
     padding: 10px;
@@ -328,6 +466,17 @@ h2 {
     margin-top: 10px;
 }
 
+/* Responsive input-label sizes for smaller screens */
+@media (max-width: 768px) {
+    .info-block span.input-label1 {
+        min-width: 100%;
+    }
+
+    .info-block span.input-label2 {
+        min-width: 100%;
+    }
+}
+
 /* Specific styling for spans with no text to keep the design */
 .info-block span.input-label1:empty::before,
 .info-block span.input-label2:empty::before {
@@ -338,9 +487,15 @@ h2 {
 /* Optional: Adjust margin or alignment to match design */
 .three-info .info-block,
 .two-info .info-block {
-    margin-bottom: 10px; /* Adjust spacing as needed */
+    margin-bottom: 10px;
 }
 
+@media (max-width: 768px) {
+    .three-info, .two-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
 
 .disabled-link {
     pointer-events: none;
@@ -351,16 +506,29 @@ h2 {
 
 #editProfileModal .modal-dialog {
     top: 25%;
-    left: 55%;
+    left: 50%;
     transform: translate(-50%, -20%);
     margin: 0;
     max-width: 70%;
+}
+
+@media (max-width: 768px) {
+    #editProfileModal .modal-dialog {
+        max-width: 90%;
+        padding: 10px;
+    }
 }
 
 #editProfileModal .modal-content {
     border-radius: 20px;
     padding: 20px;
     height: 800px;
+}
+
+@media (max-width: 768px) {
+    #editProfileModal .modal-content {
+        height: auto;
+    }
 }
 
 #editProfileModal .modal-body {
@@ -372,6 +540,12 @@ h2 {
 #editProfileModal .inputs {
     display: flex;
     flex-direction: row;
+}
+
+@media (max-width: 768px) {
+    #editProfileModal .inputs {
+        flex-direction: column;
+    }
 }
 
 #editProfileModal .form-group {
@@ -488,6 +662,13 @@ h2 {
     background-color: #57606f;
 }
 
+@media (max-width: 768px) {
+    #uploadIcon {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
 @keyframes popOut {
     0% {
         opacity: 0;
@@ -570,4 +751,68 @@ h2 {
     color: gray;
     text-decoration: none;
     cursor: default;
+}
+
+.sidebar-toggle-btn {
+    display: none;
+}
+
+/* Hide sidebar by default on smaller screens */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -300px;
+        top: 0;
+        width: 300px;
+        height: 100vh;
+        transition: left 0.3s ease; /* Sidebar slides in and out */
+        z-index: 1000;
+    }
+
+    /* Main content shifts when sidebar is shown */
+    .main-content {
+        margin-left: 0;
+        transition: margin-left 0.3s ease;
+    }
+
+    /* When the sidebar is active (visible) */
+    .sidebar.active {
+        left: 0; /* Slide in the sidebar */
+    }
+
+    .main-content.active {
+        margin-left: 300px; /* Shift content when sidebar is active */
+    }
+
+    /* Toggle button styles */
+    .sidebar-toggle-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: #142A74;
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 5px;
+        z-index: 1100;
+        cursor: pointer;
+        display: block;
+    }
+
+    /* Sidebar item adjustments */
+    .sidebar-dashboard a, .sidebar-menu a, .profile, .logout {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    /* Video cards responsive layout */
+    .video-card {
+        flex: 0 1 calc(50% - 10px);
+    }
+
+    /* For very small screens */
+    @media (max-width: 576px) {
+        .video-card {
+            flex: 0 1 calc(100% - 10px);
+        }
+    }
 }

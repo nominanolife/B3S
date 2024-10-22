@@ -153,6 +153,13 @@ body {
     margin-left: 300px;
 }
 
+@media (max-width: 768px) {
+    .main-content {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
 h3 {
     font-family: Poppins;
     font-size: 22px;
@@ -160,11 +167,23 @@ h3 {
     color: #2F2E2E;
 }
 
+@media (max-width: 768px) {
+    h3 {
+        font-size: 18px;
+    }
+}
+
 h2 {
     font-family: Poppins;
     font-size: 24px;
     font-weight: normal;
     color: #2F2E2E;
+}
+
+@media (max-width: 768px) {
+    h2 {
+        font-size: 20px;
+    }
 }
 
 .page-content {
@@ -176,6 +195,13 @@ h2 {
     gap: 20px;
 }
 
+@media (max-width: 768px) {
+    .page-content {
+        padding: 20px 15px;
+        gap: 10px;
+    }
+}
+
 .notice {
     display: none;
     padding: 20px;
@@ -185,8 +211,20 @@ h2 {
     animation: dropDown 0.5s ease forwards;
 }
 
+@media (max-width: 768px) {
+    .notice {
+        padding: 15px;
+    }
+}
+
 .notice.show {
     display: block;
+}
+
+@media (max-width: 768px) {
+    .notice.show {
+        padding: 15px;
+    }
 }
 
 .notice-content {
@@ -200,11 +238,25 @@ h2 {
     gap: 20px;
 }
 
+@media (max-width: 768px) {
+    .notice-content {
+        padding: 15px;
+        gap: 15px;
+    }
+}
+
 .notice-header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+}
+
+@media (max-width: 768px) {
+    .notice-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 .notice-header h5 {
@@ -215,10 +267,31 @@ h2 {
     margin: 0;
 }
 
+.close {
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .notice-header h5 {
+        font-size: 16px;
+    }
+
+    .notice-header {
+        display: flex;
+        flex-direction: row;
+    }
+}
+
 .notice-text {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .notice-text {
+        gap: 8px;
+    }
 }
 
 .notice-text h1 {
@@ -229,11 +302,23 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .notice-text h1 {
+        font-size: 20px;
+    }
+}
+
 .notice-text p {
     font-family: Poppins;
     font-size: 14px;
     color: #2F2E2E;
     margin: 0;
+}
+
+@media (max-width: 768px) {
+    .notice-text p {
+        font-size: 12px;
+    }
 }
 
 @keyframes dropDown {
@@ -253,10 +338,22 @@ h2 {
     justify-content: flex-end;
 }
 
+@media (max-width: 768px) {
+    .notification-bell-container {
+        justify-content: center;
+    }
+}
+
 #notification-bell {
     font-size: 24px;
     cursor: pointer;
     color: #333;
+}
+
+@media (max-width: 768px) {
+    #notification-bell {
+        font-size: 20px;
+    }
 }
 
 .notification-list {
@@ -275,9 +372,15 @@ h2 {
     font-family: Poppins;
     font-size: 14px;
     max-height: 350px;
-    overflow: auto;
     display: flex;
     flex-direction: column;
+}
+
+@media (max-width: 768px) {
+    .notification-list {
+        width: 100%;
+        right: 0;
+    }
 }
 
 .notification-title h2 {
@@ -289,12 +392,26 @@ h2 {
     padding-left: 10px;
 }
 
+@media (max-width: 768px) {
+    .notification-title h2 {
+        font-size: 16px;
+        padding-left: 5px;
+    }
+}
+
 .notification-item {
     padding: 20px 20px;
     border-bottom: 1px solid #eee;
     font-size: 14px;
     color: #333;
     cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .notification-item {
+        padding: 15px 10px;
+        font-size: 12px;
+    }
 }
 
 .notification-item:hover {
@@ -305,14 +422,28 @@ h2 {
     border-bottom: none;
 }
 
+@media (max-width: 768px) {
+    .notification-item:last-child {
+        padding-bottom: 10px;
+    }
+}
+
 .notification-list.show {
     display: flex;
     flex-direction: column;
 }
 
+@media (max-width: 768px) {
+    .notification-list.show {
+        width: 100%;
+        padding: 5px;
+    }
+}
+
 .notification-list.hidden {
     display: none;
 }
+
 
 .notification-indicator {
     position: absolute;
@@ -325,13 +456,33 @@ h2 {
     display: none;
 }
 
+@media (max-width: 768px) {
+    .notification-indicator {
+        right: 15px;
+    }
+}
+
 .notification-indicator.show {
-    display: inline-block;
+    display: center;
+}
+
+@media (max-width: 768px) {
+    .notification-indicator.show {
+        right: 10px;
+        width: 8px;
+        height: 8px;
+    }
 }
 
 .notification-item.unread {
     font-weight: bold;
     position: relative;
+}
+
+@media (max-width: 768px) {
+    .notification-item.unread {
+        font-size: 12px;
+    }
 }
 
 .notification-item.unread::after {
@@ -346,6 +497,13 @@ h2 {
     transform: translateY(-50%);
 }
 
+@media (max-width: 768px) {
+    .notification-item.unread::after {
+        width: 8px;
+        height: 8px;
+    }
+}
+
 .notification-header {
     display: flex;
     flex-direction: row;
@@ -354,10 +512,22 @@ h2 {
     border-bottom: 1px solid #eee;
 }
 
+@media (max-width: 768px) {
+    .notification-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
 #mark-all-read {
     text-decoration: underline;
 }
 
+@media (max-width: 768px) {
+    #mark-all-read {
+        font-size: 12px;
+    }
+}
 .roadmap-container {
     position: relative;
     display: flex;
@@ -370,6 +540,12 @@ h2 {
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 768px) {
+    .roadmap-container {
+        max-height: 300px;
+    }
+}
+
 .roadmap-container h1 {
     font-family: Poppins;
     font-size: 24px;
@@ -380,12 +556,25 @@ h2 {
     top: 5%;
 }
 
+@media (max-width: 768px) {
+    .roadmap-container h1 {
+        font-size: 18px;
+        top: 10%;
+    }
+}
+
 .roadmap-container img {
     width: 100%;
     height: 100%;
     object-fit: fill;
     position: relative;
     border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+    .roadmap-container img {
+        object-fit: cover;
+    }
 }
 
 .arrow {
@@ -395,10 +584,21 @@ h2 {
     transition: transform 0.3s ease;
 }
 
+@media (max-width: 768px) {
+    .arrow {
+        font-size: 60px;
+    }
+}
+
 .arrow:hover {
     transform: translateY(-30px);
 }
 
+@media (max-width: 768px) {
+    .arrow:hover {
+        transform: translateY(-20px);
+    }
+}
 .arrow1 {
     display: flex;
     flex-direction: column;
@@ -408,6 +608,12 @@ h2 {
     color: #142A74;
 }
 
+@media (max-width: 768px) {
+    .arrow1 {
+        top: 25%;
+        left: 5%;
+    }
+}
 .arrow2 {
     display: flex;
     flex-direction: column;
@@ -415,6 +621,13 @@ h2 {
     top: 50%;
     left: 30%;
     color: #B60505;
+}
+
+@media (max-width: 768px) {
+    .arrow2 {
+        top: 40%;
+        left: 25%;
+    }
 }
 
 .arrow3 {
@@ -426,6 +639,13 @@ h2 {
     color: #142A74;
 }
 
+@media (max-width: 768px) {
+    .arrow3 {
+        top: 35%;
+        left: 45%;
+    }
+}
+
 .arrow4 {
     display: flex;
     flex-direction: column;
@@ -435,6 +655,13 @@ h2 {
     color: #B60505;
 }
 
+@media (max-width: 768px) {
+    .arrow4 {
+        top: 45%;
+        left: 65%;
+    }
+}
+
 .arrow1 p, .arrow2 p, .arrow3 p, .arrow4 p {
     font-family: Poppins;
     font-size: 14px;
@@ -442,11 +669,24 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .arrow1 p, .arrow2 p, .arrow3 p, .arrow4 p {
+        font-size: 12px;
+    }
+}
+
 .information-container {
     display: flex;
     flex-direction: row;
     justify-content: center;
     gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .information-container {
+        flex-direction: column;
+        gap: 15px;
+    }
 }
 
 .appointment-card, .balance-card {
@@ -461,6 +701,13 @@ h2 {
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 768px) {
+    .appointment-card, .balance-card {
+        min-height: 200px;
+        padding: 15px;
+    }
+}
+
 .appointment-card p, .balance-card p {
     font-family: Poppins;
     font-size: 18px;
@@ -468,6 +715,11 @@ h2 {
     color: #2F2E2E;
 }
 
+@media (max-width: 768px) {
+    .appointment-card p, .balance-card p {
+        font-size: 16px;
+    }
+}
 .card-container {
     display: flex;
     flex-direction: column;
@@ -477,10 +729,22 @@ h2 {
     width: 100%;
 }
 
+@media (max-width: 768px) {
+    .card-container {
+        gap: 15px;
+    }
+}
+
 .card-body {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        align-items: flex-start;
+    }
 }
 
 .card-title {
@@ -493,8 +757,20 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .card-title {
+        font-size: 20px;
+    }
+}
+
 .card-title p {
     margin: 0;
+}
+
+@media (max-width: 768px) {
+    .card-title p {
+        font-size: 14px;
+    }
 }
 
 .card-button {
@@ -506,6 +782,14 @@ h2 {
     border-radius: 10px;
     padding: 10px 30px;
     width: 60%;
+}
+
+@media (max-width: 768px) {
+    .card-button {
+        font-size: 12px;
+        padding: 8px 20px;
+        width: 80%;
+    }
 }
 
 .card-button:hover {
@@ -520,12 +804,25 @@ h2 {
     text-align: center;
 }
 
+@media (max-width: 768px) {
+    .center-content {
+        align-items: flex-start;
+        text-align: left;
+    }
+}
+
 #packageModalBody {
     display: flex;
     flex-direction: column;
     justify-content: center;
     text-align: center;
     gap: 10px;
+}
+
+@media (max-width: 768px) {
+    #packageModalBody {
+        gap: 5px;
+    }
 }
 
 #packageName {
@@ -535,6 +832,12 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    #packageName {
+        font-size: 16px;
+    }
+}
+
 #packagePrice {
     font-size: 14px;
     font-weight: bold;
@@ -542,11 +845,23 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    #packagePrice {
+        font-size: 12px;
+    }
+}
+
 #packageDescription {
     font-size: 14px;
     color: #2F2E2E;
     font-weight: 500;
     margin: 0;
+}
+
+@media (max-width: 768px) {
+    #packageDescription {
+        font-size: 12px;
+    }
 }
 
 .disabled-link {
@@ -557,10 +872,23 @@ h2 {
     cursor: default;
 }
 
+@media (max-width: 768px) {
+    .disabled-link {
+        font-size: 12px;
+    }
+}
+
 .evaluation-container {
     display: flex;
     flex-direction: row;
     gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .evaluation-container {
+        flex-direction: column;
+        gap: 15px;
+    }
 }
 
 .wheels-card, .motors-card {
@@ -575,6 +903,13 @@ h2 {
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 768px) {
+    .wheels-card, .motors-card {
+        min-height: 200px;
+        padding: 15px;
+    }
+}
+
 .eval-container {
     display: flex;
     flex-direction: column;
@@ -582,6 +917,12 @@ h2 {
     gap: 40px;
     width: 100%;
     text-align: center;
+}
+
+@media (max-width: 768px) {
+    .eval-container {
+        gap: 20px;
+    }
 }
 
 .eval-container h3 {
@@ -592,6 +933,12 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .eval-container h3 {
+        font-size: 20px;
+    }
+}
+
 .eval-container p {
     font-family: Poppins;
     font-size: 18px;
@@ -600,6 +947,11 @@ h2 {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .eval-container p {
+        font-size: 16px;
+    }
+}
 .eval-container button {
     font-family: Poppins;
     font-size: 14px;
@@ -609,6 +961,14 @@ h2 {
     border-radius: 10px;
     padding: 10px 30px;
     width: 60%;
+}
+
+@media (max-width: 768px) {
+    .eval-container button {
+        font-size: 12px;
+        padding: 8px 20px;
+        width: 80%;
+    }
 }
 
 .eval-container button:hover {
@@ -621,16 +981,33 @@ h2 {
     top: auto;
 }
 
+@media (max-width: 768px) {
+    #WheelsModal .modal-dialog {
+        max-width: 90%;
+    }
+}
+
 #MotorsModal .modal-dialog {
     max-width: 800px;
     width: 100%;
     top: auto;
 }
 
+@media (max-width: 768px) {
+    #MotorsModal .modal-dialog {
+        max-width: 90%;
+    }
+}
 .evaluation-table {
     width: auto;
     border-collapse: collapse;
     margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .evaluation-table {
+        width: 100%;
+    }
 }
 
 .evaluation-table th, .evaluation-table td {
@@ -640,17 +1017,33 @@ h2 {
     color: #2F2E2E;
 }
 
+@media (max-width: 768px) {
+    .evaluation-table th, .evaluation-table td {
+        padding: 6px;
+        font-size: 12px;
+    }
+}
+
 .evaluation-table th {
     background-color: #f2f2f2;
     font-weight: bold;
+    color: #142A74;
+}
+
+@media (max-width: 768px) {
+    .evaluation-table th {
+        font-size: 12px;
+    }
 }
 
 .evaluation-table td:nth-child(1) {
     vertical-align: middle;
 }
 
-.evaluation-table thead th {
-    text-align: center;
+@media (max-width: 768px) {
+    .evaluation-table thead th {
+        font-size: 14px;
+    }
 }
 
 .evaluation-table td input {
@@ -659,6 +1052,12 @@ h2 {
     font-weight: 700;
     font-size: 14px;
 }
+@media (max-width: 768px) {
+    .evaluation-table td input {
+        padding: 3px;
+        font-size: 12px;
+    }
+}
 
 .evaluation-table td textarea {
     padding: 5px;
@@ -666,13 +1065,29 @@ h2 {
     font-weight: 500;
     font-size: 14px;
 }
+@media (max-width: 768px) {
+    .evaluation-table td textarea {
+        padding: 3px;
+        font-size: 12px;
+    }
+}
 
 .main {
     font-weight: 600;
 }
+@media (max-width: 768px) {
+    .main {
+        font-size: 16px;
+    }
+}
 
 tbody tr .main-text {
     padding-left: 50px;
+}
+@media (max-width: 768px) {
+    tbody tr .main-text {
+        padding-left: 20px;
+    }
 }
 
 .static-text-score {
@@ -682,9 +1097,20 @@ tbody tr .main-text {
     color: #142A74;
     border: none;
 }
+@media (max-width: 768px) {
+    .static-text-score {
+        padding: 3px;
+        font-size: 12px;
+    }
+}
 
 .score-input {
     width: 10%;
+}
+@media (max-width: 768px) {
+    .score-input {
+        width: 20%;
+    }
 }
 
 .input-container {
@@ -694,6 +1120,11 @@ tbody tr .main-text {
     justify-content: space-evenly;
     width: 100%;
 }
+@media (max-width: 768px) {
+    .input-container {
+        flex-direction: column;
+    }
+}
 
 .static-text {
     pointer-events: none;
@@ -702,11 +1133,22 @@ tbody tr .main-text {
     width: 100%;
     text-align: center;
 }
+@media (max-width: 768px) {
+    .static-text {
+        padding: 3px;
+        font-size: 12px;
+    }
+}
 
 .checkbox-checklist {
     border: 1px solid #D9D9D9;
     padding: 20px;
     border-radius: 10px;
+}
+@media (max-width: 768px) {
+    .checkbox-checklist {
+        padding: 10px;
+    }
 }
 
 .checkbox-checklist h5 {
@@ -716,6 +1158,12 @@ tbody tr .main-text {
     color: #2F2E2E;
     margin-bottom: 20px;
     text-align: center;
+}
+@media (max-width: 768px) {
+    .checkbox-checklist h5 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
 }
 
 #observationResult, #spaceManagementResult, #speedControlResult, #steeringResult, #communicationResult, #generalResult, #startTheEngine, #variousRoadUsers, #kindofJunctions {
@@ -737,7 +1185,12 @@ tbody tr .main-text {
 }
 
 .modal-content {
-    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
+    animation: popOut 0.4s ease;
+}
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 10px;
+    }
 }
 
 .modal-header, .modal-body, .modal-footer {
@@ -748,6 +1201,13 @@ tbody tr .main-text {
     top: 30%;
     left: 5%;
     border-radius: 20px;
+}
+@media (max-width: 768px) {
+    .modal-dialog {
+        top: 10%;
+        left: 0;
+        width: 90%;
+    }
 }
 
 .modal-content {
@@ -761,9 +1221,19 @@ tbody tr .main-text {
     font-weight: bold;
     color: #142A74;
 }
+@media (max-width: 480px) {
+    .modal-title {
+        font-size: 18px;
+    }
+}
 
 .modal-body {
     font-size: 14px;
+}
+@media (max-width: 480px) {
+    .modal-body {
+        font-size: 12px;
+    }
 }
 
 #roadmapstepsModal .modal-dialog {
@@ -772,9 +1242,20 @@ tbody tr .main-text {
     width: 100%;
     max-width: 1000px;
 }
+@media (max-width: 768px) {
+    #roadmapstepsModal .modal-dialog {
+        left: 2%; 
+        max-width: 90%; 
+    }
+}
 
 #roadmapstepsModal .modal-content {
     padding: 20px;
+}
+@media (max-width: 768px) {
+    #roadmapstepsModal .modal-content {
+        padding: 15px; 
+    }
 }
 
 #roadmapstepsModal .modal-body {
@@ -782,11 +1263,21 @@ tbody tr .main-text {
     flex-direction: column;
     gap: 20px;
 }
+@media (max-width: 768px) {
+    #roadmapstepsModal .modal-body {
+        gap: 15px; 
+    }
+}
 
 .step-container {
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+@media (max-width: 768px) {
+    .step-container {
+        gap: 15px; 
+    }
 }
 
 .step-container ul {
@@ -799,17 +1290,31 @@ tbody tr .main-text {
     color: #333;
     margin: 0;
 }
+@media (max-width: 768px) {
+    #roadmapstepsModal .modal-body h3 {
+        font-size: 14px; 
+    }
+}
 
 #roadmapstepsModal .modal-body p {
     font-size: 14px;
     color: #333;
     margin: 0;
 }
+@media (max-width: 768px) {
+    #roadmapstepsModal .modal-body p {
+        font-size: 12px; 
+    }
+}
 
 .close {
     font-size: 24px;
     color: #142A74;
-    cursor: pointer;
+}
+@media (max-width: 480px) {
+    .close {
+        font-size: 20px;
+    }
 }
 
 .btn-primary {
@@ -820,6 +1325,11 @@ tbody tr .main-text {
     border: none;
     border-radius: 30px;
     padding: 10px 30px;
+}
+@media (max-width: 480px) {
+    .btn-primary {
+        padding: 8px 20px;
+    }
 }
 
 .btn-primary:hover {
@@ -833,6 +1343,11 @@ tbody tr .main-text {
     background-color: #B60505;
     border-radius: 30px;
     padding: 10px 30px;
+}
+@media (max-width: 480px) {
+    .btn-secondary {
+        padding: 8px 20px;
+    }
 }
 
 .btn-secondary:hover {
@@ -857,4 +1372,68 @@ tbody tr .main-text {
 
 ::-webkit-scrollbar-thumb:hover {
     background-color: #0e1d4d; /* Darker color on hover */
+}
+
+.sidebar-toggle-btn {
+    display: none;
+}
+
+/* Hide sidebar by default on smaller screens */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -300px;
+        top: 0;
+        width: 300px;
+        height: 100vh;
+        transition: left 0.3s ease; /* Sidebar slides in and out */
+        z-index: 1000;
+    }
+
+    /* Main content shifts when sidebar is shown */
+    .main-content {
+        margin-left: 0;
+        transition: margin-left 0.3s ease;
+    }
+
+    /* When the sidebar is active (visible) */
+    .sidebar.active {
+        left: 0; /* Slide in the sidebar */
+    }
+
+    .main-content.active {
+        margin-left: 300px; /* Shift content when sidebar is active */
+    }
+
+    /* Toggle button styles */
+    .sidebar-toggle-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: #142A74;
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 5px;
+        z-index: 1100;
+        cursor: pointer;
+        display: block;
+    }
+
+    /* Sidebar item adjustments */
+    .sidebar-dashboard a, .sidebar-menu a, .profile, .logout {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    /* Video cards responsive layout */
+    .video-card {
+        flex: 0 1 calc(50% - 10px);
+    }
+
+    /* For very small screens */
+    @media (max-width: 576px) {
+        .video-card {
+            flex: 0 1 calc(100% - 10px);
+        }
+    }
 }

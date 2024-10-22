@@ -59,3 +59,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch and display modules in real-time when the page loads
     fetchAndDisplayModules();
 });
+// JavaScript for sidebar toggle
+document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+
+    // Toggle the 'active' class to show or hide the sidebar
+    sidebar.classList.toggle('active');
+    mainContent.classList.toggle('active');
+});
