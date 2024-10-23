@@ -344,9 +344,10 @@ function formatCompletionDate(completionDate) {
 document.getElementById('exportListBtn').addEventListener('click', () => {
   // Check if the filtered list (filteredStudentsData) is empty based on the current year
   if (filteredStudentsData.length === 0) {
-    // If there are no students in the filtered list, display a notification or message
-    alert('No students to export for the selected year!'); // Replace this with your custom notification if needed
-    return; // Prevent the export function from proceeding
+    // Display the successModal with the custom message
+    document.getElementById('successModalBody').innerHTML = 'No students to export for the selected year!';
+    $('#successModal').modal('show');  // Show the modal using Bootstrap modal function
+    return;  // Prevent the export function from proceeding
   }
 
   // Proceed with the export function if there are students in the current filter
@@ -371,15 +372,14 @@ function exportListToPDF() {
     "NAME", "EMAIL", "PHONE NUMBER", "ENROLLED PACKAGE", 
     "PACKAGE PRICE","COURSE", "STATUS", "CERTIFICATE CONTROL NUMBER", "APPOINTMENT DATE"
   ];
-
+  
   // Get the data from the studentsData or filteredStudentsData
   const studentsToExport = filteredStudentsData.length > 0 ? filteredStudentsData : studentsData;
-
+  
   // Map student data to an array of rows for the PDF
   const rows = studentsToExport.map(student => {
-    const completedBookings = student.completedBookings || []; // Ensure we loop through completed bookings
-
-    // If there are completed bookings, add a row for each one
+    const completedBookings = student.completedBookings || [];
+  
     if (completedBookings.length > 0) {
       return completedBookings.map(booking => [
         student.name || 'N/A',
@@ -387,93 +387,83 @@ function exportListToPDF() {
         student.phoneNumber || 'N/A',
         student.packageName || 'N/A',
         student.packagePrice ? `₱${student.packagePrice}` : 'N/A',
-        booking.course || 'N/A',  // Add course name here
-        'Completed',  // Status is always 'Completed'
-        student.certificateControlNumber || 'N/A',  // CTC field
-        formatCompletionDate(booking.completionDate) || 'N/A'  // Add formatted appointment date here
+        booking.course || 'N/A',
+        'Completed',
+        student.certificateControlNumber || 'N/A',
+        formatCompletionDate(booking.completionDate) || 'N/A'
       ]);
     } else {
-      // If no completed bookings, still include the student info, but with placeholders for booking info
       return [[
         student.name || 'N/A',
         student.email || 'N/A',
         student.phoneNumber || 'N/A',
         student.packageName || 'N/A',
         student.packagePrice ? `₱${student.packagePrice}` : 'N/A',
-        'N/A',  // No course
-        'N/A',  // No status
+        'N/A',
+        'N/A',
         student.certificateControlNumber || 'N/A',
-        'N/A'  // No completion date
+        'N/A'
       ]];
     }
-  }).flat();  // Flatten the array to handle multiple bookings per student
-
-  // Assuming you have the image in base64 format or a URL
-  const logoUrl = 'Assets/logo.png';  // Change this to your actual logo path or base64 string
-
-  // Assuming you have the new image in base64 format or a URL
-  const newLogoUrl = 'Assets/lto-compressed.png';  // Change this to your actual new logo path or base64 string
-
-  // Add the new logo to the upper right side of the PDF
-  const newLogoWidth = 15;  // Set the desired width of the new logo
-  const newLogoHeight = 15;  // Set the desired height of the new logo
-  const newLogoX = pageWidth - newLogoWidth - 10;  // Adjust position from the right edge
-  const newLogoY =8;  // Keep the same Y position as the first logo
+  }).flat();
+  
+  // Add the logos to the PDF
+  const logoUrl = 'Assets/logo.png';
+  const newLogoUrl = 'Assets/lto-compressed.png';
+  const newLogoWidth = 15;
+  const newLogoHeight = 15;
+  const newLogoX = pageWidth - newLogoWidth - 10;
+  const newLogoY = 8;
   doc.addImage(newLogoUrl, 'PNG', newLogoX, newLogoY, newLogoWidth, newLogoHeight);
-
-  // Add the original logo to the upper left side of the PDF
-  const logoWidth = 20;  // Set the desired width of the logo
-  const logoHeight = 20;  // Set the desired height of the logo
+  const logoWidth = 20;
+  const logoHeight = 20;
   doc.addImage(logoUrl, 'PNG', 10, 5, logoWidth, logoHeight);
-
-  // Add the title to the PDF formatted as in the image, broken into three lines
+  
+  // Add the title and subtitle, using text alignment to center
   const titleLine1 = "LIST OF GRADUATES";
   const titleLine2 = "FROM";
   const titleLine3 = "DRIVEHUB DRIVING SCHOOL";
-
-  // Set the font size and style
+  const subtitle = "from November 2024 to December 2024";
+  
   doc.setFontSize(14);
   doc.setFont('Poppins', 'normal');
-
-  // Measure the width of each line of text in the current font and size
-  const titleWidth1 = doc.getTextWidth(titleLine1);
-  const titleWidth2 = doc.getTextWidth(titleLine2);
-  const titleWidth3 = doc.getTextWidth(titleLine3);
-
-  // Calculate the position for each line to be centered
-  const titleX1 = (pageWidth - titleWidth1) / 2;
-  const titleX2 = (pageWidth - titleWidth2) / 2;
-  const titleX3 = (pageWidth - titleWidth3) / 2;
-
-  // Set text alignment manually by using the calculated X position and Y position
-  doc.text(titleLine1, titleX1, 11);  // First line, slightly above the center
-  doc.text(titleLine2, titleX2, 17);  // Second line
-  doc.text(titleLine3, titleX3, 23);  // Third line, slightly below the center
-
-  // Add the table to the PDF and ensure both header and body text are centered
+  
+  // Use the built-in textAlign property to ensure centering
+  doc.text(titleLine1, pageWidth / 2, 11, { align: 'center' });
+  doc.text(titleLine2, pageWidth / 2, 17, { align: 'center' });
+  doc.text(titleLine3, pageWidth / 2, 23, { align: 'center' });
+  
+  // Set the font size for the subtitle and ensure it is centered as well
+  doc.setFontSize(10);
+  doc.text(subtitle, pageWidth / 2, 28, { align: 'center' });
+  
+  // Add the table to the PDF
   doc.autoTable({
     head: [columns],
     body: rows,
-    startY: 30,
+    startY: 32,
     theme: 'grid',
+    pageBreak: 'auto',
+    rowPageBreak: 'auto',
+    margin: { top: 30 },
     headStyles: { 
-      fillColor: [255, 255, 255], // White header background
-      textColor: '#2F2E2E',       // Black text color
+      fillColor: [255, 255, 255],
+      textColor: '#2F2E2E',
       halign: 'center',
       valign: 'middle',
       lineWidth: 0.2, 
       lineColor: [0, 0, 0],
-      font: 'Poppins',  // Set header font
+      font: 'Poppins',
       fontSize: 10
     },
     bodyStyles: {
-      fillColor: [255, 255, 255], // White body background
-      textColor: '#2F2E2E',       // Black text color
+      fillColor: [255, 255, 255],
+      textColor: '#2F2E2E',
       halign: 'center',
       valign: 'middle',
       lineWidth: 0.2,
       lineColor: [0, 0, 0],
-      font: 'Poppins',  // Set body font
+      font: 'Poppins',
       fontSize: 9
     },
     columnStyles: {
@@ -486,9 +476,34 @@ function exportListToPDF() {
       6: { halign: 'left' },
       7: { halign: 'left' },
       8: { halign: 'left' }
-    }
+    },
+    didDrawPage: function (data) {
+      doc.addImage(newLogoUrl, 'PNG', newLogoX, newLogoY, newLogoWidth, newLogoHeight);
+      doc.addImage(logoUrl, 'PNG', 10, 5, logoWidth, logoHeight);
+    },
+    showHead: 'firstPage',
+    pageBreak: 'auto',
+    bodyLimit: 10,
   });
-
-  // Save the PDF and trigger the download
+  
+  // After generating the table, go to the last page
+  const pageCount = doc.internal.getNumberOfPages();
+  doc.setPage(pageCount);
+  
+  // Set font and size for the "Prepared by" section
+  doc.setFontSize(10);
+  doc.setFont('Poppins', 'normal');
+  
+  const rightX = pageWidth - 70;
+  doc.text("Prepared by:", rightX, doc.internal.pageSize.getHeight() - 40);
+  const adjustedRightX = rightX + 8;
+  doc.text("Aaron Loeb", adjustedRightX, doc.internal.pageSize.getHeight() - 30);
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.3);
+  doc.line(rightX, doc.internal.pageSize.getHeight() - 28, rightX + 35, doc.internal.pageSize.getHeight() - 28);
+  const adjustedTitleX = rightX + 12;
+  doc.text("Admin", adjustedTitleX, doc.internal.pageSize.getHeight() - 25);
+  
+  // Save the PDF
   doc.save('completed-student-list.pdf');
 }

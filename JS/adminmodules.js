@@ -321,4 +321,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial fetch of modules
     fetchAndDisplayModules();
+
+    const moduleList = document.querySelector('.module-list');
+    const gridViewIcon = document.getElementById('gridViewIcon');
+    const listViewIcon = document.getElementById('listViewIcon');
+
+    // Apply saved view preference when page loads
+    applyViewPreference();
+
+    // Event listener for grid view
+    gridViewIcon.addEventListener('click', function () {
+        moduleList.classList.remove('list-view');
+        gridViewIcon.classList.add('active');
+        listViewIcon.classList.remove('active');
+
+        // Save grid view preference in localStorage
+        localStorage.setItem('viewPreference', 'grid');
+    });
+
+    // Event listener for list view
+    listViewIcon.addEventListener('click', function () {
+        moduleList.classList.add('list-view');
+        listViewIcon.classList.add('active');
+        gridViewIcon.classList.remove('active');
+
+        // Save list view preference in localStorage
+        localStorage.setItem('viewPreference', 'list');
+    });
+
+    // Function to apply saved view preference from localStorage
+    function applyViewPreference() {
+        const savedView = localStorage.getItem('viewPreference');
+
+        if (savedView === 'list') {
+            moduleList.classList.add('list-view');
+            listViewIcon.classList.add('active');
+            gridViewIcon.classList.remove('active');
+        } else {
+            moduleList.classList.remove('list-view');
+            gridViewIcon.classList.add('active');
+            listViewIcon.classList.remove('active');
+        }
+    }
 });

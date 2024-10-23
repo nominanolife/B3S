@@ -320,6 +320,7 @@ function showChart(categoryScores) {
 }
 
 // Show performance evaluation with Flask AI insights
+// Show performance evaluation with Flask AI insights
 async function showPerformanceEvaluation(evaluationData) {
     const resultContainer = document.querySelector('.result-container');
     resultContainer.innerHTML = ''; // Clear content
@@ -350,13 +351,13 @@ async function showPerformanceEvaluation(evaluationData) {
 
             if (predictedPerformance === 'Poor') {
                 status = 'Poor';
-                color = 'red';
+                color = '#B60505';
             } else if (predictedPerformance === 'Great') {
                 status = 'Great';
                 color = 'green';
             } else if (predictedPerformance === 'Excellent') {
                 status = 'Excellent';
-                color = 'blue';
+                color = '#142A74';
             }
 
             let additionalResources = insights ? `<p><strong>Insights:</strong> ${insights}</p>` : '';
@@ -370,10 +371,16 @@ async function showPerformanceEvaluation(evaluationData) {
             }
 
             performanceBlock.innerHTML = `
-                <p><strong>${item.category}:</strong> 
-                    <span class="status" style="color:${color};">${status}</span>
-                </p>
-                ${additionalResources}
+                <div style="border: 1px solid ${color}; border-radius: 10px; padding: 15px; margin-bottom: 10px;">
+                    <p style="display: flex; gap: 5px">
+                        <strong>${item.category}:</strong> 
+                        <span class="status" style="color:${color};">${status}</span>
+                        <i class="bi bi-chevron-down toggle-insights" style="cursor: pointer; color: #2F2E2E; margin-left: auto;"></i>
+                    </p>
+                    <div class="insights-content" style="display: none;">
+                        ${additionalResources}
+                    </div>
+                </div>
             `;
 
             performanceWrapper.appendChild(performanceBlock);
@@ -382,6 +389,9 @@ async function showPerformanceEvaluation(evaluationData) {
 
     resultContent.appendChild(performanceWrapper);
     resultContainer.appendChild(resultContent);
+
+    // Reattach the event listener after the performance evaluation is rendered
+    attachToggleListeners();
 
     const categoryScores = calculateCategoryScores();
     const passed = checkIfPassed(categoryScores);
@@ -407,6 +417,27 @@ async function showPerformanceEvaluation(evaluationData) {
             }
         });
     }
+}
+
+// Helper function to reattach event listeners for toggling insights
+function attachToggleListeners() {
+    const toggleElements = document.querySelectorAll('.toggle-insights');
+    toggleElements.forEach(toggle => {
+        toggle.addEventListener('click', function(event) {
+            const performanceBlock = event.target.closest('.performance-evaluation');
+            const insightsContent = performanceBlock.querySelector('.insights-content');
+
+            if (insightsContent.style.display === 'none' || insightsContent.style.display === '') {
+                insightsContent.style.display = 'block'; // Show insights
+                event.target.classList.remove('bi-chevron-down'); // Change the icon
+                event.target.classList.add('bi-chevron-up');
+            } else {
+                insightsContent.style.display = 'none'; // Hide insights
+                event.target.classList.remove('bi-chevron-up');
+                event.target.classList.add('bi-chevron-down');
+            }
+        });
+    });
 }
 
 async function getCertificateData(userId) {
@@ -483,6 +514,9 @@ async function generateCertificate(fullName, totalScore, certificateID, completi
     doc.text(`with a quiz result of ${totalScore}%, earning Quiz Passing ID ${certificateID}`, pageWidth / 2, 140, { align: 'center' });
 
     // Add the signature and line for admin signature
+    doc.setFont("Helvetica");
+    doc.setFontSize(24);
+    doc.text("Aaron Loeb", 195, 170);
     doc.line(195, 172, 239, 172);  // Signature line
     doc.setFont("Helvetica");
     doc.setFontSize(17);

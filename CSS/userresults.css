@@ -345,6 +345,7 @@ h2 {
     font-weight: normal;
     color: #2F2E2E;
 }
+
 @media (max-width: 600px) {
     .performance-evaluation p {
         font-size: 14px;
@@ -599,4 +600,8 @@ h2 {
     color: gray;
     text-decoration: none;
     cursor: default;
+}
+
+.insights-content {
+    display: none;
 }

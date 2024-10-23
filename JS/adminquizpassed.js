@@ -22,86 +22,95 @@ let passedStudentsData = []; // Stores passed students data
 
 // Function to render passed students to the table
 async function renderApplicants() {
-    const passedStudentsTable = document.querySelector('.passed-student-list'); 
+    const passedStudentsTable = document.querySelector('.passed-student-list');
     passedStudentsTable.innerHTML = ''; // Clear the table before rendering
 
-    // Check if there are no passed students
     if (passedStudentsData.length === 0) {
-        // Display the message when there are no students
         const row = document.createElement('tr');
         const noDataCell = document.createElement('td');
-        noDataCell.setAttribute('colspan', '4'); // Span all columns
+        noDataCell.setAttribute('colspan', '4');
         noDataCell.textContent = 'No pass student/s yet';
-        noDataCell.style.textAlign = 'center'; // Center the message
+        noDataCell.style.textAlign = 'center';
         row.appendChild(noDataCell);
         passedStudentsTable.appendChild(row);
-        return; // Exit the function since there's no data to render
+        return;
     }
 
+    // Batch operation to avoid flickering and ensure all data is rendered at once
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const currentItems = passedStudentsData.slice(start, end);
 
-    for (const student of currentItems) {
+    const fragment = document.createDocumentFragment(); // Create a document fragment for batch DOM updates
+
+    // Fetch all applicant data first before rendering
+    const promises = currentItems.map(async (student) => {
         try {
-            // Fetch the applicant's personal information using the same ID from 'applicants' collection
-            const applicantDoc = await getDoc(doc(db, 'applicants', student.id)); // Use the document ID
+            const applicantDoc = await getDoc(doc(db, 'applicants', student.id));
             if (applicantDoc.exists()) {
                 const personalInfo = applicantDoc.data()?.personalInfo || {};
-                const firstName = personalInfo.first || ''; 
-                const middleName = personalInfo.middle ? ` ${personalInfo.middle}` : '';  // Add space before middle name
+                const firstName = personalInfo.first || '';
+                const middleName = personalInfo.middle ? ` ${personalInfo.middle}` : '';
                 const lastName = personalInfo.last || '';
-                const suffix = personalInfo.suffix ? ` ${personalInfo.suffix}` : '';  // Add space before suffix
+                const suffix = personalInfo.suffix ? ` ${personalInfo.suffix}` : '';
                 const fullName = `${firstName}${middleName} ${lastName}${suffix}`.trim();
 
-                // Store fullName in the student object
                 student.fullName = fullName;
 
-                // Create a new row for the table
                 const row = document.createElement('tr');
 
-                // Name cell
                 const nameCell = document.createElement('td');
                 nameCell.textContent = fullName;
 
-                // Date cell (Handling both Firestore Timestamp and ISO string)
                 const dateCell = document.createElement('td');
                 let date;
-                
                 if (student.date && student.date.toDate) {
-                    // If it's a Firestore Timestamp
                     date = student.date.toDate();
                 } else if (student.date && typeof student.date === 'string') {
-                    // If it's a string (e.g., ISO format)
                     date = new Date(student.date);
                 }
-                
                 dateCell.textContent = date ? date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Invalid Date';
 
-                // Percentage cell
                 const percentageCell = document.createElement('td');
                 const percentage = student.percentage || '0.00';
                 percentageCell.textContent = `${percentage}%`;
 
-                // Certificate ID cell
                 const certificateIdCell = document.createElement('td');
-                certificateIdCell.textContent = student.certificateID || '';
 
-                // Append all cells to the row
+                // Create an anchor link for the certificate ID if it exists
+                if (student.certificateID) {
+                    const certificateLink = document.createElement('a');
+                    certificateLink.href = '#';  // Prevent default behavior
+                    certificateLink.textContent = student.certificateID;
+                    certificateLink.addEventListener('click', async (event) => {
+                        event.preventDefault();  // Prevent default link behavior
+                        await generateCertificateForUser(student.id);  // Function to generate the certificate
+                    });
+
+                    certificateIdCell.appendChild(certificateLink);
+                } else {
+                    certificateIdCell.textContent = 'N/A';  // Fallback if no certificate ID exists
+                }
+                row.appendChild(certificateIdCell);
+
                 row.appendChild(nameCell);
                 row.appendChild(dateCell);
                 row.appendChild(percentageCell);
                 row.appendChild(certificateIdCell);
 
-                // Append the row to the table
-                passedStudentsTable.appendChild(row);
+                fragment.appendChild(row); // Append the row to the document fragment
             } else {
                 console.warn(`No applicant found for student ID: ${student.id}`);
             }
         } catch (error) {
             console.error('Error fetching applicant details:', error);
         }
-    }
+    });
+
+    // Wait for all fetch operations to complete before rendering
+    await Promise.all(promises);
+
+    passedStudentsTable.appendChild(fragment); // Append the fragment to the table in one go
 }
 
 // Function to update pagination controls
@@ -252,3 +261,90 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up real-time listener to automatically fetch and display passed students
     setupRealTimeListener();
 });
+
+async function generateCertificateForUser(userId) {
+    try {
+        const userResultDoc = await getDoc(doc(db, 'userResults', userId));
+
+        if (userResultDoc.exists()) {
+            const userResultData = userResultDoc.data();
+            const fullName = userResultData.name || 'N/A';
+            const totalScore = userResultData.percentage || 0;
+            const certificateID = userResultData.certificateID || 'N/A';
+            const completionDate = userResultData.date ? new Date(userResultData.date).toLocaleDateString() : 'N/A';
+
+            // Call the function to generate and download the certificate PDF
+            generateCertificate(fullName, totalScore, certificateID, completionDate);
+        } else {
+            console.error("No certificate data found for user:", userId);
+            alert('No certificate available.');
+        }
+    } catch (error) {
+        console.error("Error fetching certificate data:", error);
+        alert('Error generating certificate. Please try again later.');
+    }
+}
+
+async function generateCertificate(fullName, totalScore, certificateID, completionDate) {
+    const { jsPDF } = window.jspdf;
+
+    // Create a new PDF document
+    const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
+    });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Add background image (you can change the path to your actual image path)
+    const backgroundBase64 = 'Assets/TDC Cert.png'; // Adjust path or use base64 string if available
+    doc.addImage(backgroundBase64, 'PNG', 0, 0, pageWidth, pageHeight);
+
+    // Set the title of the certificate with default fonts
+    doc.setFont("Times");
+    doc.setFontSize(66);
+
+    // Add logo and adjust size
+    const logoBase64 = 'Assets/logo.png';  // Adjust path or use base64 string if available
+    doc.addImage(logoBase64, 'PNG', 130, 13, 30, 30);
+
+    // Center the text manually by calculating the width
+    doc.text("CERTIFICATE", pageWidth / 2, 60, { align: 'center' });
+    doc.setFontSize(26);
+    doc.text("OF COMPLETION", pageWidth / 2, 75, { align: 'center' });
+
+    // Add certificate content text
+    doc.setFontSize(16);
+    doc.text("This is to certify that", pageWidth / 2, 85, { align: 'center' });
+
+    // Add the user's name dynamically
+    doc.setFont("Helvetica");
+    doc.setFontSize(32);
+    doc.text(fullName, pageWidth / 2, 115, { align: 'center' });
+
+    // Add quiz completion details dynamically (total score and certificate ID)
+    doc.setFont("Helvetica");
+    doc.setFontSize(15);
+    doc.text(`Has successfully passed the theoretical driving course on ${completionDate}`, pageWidth / 2, 130, { align: 'center' });
+    doc.text(`with a quiz result of ${totalScore}%, earning Quiz Passing ID ${certificateID}`, pageWidth / 2, 140, { align: 'center' });
+
+    // Add the signature and line for admin signature
+    doc.setFont("Helvetica");
+    doc.setFontSize(24);
+    doc.text("Aaron Loeb", 195, 170);
+    doc.line(195, 172, 239, 172);  // Signature line
+    doc.setFont("Helvetica");
+    doc.setFontSize(17);
+    doc.text("Admin", 208, 180);
+
+    // Convert the PDF to a blob
+    const pdfBlob = doc.output('blob');
+
+    // Create a URL for the blob
+    const blobUrl = URL.createObjectURL(pdfBlob);
+
+    // Open the PDF in a new tab
+    window.open(blobUrl, '_blank');
+}

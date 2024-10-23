@@ -58,7 +58,53 @@ function fetchAndDisplayModules() {
 document.addEventListener('DOMContentLoaded', function() {
     // Fetch and display modules in real-time when the page loads
     fetchAndDisplayModules();
+
+    const gridIcon = document.querySelector('.bi-grid');
+    const listIcon = document.querySelector('.bi-list');
+    const moduleList = document.querySelector('.module-list');
+
+    // Load the saved view format from localStorage (if exists)
+    const savedView = localStorage.getItem('moduleView');
+    if (savedView) {
+        // Apply the saved view
+        if (savedView === 'list-view') {
+            listIcon.classList.add('active');
+            gridIcon.classList.remove('active');
+            moduleList.classList.add('list-view');
+        } else {
+            gridIcon.classList.add('active');
+            listIcon.classList.remove('active');
+            moduleList.classList.add('grid-view');
+        }
+    } else {
+        // Default to grid view if no preference is saved
+        gridIcon.classList.add('active');
+        moduleList.classList.add('grid-view');
+    }
+
+    // Event listener for grid view
+    gridIcon.addEventListener('click', function () {
+        gridIcon.classList.add('active');
+        listIcon.classList.remove('active');
+
+        // Change module-list class to grid view and save preference
+        moduleList.classList.remove('list-view');
+        moduleList.classList.add('grid-view');
+        localStorage.setItem('moduleView', 'grid-view'); // Save grid view
+    });
+
+    // Event listener for list view
+    listIcon.addEventListener('click', function () {
+        listIcon.classList.add('active');
+        gridIcon.classList.remove('active');
+
+        // Change module-list class to list view and save preference
+        moduleList.classList.remove('grid-view');
+        moduleList.classList.add('list-view');
+        localStorage.setItem('moduleView', 'list-view'); // Save list view
+    });
 });
+
 // JavaScript for sidebar toggle
 document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
     const sidebar = document.querySelector('.sidebar');

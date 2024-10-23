@@ -602,11 +602,11 @@ const ctx = document.getElementById('splineChart').getContext('2d');
 const splineChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: [],
+        labels: [], // Add your dynamic labels
         datasets: [{
             label: 'Total Monthly Sales',
-            data: [],
-            fill: false, // This fill property was set to true in the previous example.
+            data: [], // Add your dynamic data
+            fill: false, 
             backgroundColor: '#5a699d',
             borderColor: '#142A74',
             tension: 0.5,
@@ -614,19 +614,20 @@ const splineChart = new Chart(ctx, {
     },
     options: {
         responsive: true,
+        maintainAspectRatio: false, // Allow the chart to resize freely
         scales: {
             x: {
                 title: {
                     display: true,
                     text: 'Month of the Year',
                     font: {
-                        size: 16, // Font size for x-axis title
-                        weight: 'bold' // Font weight for x-axis title
+                        size: 16,
+                        weight: 'bold'
                     }
                 },
                 ticks: {
                     font: {
-                        size: 16 // Adjust the font size of the x-axis labels
+                        size: 16
                     }
                 }
             },
@@ -635,13 +636,13 @@ const splineChart = new Chart(ctx, {
                     display: true,
                     text: 'Total Sales (PHP)',
                     font: {
-                        size: 16, // Font size for y-axis title
-                        weight: 'bold' // Font weight for y-axis title
+                        size: 16,
+                        weight: 'bold'
                     }
                 },
                 ticks: {
                     font: {
-                        size: 14 // Adjust the font size of the y-axis labels
+                        size: 14
                     }
                 }
             }
@@ -652,7 +653,7 @@ const splineChart = new Chart(ctx, {
                     usePointStyle: true,
                     pointStyle: 'rectRounded',
                     font: {
-                        size: 14 // Font size for legend labels
+                        size: 14
                     }
                 }
             }
@@ -791,71 +792,71 @@ function updatePackageData() {
 }
 
 function renderPackageBarChart(packageData) {
-    const labels = packageData.map(item => item.packageName);
-    const data = packageData.map(item => item.count);
+  const labels = packageData.map(item => item.packageName);
+  const data = packageData.map(item => item.count);
 
-    console.log("Labels for Chart:", labels); // Log labels
-    console.log("Data for Chart:", data); // Log data
+  console.log("Labels for Chart:", labels); // Log labels
+  console.log("Data for Chart:", data); // Log data
 
-    const ctx = document.getElementById('packageBarChart').getContext('2d');
-    if(window.packageBarChartInstance) {
-        window.packageBarChartInstance.destroy(); // Destroy previous instance if exists
-    }
-    window.packageBarChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Students per Package',
-                data: data,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1,
-                barThickness: 100, // Customize the thickness of bars
-                borderRadius: 3, // Rounded corners on bars
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Number of Students',
-                        font: {
-                            size: 16, // Font size for y-axis title
-                            weight: 'bold' // Font weight for y-axis title
-                        }
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Package Name',
-                        font: {
-                            size: 16, // Font size for x-axis title
-                            weight: 'bold' // Font weight for x-axis title
-                        }
-                    },
-                    ticks: {
-                        font: {
-                            size: 16 // Adjust the font size of the package names
-                        }
-                    }
-                }
-            },
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    labels: {
-                        usePointStyle: true,
-                        pointStyle: 'rectRounded',
-                        font: {
-                            size: 14 // Font size for legend labels
-                        }
-                    }
-                }
-            }
-        }
-    });     
+  const ctx = document.getElementById('packageBarChart').getContext('2d');
+  if(window.packageBarChartInstance) {
+      window.packageBarChartInstance.destroy(); // Destroy previous instance if exists
+  }
+  window.packageBarChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: labels,
+          datasets: [{
+              label: 'Students per Package',
+              data: data,
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1,
+              barThickness: 50, // Adjust the thickness of bars as needed
+              borderRadius: 3, // Rounded corners on bars
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false, // Allow the chart to resize freely
+          scales: {
+              y: {
+                  title: {
+                      display: true,
+                      text: 'Number of Students',
+                      font: {
+                          size: 16, // Font size for y-axis title
+                          weight: 'bold' // Font weight for y-axis title
+                      }
+                  }
+              },
+              x: {
+                  title: {
+                      display: true,
+                      text: 'Package Name',
+                      font: {
+                          size: 16, // Font size for x-axis title
+                          weight: 'bold' // Font weight for x-axis title
+                      }
+                  },
+                  ticks: {
+                      font: {
+                          size: 16 // Adjust the font size of the package names
+                      }
+                  }
+              }
+          },
+          plugins: {
+              legend: {
+                  labels: {
+                      usePointStyle: true,
+                      pointStyle: 'rectRounded',
+                      font: {
+                          size: 14 // Font size for legend labels
+                      }
+                  }
+              }
+          }
+      }
+  });
 }

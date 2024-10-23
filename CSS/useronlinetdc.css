@@ -231,7 +231,7 @@ h2 {
 
 @media (max-width: 768px) {
     .history {
-        align-self: center;
+        align-self: flex-end;
     }
 }
 

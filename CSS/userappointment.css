@@ -222,8 +222,10 @@ h2 {
 }
 @media (max-width: 768px) {
     .page-content-header {
-        justify-content: center; 
-        padding: 5px;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        padding: 10px;
     }
 }
 

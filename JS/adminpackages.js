@@ -471,6 +471,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
 
             renderPackages(allPackages);
+            applyViewPreference();
         } catch (e) {
             console.error("Error loading packages: ", e);
         }
@@ -525,5 +526,65 @@ document.addEventListener("DOMContentLoaded", async function () {
         } else {
             showNotificationModal("Please fill out all fields.", "error");
         }
+    });
+
+    const gridViewIcon = document.querySelector(".bi-grid");
+    const listViewIcon = document.querySelector(".bi-list");
+
+    // Function to apply the view from localStorage
+    function applyViewPreference() {
+        const savedView = localStorage.getItem("viewPreference");
+        const packageItems = packageList.querySelectorAll(".package-text");
+        
+        // Reset classes first
+        packageList.classList.remove("list-view");
+        packageItems.forEach((item) => {
+            item.classList.remove("list-view-item");
+        });
+        
+        if (savedView === "list") {
+            // Apply list view
+            listViewIcon.classList.add("active");
+            gridViewIcon.classList.remove("active");
+            packageList.classList.add("list-view");
+            packageItems.forEach((item) => {
+                item.classList.add("list-view-item");
+            });
+        } else {
+            // Apply grid view (default)
+            gridViewIcon.classList.add("active");
+            listViewIcon.classList.remove("active");
+            packageList.classList.remove("list-view");
+        }
+    }
+
+    // Apply the saved view preference on page load
+    applyViewPreference();
+
+    // Function to toggle views (this part seems fine)
+    listViewIcon.addEventListener("click", function () {
+        packageList.classList.add("list-view");
+        const packageItems = packageList.querySelectorAll(".package-text");
+        packageItems.forEach((item) => {
+            item.classList.add("list-view-item");
+        });
+        listViewIcon.classList.add("active");
+        gridViewIcon.classList.remove("active");
+
+        // Save view preference in localStorage
+        localStorage.setItem("viewPreference", "list");
+    });
+
+    gridViewIcon.addEventListener("click", function () {
+        packageList.classList.remove("list-view");
+        const packageItems = packageList.querySelectorAll(".package-text");
+        packageItems.forEach((item) => {
+            item.classList.remove("list-view-item");
+        });
+        gridViewIcon.classList.add("active");
+        listViewIcon.classList.remove("active");
+
+        // Save view preference in localStorage
+        localStorage.setItem("viewPreference", "grid");
     });
 });

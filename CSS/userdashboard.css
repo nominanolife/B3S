@@ -340,7 +340,8 @@ h2 {
 
 @media (max-width: 768px) {
     .notification-bell-container {
-        justify-content: center;
+        display: flex;
+        justify-content: flex-end;
     }
 }
 
@@ -806,8 +807,11 @@ h2 {
 
 @media (max-width: 768px) {
     .center-content {
-        align-items: flex-start;
-        text-align: left;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
     }
 }
 
