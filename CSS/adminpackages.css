@@ -231,7 +231,7 @@ h2 {
     width: 200px;
     position: relative;
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 18px;
 }
 
 .selected {
@@ -381,7 +381,7 @@ h2 {
 
 .package-text h1 {
     font-family: Poppins;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: normal;
     color: #1B3286;
     margin-bottom: 20px;
@@ -444,7 +444,7 @@ h2 {
 
 .package-text span {
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 16px;
     color: #B60505;
     margin-bottom: 20px;
 }
@@ -458,7 +458,7 @@ h2 {
 
 .package-text h4 {
     font-family: Poppins;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     color: #252641;
     margin-top: 30px;

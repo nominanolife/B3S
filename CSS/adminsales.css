@@ -324,7 +324,7 @@ h2 {
     width: 50%;
     cursor: pointer;
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 18px;
 }
 
 .selected {
@@ -416,7 +416,7 @@ h2 {
 
 .sales-list {
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 20px;
     text-align: left;
 }
 
