@@ -328,7 +328,7 @@ h2 {
 }
 
 .modal-content {
-    animation: popOut 0.4s ease;
+    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
 }
 @media (max-width: 768px) {
     .modal-content {
@@ -347,9 +347,9 @@ h2 {
 }
 @media (max-width: 768px) {
     .modal-dialog {
-        top: 10%;
+        top: 30%;
         left: 0;
-        width: 90%;
+        border-radius: 20px;
     }
 }
 
@@ -378,6 +378,7 @@ h2 {
         font-size: 12px;
     }
 }
+
 .close {
     font-size: 24px;
     color: #142A74;

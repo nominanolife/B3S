@@ -789,69 +789,56 @@ h2 {
 }
 
 .modal-content {
-    animation: popOut 0.4s ease;
-    justify-content: space-evenly;
-    font-family: Poppins;
-    border-radius: 20px;
-    padding: 20px;
-  }
-  
-  @media (max-width: 768px) {
+    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
+}
+@media (max-width: 768px) {
     .modal-content {
-      padding: 10px;
+        padding: 10px;
     }
-  }
-  
-  .modal-header, .modal-body, .modal-footer {
+}
+
+.modal-header, .modal-body, .modal-footer {
     border: none;
-  }
-  
-  @media (max-width: 768px) {
-    .modal-header, .modal-body, .modal-footer {
-      padding: 10px;
-    }
-  }
-  
-  .modal-dialog {
+}
+
+.modal-dialog {
     top: 30%;
     left: 5%;
     border-radius: 20px;
-  }
-  
-  @media (max-width: 768px) {
+}
+@media (max-width: 768px) {
     .modal-dialog {
-      top: 10%;
-      left: 2%;
-      width: 95%;
+        top: 30%;
+        left: 0;
+        border-radius: 20px;
     }
-  }
-  .modal-content {
+}
+
+.modal-content {
     justify-content: space-evenly;
     font-family: Poppins;
     border-radius: 20px;
     padding: 20px;
-  }
-  
-  .modal-title {
+}
+
+.modal-title {
     font-weight: bold;
     color: #142A74;
-  }
-  
-  @media (max-width: 768px) {
+}
+@media (max-width: 480px) {
     .modal-title {
-      font-size: 1.2rem;
+        font-size: 18px;
     }
-  }
-  
-  .modal-body {
+}
+
+.modal-body {
     font-size: 14px;
-  }
-  
-  @media (max-width: 768px) {
+}
+@media (max-width: 480px) {
     .modal-body {
-      font-size: 12px;
+        font-size: 12px;
     }
-  }
+}
   
   .close {
     font-size: 24px;
