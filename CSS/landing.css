@@ -37,7 +37,7 @@ nav {
 
 .brand-title {
     font-family: Poppins; 
-    font-size: 20px;
+    font-size: 25px;
     font-weight: bold;
     margin: 0;
     padding-left: 10px;
@@ -61,7 +61,7 @@ nav {
     margin: 10px;
     padding: 10px;
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: bold;
     text-decoration: none;
     color: #2F2E2E;
@@ -94,7 +94,7 @@ nav {
     margin: 10px;
     padding: 10px;
     font-family: Poppins;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
     text-decoration: none;
     color: #092A73;
@@ -108,7 +108,7 @@ nav {
     margin: 10px;
     padding: 10px;
     font-family: Poppins;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
     text-decoration: none;
     color: #fff;
