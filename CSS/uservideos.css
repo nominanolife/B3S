@@ -333,6 +333,13 @@ h2 {
     top: 55%;
 }
 
+@media (max-width: 768px) {
+    .chat-content {
+        width: 100%;
+        right: 0;
+    }
+}
+
 .chat-header {
     display: flex;
     flex-direction: row;

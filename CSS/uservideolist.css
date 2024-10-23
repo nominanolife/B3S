@@ -154,6 +154,13 @@ body {
     margin-left: 300px;
 }
 
+@media (max-width: 768px) {
+    .main-content {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
 .header {
     position: fixed;
     top: 0;
@@ -450,7 +457,7 @@ h2 {
         color: #fff;
         padding: 10px 15px;
         border-radius: 5px;
-        z-index: 1100;
+        z-index: 1001;
         cursor: pointer;
         display: block;
     }
@@ -471,5 +478,14 @@ h2 {
         .video-card {
             flex: 0 1 calc(100% - 10px);
         }
+    }
+}
+
+@media (max-width: 768px) {
+    #logoutModal {
+        top: -5%;
+        left: 3%;
+        width: 90%;
+        max-width: 400px;
     }
 }

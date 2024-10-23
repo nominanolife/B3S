@@ -51,6 +51,15 @@ function fetchAndDisplayModules() {
 
             // Append the module element to the container
             moduleContainer.appendChild(moduleElement);
+
+            // Check if list-view is active, then make the module clickable
+            moduleElement.addEventListener('click', function () {
+                const moduleList = document.querySelector('.module-list');
+                if (moduleList.classList.contains('list-view')) {
+                    // If it's in list-view, redirect to the module file
+                    window.open(module.fileUrl, '_blank');
+                }
+            });
         });
     });
 }

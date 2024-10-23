@@ -963,7 +963,7 @@ h2 {
         color: #fff;
         padding: 10px 15px;
         border-radius: 5px;
-        z-index: 1100;
+        z-index: 1001;
         cursor: pointer;
         display: block;
     }
@@ -973,5 +973,13 @@ h2 {
         padding: 10px 15px;
         font-size: 14px;
     }
+}
 
+@media (max-width: 768px) {
+    #logoutModal {
+        top: -4%;
+        left: 3%;
+        width: 90%;
+        max-width: 400px;
+    }
 }

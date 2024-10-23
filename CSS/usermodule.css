@@ -586,7 +586,7 @@ body {
         color: #fff;
         padding: 10px 15px;
         border-radius: 5px;
-        z-index: 1100;
+        z-index: 1001;
         cursor: pointer;
         display: block;
     }
@@ -609,7 +609,12 @@ body {
     flex-direction: row;
     width: 100%;
     margin-bottom: 20px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1)
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.list-view .module-container:hover {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .list-view .module-details {
@@ -628,16 +633,20 @@ body {
     margin: 0;
 }
 
-.list-view .module-details a {
-    margin: 0;
-    border-radius: 10px;
-}
-
-.list-view .description p, .list-view .module-preview {
+.list-view .description p, .list-view .module-preview, .list-view .module-details a {
     display: none;
 }
 
 .list-view .download-btn {
     width: auto;
     max-width: 150px;
+}
+
+@media (max-width: 768px) {
+    #logoutModal {
+        top: 0;
+        left: 5%;
+        width: 90%;
+        max-width: 400px;
+    }
 }

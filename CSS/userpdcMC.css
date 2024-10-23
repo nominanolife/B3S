@@ -966,7 +966,7 @@ background-color: #e74c3c; /* Red color for full */
       color: #fff;
       padding: 10px 15px;
       border-radius: 5px;
-      z-index: 1100;
+      z-index: 1001;
       cursor: pointer;
       display: block;
   }
@@ -987,5 +987,15 @@ background-color: #e74c3c; /* Red color for full */
       .video-card {
           flex: 0 1 calc(100% - 10px);
       }
+  }
+}
+
+@media (max-width: 768px) {
+  #logoutModal {
+      top: 5%;
+      left: 2%;
+      width: 90%;
+      max-width: 400px;
+      max-height: 50%;
   }
 }

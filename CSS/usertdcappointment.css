@@ -971,7 +971,7 @@ body {
         color: #fff;
         padding: 10px 15px;
         border-radius: 5px;
-        z-index: 1100;
+        z-index: 1001;
         cursor: pointer;
         display: block;
     }
@@ -994,3 +994,12 @@ body {
         }
     }
   }
+
+  @media (max-width: 768px) {
+    #logoutModal {
+        top: -10%;
+        left: 2%;
+        width: 90%;
+        max-width: 400px;
+    }
+}
