@@ -1949,6 +1949,11 @@ document.addEventListener('DOMContentLoaded', () => {
 // Function to reset fields in the given modal
 function resetModalFields(modalId) {
   const modal = document.getElementById(modalId);
+  const modalElement = document.getElementById(modalId);
+  if (!modalElement) {
+    console.error('Modal element not found:', modalId);
+    return; // Exit the function early if the modal element is not found
+  }
 
   // Reset all text inputs, number inputs, and text areas to empty
   modal.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
@@ -1981,11 +1986,13 @@ function resetModalFields(modalId) {
   const [firstSection, secondSection] = modal.querySelectorAll('.modal-body');
   const [backBtn, nextBtn, saveBtn] = modal.querySelectorAll('.back-btn, .next-btn, .save-btn');
 
-  firstSection.classList.remove('d-none');
-  secondSection.classList.add('d-none');
-  backBtn.classList.add('d-none');
-  nextBtn.classList.remove('d-none');
-  saveBtn.classList.add('d-none');
+   // Ensure the elements exist before applying classList methods
+   if (firstSection) firstSection.classList.remove('d-none');
+   if (secondSection) secondSection.classList.add('d-none'); // Add check for undefined
+   
+   if (backBtn) backBtn.classList.add('d-none');
+   if (nextBtn) nextBtn.classList.remove('d-none');
+   if (saveBtn) saveBtn.classList.add('d-none');
 }
 
 // Function to check if data exists for the given modal
