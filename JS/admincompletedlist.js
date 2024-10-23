@@ -406,6 +406,23 @@ function exportListToPDF() {
       ]];
     }
   }).flat();
+
+  // Extract the completion dates from the students data
+const completionDates = studentsToExport.flatMap(student => 
+  (student.completedBookings || []).map(booking => booking.completionDate)
+);
+
+// Find the earliest and latest completion dates
+const earliestDate = new Date(Math.min(...completionDates.map(date => new Date(date))));
+const latestDate = new Date(Math.max(...completionDates.map(date => new Date(date))));
+
+// Format the earliest and latest dates into month and year
+const formatMonthYear = date => date.toLocaleString('default', { month: 'long', year: 'numeric' });
+const earliestMonthYear = formatMonthYear(earliestDate);
+const latestMonthYear = formatMonthYear(latestDate);
+
+// Generate the subtitle based on the date range
+const subtitle = `from ${earliestMonthYear} to ${latestMonthYear}`;
   
   // Add the logos to the PDF
   const logoUrl = 'Assets/logo.png';
@@ -423,7 +440,6 @@ function exportListToPDF() {
   const titleLine1 = "LIST OF GRADUATES";
   const titleLine2 = "FROM";
   const titleLine3 = "DRIVEHUB DRIVING SCHOOL";
-  const subtitle = "from November 2024 to December 2024";
   
   doc.setFontSize(14);
   doc.setFont('Poppins', 'normal');
