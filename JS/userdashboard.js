@@ -84,7 +84,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                     // Redirect to the appointment page
                     window.location.href = 'userappointment.html';
                 } catch (error) {
-                    console.error("Error updating notification:", error);
                 }
             });
         });
@@ -126,7 +125,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
 
             } catch (error) {
-                console.error("Error updating document:", error);
             }
         });
     }
@@ -152,9 +150,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
 
         await batch.commit().then(() => {
-            console.log('Deleted outdated notifications');
         }).catch(error => {
-            console.error('Error deleting notifications: ', error);
+
         });
     };
 
@@ -441,7 +438,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                     const userData = docSnap.data();
                     const userRole = userData.role;
     
-                    console.log("User Data:", userData); // Log userData to check if it's retrieved properly
     
                     if (userRole === "applicant") {
                         disableLinks();
@@ -498,7 +494,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     
                                     // Skip this booking if the appointment date is more than 1 day past the current date
                                     if (differenceInDays > 1) {
-                                        console.log(`Appointment on ${appointmentData.date} has passed more than 1 day. Ignoring this booking.`);
                                         return; // Skip this booking
                                     }
     
@@ -567,7 +562,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                             `;
                         }
                     } else {
-                        console.error("Appointment card element not found.");
                     }
     
                     // Display the package price and remaining balance in the balance card
@@ -624,7 +618,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     
                                     $('#packageModal').modal('show');
                                 } else {
-                                    console.log("Package details not found.");
                                 }
                             });
                         } else {
@@ -635,16 +628,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                             `;
                         }
                     } else {
-                        console.error("Balance card element not found.");
                     }
                 } else {
-                    console.error("No such document!");
                 }
             } catch (error) {
-                console.error("Error getting document:", error);
             }
         } else {
-            console.error("No user is currently signed in.");
         }
     });
     
@@ -677,7 +666,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                 $('#WheelsModal').modal('show');
             });
         } else {
-            console.error("Wheels button not found in the DOM.");
         }
     
         if (motorsButton) {
@@ -685,7 +673,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                 $('#MotorsModal').modal('show');
             });
         } else {
-            console.error("Motors button not found in the DOM.");
         }
     }
     
@@ -699,7 +686,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (user) {
             fetchAndDisplayPerformanceSummary(user.uid);
         } else {
-            console.error("User is not logged in.");
         }
     });
 });
@@ -720,7 +706,7 @@ async function fetchAndDisplayPerformance(studentId) {
             populateWheelsModal(WassessmentData, WprocessedData);
         }
     } catch (error) {
-        console.error("Error fetching performance data:", error);
+
     }
 }
 
@@ -812,20 +798,20 @@ async function fetchAndDisplayMotorPerformance(studentId) {
 
             // Check if data is available
             if (Object.keys(MassessmentData).length === 0) {
-                console.error("MassessmentData is empty");
+
             }
 
             if (Object.keys(MprocessedData).length === 0) {
-                console.error("MprocessedData is empty");
+
             }
 
             // Populate the modal with the fetched data
             populateMotorsModal(MassessmentData, MprocessedData);
         } else {
-            console.error("No such document exists for the student.");
+
         }
     } catch (error) {
-        console.error("Error fetching motorcycle performance data:", error);
+
     }
 }
 
@@ -966,10 +952,10 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
                 `;
             }
         } else {
-            console.error("No student document found.");
+
         }
     } catch (error) {
-        console.error("Error fetching performance data:", error);
+
     }
 }
 
@@ -978,7 +964,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         fetchAndDisplayPerformanceSummary(user.uid);
     } else {
-        console.error("User is not logged in.");
+
     }
 });
 
@@ -991,7 +977,7 @@ async function checkForInstructorMatch(userId) {
         const snapshot = await getDocs(q);
         return !snapshot.empty; // Return true if there's at least one match
     } catch (error) {
-        console.error("Error checking instructor match:", error);
+
         return false; // Default to no match in case of an error
     }
 }
@@ -1045,10 +1031,10 @@ onAuthStateChanged(auth, async function (user) {
             });
 
         } catch (error) {
-            console.error("Error fetching appointment data:", error);
+
         }
     } else {
-        console.error("No user is currently signed in.");
+
     }
 });
 // JavaScript for sidebar toggle

@@ -59,7 +59,6 @@ onAuthStateChanged(auth, (user) => {
         studentId = user.uid; // Assign the logged-in user's ID as the studentId
         fetchMatchAndInstructorData(studentId); // Call the function to fetch data
     } else {
-        console.error('No user is logged in.');
         hideLoader(); // Hide loader if no user is logged in
     }
 });
@@ -69,13 +68,13 @@ async function fetchMatchAndInstructorData(studentId) {
         // Show loader before starting the fetch operation
         showLoader();
 
-        console.log("Fetching match for studentId:", studentId);
+
 
         // Fetch the match document from Firestore based on studentId
         const matchDoc = await getDoc(doc(db, 'matches', studentId));
 
         if (!matchDoc.exists()) {
-            console.error(`Match not found for the given student ID: ${studentId}`);
+
             hideLoader(); // Hide loader if match is not found
             return;
         }
@@ -88,7 +87,7 @@ async function fetchMatchAndInstructorData(studentId) {
         const instructorDoc = await getDoc(doc(db, 'instructors', instructorId));
 
         if (!instructorDoc.exists()) {
-            console.error(`Instructor not found for the given instructor ID: ${instructorId}`);
+
             hideLoader(); // Hide loader if instructor is not found
             return;
         }
@@ -204,7 +203,7 @@ async function fetchMatchAndInstructorData(studentId) {
         hideLoader();
 
     } catch (error) {
-        console.error('Error fetching data:', error);
+
         showNotification('An error occurred while fetching data.');
         // Hide the loader in case of an error
         hideLoader();
@@ -220,7 +219,7 @@ function updateStarsUI(averageRating) {
 
     // Check if the starContainer element exists
     if (!starContainer) {
-        console.error("Star container element not found.");
+
         return; // Exit the function if the element is not found
     }
 
@@ -341,7 +340,7 @@ document.querySelector('.feedback-form').addEventListener('submit', async functi
         window.location.href = 'userdashboard.html';
 
     } else {
-        console.error("Instructor not found.");
+
     }
 });
 
@@ -408,10 +407,10 @@ async function storeFeedbackInFirestore(studentId, instructorId, rating, comment
             // Update match status to 'Completed' after feedback submission
             await completeMatch(studentId);  // Call the completeMatch function
         } else {
-            console.error("Instructor not found.");
+
         }
     } catch (error) {
-        console.error('Error submitting feedback:', error);
+
         showNotification('Error submitting feedback. Please try again later.');
     }
 }
@@ -427,9 +426,8 @@ async function completeMatch(studentId) {
             'matchStatus': 'Completed'
         });
 
-        console.log('Match status updated to Completed');
     } catch (error) {
-        console.error('Error updating match status:', error);
+
     }
 }
 
@@ -483,11 +481,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check authentication state and then check appointment progress
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            console.log('User is logged in:', user.uid);
+
             studentId = user.uid;
             checkAppointmentProgress(studentId);
         } else {
-            console.error('No user is logged in.');
+
             hideLoader(); // Ensure the loader is hidden
         }
     });
@@ -511,11 +509,11 @@ async function checkAppointmentProgress(studentId) {
         // Check if bookings is an array and contains valid data
         if (appointmentData.bookings && Array.isArray(appointmentData.bookings)) {
             for (const booking of appointmentData.bookings) {
-                console.log('Checking booking:', booking);
+
 
                 // Check if the booking matches the student ID and is completed
                 if (booking.userId === studentId && booking.progress === "Completed") {
-                    console.log('Appointment Date:', appointmentDate);
+
 
                     // Calculate the difference in time between current date and appointment date
                     const timeDifference = currentDate.getTime() - appointmentDate.getTime();
@@ -524,7 +522,7 @@ async function checkAppointmentProgress(studentId) {
                     // Enable feedback if appointment was within the last 24 hours
                     if (daysDifference <= 1) {
                         feedbackButtonEnabled = true;
-                        console.log('Feedback button should be enabled');
+
                         break; // Stop further iteration once the condition is met
                     }
                 }
@@ -539,9 +537,9 @@ async function checkAppointmentProgress(studentId) {
     feedbackButton.disabled = !feedbackButtonEnabled;
 
     if (!feedbackButtonEnabled) {
-        console.log('Feedback button remains disabled');
+
     } else {
-        console.log('Feedback button is enabled');
+
     }
 }
 
@@ -586,7 +584,7 @@ async function updateRatingUI(instructorId) {
         // Update stars UI
         updateStarsUI(newAverageRating);
     } else {
-        console.error('Instructor data not found');
+
     }
 }
 

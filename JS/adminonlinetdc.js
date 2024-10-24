@@ -130,7 +130,6 @@ async function fetchSavedVideosAndQuizzes() {
 
         courseContent.insertBefore(uploadContainer, courseContent.firstChild);
     } catch (error) {
-        console.error("Error fetching videos and quizzes:", error);
         displayNotification('error', 'Failed to fetch videos and quizzes.');
     }
 }
@@ -154,10 +153,6 @@ async function editLesson(videoId) {
                 quizData = quizDoc.data();
             });
         }
-
-        // Log the data to check if it's correctly fetched
-        console.log('Video Data:', videoData);
-        console.log('Quiz Data:', quizData);
 
         // Populate Video Fields
         document.getElementById('editVideoTitleInput').value = videoData.title;
@@ -189,7 +184,6 @@ async function editLesson(videoId) {
         });// Ensure the modal is shown after fetching and populating data
 
     } catch (error) {
-        console.error('Error fetching video/quiz data for editing:', error);
     }
 }
 
@@ -252,7 +246,6 @@ async function deleteLesson(videoId) {
         // Optionally, refresh the page or fetch the latest lessons after deletion
         fetchSavedVideosAndQuizzes();
     } catch (error) {
-        console.error("Error deleting lesson:", error);
         showNotification("Failed to delete the lesson. Please try again.");
     }
 }
@@ -282,7 +275,6 @@ function populateQuizFields(questions) {
 
     questions.forEach((question, index) => {
         if (!question || !question.options || question.options.length === 0) {
-            console.error(`Question or options missing for question index: ${index}`);
             return; // Skip this question if it's invalid
         }
 
@@ -383,15 +375,12 @@ function populateQuizFields(questions) {
                 const imageRef = ref(storage, question.imageURL); // Get a reference to the image in Firebase Storage
                 try {
                     await deleteObject(imageRef); // Delete the image from Firebase Storage
-                    console.log(`Image deleted from Firebase Storage: ${question.imageURL}`);
                 } catch (error) {
-                    console.error("Error deleting image from Firebase Storage:", error);
                 }
             }
 
             // Optionally, remove the image URL from session storage or quizQuestions array
             quizQuestions[index].imageURL = null; // Update the quizQuestions array to reflect the deleted image
-            console.log(`Image deleted for question ${questionCount}`);
         });
 
         // Handle delete question
@@ -405,13 +394,9 @@ function populateQuizFields(questions) {
                 try {
                     const quizDocRef = doc(db, 'quizzes', question.id); // Assuming each question has an ID
                     await deleteDoc(quizDocRef); // Delete the question document from Firestore
-                    console.log(`Question deleted from Firestore: ${question.id}`);
                 } catch (error) {
-                    console.error("Error deleting question from Firestore:", error);
                 }
             }
-
-            console.log(`Question deleted for index ${index}`);
             updateQuestionNumbers(); // Re-number remaining questions
         });
     });
@@ -428,7 +413,6 @@ function updateQuestionNumbers() {
 }
 
 function updateEditPreview() {
-    console.log("Updating preview based on form data");
 
     const videoTitleContainer = document.getElementById('editVideoTitlePreviewContainer');
     const videoTitle = document.getElementById('editVideoTitleInput').value.trim();
@@ -561,7 +545,7 @@ function updateEditPreview() {
 
                     quizPreviewContainer.appendChild(quizPreviewItem);
                 } else {
-                    console.error("Question or valid options missing for question index:", index);
+                
                 }
             });
         } else {
@@ -600,15 +584,15 @@ const videoTitleInputField = document.getElementById('videoTitleInput');
 // Function to handle file uploads when files are selected
 async function handleFileUpload(file, folder, docId, fileType) {
     if (!file) {
-        console.log(`No ${fileType} file selected.`);
+      
         return '';
     }
 
     const fileRef = ref(storage, `${folder}/${docId}_${fileType}.${file.type.split('/')[1]}`);
-    console.log(`Uploading ${fileType}...`);
+   
     await uploadBytes(fileRef, file);
     const fileURL = await getDownloadURL(fileRef);
-    console.log(`${fileType} uploaded successfully:`, fileURL);
+   
     return fileURL;
 }
 
@@ -645,7 +629,7 @@ function saveFormDataToSession() {
     draftData.quizQuestions = quizQuestions;
 
     sessionStorage.setItem('draftData', JSON.stringify(draftData));
-    console.log("Session storage updated with form data:", sessionStorage.getItem('draftData'));
+    
 }
 
 // Attach event listeners to input fields to save form data on changes
@@ -697,10 +681,10 @@ document.querySelectorAll('.quiz-container').forEach((container, index) => {
                 if (quizDraftImageURL) {
                     sessionStorage.setItem(`quizDraftImageURL_${index}`, quizDraftImageURL);  // Save the image URL to sessionStorage
                 } else {
-                    console.log(`Image upload failed for draft question ${index + 1}`);
+                   
                 }
             } else {
-                console.log('Document ID is not available for uploading quiz image.');
+               
             }
         }
     });
@@ -719,7 +703,7 @@ async function createDraftAndSetDocumentId() {
         createdAt: new Date()
     });
     documentId = draftDocRef.id; // Set the global documentId for this draft
-    console.log('New draft document created with ID:', documentId);
+
 
     // Update draft count after creating a new draft
     await updateDraftCount();
@@ -781,7 +765,7 @@ async function saveDraftFromSession() {
         // Clear session storage after saving
         clearSessionStorage();
     } catch (error) {
-        console.error('Error saving draft:', error);
+        
         toggleLoader(false);
         showNotification('An error occurred while saving the draft. Please try again.');
     }
@@ -1285,12 +1269,12 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                         draftData.quizQuestions[questionCount - 1].imageFile = quizImageURL;
                         sessionStorage.setItem('draftData', JSON.stringify(draftData));
 
-                        console.log('Updated draftData with new image URL:', draftData);
+                       
                     } else {
-                        console.log(`Image upload failed for question ${questionCount}`);
+                       
                     }
                 } else {
-                    console.log('Document ID is not available for uploading quiz image.');
+                   
                 }
             }
         });
@@ -1315,7 +1299,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                 sessionStorage.setItem('draftData', JSON.stringify(draftData));
             }
 
-            console.log(`Image deleted for question ${questionCount}`);
+           
         });
     
         // Add delete question functionality
@@ -1689,7 +1673,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
             fetchSavedVideosAndQuizzes();
     
         } catch (error) {
-            console.error('Error saving video and quiz:', error);
+           
             toggleLoader(false);
             showNotification('An error occurred while saving the video and quiz. Please try again.');
         }
@@ -1715,7 +1699,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         toggleLoader(true);
     
         try {
-            console.log("Starting the Firebase edit process...");
+            
             
             // Collect data from the preview (already validated)
             const videoUrlFromPreview = document.querySelector('#editVideoPreviewContainer video source')?.src;
@@ -1759,7 +1743,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                 thumbnailURL: thumbnailUrl
             };
     
-            console.log("Video Data to be saved: ", updatedVideoData);
+            
     
             // Update video data using the existing videoId (editingVideoId)
             if (editingVideoId) {
@@ -1774,7 +1758,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                 questions: quizQuestions
             };
     
-            console.log("Quiz Data to be saved: ", updatedQuizData);
+           
     
             // Check if a quiz with the same videoId exists
             const quizQuery = query(collection(db, 'quizzes'), where('videoId', '==', editingVideoId));
@@ -1796,7 +1780,6 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
             fetchSavedVideosAndQuizzes();
     
         } catch (error) {
-            console.error('Error saving video and quiz:', error);
             toggleLoader(false);
             showNotification('An error occurred while saving the video and quiz. Please try again.');
         }
@@ -1949,7 +1932,7 @@ async function updateDraftCount() {
         const draftsLink = document.getElementById('draftsLink');
         draftsLink.textContent = `Drafts (${draftCount})`;
     } catch (error) {
-        console.error("Error fetching drafts count:", error);
+       
     }
 }
 

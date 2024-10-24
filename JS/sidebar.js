@@ -35,7 +35,6 @@ onAuthStateChanged(auth, (user) => {
             }
         });
     } else {
-        console.error('No user is logged in.');
         // Optionally redirect to a login page or show an error message
         window.location.href = 'login.html'; // Redirect to login if no user is logged in
     }
@@ -60,24 +59,16 @@ async function checkMatch(studentId) {
             const matchStatus = matchData.matchStatus;  // Get the match status
 
             if (matchStatus === "In Progress") {
-                // If match is in progress, redirect to the matched instructor page
-                console.log("Match is in progress. Redirecting to matched instructor page...");
+
                 window.location.href = 'userinstructormatch.html';
             } else if (matchStatus === "Completed") {
-                // If match is completed, redirect to the reminder page
-                console.log("Match is completed. Redirecting to reminder page...");
                 window.location.href = 'userinstructorreminder.html';
             } else {
-                // Handle unexpected status cases
-                console.error("Unknown match status:", matchStatus);
             }
         } else {
-            // If no match document exists, redirect to the first page
-            console.log('No match document found, redirecting to the first page...');
             window.location.href = 'userinstructorreminder.html'; // Adjust URL accordingly
         }
     } catch (error) {
-        console.error('Error checking match status:', error);
     } finally {
         // Reset the flag after processing
         redirectionInProgress = false;

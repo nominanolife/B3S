@@ -357,7 +357,6 @@ async function proceedWithBooking(selectedSlot, appointment) {
     showNotification('Booking successful!');
 
   } catch (error) {
-    console.error("Error updating booking:", error);
     showNotification('Failed to book appointment. Please try again later.');
   }
 }

@@ -27,7 +27,6 @@ onAuthStateChanged(auth, (user) => {
             fetchUserAttempts(user.uid);  // Fetch the user's attempts after the name is fetched
         });
     } else {
-        console.log("No user is logged in");
         window.location.href = '/login.html';
     }
 });
@@ -42,10 +41,10 @@ async function fetchApplicantName(uid) {
             const applicantData = applicantDoc.data();
             applicantName = `${applicantData.personalInfo.first} ${applicantData.personalInfo.last}`;
         } else {
-            console.log("No applicant data found.");
+
         }
     } catch (error) {
-        console.error("Error fetching applicant name:", error);
+
     }
 }
 
@@ -64,11 +63,11 @@ async function fetchUserAttempts(uid) {
                 populateTable([]); // Pass an empty array if no attempts
             }
         } else {
-            console.log("No attempt data found.");
+
             populateTable([]); // No attempts found, pass an empty array
         }
     } catch (error) {
-        console.error("Error fetching user attempts:", error);
+
         populateTable([]); // Handle error by showing "No history yet"
     }
 }

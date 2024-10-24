@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 renderPackages(filteredPackages);
             }
         } catch (e) {
-            console.error("Error reloading packages: ", e);
+      
         }
     });
 
@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 packageElementToDelete = null;
                 cancelDeleteMode();
             } catch (error) {
-                console.error("Error deleting package: ", error);
+          
                 showNotificationModal("Failed to delete package. Please try again.", "error");
             }
         }
@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
             showNotificationModal("Package deleted successfully!", "success");
         } catch (e) {
-            console.error("Error deleting document: ", e);
+ 
             showNotificationModal("Failed to delete package. Please try again.", "error");
         }
     }
@@ -260,7 +260,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             addPackageToDOM(docRef.id, packageName, packagePrice, packageDescription, packageType);
             showNotificationModal("Package Added Successfully!", "success");
         } catch (e) {
-            console.error("Error adding document: ", e);
+    
             showNotificationModal("Failed to add package. Please try again.", "error");
         }
     }
@@ -323,10 +323,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             await batch.commit();
-            console.log(`Updated ${updatedCount} applicants.`);
+       
             showNotificationModal("Package updated successfully!", "success");
         } catch (e) {
-            console.error("Error updating document: ", e);
+          
             showNotificationModal("Failed to update package. Please try again.", "error");
         }
     }
@@ -364,10 +364,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 updateDoc(packageRef, { type: packageTypes })
                     .then(() => {
-                        console.log("Package types updated successfully.");
+                       
                     })
                     .catch((error) => {
-                        console.error("Error updating package types: ", error);
+                       
                     });
             }
         });
@@ -454,7 +454,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 packageDescriptionElement.textContent = packageDescription;
             }
         } else {
-            console.error(`Package element with ID ${id} not found.`);
+          
         }
     }
 
@@ -473,7 +473,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             renderPackages(allPackages);
             applyViewPreference();
         } catch (e) {
-            console.error("Error loading packages: ", e);
+        
         }
     }
 

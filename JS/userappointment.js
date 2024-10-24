@@ -47,7 +47,6 @@ function updatePDCState(enabled) {
   
   if (enabled) {
     pdcElement.removeClass('disabled-link');
-    console.log("PDC Enabled");
     localStorage.setItem('pdcState', 'enabled');
 
     // Remove the popover and event handlers
@@ -55,7 +54,6 @@ function updatePDCState(enabled) {
     pdcElement.off('mouseenter mouseleave click');
   } else {
     pdcElement.addClass('disabled-link');
-    console.log("PDC Disabled");
     localStorage.setItem('pdcState', 'disabled');
 
     // Initialize popover
@@ -97,11 +95,9 @@ async function fetchUserData(userId) {
       userCache = userDocSnap.data(); // Cache the user data
       return userCache;
     } else {
-      console.log("No user document found.");
       return null;
     }
   } catch (error) {
-    console.error("Error fetching user data:", error);
     return null;
   }
 }
@@ -112,7 +108,6 @@ function updateTDCState(enabled) {
   
   if (enabled) {
     tdcElement.removeClass('disabled-link');
-    console.log("TDC Enabled");
     localStorage.setItem('tdcState', 'enabled');
 
     // Remove the popover and event handlers
@@ -120,7 +115,6 @@ function updateTDCState(enabled) {
     tdcElement.off('mouseenter mouseleave click');
   } else {
     tdcElement.addClass('disabled-link');
-    console.log("TDC Disabled");
     localStorage.setItem('tdcState', 'disabled');
 
     // Initialize popover
@@ -236,7 +230,6 @@ async function monitorActiveBookings(userId) {
     });
 
     if (tdcCompleted) {
-      console.log("TDC is completed in active bookings!");
       updateTDCState(true); // Enable TDC if completed
       updatePDCState(true); // Simultaneously check PDC as TDC is a prerequisite
     } else {
@@ -252,7 +245,6 @@ onAuthStateChanged(auth, (user) => {
     determinePDCAndTDCStatus(userId); // Check user's enrolled package and completed bookings for both PDC and TDC
     monitorActiveBookings(userId); // Monitor TDC progress in real-time
   } else {
-    console.log("No user is signed in.");
     updatePDCState(false); // Ensure PDC is disabled if no user is signed in
     updateTDCState(false); // Ensure TDC is disabled if no user is signed in
   }

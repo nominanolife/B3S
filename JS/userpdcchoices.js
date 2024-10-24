@@ -28,15 +28,13 @@ async function fetchApplicantData(applicantId) {
         if (docSnap.exists()) {
             const data = docSnap.data();
             const packageType = data.packageType; // Fetch the packageType string or array
-            console.log("Package Type from Firestore:", packageType);
 
             // Enable the appropriate cards based on the packageType
             enableCard(packageType);
         } else {
-            console.log("No such document!");
         }
     } catch (error) {
-        console.error("Error fetching document:", error);
+
     }
 }
 
@@ -107,7 +105,6 @@ onAuthStateChanged(auth, (user) => {
         const applicantId = user.uid; // Use the logged-in user's unique ID (uid)
         fetchApplicantData(applicantId); // Fetch applicant data using the user's ID
     } else {
-        console.log("No user is logged in");
     }
 });
 // JavaScript for sidebar toggle

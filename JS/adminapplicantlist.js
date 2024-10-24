@@ -244,7 +244,6 @@ function setupRealTimeListener() {
         renderApplicants();
         updatePaginationControls();
     }, (error) => {
-        console.error("Error with real-time listener: ", error);
     });
 }
 

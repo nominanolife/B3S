@@ -100,10 +100,10 @@ async function renderApplicants() {
 
                 fragment.appendChild(row); // Append the row to the document fragment
             } else {
-                console.warn(`No applicant found for student ID: ${student.id}`);
+
             }
         } catch (error) {
-            console.error('Error fetching applicant details:', error);
+
         }
     });
 
@@ -276,11 +276,11 @@ async function generateCertificateForUser(userId) {
             // Call the function to generate and download the certificate PDF
             generateCertificate(fullName, totalScore, certificateID, completionDate);
         } else {
-            console.error("No certificate data found for user:", userId);
+      
             alert('No certificate available.');
         }
     } catch (error) {
-        console.error("Error fetching certificate data:", error);
+    
         alert('Error generating certificate. Please try again later.');
     }
 }

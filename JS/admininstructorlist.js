@@ -51,7 +51,6 @@ async function fetchInstructors() {
     renderInstructors(); // Render the first page
     updatePaginationControls(); // Update pagination controls
   } catch (error) {
-    console.error("Error fetching instructors:", error);
   } finally {
     loader.style.display = 'none'; // Hide loader after fetching instructors
   }
@@ -209,7 +208,6 @@ function handleFeedbacks() {
                   modalBody.innerHTML = '<p class="text-center">Instructor data not found</p>';
               }
           } catch (error) {
-              console.error("Error fetching feedbacks:", error);
               modalBody.innerHTML = '<p class="text-center">An error occurred while loading feedbacks</p>';
           }
       });
@@ -227,9 +225,7 @@ function handleSliderSwitch() {
         await updateDoc(doc(db, 'instructors', instructorId), {
           active: isChecked
         });
-        console.log(`Instructor ${instructorId} is now ${isChecked ? 'active' : 'inactive'}`);
       } catch (error) {
-        console.error('Error updating instructor status:', error);
       }
     });
   });
@@ -289,7 +285,6 @@ async function uploadImage(file, instructorId) {
     const downloadURL = await getDownloadURL(snapshot.ref); // Get the file's URL
     return downloadURL; // Return the image URL
   } catch (error) {
-    console.error('Error uploading image:', error);
     return null;
   }
 }
@@ -456,7 +451,6 @@ async function saveInstructor(event) {
     fetchInstructors();
     resetForm();
   } catch (error) {
-    console.error('Error saving instructor:', error);
     showNotification('An error occurred while saving the instructor. Please try again.');
   }
 }
@@ -654,7 +648,6 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', async func
       instructorIdToDelete = null; // Reset the variable
       showNotification('Instructor deleted successfully.'); // Show success notification after delete
     } catch (error) {
-      console.error('Error deleting instructor:', error);
       showNotification('An error occurred while deleting the instructor. Please try again.');
     }
   }

@@ -105,7 +105,6 @@ document.addEventListener("DOMContentLoaded", async function() {
                 document.getElementById("btn-add").style.display = "block";
                 document.getElementById("btn-update").style.display = "none";
             } catch (e) {
-                console.error("Error Updating Appointment: ", e);
             }
         } else {
             // Add a new document
@@ -129,7 +128,6 @@ document.addEventListener("DOMContentLoaded", async function() {
     
                 showSuccessModal("Appointment Added Successfully!");
             } catch (e) {
-                console.error("Error Adding Appointment: ", e);
             }
         }
         
@@ -220,7 +218,6 @@ async function populateFormForEdit(id) {
         document.getElementById("btn-update").style.display = "block";
         selectedAppointmentId = id;
     } else {
-        console.error("No such document!");
     }
 }
 
@@ -246,13 +243,11 @@ async function populateFormForEdit(id) {
     });
     function formatTimeToAMPM(time) {
         if (typeof time !== 'string') {
-            console.error('Invalid time format:', time);
             return 'Invalid time';
         }
     
         let [hour, minute] = time.split(":");
         if (!hour || !minute) {
-            console.error('Invalid time format:', time);
             return 'Invalid time';
         }
     

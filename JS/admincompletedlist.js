@@ -180,7 +180,6 @@ async function renderStudents() {
           certificateControlNumber = applicantDoc.data().certificateControlNumber || 'N/A';
         }
       } catch (error) {
-        console.error(`Error fetching certificate number for student ${student.name}:`, error);
       }
     }
 
@@ -269,7 +268,6 @@ document.getElementById('saveChangesBtn').addEventListener('click', async () => 
   const newCertNumber = document.getElementById('certificateControlNumberInput').value;
   const studentId = document.getElementById('saveChangesBtn').getAttribute('data-student-id');
 
-  console.log('Updating applicant:', studentId, 'with new certificate number:', newCertNumber);
 
   // Update the Firestore document in the `applicants` collection with the new certificate control number
   try {
@@ -288,7 +286,6 @@ document.getElementById('saveChangesBtn').addEventListener('click', async () => 
       // Optionally, re-fetch or update the list to reflect the change
       fetchCompletedStudents(); // You can also adjust this function if needed to refresh the display
   } catch (error) {
-      console.error('Error updating certificate control number in applicants table:', error);
       // Show error modal or notification
       document.getElementById('successModalBody').innerHTML = 'Failed to update the Certificate Control Number.';
       $('#successModal').modal('show');

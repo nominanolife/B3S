@@ -89,7 +89,7 @@ async function renderVideoCards(userProgress) {
         });
 
     } catch (error) {
-        console.error('Error fetching video data:', error);
+       
     }
 }
 
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             listenToUserProgress();
         } else {
-            console.log('User is not logged in');
+           
             // Optionally redirect to login page
         }
     });

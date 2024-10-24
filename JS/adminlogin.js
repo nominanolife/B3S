@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     showModal("No such document!");
                 }
             }).catch((error) => {
-                console.error("Error getting document: ", error);
                 hideLoader();  // Hide the loader
                 showModal("Error logging in");
             });

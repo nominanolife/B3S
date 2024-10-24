@@ -193,7 +193,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 appendMessage('bot', aiResponse);
             })
             .catch(error => {
-                console.error('Error:', error);
                 removeTypingIndicator();
                 appendMessage('bot', 'Sorry, there was an error processing your request.');
             });

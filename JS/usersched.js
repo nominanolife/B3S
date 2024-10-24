@@ -58,7 +58,7 @@ function showNotificationModal(message, redirectUrl = null) {
             });
         }
     } else {
-        console.error('Notification modal not found');
+        
     }
 }
 
@@ -80,7 +80,7 @@ function showConfirmationModal(action, callback, redirectUrl) {
 
         modalInstance.show();
     } else {
-        console.error('Confirmation modal not found');
+       
     }
 }
 
@@ -98,9 +98,9 @@ async function moveToCompletedBookings(userId, appointment, booking) {
             status: 'Completed'
         });
 
-        console.log(`Booking moved to completedBookings for user ${userId}`);
+       
     } catch (error) {
-        console.error("Error moving booking to completedBookings:", error);
+        
     }
 }
 
@@ -124,12 +124,12 @@ async function updateBookingProgress(appointmentId, userId, newProgress) {
             await updateDoc(appointmentRef, {
                 bookings: updatedBookings
             });
-            console.log(`Booking progress updated to ${newProgress} for appointment ID ${appointmentId}`);
+            
         } else {
-            console.log("No such document!");
+            
         }
     } catch (error) {
-        console.error("Error updating booking progress:", error);
+        
     }
 }
 
@@ -176,33 +176,33 @@ async function fetchUserAppointments(userId) {
         });
 
         onSnapshot(completedBookingsParentRef, (completedSnapshot) => {
-            console.log("Real-time update for completed bookings...");
+            
           
             if (completedSnapshot.exists()) {
               const completedBookingDoc = completedSnapshot.data();
-              console.log("Processing Completed Bookings:", completedBookingDoc);
+              
           
               if (Array.isArray(completedBookingDoc.completedBookings)) {
                 completedBookingDoc.completedBookings.forEach(booking => {
                   const bookingKey = `${booking.date}_${booking.startTime}`;
-                  console.log("Completed Booking Key:", bookingKey, "Booking Data:", booking);
+                 
           
                   if (!activeBookingsMap.has(bookingKey)) {
                     appointmentsData.push({ appointment: booking, booking: booking, docId: completedSnapshot.id, isCompleted: true });
-                    console.log("Added Completed Booking to Appointments Data:", booking);
+                    
                   } else {
-                    console.log("Skipped adding completed booking because an active booking exists for the same time slot:", bookingKey);
+                   
                   }
                 });
               } else {
-                console.log("No completed bookings array found in this document:", completedSnapshot.id);
+               
               }
             }
           
             updateAppointmentData(activeBookingsMap, appointmentsData, userId);
           });
     } catch (error) {
-        console.error("Error fetching appointments:", error);
+        
     }
 }
 
@@ -243,8 +243,7 @@ function updateAppointmentData(activeBookingsMap, appointmentsData, userId) {
 }
 
 function renderAppointmentRow(appointment, booking, docId, isCompleted = false) {
-    console.log("Rendering Row for Booking:", booking, "isCompleted:", isCompleted);
-
+    
     const row = document.createElement('tr');
 
     const courseCell = document.createElement('td');
@@ -267,9 +266,7 @@ function renderAppointmentRow(appointment, booking, docId, isCompleted = false) 
     endTimeCell.innerText = endTime;
     row.appendChild(endTimeCell);
 
-    // Debugging: Log current booking progress
-    console.log(`Booking Progress: ${booking.progress}, Booking Status: ${booking.status}`);
-
+   
     // Ensure progress and status are correctly reflected
     const progressText = booking.progress || (isCompleted ? 'Completed' : 'Not started');
     const statusText = booking.status || (isCompleted ? 'Completed' : 'Pending');
@@ -300,7 +297,7 @@ function renderAppointmentRow(appointment, booking, docId, isCompleted = false) 
 
     // Append row to the table body
     appointmentsTableBody.appendChild(row);
-    console.log("Row added to the table for:", booking);
+    
 }
 
 
@@ -373,7 +370,7 @@ function appendActionButtons(actionCell, isDisabled, docId, booking, appointment
                                 showNotificationModal(`${action} successful.`, 'userappointment.html');
 
                             } catch (error) {
-                                console.error("Error updating booking:", error);
+                                
                                 showNotificationModal("An error occurred. Please try again.");
                                 if (row) {
                                     row.querySelectorAll('button').forEach(btn => btn.disabled = false);
@@ -382,7 +379,7 @@ function appendActionButtons(actionCell, isDisabled, docId, booking, appointment
                         }
                     });
                 } else {
-                    console.log("User is not signed in");
+                    
                 }
             });
         });
@@ -394,7 +391,7 @@ onAuthStateChanged(auth, async (user) => {
         const userId = user.uid;
         await fetchUserAppointments(userId);
     } else {
-        console.log("User is not signed in");
+       
     }
 });
 

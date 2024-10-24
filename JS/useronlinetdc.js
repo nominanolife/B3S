@@ -108,8 +108,7 @@ async function fetchVideos() {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         userId = user.uid;  // Set userId globally when the user is authenticated
-        console.log("User is authenticated.");
-
+       
         // Fetch videos and user progress
         try {
             const videos = await fetchVideos();
@@ -119,13 +118,13 @@ onAuthStateChanged(auth, async (user) => {
             // Update exam availability based on fetched data
             updateExamAvailability(videos, userProgress);
         } catch (error) {
-            console.error("Error fetching videos or user progress:", error);
+           
         }
 
         // Check quiz progress
         checkUserProgress();  // Ensure this runs after updating exam availability
     } else {
-        console.error("User is not authenticated.");
+      
     }
 });
 
@@ -151,7 +150,7 @@ async function checkUserProgress() {
             startExamButton.style.display = 'block';
         }
     } catch (error) {
-        console.error("Error checking user progress:", error);
+        
     }
 }
 

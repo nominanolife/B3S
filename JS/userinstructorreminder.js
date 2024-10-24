@@ -41,7 +41,7 @@ if (sessionStorage.getItem('findMatchEnabled') === 'true') {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         studentId = user.uid;  // Set the logged-in user ID
-        console.log("Student ID set: ", studentId);  // Debugging log
+
 
         // Fetch traits once and use them in both functions
         const userDocRef = doc(db, 'applicants', studentId);
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateLoader(40); // Increment as data is fetched
         
             const data = await response.json();
-            console.log('Data received:', data);
+
         
             if (data.status === 'success') {
                 const studentId = data.student_id;
@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             // Error handling
-            console.error('Error:', error);
+
             showNotification('An error occurred while contacting the server: ' + error.message);
             loader.style.display = 'none';
         }        
@@ -297,7 +297,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('otherTraitInput').value = '';
     
         } catch (error) {
-            console.error("Error updating traits: ", error);
+
             showNotification("An error occurred while updating traits. Please try again.");
             document.getElementById('loader1').style.display = 'none';
             saveButton.disabled = false;
@@ -318,10 +318,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'matchStatus': 'In Progress'  // Set initial status as 'In Progress'
             }, { merge: true }); // Ensure it merges with existing data
     
-            console.log('Match successfully saved to Firestore');
+
     
         } catch (error) {
-            console.error('Error saving match to Firestore:', error);
+           
             showNotification('An error occurred while saving the match. Please try again.');
         }
     }
@@ -389,7 +389,7 @@ async function checkPDCAppointment(studentId) {
         const q = query(appointmentsRef);
         const querySnapshot = await getDocs(q);
 
-        console.log("Checking appointments for userId:", studentId);
+        
 
         // Iterate through appointments and check the bookings array
         for (let docSnap of querySnapshot.docs) {
@@ -398,7 +398,7 @@ async function checkPDCAppointment(studentId) {
             // First check the course at the top level of the document
             const course = appointmentData.course;
             if (course !== "PDC-4Wheels" && course !== "PDC-Motors") {
-                console.log(`Skipping appointment as course is not valid: ${course}`);
+               
                 continue;
             }
 
@@ -407,27 +407,27 @@ async function checkPDCAppointment(studentId) {
                 const bookings = appointmentData.bookings;
 
                 for (let booking of bookings) {
-                    console.log("Evaluating booking:", booking);
+                    
 
                     // Accept bookings only with "Not yet Started" progress
                     if (booking.userId === studentId &&
                         booking.status === "Booked" &&
                         booking.progress === "Not yet Started") {
 
-                        console.log("Valid booking found:", booking);
+                       
                         return true;  // Exit the function and return true as soon as a valid booking is found
                     }
                 }
             } else {
-                console.warn(`No bookings array found in document ${docSnap.id}`);
+              
             }
         }
 
-        console.log("No valid PDC booking found.");
+      
         return false;  // No valid booking found after iterating through all appointments
 
     } catch (error) {
-        console.error('Error checking PDC appointment:', error);
+        
         return false;  // Treat as no appointment in case of error
     }
 }

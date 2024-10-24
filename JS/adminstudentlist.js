@@ -171,8 +171,6 @@ async function fetchAppointments() {
       filteredStudentsData = studentsData;
       totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
 
-      // Debugging: Ensure data is populated correctly
-      console.log("Populated studentsData:", studentsData);
 
       renderStudents();
       updatePaginationControls();
@@ -183,7 +181,6 @@ async function fetchAppointments() {
     });
 
   } catch (error) {
-    console.error("Error fetching appointments: ", error);
   }
 }
 
@@ -196,7 +193,6 @@ document.getElementById('saveChangesBtn').onclick = async (event) => {
   const studentIndex = event.target.getAttribute('data-student-index');
 
   if (studentIndex === null || studentIndex === undefined) {
-    console.error("Student index is null or undefined.");
     showNotification("Failed to update certificate control number.");
     return;
   }
@@ -204,7 +200,6 @@ document.getElementById('saveChangesBtn').onclick = async (event) => {
   const studentData = studentsData[studentIndex]; // Retrieve the correct student data
 
   if (!studentData || !studentData.id) {
-    console.error("Student data is invalid or ID is missing:", studentData);
     showNotification("Failed to update certificate control number.");
     return;
   }
@@ -254,11 +249,9 @@ document.getElementById('saveChangesBtn').onclick = async (event) => {
         showNotification("Certificate control number updated successfully!");
       }
     } else {
-      console.error("Completed student data not found.");
       showNotification("Failed to find completed student record.");
     }
   } catch (error) {
-    console.error("Error updating certificate control number:", error);
     showNotification("Failed to update certificate control number.");
   }
 };
@@ -398,8 +391,6 @@ async function handleStatusToggle(event) {
   const course = event.target.dataset.column;
   const isCompleted = event.target.checked;
 
-  // Log for debugging
-  console.log(`Checkbox toggled for user ${userId}, course: ${course}, completed: ${isCompleted}`);
 
   // Update local state immediately
   const student = studentsData.find(student => student.id === userId);
@@ -440,7 +431,6 @@ async function handleStatusToggle(event) {
       window.location.reload();
 
     } catch (error) {
-      console.error("Error updating completion status in Firestore:", error);
 
       // If update fails, revert the checkbox state
       event.target.checked = !isCompleted;
@@ -465,7 +455,6 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
     const applicantSnapshot = await getDoc(applicantDocRef);
 
     if (!applicantSnapshot.exists()) {
-      console.error("Applicant data not found.");
       return;
     }
 
@@ -474,7 +463,6 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
     const docSnapshot = await getDoc(docRef);
 
     if (!docSnapshot.exists()) {
-      console.error("Appointment data not found.");
       return;
     }
 
@@ -543,7 +531,6 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
 
         if (existingBookingIndex >= 0) {
           // If the same appointment date exists, don't duplicate
-          console.log("Completion for this appointment date already exists, skipping duplicate entry.");
         } else {
           completedStudentData.completedBookings.push({
             course: course,
@@ -558,7 +545,6 @@ async function toggleCompletionStatus(userId, course, isCompleted, appointmentId
       }
     }
   } catch (error) {
-    console.error("Error updating completion status:", error);
   }
 }
 
@@ -595,7 +581,6 @@ async function updateCompletedBookings(userId, bookingDetails) {
       });
     }
   } catch (error) {
-    console.error("Error updating completed bookings: ", error);
   }
 }
 // Removing a completed booking if reverted
@@ -621,7 +606,6 @@ async function removeCompletedBooking(userId, course, appointmentId) {
       }
     }
   } catch (error) {
-    console.error("Error removing completed booking: ", error);
   }
 }
 
@@ -827,8 +811,6 @@ if (modalId !== 'editCcnModal') {
         const [firstSection, secondSection] = modalElement.querySelectorAll('.modal-body');
         const [backBtn, nextBtn, saveBtn] = modalElement.querySelectorAll('.back-btn, .next-btn, .save-btn');
 
-        console.log('Modal Element:', modalElement);
-        console.log({ firstSection, secondSection, backBtn, nextBtn, saveBtn });
 
         // Use conditional checks to avoid undefined errors
         if (firstSection) firstSection.classList.remove('d-none');
@@ -837,7 +819,6 @@ if (modalId !== 'editCcnModal') {
         if (nextBtn) nextBtn.classList.remove('d-none');
         if (saveBtn) saveBtn.classList.add('d-none');
     } else {
-        console.error('Modal element not found for ID:', modalId);
     }
 }
 
@@ -998,14 +979,12 @@ async function sendAssessmentDataToFlask() {
       category.items.forEach(item => {
           const score = parseFloat(item.score); // Ensure the score is a number
           if (isNaN(score)) {
-              console.error(`Invalid score for ${categoryName}:`, item.score);
           } else {
               dataToSend[categoryName] += score;
           }
       });
   });
 
-  console.log('Raw Data to send:', dataToSend); // Log the raw data
 
   try {
       const response = await fetch('https://4wheels-ai-dot-authentication-d6496.df.r.appspot.com/predict', {
@@ -1024,7 +1003,6 @@ async function sendAssessmentDataToFlask() {
       }
 
       const result = await response.json();
-      console.log('Prediction results:', result);
 
       // Use the predictions directly from the AI
       const interpretedResults = result.predictions;
@@ -1033,7 +1011,6 @@ async function sendAssessmentDataToFlask() {
       sessionStorage.setItem(`4WProcessedData_${selectedStudentIndex}`, JSON.stringify(interpretedResults));
 
   } catch (error) {
-      console.error('Error sending data to Flask API:', error);
       showNotification('Failed to send data. Please try again.');
   }
 }
@@ -1099,11 +1076,10 @@ async function saveAllDataToFirestore() {
 
   try {
       await setDoc(doc(db, "applicants", studentsData[selectedStudentIndex].id), combinedData, { merge: true });
-      console.log('Saving combined data:', combinedData);
       showNotification(`All data has been saved successfully for ${WchecklistData.studentName}`);
       return true;
   } catch (e) {
-      console.error("Error saving combined data: ", e);
+
       showNotification('Failed to save all data. Please try again.');
       return false;
   }
@@ -1298,7 +1274,6 @@ if (studentData.Mchecklist) {
   const saveButton = document.getElementById('motorcycleSaveBtn');
   saveButton.setAttribute('data-student-index', index);
 
-  console.log("Setting data-student-index to:", index); // Debugging output
 
   validateForm(modalId); 
 
@@ -1604,16 +1579,12 @@ async function sendMotorcycleAssessmentDataToFlask() {
         if (dataToSend[categoryName] !== undefined) {
           dataToSend[categoryName] += score;
         } else {
-          console.error(`Unexpected category: ${categoryName}`);
           showNotification(`Unexpected category found: ${categoryName}. Please review the data.`);
         }
       } else {
-        console.warn(`Invalid score for ${item.sentence}. Setting score to 0.`);
       }
     });
   });
-
-  console.log('Aggregated Data to send:', dataToSend); // Log the aggregated data for debug
 
   try {
     const response = await fetch('https://motor-eval-dot-authentication-d6496.df.r.appspot.com/predict', {
@@ -1632,7 +1603,6 @@ async function sendMotorcycleAssessmentDataToFlask() {
     }
 
     const result = await response.json();
-    console.log('Prediction results:', result);
 
     // Use the predictions directly from the AI
     const interpretedResults = result.predictions;
@@ -1641,7 +1611,6 @@ async function sendMotorcycleAssessmentDataToFlask() {
     sessionStorage.setItem(`MProcessedData_${selectedStudentIndex}`, JSON.stringify(interpretedResults));
 
   } catch (error) {
-    console.error('Error sending data to Flask API:', error);
     showNotification('Failed to send data. Please try again.');
   }
 }
@@ -1707,11 +1676,9 @@ async function saveAllMotorcycleDataToFirestore() {
 
   try {
       await setDoc(doc(db, "applicants", studentsData[selectedStudentIndex].id), combinedData, { merge: true });
-      console.log('Saving combined motorcycle data:', combinedData);
       showNotification(`All data has been saved successfully for ${MchecklistData.studentName}`);
       return true;
   } catch (e) {
-      console.error("Error saving combined motorcycle data: ", e);
       showNotification('Failed to save all motorcycle data. Please try again.');
       return false;
   }
@@ -1951,7 +1918,6 @@ function resetModalFields(modalId) {
   const modal = document.getElementById(modalId);
   const modalElement = document.getElementById(modalId);
   if (!modalElement) {
-    console.error('Modal element not found:', modalId);
     return; // Exit the function early if the modal element is not found
   }
 

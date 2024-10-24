@@ -48,7 +48,7 @@ async function fetchQuizQuestions() {
         
                 quizzes[category].push(...data.questions);
             } else {
-                console.warn(`Quiz document ${doc.id} does not contain a valid 'questions' field.`);
+              
             }
         });        
 
@@ -127,7 +127,7 @@ async function fetchQuizQuestions() {
         setupCheckboxListeners();
 
     } catch (error) {
-        console.error("Error fetching quiz questions:", error);
+
     }
 }
 
@@ -182,7 +182,7 @@ async function applyChangesToFirestore() {
         const quizDoc = await getDoc(quizDocRef);
 
         if (!quizDoc.exists()) {
-            console.error("Quiz document not found for quizId:", quizId);
+           
             continue;
         }
 
@@ -200,7 +200,7 @@ async function applyChangesToFirestore() {
 
     // Commit the batch
     await batch.commit();
-    console.log("Batch update completed.");
+  
 
     // Reset tracking
     changesToApply = {};
@@ -242,7 +242,7 @@ function setupPublishButton() {
     const confirmPublishButton = document.getElementById('confirmButton');
 
     if (!publishButton) {
-        console.error("Publish button not found");
+       
         return;
     }
 
@@ -256,9 +256,9 @@ function setupPublishButton() {
         try {
             // Apply all tracked changes to Firestore using batch
             await applyChangesToFirestore();
-            console.log("Changes applied successfully.");
+          
         } catch (error) {
-            console.error("Error applying batch changes:", error);
+          
         } finally {
             confirmationModal.hide();  // Hide modal after confirmation
         }

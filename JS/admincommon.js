@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (confirmLogoutBtn) {
         confirmLogoutBtn.addEventListener('click', () => {
             // Perform the logout action here
-            console.log('User logged out.');
 
             // Optionally hide the modal if it doesn't hide automatically
             logoutModal.hide();

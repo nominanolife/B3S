@@ -53,7 +53,6 @@ async function fetchBookings() {
             let bookings = appointmentData.bookings;
 
             if (!Array.isArray(bookings) || bookings.length === 0) {
-                console.log(`No bookings found for document ID: ${appointmentDoc.id}`);
                 continue;
             }
 
@@ -68,11 +67,9 @@ async function fetchBookings() {
                     if (applicantData && applicantData.personalInfo) {
                         fullName = `${applicantData.personalInfo.first} ${applicantData.personalInfo.middle} ${applicantData.personalInfo.last} ${applicantData.personalInfo.suffix ? applicantData.personalInfo.suffix : ''}`.trim();
                     } else {
-                        console.warn(`Applicant data is missing or malformed for userId: ${booking.userId}`);
                         continue;
                     }
                 } else {
-                    console.log(`Account for userId: ${booking.userId} has been deleted. Ignoring this booking.`);
                     continue;
                 }
 
@@ -97,7 +94,6 @@ async function fetchBookings() {
 
                 // Skip past appointments
                 if (new Date(appointmentData.date) < currentDate) {
-                    console.log(`Appointment on ${appointmentData.date} has already passed. Ignoring this booking.`);
                     continue;
                 }
 
@@ -127,7 +123,7 @@ async function fetchBookings() {
         updatePaginationControls('cancelled');
 
     } catch (error) {
-        console.error("Error fetching appointments: ", error);
+
     } finally {
         // Hide loader after fetching data
         loader.style.display = 'none';

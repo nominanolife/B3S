@@ -177,7 +177,6 @@ document.addEventListener('DOMContentLoaded', function() {
             fetchAndDisplayModules();
 
         } catch (error) {
-            console.error('Error uploading module:', error);
             showNotificationModal('Error uploading module. Please try again.');
         }
     });
@@ -250,21 +249,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const storageRef = ref(storage, `modules/${fileName}`); // Assuming files are stored in the 'modules' folder
                 await deleteObject(storageRef)
                     .then(() => {
-                        console.log(`File ${fileName} deleted successfully.`);
                     })
                     .catch((error) => {
-                        console.error("Error deleting file from storage:", error);
                     });
             }
             
             // Delete the Firestore document
             await deleteDoc(moduleDocRef);
-            console.log("Module document deleted successfully.");
     
             // Refresh the module list
             fetchAndDisplayModules();
         } else {
-            console.error("Module not found.");
         }
     }
 

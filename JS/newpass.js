@@ -137,7 +137,6 @@ async function handlePasswordReset() {
         showNotification('Password has been reset successfully!');
 
     } catch (error) {
-        console.error('Error resetting password:', error);
         showNotification('Failed to reset password. Please try again or the link may have expired.');
     }
 }

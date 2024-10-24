@@ -252,7 +252,6 @@ async function fetchStudentData() {
 
       return { unsubscribeApplicants };
   } catch (error) {
-      console.error("Error fetching student data: ", error);
       hideLoader(); // Hide the loader in case of an error
   }
 }
@@ -266,7 +265,6 @@ function storeMonthYearData() {
 function renderStudents() {
   const studentList = document.querySelector('.sales-list');
   if (!studentList) {
-      console.error("Student list element not found.");
       return;
   }
 
@@ -373,7 +371,7 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
 
   const userId = selectedStudent.userId;
   if (!userId) {
-      console.error("User ID is undefined or missing for the selected student.");
+
       return;
   }
 
@@ -432,14 +430,14 @@ async function saveSalesData(studentIndex, existingSalesDocId = null) {
       if (existingSalesDocId) {
           const salesDocRef = doc(db, "sales", existingSalesDocId);
           await updateDoc(salesDocRef, updatedData);
-          console.log('Sales data successfully updated.');
+
       } else {
           const salesDocRef = doc(db, "sales", userId);
           await setDoc(salesDocRef, updatedData);
-          console.log('Sales data successfully saved.');
+
       }
   } catch (error) {
-      console.error("Error saving sales data: ", error);
+
   }
 
   $('#editSalesModal').modal('hide');
@@ -461,7 +459,7 @@ function calculatePopularPackage() {
   });
 
   if (Object.keys(packageCounts).length === 0) {
-    console.error('No packages found.');
+
     return;
   }
 
@@ -471,7 +469,7 @@ function calculatePopularPackage() {
 function updatePaginationControls() {
   const paginationControls = document.querySelector('.pagination-controls');
   if (!paginationControls) {
-    console.error("Pagination controls element not found.");
+
     return;
   }
 
@@ -518,7 +516,6 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     fetchStudentData();
   } else {
-    console.error("No user is currently signed in.");
   }
 });
 
@@ -768,11 +765,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function updatePackageData() {
     const packageData = [];
-    console.log("All Students Data:", allStudentsData);
+
 
     // Iterate over all students data instead of just the current page
     allStudentsData.forEach(student => {
-        console.log("Student:", student); // Add this line to see each student's data
+
         const packageName = student.packageName || 'Unknown Package';
         let count = 1; // Each student represents one package availed
 
@@ -784,8 +781,6 @@ function updatePackageData() {
         }
     });
 
-    // Check data integrity in the console
-    console.log("Package Data for Chart:", packageData);
 
     // Proceed to render the chart
     renderPackageBarChart(packageData);
@@ -795,8 +790,7 @@ function renderPackageBarChart(packageData) {
   const labels = packageData.map(item => item.packageName);
   const data = packageData.map(item => item.count);
 
-  console.log("Labels for Chart:", labels); // Log labels
-  console.log("Data for Chart:", data); // Log data
+
 
   const ctx = document.getElementById('packageBarChart').getContext('2d');
   if(window.packageBarChartInstance) {

@@ -112,12 +112,9 @@ function setupButtons() {
     });
 
     confirmLogoutButton.addEventListener('click', function() {
-        console.log('Logout confirmed');
         signOut(auth).then(() => {
-            console.log('User signed out.');
             window.location.href = 'login.html';
         }).catch((error) => {
-            console.error('Sign out error:', error);
         });
     });
 }
@@ -157,16 +154,12 @@ function checkUserRole() {
                             disableLink('userinstructorreminder.html');
                         }
                     } else {
-                        console.error("No such document!");
                     }
                 }, (error) => {
-                    console.error("Error getting document:", error);
                 });
             } catch (error) {
-                console.error("Error setting up snapshot listener:", error);
             }
         } else {
-            console.error("No user is currently signed in.");
         }
     });
 }

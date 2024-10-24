@@ -59,7 +59,7 @@ const resetFadeOutTimer = (videoElement, controlsDiv, videoPlayer) => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM fully loaded and parsed.");
+  
 
     const videoPlayer = document.getElementById('lesson-video'); // Define videoPlayer after DOM is loaded
 
@@ -87,16 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            console.log("User is authenticated.");
+           
             const userId = user.uid;
             let videoId = sessionStorage.getItem('selectedVideoId');
 
             try {
-                console.log("Fetching lessons from Firestore...");
+                
                 const videosSnapshot = await getDocs(collection(db, 'videos'));
 
                 if (videosSnapshot.empty) {
-                    console.error("No videos found in Firestore.");
+                    
                     return;
                 }
 
@@ -104,14 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: doc.id,
                     ...doc.data()
                 }));
-                console.log("Fetched videos:", videos);
-
-                console.log("Fetching user progress in real-time...");
+               
                 const userProgressDocRef = doc(db, 'userProgress', userId);
 
                 onSnapshot(userProgressDocRef, (userProgressDoc) => {
                     globalUserProgress = userProgressDoc.exists() ? userProgressDoc.data() : {};
-                    console.log("Real-time user progress:", globalUserProgress);
+                    
                     updateLessonList(videos, globalUserProgress, userId);
                 });
 
@@ -125,10 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderVideoDetails(videoId, videos, userId);
                 }
             } catch (error) {
-                console.error("Error during Firestore operations:", error);
+                
             }
         } else {
-            console.error("User is not authenticated.");
+           
         }
     });
 
@@ -150,7 +148,7 @@ async function renderVideoDetails(videoId, videos, userId) {
     const userProgressDocRef = doc(db, 'userProgress', userId);
 
     try {
-        console.log("Fetching video document from Firestore...");
+        
         
         // Sort videos array by title
         videos.sort((a, b) => {
@@ -165,7 +163,7 @@ async function renderVideoDetails(videoId, videos, userId) {
             const videoTitleElement = document.querySelector('.video-header h3');
 
             if (!videoTitleElement || !videoPlayer) {
-                console.error("Video title element or video player not found in DOM.");
+               
                 return;
             }
 
@@ -203,15 +201,15 @@ async function renderVideoDetails(videoId, videos, userId) {
                     if (videoElement.textTracks.length > 0) {
                         // Set mode to 'showing' to display subtitles
                         videoElement.textTracks[0].mode = 'showing';
-                        console.log("Subtitles are now showing.");
+                        
                     } else {
-                        console.warn("No text tracks found after appending the subtitle track.");
+                        
                     }
                 });
             
                 // In case of error, log the issue
                 subtitleTrack.addEventListener('error', () => {
-                    console.error("Subtitle track failed to load. Check the VTT file format or the URL.");
+                   
                 });
             }
 
@@ -255,9 +253,9 @@ async function renderVideoDetails(videoId, videos, userId) {
             if (userProgressDoc.exists() && userProgressDoc.data()[videoId]) {
                 const userProgress = userProgressDoc.data()[videoId];
                 maxAllowedSeekTime = userProgress.completed ? Infinity : userProgress.currentTime;
-                console.log("User progress found, max allowed seek time:", maxAllowedSeekTime);
+                
             } else {
-                console.log("No user progress found, starting from the beginning.");
+               
             }
 
             videoElement.addEventListener('loadedmetadata', () => {
@@ -346,11 +344,11 @@ async function renderVideoDetails(videoId, videos, userId) {
             fullscreenButton.addEventListener('click', () => {
                 if (!document.fullscreenElement) {
                     videoPlayer.requestFullscreen().catch(err => {
-                        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                        
                     });
                 } else {
                     document.exitFullscreen().catch(err => {
-                        console.error(`Error attempting to exit full-screen mode: ${err.message} (${err.name})`);
+                  
                     });
                 }
             });
@@ -364,7 +362,7 @@ async function renderVideoDetails(videoId, videos, userId) {
             });
 
             videoElement.addEventListener('ended', async () => {
-                console.log("Video ended. Marking as completed.");
+               
 
                 try {
                     // Mark current video as completed in the database
@@ -374,7 +372,7 @@ async function renderVideoDetails(videoId, videos, userId) {
                     const currentIndex = videos.findIndex(video => video.id === videoId);
                     if (currentIndex >= 0 && currentIndex < videos.length - 1) {
                         const nextVideoId = videos[currentIndex + 1].id;
-                        console.log(`Auto-playing next video: ${nextVideoId}`);
+                        
 
                         // Update sessionStorage with the next video ID
                         sessionStorage.setItem('selectedVideoId', nextVideoId);
@@ -386,7 +384,7 @@ async function renderVideoDetails(videoId, videos, userId) {
                         updateLessonList(videos, globalUserProgress, userId);
                     }
                 } catch (error) {
-                    console.error("Error marking video as completed:", error);
+                    
                 }
             });
 
@@ -399,10 +397,10 @@ async function renderVideoDetails(videoId, videos, userId) {
             controlsDiv.classList.remove('hidden'); // Ensure controls are visible initially
 
         } else {
-            console.error("No such video document found in Firestore for videoId:", videoId);
+           
         }
     } catch (error) {
-        console.error("Error during video rendering:", error);
+       
     }
 }
 
@@ -424,7 +422,7 @@ async function saveUserProgress(userId, videoId, currentTime, completed = false)
             }
         }, { merge: true });
     } catch (error) {
-        console.error("Error saving user progress:", error);
+       
     }
 }
 
@@ -434,19 +432,19 @@ async function unlockNextLesson(userId, videos, currentVideoId) {
         const currentIndex = videos.findIndex(video => video.id === currentVideoId);
         if (currentIndex >= 0 && currentIndex < videos.length - 1) {
             const nextVideoId = videos[currentIndex + 1].id;
-            console.log(`Attempting to unlock the next lesson: ${nextVideoId}`);
+           
             await setDoc(doc(db, 'userProgress', userId), {
                 [nextVideoId]: {
                     currentTime: 0,
                     completed: false
                 }
             }, { merge: true });
-            console.log(`Unlocked the next lesson: ${nextVideoId}`);
+           
         } else {
-            console.error("Unable to unlock the next lesson. Either at the last video or index not found.");
+           
         }
     } catch (error) {
-        console.error("Error unlocking next lesson:", error);
+        
     }
 }
 
@@ -454,7 +452,7 @@ async function unlockNextLesson(userId, videos, currentVideoId) {
 function updateLessonList(videos, userProgress, userId) {
     const lessonListContainer = document.querySelector('.lessons ul');
     if (!lessonListContainer) {
-        console.error("Lesson list container not found in DOM.");
+       
         return;
     }
 
@@ -472,7 +470,7 @@ function updateLessonList(videos, userProgress, userId) {
             lessonLink.href = ''; // Optional: keep the link here if needed
             listItem.addEventListener('click', () => {
                 sessionStorage.setItem('selectedVideoId', video.id);
-                console.log("Navigating to video ID:", video.id);
+                
                 renderVideoDetails(video.id, videos, userId);
 
                 // Update the lesson list to reflect the new current video
@@ -604,7 +602,7 @@ document.querySelector('.message').addEventListener('submit', async function (e)
 
         // Handle fetch errors (e.g., network issues)
         displayMessage("There was an error connecting to the chatbot.", 'bot-message');
-        console.error("Error connecting to the chatbot:", error);
+       
     }
 });
 

@@ -24,9 +24,9 @@ let currentUser = null;
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser = user; // Store the user globally
-        console.log("User logged in:", user.displayName || user.email);
+        
     } else {
-        console.error("No authenticated user found.");
+        
         window.location.href = 'login.html'; // Redirect to login if no user found
     }
 });
@@ -39,7 +39,7 @@ async function getUserFullName(userId) {
         const fullName = `${personalInfo.first} ${personalInfo.middle ? personalInfo.middle + ' ' : ''}${personalInfo.last}`;
         return fullName;
     } else {
-        console.error("No applicant data found for user:", userId);
+        
         return "John Doe";  // Fallback
     }
 }
@@ -52,22 +52,22 @@ async function fetchUserQuizProgress(userId) {
 
         if (userQuizDoc.exists()) {
             const userProgressData = userQuizDoc.data();
-            console.log("User Quiz Progress fetched:", userProgressData);
+           
 
             // Save progress to sessionStorage
             sessionStorage.setItem('userAnswers', JSON.stringify(userProgressData.answers));
 
             // After saving, delete the entire quiz progress document from Firestore
             await deleteDoc(userQuizDocRef);  // Delete the document
-            console.log("Quiz progress document deleted from Firestore.");
+           
 
             return userProgressData.answers;  // Return the fetched answers for further use
         } else {
-            console.error("No quiz progress found for user.");
+           
             return {};  // Return an empty object if no progress is found
         }
     } catch (error) {
-        console.error("Error fetching and deleting user quiz progress:", error);
+       
         return {};
     }
 }
@@ -90,10 +90,10 @@ async function predictPerformanceAndFetchInsights(studentId, category, percentag
                 insights: data.insights  // Insights for this category and performance
             };
         } else {
-            console.error("Error in prediction and insights:", data.error);
+           
         }
     } catch (error) {
-        console.error("Error sending data to Flask:", error);
+       
     }
 }
 
@@ -183,9 +183,9 @@ async function saveUserAttemptToFirestore(userId, totalScore, evaluation, evalua
             });
         }
         
-        console.log("User attempt data saved successfully.");
+       
     } catch (error) {
-        console.error("Error saving user attempt data:", error);
+        
     }
 }
 
@@ -203,9 +203,9 @@ async function saveFinalUserResultsToFirestore(userId, fullName, totalScore, cer
 
         // Create a new document in the 'userResults' collection
         await setDoc(doc(db, 'userResults', userId), userResultData);
-        console.log("User results saved successfully.");
+        
     } catch (error) {
-        console.error("Error saving user results:", error);
+        
     }
 }
 
@@ -250,12 +250,12 @@ async function handleSavingResults(categoryScores) {
 // In the button click handler (for fetching and calculating results)
 document.getElementById('seeResultsBtn').addEventListener('click', async function () {
     if (!currentUser) {
-        console.error('No authenticated user found!');
+        
         return;
     }
 
     const studentId = currentUser.uid;
-    console.log("User ID:", studentId);
+   
 
     document.getElementById('loader1').style.display = 'flex';
 
@@ -490,11 +490,11 @@ async function getCertificateData(userId) {
             const totalScore = userResultData.percentage || 0;  // Use 0 if totalScore is missing
             return { certificateID, totalScore };
         } else {
-            console.error("No user result data found for user:", userId);
+           
             return { certificateID: 'N/A', totalScore: 0 };  // Return default values if no result is found
         }
     } catch (error) {
-        console.error("Error fetching certificate data:", error);
+        
         return { certificateID: 'N/A', totalScore: 0 };  // Return default values in case of error
     }
 }

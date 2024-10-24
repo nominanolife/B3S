@@ -110,7 +110,7 @@ async function fetchPackages() {
     packages = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     renderPackages(packages);
   } catch (error) {
-    console.error("Error fetching packages: ", error);
+    
   }
 }
 
@@ -162,11 +162,11 @@ document.getElementById('confirmEnrollButton').addEventListener('click', async (
           showEnrollmentModal("Failed to enroll. Please try again.", "error");
         }
       } else {
-        console.error("Package not found.");
+       
       }
     }
   } else {
-    console.error("No user is currently signed in.");
+   
   }
 
   // Hide the confirmation modal
@@ -210,13 +210,10 @@ onAuthStateChanged(auth, async (user) => {
           renderPackages(packages);
         }
       } else {
-        console.error("No such document!");
       }
     } catch (error) {
-      console.error("Error getting document:", error);
     }
   } else {
-    console.error("No user is currently signed in.");
   }
 });
 // JavaScript for sidebar toggle

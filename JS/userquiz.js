@@ -43,7 +43,7 @@ async function fetchAndRandomizeQuizzes() {
                         });
                     });
             } else {
-                console.warn(`Quiz document with ID ${doc.id} does not have a valid 'questions' field.`);
+               
             }
         });
         
@@ -53,10 +53,10 @@ async function fetchAndRandomizeQuizzes() {
         if (questions.length > 0) {
             renderQuestion(currentQuestionIndex); // Render the first question
         } else {
-            console.warn("No active questions found.");
+           
         }
     } catch (error) {
-        console.error("Error fetching quizzes:", error);
+       
     } finally {
         // Hide loader once the quiz is loaded
         document.getElementById('loader1').style.display = 'none';
@@ -81,9 +81,9 @@ async function saveUserAnswerToFirestore(index) {
         try {
             const userQuizDocRef = doc(db, 'userQuizProgress', userId);
             await setDoc(userQuizDocRef, { answers: userAnswers }, { merge: true });
-            console.log("Answer saved to Firestore for question index:", index);
+           
         } catch (error) {
-            console.error("Error saving user answer to Firestore:", error);
+            
         }
     }
 }
@@ -96,10 +96,10 @@ async function loadUserAnswersFromFirestore() {
             const userQuizDoc = await getDoc(userQuizDocRef);
             if (userQuizDoc.exists()) {
                 userAnswers = userQuizDoc.data().answers || {};
-                console.log("Loaded answers from Firestore:", userAnswers);
+               
             }
         } catch (error) {
-            console.error("Error loading user answers from Firestore:", error);
+           
         }
     }
 }
@@ -155,7 +155,7 @@ async function renderQuestion(index) {
 
                 questionImageContainer.appendChild(imgElement);
             } catch (error) {
-                console.error("Error fetching image from storage:", error);
+               
             }
         }
 
@@ -264,7 +264,7 @@ function checkIfPassed() {
 
     const totalQuestions = Object.keys(userAnswers).length;
     const scorePercentage = (correctCount / totalQuestions) * 100;
-    console.log("Score Percentage:", scorePercentage);
+    
 
     return scorePercentage >= 80; // 80% passing grade
 }
@@ -306,16 +306,16 @@ async function saveResultsAndAttempts() {
 
             // Save to Firestore
             await setDoc(userResultsRef, userResults, { merge: true });
-            console.log("User results and attempts saved successfully.");
+           
             
             // Redirect to results page
             window.location.href = 'userresults.html';
 
         } catch (error) {
-            console.error("Error saving user results and attempts:", error);
+           
         }
     } else {
-        console.error("No authenticated user found.");
+       
     }
 }
 
@@ -349,11 +349,11 @@ document.querySelector('.save-btn').addEventListener('click', async () => {
 onAuthStateChanged(auth, (user) => {
     if (user) {
         userId = user.uid; // Store the user's UID
-        console.log("User logged in:", userId);
+       
         // Fetch quizzes once we know the user is authenticated
         fetchAndRandomizeQuizzes();
     } else {
-        console.error("User is not logged in.");
+       
         // Optionally redirect to a login page
         window.location.href = 'login.html';
     }

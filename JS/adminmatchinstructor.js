@@ -60,7 +60,6 @@ function setUpMatchedStudentsListener() {
             // Update pagination controls if necessary
         });
     } catch (error) {
-        console.error('Error setting up listener for students with matches:', error);
     }
 }
 
@@ -85,7 +84,6 @@ async function fetchStudentAndInstructorDetails(studentId, instructorId) {
 
         return { studentName, instructorName };
     } catch (error) {
-        console.error('Error fetching student or instructor details:', error);
         return { studentName: 'Error Fetching Name', instructorName: 'Error Fetching Name' };
     }
 }
@@ -117,7 +115,6 @@ async function fetchCourseAndAppointmentDateForStudent(studentId) {
 
         return { course, appointmentDate };
     } catch (error) {
-        console.error('Error fetching course and appointment date for student:', error);
         return { course: 'Error Fetching Course', appointmentDate: 'Error Fetching Date' };
     }
 }
@@ -130,11 +127,9 @@ async function fetchStudentTraits(studentId) {
             const studentData = studentDoc.data();
             return studentData.traits || [];
         } else {
-            console.warn('No student document found for ID:', studentId);
             return [];
         }
     } catch (error) {
-        console.error('Error fetching student traits:', error);
         return [];
     }
 }
@@ -281,14 +276,11 @@ async function reassignInstructor(studentId, newInstructorId) {
             'matchedAt': new Date(),
             'matchStatus': 'In Progress'
         });
-
-        console.log('Instructor successfully reassigned!');
         showNotification('Instructor successfully reassigned!');
 
         $('#assigninstructormodal').modal('hide');
 
     } catch (error) {
-        console.error('Error reassigning instructor:', error);
         showNotification('An error occurred while reassigning the instructor. Please try again.');
     }
 }
@@ -319,7 +311,6 @@ async function fetchInstructorsForCourse(course, currentInstructorId) {
         return instructors;
 
     } catch (error) {
-        console.error('Error fetching instructors:', error);
     }
 }
 
