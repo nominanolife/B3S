@@ -316,16 +316,11 @@ h2 {
 }
 
 .modal-content {
-  animation: popOut 0.4s ease;
-  justify-content: space-evenly;
-  font-family: Poppins;
-  border-radius: 20px;
-  padding: 20px;
+  animation: popOut 0.4s ease; /* Duration of the pop-out animation */
 }
-
 @media (max-width: 768px) {
   .modal-content {
-    padding: 10px;
+      padding: 10px;
   }
 }
 
@@ -333,25 +328,19 @@ h2 {
   border: none;
 }
 
-@media (max-width: 768px) {
-  .modal-header, .modal-body, .modal-footer {
-    padding: 10px;
-  }
-}
-
 .modal-dialog {
   top: 30%;
   left: 5%;
   border-radius: 20px;
 }
-
 @media (max-width: 768px) {
   .modal-dialog {
-    top: 10%;
-    left: 2%;
-    width: 95%;
+      top: 30%;
+      left: 0;
+      border-radius: 20px;
   }
 }
+
 .modal-content {
   justify-content: space-evenly;
   font-family: Poppins;
@@ -363,20 +352,18 @@ h2 {
   font-weight: bold;
   color: #142A74;
 }
-
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .modal-title {
-    font-size: 1.2rem;
+      font-size: 18px;
   }
 }
 
 .modal-body {
   font-size: 14px;
 }
-
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .modal-body {
-    font-size: 12px;
+      font-size: 12px;
   }
 }
 
@@ -980,7 +967,7 @@ background-color: #e74c3c; /* Red color for full */
       color: #fff;
       padding: 10px 15px;
       border-radius: 5px;
-      z-index: 1100;
+      z-index: 1001;
       cursor: pointer;
       display: block;
   }
@@ -1001,5 +988,15 @@ background-color: #e74c3c; /* Red color for full */
       .video-card {
           flex: 0 1 calc(100% - 10px);
       }
+  }
+}
+
+@media (max-width: 768px) {
+  #logoutModal {
+      top: 5%;
+      left: 2%;
+      width: 90%;
+      max-width: 400px;
+      max-height: 50%;
   }
 }

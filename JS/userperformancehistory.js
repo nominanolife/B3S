@@ -92,10 +92,17 @@ function populateTable(attempts) {
         attempts.forEach((attempt, index) => {
             const row = document.createElement('tr');
 
+            // Format the date as "Month Day, Year"
+            const formattedDate = new Date(attempt.date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
             // Create table cells and append them
             row.innerHTML = `
                 <td>${applicantName}</td>  <!-- Display the applicant's name -->
-                <td>${new Date(attempt.date).toLocaleDateString()}</td>
+                <td>${formattedDate}</td>  <!-- Display the formatted date -->
                 <td>${attempt.percentage || 'N/A'}%</td>
                 <td><a href="#" class="view-result-link" data-attempt-index="${index}" data-toggle="modal" data-target="#performanceEvaluationModal">View Result</a></td>
                 <td class="${attempt.evaluation === 'Passed' ? 'status-passed' : 'status-failed'}">${attempt.evaluation}</td>

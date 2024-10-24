@@ -587,7 +587,7 @@ h2 {
 
 @media (max-width: 768px) {
     .arrow {
-        font-size: 60px;
+        font-size: 40px;
     }
 }
 
@@ -595,11 +595,6 @@ h2 {
     transform: translateY(-30px);
 }
 
-@media (max-width: 768px) {
-    .arrow:hover {
-        transform: translateY(-20px);
-    }
-}
 .arrow1 {
     display: flex;
     flex-direction: column;
@@ -611,10 +606,11 @@ h2 {
 
 @media (max-width: 768px) {
     .arrow1 {
-        top: 25%;
-        left: 5%;
+        top: 33%;
+        left: 0%;
     }
 }
+
 .arrow2 {
     display: flex;
     flex-direction: column;
@@ -626,7 +622,7 @@ h2 {
 
 @media (max-width: 768px) {
     .arrow2 {
-        top: 40%;
+        top: 53%;
         left: 25%;
     }
 }
@@ -642,8 +638,8 @@ h2 {
 
 @media (max-width: 768px) {
     .arrow3 {
-        top: 35%;
-        left: 45%;
+        top: 45%;
+        left: 40%;
     }
 }
 
@@ -658,7 +654,7 @@ h2 {
 
 @media (max-width: 768px) {
     .arrow4 {
-        top: 45%;
+        top: 55%;
         left: 65%;
     }
 }
@@ -672,7 +668,7 @@ h2 {
 
 @media (max-width: 768px) {
     .arrow1 p, .arrow2 p, .arrow3 p, .arrow4 p {
-        font-size: 12px;
+        font-size: 10px;
     }
 }
 
@@ -1189,7 +1185,7 @@ tbody tr .main-text {
 }
 
 .modal-content {
-    animation: popOut 0.4s ease;
+    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
 }
 @media (max-width: 768px) {
     .modal-content {
@@ -1208,9 +1204,9 @@ tbody tr .main-text {
 }
 @media (max-width: 768px) {
     .modal-dialog {
-        top: 10%;
+        top: 30%;
         left: 0;
-        width: 90%;
+        border-radius: 20px;
     }
 }
 
@@ -1418,7 +1414,7 @@ tbody tr .main-text {
         color: #fff;
         padding: 10px 15px;
         border-radius: 5px;
-        z-index: 1100;
+        z-index: 1001;
         cursor: pointer;
         display: block;
     }
@@ -1439,5 +1435,14 @@ tbody tr .main-text {
         .video-card {
             flex: 0 1 calc(100% - 10px);
         }
+    }
+}
+
+@media (max-width: 768px) {
+    #logoutModal {
+        top: -3%;
+        left: 3%;
+        width: 90%;
+        max-width: 400px;
     }
 }

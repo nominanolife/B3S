@@ -220,7 +220,7 @@ body {
     position: relative;
     padding-left: 30px;
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: normal;
     color: #2F2E2E;
 }
@@ -248,7 +248,7 @@ body {
     position: absolute;
     left: 4px;
     top: 0px;
-    font-size: 14px;
+    font-size: 16px;
     color: #ffffff;
     opacity: 0;
     transition: all 0.3s ease;
@@ -325,7 +325,7 @@ h2 {
 
 .question-header p {
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: bold;
     color: #2F2E2E;
     margin: 0;
@@ -340,7 +340,7 @@ h2 {
 
 .options p {
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: normal;
     color: #2F2E2E;
     margin: 0;
@@ -353,7 +353,7 @@ h2 {
 
 .publish-btn {
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 16px;
     color: #ffffff;
     background-color: #142A74;
     border: none;

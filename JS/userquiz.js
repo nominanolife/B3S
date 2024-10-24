@@ -24,6 +24,9 @@ let userAnswers = {};
 let userId = null; // Variable to store user ID
 
 async function fetchAndRandomizeQuizzes() {
+    // Show loader before fetching quizzes
+    document.getElementById('loader1').style.display = 'flex';
+    
     try {
         const quizzesSnapshot = await getDocs(collection(db, 'quizzes'));
         quizzesSnapshot.forEach(doc => {
@@ -54,6 +57,9 @@ async function fetchAndRandomizeQuizzes() {
         }
     } catch (error) {
         console.error("Error fetching quizzes:", error);
+    } finally {
+        // Hide loader once the quiz is loaded
+        document.getElementById('loader1').style.display = 'none';
     }
 }
 
@@ -113,11 +119,13 @@ async function renderQuestion(index) {
         const questionImageContainer = document.querySelector('.quiz-image');  // Select the image container
         const categoryElement = document.querySelector('.quiz-category');
         const nextBtn = document.querySelector('.next-btn'); // Get the next button
+        const saveBtn = document.querySelector('.save-btn'); // Get the save button (submit)
 
         const questionData = questions[index];
 
         // Disable the next button by default
         nextBtn.disabled = true;
+        saveBtn.disabled = true; // Also disable save button by default
 
         // Update question text
         if (questionElement) {
@@ -180,11 +188,16 @@ async function renderQuestion(index) {
             optionsContainer.appendChild(optionElement);
         });
 
-        // Add event listener to enable the next button when a choice is selected
+        // Add event listener to enable the next or save button when a choice is selected
         const radioButtons = document.querySelectorAll('input[name="questionanswer"]');
         radioButtons.forEach(radio => {
             radio.addEventListener('change', () => {
                 nextBtn.disabled = false; // Enable the next button when an option is selected
+
+                // Check if it's the last question
+                if (index === questions.length - 1) {
+                    saveBtn.disabled = false; // Enable the save button for the last question
+                }
             });
         });
 
@@ -195,6 +208,11 @@ async function renderQuestion(index) {
             if (optionToSelect) {
                 optionToSelect.checked = true;
                 nextBtn.disabled = false; // Enable the next button if an answer was previously saved
+
+                // Enable save button for the last question
+                if (index === questions.length - 1) {
+                    saveBtn.disabled = false; // Enable the save button for the last question
+                }
             }
         }
 

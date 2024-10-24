@@ -301,6 +301,15 @@ h2 {
     justify-content: space-between;
     align-items: center;
     border-radius: 10px;
+    
+}
+.list-view .module-details:hover {
+    background-color: #1B3286;
+    color: #ffffff; 
+}
+
+.list-view .module-details:hover * {
+    color: #ffffff; 
 }
 
 .list-view .description h3 {

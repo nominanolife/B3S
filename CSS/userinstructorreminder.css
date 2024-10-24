@@ -633,6 +633,11 @@ h2 {
 .modal-content {
     animation: popOut 0.4s ease; /* Duration of the pop-out animation */
 }
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 10px;
+    }
+}
 
 .modal-header, .modal-body, .modal-footer {
     border: none;
@@ -642,6 +647,13 @@ h2 {
     top: 30%;
     left: 5%;
     border-radius: 20px;
+}
+@media (max-width: 768px) {
+    .modal-dialog {
+        top: 30%;
+        left: 0;
+        border-radius: 20px;
+    }
 }
 
 .modal-content {
@@ -951,7 +963,7 @@ h2 {
         color: #fff;
         padding: 10px 15px;
         border-radius: 5px;
-        z-index: 1100;
+        z-index: 1001;
         cursor: pointer;
         display: block;
     }
@@ -961,5 +973,13 @@ h2 {
         padding: 10px 15px;
         font-size: 14px;
     }
+}
 
+@media (max-width: 768px) {
+    #logoutModal {
+        top: -4%;
+        left: 3%;
+        width: 90%;
+        max-width: 400px;
+    }
 }

@@ -230,7 +230,7 @@ h2 {
 
 .button-right {
     font-family: Poppins;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: bold;
     border: 2px solid #142A74;
     background: linear-gradient(#102369 ,#18349C, #2045CF);
@@ -261,7 +261,7 @@ h2 {
     width: 200px;
     position: relative;
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 18px;
 }
 
 .selected {
@@ -337,7 +337,7 @@ h2 {
 
 .table-headers-title {
     font-family: Poppins;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     color: #585353;
     text-align: left;
@@ -346,7 +346,7 @@ h2 {
 
 .upcoming-list, .cancelled-list {
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 20px;
     text-align: left;
 }
 

@@ -315,7 +315,7 @@ body {
 }
 
 .modal-content {
-    animation: popOut 0.4s ease;
+    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
 }
 @media (max-width: 768px) {
     .modal-content {
@@ -334,9 +334,9 @@ body {
 }
 @media (max-width: 768px) {
     .modal-dialog {
-        top: 10%;
+        top: 30%;
         left: 0;
-        width: 90%;
+        border-radius: 20px;
     }
 }
 
@@ -365,6 +365,7 @@ body {
         font-size: 12px;
     }
 }
+
 .close {
     font-size: 24px;
     color: #142A74;
@@ -467,7 +468,7 @@ body {
         color: #fff;
         padding: 10px 15px;
         border-radius: 5px;
-        z-index: 1100;
+        z-index: 1001;
         cursor: pointer;
         display: block;
     }
@@ -488,5 +489,15 @@ body {
         .video-card {
             flex: 0 1 calc(100% - 10px);
         }
+    }
+}
+
+@media (max-width: 768px) {
+    #logoutModal {
+        top: 18%;
+        left: 2%;
+        width: 90%;
+        max-width: 400px;
+        max-height: 50%;
     }
 }

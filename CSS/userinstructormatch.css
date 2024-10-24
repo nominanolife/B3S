@@ -153,8 +153,9 @@ body {
 
 @media (max-width: 768px) {
     .main-content {
+        height: 100%;
         width: 100%;
-        margin-left: 0;
+        margin: 0;
     }
 }
 
@@ -197,7 +198,7 @@ body {
 
 @media (max-width: 768px) {
     .title {
-        margin-left: 0;
+        margin: 0;
         text-align: center;
     }
 }
@@ -250,7 +251,7 @@ h2 {
 
 @media (max-width: 768px) {
     .personality-container {
-        border-radius: 10px;
+        border-radius: 20px;
     }
 }
 
@@ -485,6 +486,12 @@ h2 {
     margin-left: auto;
 }
 
+@media (max-width: 768px) {
+    .feedback {
+        width: 100%;
+    }
+}
+
 .feedback-btn {
     font-size: 12px;
     color: #ffffff;
@@ -492,6 +499,12 @@ h2 {
     border: none;
     border-radius: 10px;
     padding: 5px 10px;
+}
+
+@media (max-width: 768px) {
+    .feedback-btn {
+        width: 100%;
+    }
 }
 
 .right-info {
@@ -502,12 +515,20 @@ h2 {
 }
 @media (max-width: 768px) {
     .right-info {
-        padding-left: 10px;
+        display: flex;
+        gap: 10px;
+        padding: 0;
     }
 }
 
 .right-info-header {
     text-align: center;
+}
+
+.right-info-header span {
+    font-size: 24px;
+    font-weight: bold;
+    color: #142A74;
 }
 
 .right-info-body {
@@ -518,7 +539,7 @@ h2 {
 @media (max-width: 768px) {
     .right-info-body {
         flex-direction: column;
-        gap: 5px;
+        gap: 20px;
     }
 }
 
@@ -533,6 +554,12 @@ h2 {
     font-weight: bold;
     color: #142A74;
     text-align: center
+}
+
+@media (max-width: 768px) {
+    .about-container h5 {
+        text-align: left;
+    }
 }
 
 .about-item {
@@ -581,6 +608,12 @@ h2 {
     font-weight: bold;
     color: #142A74;
     text-align: center
+}
+
+@media (max-width: 768px) {
+    .comments-section h5 {
+        text-align: left;
+    }
 }
 
 .comments-header {
@@ -1120,7 +1153,7 @@ h2 {
         color: #fff;
         padding: 10px 15px;
         border-radius: 5px;
-        z-index: 1100;
+        z-index: 1001;
         cursor: pointer;
         display: block;
     }
@@ -1143,3 +1176,13 @@ h2 {
         }
     }
   }
+
+  @media (max-width: 768px) {
+    #logoutModal {
+        top: 22%;
+        left: 2%;
+        width: 90%;
+        max-width: 400px;
+        max-height: 50%;
+    }
+}

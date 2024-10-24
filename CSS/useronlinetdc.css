@@ -534,9 +534,8 @@ h2 {
 }
 
 .modal-content {
-    animation: popOut 0.4s ease;
+    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
 }
-
 @media (max-width: 768px) {
     .modal-content {
         padding: 10px;
@@ -547,23 +546,16 @@ h2 {
     border: none;
 }
 
-@media (max-width: 768px) {
-    .modal-header, .modal-body, .modal-footer {
-        padding: 10px;
-    }
-}
-
 .modal-dialog {
     top: 30%;
     left: 5%;
     border-radius: 20px;
 }
-
 @media (max-width: 768px) {
     .modal-dialog {
-        top: 10%;
+        top: 30%;
         left: 0;
-        width: 100%;
+        border-radius: 20px;
     }
 }
 
@@ -578,16 +570,19 @@ h2 {
     font-weight: bold;
     color: #142A74;
 }
-
-@media (max-width: 768px) {
+@media (max-width: 480px) {
     .modal-title {
         font-size: 18px;
     }
 }
 
-
 .modal-body {
     font-size: 14px;
+}
+@media (max-width: 480px) {
+    .modal-body {
+        font-size: 12px;
+    }
 }
 
 .close {
@@ -716,7 +711,7 @@ h2 {
         color: #fff;
         padding: 10px 15px;
         border-radius: 5px;
-        z-index: 1100;
+        z-index: 1001;
         cursor: pointer;
         display: block;
     }
@@ -737,5 +732,14 @@ h2 {
         .video-card {
             flex: 0 1 calc(100% - 10px);
         }
+    }
+}
+
+@media (max-width: 768px) {
+    #logoutModal {
+        top: 0;
+        left: 5%;
+        width: 90%;
+        max-width: 400px;
     }
 }

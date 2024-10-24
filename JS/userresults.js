@@ -279,6 +279,8 @@ function showChart(categoryScores) {
 
     const chartContent = document.createElement('div');
     chartContent.className = 'chart-content';
+    chartContent.style.width = '100%';  // Set the width to fill the container
+    chartContent.style.height = '500px'; // Set a larger height for the chart
     chartContent.innerHTML = `<canvas id="myBarChart"></canvas>`;
     resultContainer.appendChild(chartContent);
 
@@ -298,14 +300,53 @@ function showChart(categoryScores) {
             datasets: [{
                 label: 'Performance Score',
                 data: dataPoints,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                backgroundColor: 'rgba(75, 192, 192, 0.4)',  // Thicker background color
                 borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
+                borderWidth: 2  // Thicker borders for the bars
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false, // Ensure the chart fills the container
             scales: {
-                y: { beginAtZero: true }
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Score Percentage',  // Label for the y-axis
+                        font: {
+                            size: 20  // Make the font size larger
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: 18  // Larger tick labels for the y-axis
+                        }
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Category',  // Label for the x-axis
+                        font: {
+                            size: 20  // Make the font size larger
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: 18  // Larger tick labels for the x-axis
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            size: 18  // Larger font for the legend
+                        }
+                    }
+                }
             }
         }
     });
@@ -319,7 +360,6 @@ function showChart(categoryScores) {
     });
 }
 
-// Show performance evaluation with Flask AI insights
 // Show performance evaluation with Flask AI insights
 async function showPerformanceEvaluation(evaluationData) {
     const resultContainer = document.querySelector('.result-container');

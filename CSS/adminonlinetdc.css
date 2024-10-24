@@ -375,13 +375,13 @@ h2 {
 }
 
 .upload-area i {
-    font-size: 64px;
+    font-size: 70px;
     color: #9CA3AF;
 }
 
 .upload-area p {
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: normal;
     color: #9CA3AF;
     margin-top: 10px;
@@ -577,7 +577,7 @@ h2 {
 
 .selected:after {
     content: '\25BC';
-    font-size: 12px;
+    font-size: 18px;
     color: #142A74;
     margin-left: 10px;
     position: absolute;
