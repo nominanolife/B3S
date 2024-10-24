@@ -188,6 +188,33 @@ async function renderVideoDetails(videoId, videos, userId) {
             videoElement.volume = 0.5;
             videoElement.autoplay = true;
 
+            if (videoData.subtitleURL) {
+                const subtitleTrack = document.createElement('track');
+                subtitleTrack.src = videoData.subtitleURL;
+                subtitleTrack.kind = 'subtitles';
+                subtitleTrack.label = 'Filipino';
+                subtitleTrack.srclang = 'tl';
+            
+                // Append the subtitle track to the video element
+                videoElement.appendChild(subtitleTrack);
+            
+                // Wait for the metadata to load
+                videoElement.addEventListener('loadedmetadata', () => {
+                    if (videoElement.textTracks.length > 0) {
+                        // Set mode to 'showing' to display subtitles
+                        videoElement.textTracks[0].mode = 'showing';
+                        console.log("Subtitles are now showing.");
+                    } else {
+                        console.warn("No text tracks found after appending the subtitle track.");
+                    }
+                });
+            
+                // In case of error, log the issue
+                subtitleTrack.addEventListener('error', () => {
+                    console.error("Subtitle track failed to load. Check the VTT file format or the URL.");
+                });
+            }
+
             videoElement.addEventListener('contextmenu', function (e) {
                 e.preventDefault();
             });
