@@ -161,13 +161,14 @@ body {
 }
 
 .modal-dialog {
-  top: 30%;
+  top: 10%;
   left: 5%;
   border-radius: 20px;
 }
+
 @media (max-width: 768px) {
   .modal-dialog {
-      top: 30%;
+      top: 10%;
       left: 0;
       border-radius: 20px;
   }

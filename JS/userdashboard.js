@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         let stepContent = '';
         switch (step) {
             case '1':
-                modalTitle.textContent = "Step 1: Theoretical Driving Course";
+                modalTitle.textContent = "Step 1 - Theoretical Driving Course";
                 stepContent = `
                     <div class="step-container">
                         <h3>Prepare the Required Documents</h3>
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     `;
                 break;
             case '2':
-                modalTitle.textContent = "Step 2: Student Permit";
+                modalTitle.textContent = "Step 2 - Student Permit";
                 stepContent = `
                             <div class="step-container">
                         <h3>Prepare the Required Document</h3>
@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 `;
             break;
             case '3':
-                modalTitle.textContent = "Step 3: Practical Driving Course";
+                modalTitle.textContent = "Step 3 - Practical Driving Course";
                 stepContent = `
                     <div class="step-container">
                         <h3>Prepare the Required Documents</h3>
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 `;
             break;
             case '4':
-                modalTitle.textContent = "Step 4: Non-Professional Driver's License";
+                modalTitle.textContent = "Step 4 - Non-Professional Driver's License";
                 stepContent = `
                     <div class="step-container">
                         <h3>Prepare the Required Document</h3>
@@ -592,13 +592,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                             // Display the calculated remaining balance in the balance card
                             if (remainingBalance === 0) {
                                 balanceCard.innerHTML = `
-                                    <h5 class="card-title">Current Balance</h5>
+                                    <h5 class="card-title">Amount to Pay</h5>
                                     <p style="color: green; font-size: 24px;">Fully Paid</p>
                                 `;
                             } else {
                                 // Otherwise, show the remaining balance as normal
                                 balanceCard.innerHTML = `
-                                    <h5 class="card-title">Current Balance</h5>
+                                    <h5 class="card-title">Amount to Pay</h5>
                                     <p class="card-body" style="color: red; font-size: 40px;">&#8369; ${remainingBalance.toFixed(2)}</p>
                                     <button class="card-button" id="viewDetailsBtn">View Details</button>
                                 `;
@@ -623,8 +623,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                         } else {
                             balanceCard.classList.add('center-content');
                             balanceCard.innerHTML = `
-                                <h5 class="card-title">Current Balance</h5>
-                                <p style="color: #142A74;">No balance</p>
+                                <h5 class="card-title">Amount to Pay</h5>
+                                <p style="color: #142A74;">No package availed</p>
                             `;
                         }
                     } else {

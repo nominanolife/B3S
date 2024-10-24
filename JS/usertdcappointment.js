@@ -93,31 +93,35 @@ function renderCalendar(month, year) {
 
     if (appointmentsForDate.length > 0) {
       let hasAvailableSlots = false;
-      
+    
       // Loop through all appointments to check for any available slots
       for (const appointment of appointmentsForDate) {
         const totalSlots = appointment.slots;
         const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
-
+    
         if (bookedSlots < totalSlots) {
           hasAvailableSlots = true;
           break;  // Stop checking further if there's availability
         }
       }
-
+    
       // Set the background color based on availability
       dayDiv.style.backgroundColor = hasAvailableSlots ? "green" : "red";
-
+    
       const appointmentDate = new Date(fullDate);
       if (appointmentDate.toDateString() === today.toDateString()) {
         // Disable the tile if it's the day of the appointment
         dayDiv.style.pointerEvents = 'none';  // Disable click events
         dayDiv.style.opacity = '0.5';  // Dim the tile to indicate it's disabled
         dayDiv.title = 'Booking not allowed on the day of the appointment';
+      } else if (!hasAvailableSlots) {
+        // Disable the tile if it has no available slots
+        dayDiv.style.pointerEvents = 'none';
+        dayDiv.title = 'No available slots';
       } else {
         dayDiv.addEventListener('click', () => showAppointmentDetails(fullDate));
       }
-    }
+    }    
 
     if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
       dayDiv.classList.add("today");
