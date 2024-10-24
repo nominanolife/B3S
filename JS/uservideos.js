@@ -185,32 +185,37 @@ async function renderVideoDetails(videoId, videos, userId) {
             videoElement.style.backgroundColor = "black";
             videoElement.volume = 0.5;
             videoElement.autoplay = true;
+            videoElement.crossOrigin = "anonymous"; // Add this line for cross-origin handling
 
             if (videoData.subtitleURL) {
+                console.log("Subtitle URL: ", videoData.subtitleURL); // Log the subtitle URL
                 const subtitleTrack = document.createElement('track');
                 subtitleTrack.src = videoData.subtitleURL;
                 subtitleTrack.kind = 'subtitles';
                 subtitleTrack.label = 'Filipino';
                 subtitleTrack.srclang = 'tl';
+                subtitleTrack.default = true;
             
-                // Append the subtitle track to the video element
-                videoElement.appendChild(subtitleTrack);
+                // Additional event listeners to debug different stages
+                subtitleTrack.addEventListener('loadstart', () => {
+                    console.log('Subtitle load started:', subtitleTrack.src);
+                });
             
-                // Wait for the metadata to load
-                videoElement.addEventListener('loadedmetadata', () => {
-                    if (videoElement.textTracks.length > 0) {
-                        // Set mode to 'showing' to display subtitles
-                        videoElement.textTracks[0].mode = 'showing';
-                        
-                    } else {
-                        
+                subtitleTrack.addEventListener('load', () => {
+                    console.log('Subtitle loaded successfully:', subtitleTrack.src);
+                });
+            
+                subtitleTrack.addEventListener('error', (event) => {
+                    console.error('Error loading subtitle:', subtitleTrack.src);
+                    console.error('Error details:', event);
+                    // Log specific error code if available
+                    if (event.target && event.target.error) {
+                        console.error('Subtitle Error Code:', event.target.error.code);
                     }
                 });
             
-                // In case of error, log the issue
-                subtitleTrack.addEventListener('error', () => {
-                   
-                });
+                // Append the subtitle track to the video element
+                videoElement.appendChild(subtitleTrack);
             }
 
             videoElement.addEventListener('contextmenu', function (e) {
