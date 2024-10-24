@@ -185,7 +185,7 @@ async function renderVideoDetails(videoId, videos, userId) {
             videoElement.style.backgroundColor = "black";
             videoElement.volume = 0.5;
             videoElement.autoplay = true;
-            videoElement.crossOrigin = "anonymous"; // Add this line for cross-origin handling
+            videoElement.crossOrigin = "anonymous"; // Alternative to "anonymous"
 
             if (videoData.subtitleURL) {
                 console.log("Subtitle URL: ", videoData.subtitleURL); // Log the subtitle URL

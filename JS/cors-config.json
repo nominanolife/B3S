@@ -1,6 +1,6 @@
 [
   {
-    "origin": ["*"],
+    "origin": ["https://drivehubonline.com", "http://127.0.0.1:5500"],
     "method": ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
     "responseHeader": ["Content-Type", "Authorization", "Access-Control-Allow-Origin"],
     "maxAgeSeconds": 3600
