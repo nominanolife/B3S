@@ -246,3 +246,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 });
+
+// Toggle sidebar functionality
+document.getElementById("toggleSidebarBtn").addEventListener("click", function() {
+    document.querySelector("nav").classList.toggle("sidebar-open");
+});

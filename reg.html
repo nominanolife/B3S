@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="CSS/styles.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="icon" href="Assets/logo.png" type="image/x-icon">
 </head>
 <body>
@@ -68,7 +69,7 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-center">
-                            <button type="submit" id="signUp" class="btn btn-outline-primary login-btn">CREATE ACCOUNT</button>
+                            <button type="submit" id="signUp" class="btn btn-outline-primary create-btn">CREATE ACCOUNT</button>
                         </div>
                         <p class="text-center mt-3">Already have an account? <a href="login.html" id="loginLink" class="text-dark">Login Here!</a></p>
                     </form>
@@ -76,6 +77,60 @@
             </div>
         </div>
     </main>
+
+    <!-- Policy Privacy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Privacy Policy</h5>
+            </div>
+            <form class="traits">
+                <div class="modal-body">
+                    <h4>Please read our privacy policy carefully.</h4>
+                    <p>
+                        DriveHub is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our services, including our website and mobile application (collectively, the "Services"). By using our Services, you agree to the collection and use of information in accordance with this policy.
+                    </p>
+                    <h5>Information We Collect</h5>
+                    <p>
+                        We may collect and process the following types of information: 
+                        <ul>
+                            <li><strong>Personal Information:</strong> Name, email address, phone number, address, date of birth, and any other information you provide to us directly.</li>
+                            <li><strong>Usage Data:</strong> Information about how you use our Services, including your IP address, browser type, pages visited, and time spent on the Services.</li>
+                            <li><strong>Cookies and Tracking Technologies:</strong> We may use cookies and similar tracking technologies to monitor activity on our Services and store certain information.</li>
+                        </ul>
+                    </p>
+                    <h5>How We Use Your Information</h5>
+                    <p>
+                        We use the information we collect for various purposes, including:
+                        <ul>
+                            <li>To provide, maintain, and improve our Services.</li>
+                            <li>To process your bookings and manage your account.</li>
+                            <li>To communicate with you, including sending you updates and promotional materials.</li>
+                            <li>To monitor the usage of our Services.</li>
+                            <li>To detect, prevent, and address technical issues.</li>
+                            <li>To comply with legal obligations.</li>
+                        </ul>
+                    </p>
+                    <h5>Your Rights</h5>
+                    <p>
+                        Depending on your location, you may have rights regarding your personal information. Please contact us for more information.
+                    </p>
+                    <div class="form-group">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="agreeCheckbox" required>
+                            <span class="checkbox-label">I agree to the Privacy Policy</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary dec-btn" id="declineButton">Decline</button>
+                    <button type="button" class="btn btn-outline-primary save-btn">Accept</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
     <!-- Notification Modal -->
     <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
@@ -98,6 +153,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="JS/reg.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
         import { getFirestore, doc, setDoc, query, collection, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";

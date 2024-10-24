@@ -291,6 +291,115 @@ span {
     color: white !important;
 }
 
+.create-btn {
+    font-family: Poppins !important;
+    font-weight: bold !important;
+    background-color: #142A74 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 10px 20px !important;
+    margin-top: 20px !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.create-btn:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+.save-btn {
+    font-family: Poppins !important;
+    font-weight: bold !important;
+    background-color: #142A74 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 10px 20px !important;
+    margin-top: 20px !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.save-btn:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+
+.btn-primary:hover {
+    background-color: #142a74ec;
+}
+
+.dec-btn{
+    font-family: Poppins !important;
+    font-weight: bold !important;
+    background-color: #b60505ec !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 10px 20px !important;
+    margin-top: 20px !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.dec-btn:hover {
+    background-color: #b60505ec  !important;
+}
+
+.btn[disabled] {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed; /* Change the cursor to indicate it's not clickable */
+}
+/* Hide the default checkbox */
+.custom-checkbox input[type="checkbox"] {
+    display: none; /* Hide the default checkbox */
+}
+
+/* Create a custom checkbox */
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.custom-checkbox .checkbox-label {
+    position: relative;
+    padding-left: 30px; /* Space for the custom checkbox */
+    cursor: pointer;
+}
+
+/* Create the custom checkbox */
+.custom-checkbox .checkbox-label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px; /* Width of the custom checkbox */
+    height: 20px; /* Height of the custom checkbox */
+    border: 2px solid #142a74; /* Border color */
+    border-radius: 4px; /* Rounded corners */
+    background-color: white; /* Background color when unchecked */
+}
+
+/* Checkbox checked state */
+.custom-checkbox input[type="checkbox"]:checked + .checkbox-label::before {
+    background-color: #142a74; /* Background color when checked */
+    border-color: #142a74; /* Border color when checked */
+}
+
+/* Checkmark */
+.custom-checkbox input[type="checkbox"]:checked + .checkbox-label::after {
+    content: '';
+    position: absolute;
+    left: 6px; /* Position of checkmark */
+    top: 10px; /* Position of checkmark */
+    width: 6px; /* Width of checkmark */
+    height: 10px; /* Height of checkmark */
+    border: solid white; /* Checkmark color */
+    border-width: 0 2px 2px 0; /* Create the checkmark */
+    transform: rotate(45deg); /* Rotate the checkmark */
+}
+
 /* Link styles */
 .text-dark {
     text-decoration: underline;
@@ -575,4 +684,62 @@ h5 {
     100% {
         content: '.';
     }
+}
+
+#privacyModal .modal-dialog {
+    top: 5%;
+    left: 0;
+    width: 100%;
+    max-width: 1000px;
+}
+
+@media (max-width: 768px) {
+    #privacyModal .modal-dialog {
+        max-width: 95%;
+        left: 2%;
+        top: 0;
+    }
+}
+
+#privacyModal .modal-content {
+    padding: 20px;
+    border-radius: 30px;
+}
+
+#privacyModal .modal-header {
+    display: flex;
+    flex-direction: column;
+}
+
+#privacyModal .modal-header h4 {
+    font-size: 14px;
+}
+@media (max-width: 768px) {
+    #privacyModal .modal-header h4 {
+        font-size: 12px;
+    }
+}
+
+#privacyModal .modal-footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-primary {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+}
+@media (max-width: 480px) {
+    .btn-primary {
+        padding: 8px 20px;
+    }
+}
+
+.btn-primary:hover {
+    background-color: #142a74ec;
 }
