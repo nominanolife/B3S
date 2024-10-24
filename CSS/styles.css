@@ -687,17 +687,23 @@ h5 {
 }
 
 #privacyModal .modal-dialog {
-    top: auto;
-    left: 5%;
-    border-radius: 20px;
-    max-width: 30%;
-    width: auto;
+    top: 5%;
+    left: 0;
+    width: 100%;
+    max-width: 1000px;
 }
+
 @media (max-width: 768px) {
     #privacyModal .modal-dialog {
-        max-width: 80%;
-        left: 10%;
+        max-width: 95%;
+        left: 2%;
+        top: 0;
     }
+}
+
+#privacyModal .modal-content {
+    padding: 20px;
+    border-radius: 30px;
 }
 
 #privacyModal .modal-header {
@@ -712,6 +718,11 @@ h5 {
     #privacyModal .modal-header h4 {
         font-size: 12px;
     }
+}
+
+#privacyModal .modal-footer {
+    display: flex;
+    justify-content: space-between;
 }
 
 .btn-primary {

@@ -29,10 +29,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
 $(document).ready(function() {
-    // Show the modal when the page loads
-    $('#privacyModal').modal('show'); 
-    
+    // Show the modal when the page loads with the backdrop static option
+    $('#privacyModal').modal({
+        backdrop: 'static', // Prevents closing when clicking outside the modal
+        keyboard: false      // Prevents closing with the Esc key
+    });
+
     const checkbox = document.getElementById('agreeCheckbox');
     const saveBtn = document.querySelector('.save-btn');
 
