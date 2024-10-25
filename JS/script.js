@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initialMessage.innerHTML = `
         <div class="bot-message-container">
             <img src="Assets/logo.png" alt="Chatbot Logo" class="chatbot-logo">
-            <p class="bubble">Hi! I\'m DriveHub\'s Chatbot. How can I help you today?</p>
+            <p class="bubble">Hi! I\'m DriveHub\'s Chatbot. I can answer strictly for inquiries</p>
         </div>`;
     chatbotMessages.appendChild(initialMessage);
 
