@@ -986,28 +986,105 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         videoUpload.click(); // Trigger the file input to select a new video file
     });
 
+    function validateStep(stepIndex) {
+        let isValid = true;
+    
+        if (stepIndex === 0) {
+            const videoTitle = document.getElementById('videoTitleInput').value.trim();
+            const selectedCategory = document.querySelector('.category .selected').textContent.trim();
+            const thumbnailFile = document.getElementById('thumbnailUpload').files[0];
+            const videoFile = document.getElementById('videoUpload').files[0];
+    
+            if (!videoTitle || selectedCategory === 'Select a category' || !thumbnailFile || !videoFile) {
+                isValid = false;
+            }
+        }
+    
+        return isValid;
+    }
+
+    // Function to validate Step 2
+    function validateStep2() {
+        const questionInputs = document.querySelectorAll('.quiz-container .question-input input');
+        const optionInputs = document.querySelectorAll('.quiz-container .question-options input[type="text"]');
+        const areQuestionsFilled = Array.from(questionInputs).every(input => input.value.trim() !== '');
+        const areOptionsFilled = Array.from(optionInputs).every(input => input.value.trim() !== '');
+        const areCorrectOptionsSelected = Array.from(document.querySelectorAll('.quiz-container')).every(container => {
+            return container.querySelector('.question-options input[type="radio"]:checked');
+        });
+    
+        const isStep2Valid = areQuestionsFilled && areOptionsFilled && areCorrectOptionsSelected;
+        nextButton.disabled = !isStep2Valid;
+    }    
+
+    // Attach event listeners to monitor changes in Step 2 inputs
+    document.addEventListener('input', function(event) {
+        if (event.target.closest('.quiz-container')) {
+            validateStep2();
+        }
+    });
+    
     function showStep(stepIndex) {
         steps.forEach(step => {
             const stepElement = document.getElementById(step);
             if (stepElement) {
-                // Pause all videos within the step being hidden
                 const videos = stepElement.querySelectorAll('video');
                 videos.forEach(video => {
                     video.pause();
-                    video.currentTime = 0; // Optional: Reset to the start
+                    video.currentTime = 0; // Reset to the start
                 });
-                // Hide the step
                 stepElement.classList.add('d-none');
             }
         });
+    
         const currentStepElement = document.getElementById(steps[stepIndex]);
         if (currentStepElement) currentStepElement.classList.remove('d-none');
         updateButtonVisibility(stepIndex);
+    
+        // Step-specific validation
+        if (stepIndex === 0) {
+            const isStep1Valid = validateStep(stepIndex);
+            if (nextButton) nextButton.disabled = !isStep1Valid;
+        } else if (stepIndex === 1) {
+            const isStep2Valid = validateStep2();
+            if (nextButton) nextButton.disabled = !isStep2Valid;
+        }
     
         if (stepIndex === 2) {
             updatePreview();
         }
     }    
+    
+    function attachValidationListeners() {
+        // Existing Step 1 validation listeners
+        const videoTitleInput = document.getElementById('videoTitleInput');
+        const thumbnailUploadInput = document.getElementById('thumbnailUpload');
+        const videoUploadInput = document.getElementById('videoUpload');
+        const categoryDropdown = document.querySelector('.category .selected');
+    
+        videoTitleInput.addEventListener('input', () => validateCurrentStep());
+        thumbnailUploadInput.addEventListener('change', () => validateCurrentStep());
+        videoUploadInput.addEventListener('change', () => validateCurrentStep());
+        categoryDropdown.addEventListener('click', () => validateCurrentStep());
+    
+        // New Step 2 validation listeners
+        const step2Inputs = document.querySelectorAll('#step2 input');
+        step2Inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                const isStep2Valid = validateStep2();
+                nextButton.disabled = !isStep2Valid; // Enable/Disable next button based on validation
+            });
+        });
+    }    
+    
+    function validateCurrentStep() {
+        const isStepValid = validateStep(currentStep);
+        if (nextButton) nextButton.disabled = !isStepValid;
+    }
+    
+    // Call this function on page load or when initializing the modal
+    attachValidationListeners();
+    
 
     function updateButtonVisibility(stepIndex) {
         if (backButton) backButton.style.display = stepIndex > 0 ? 'inline-block' : 'none';
@@ -1313,6 +1390,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
 
         // Call the renumbering function after adding a question
         renumberQuestions();
+        validateStep2();
     }
 
     // Function to renumber all questions
@@ -1392,6 +1470,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         deleteButton.addEventListener('click', function () {
             quizContent.removeChild(newQuestion);
             updateQuestionNumbers();  // Update question numbering after deletion
+            validateStep2();
         });
     
         // Handle image upload functionality
@@ -1574,12 +1653,6 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         const title = videoTitleInput.value.trim();
         const category = document.querySelector('.category .selected').textContent.trim();
     
-        // Check if all required fields are filled in
-        if (!videoFile || !thumbnailFile || !title || !category) {
-            showNotification("Please fill in all required fields.");
-            return;
-        }
-    
         // Turn on loader only after fields are validated
         toggleLoader(true, 'Uploading Lesson');
     
@@ -1699,8 +1772,6 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
         toggleLoader(true);
     
         try {
-            
-            
             // Collect data from the preview (already validated)
             const videoUrlFromPreview = document.querySelector('#editVideoPreviewContainer video source')?.src;
             const thumbnailUrlFromPreview = document.querySelector('#editThumbnailPreviewContainer img')?.src;

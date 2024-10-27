@@ -1,8 +1,9 @@
 /* Base styles */
 body {
-    font-family: Poppins, sans-serif;
+    font-family: Poppins;
     margin: 0;
     padding: 0;
+    width: 100%;
 }
 
 nav {
@@ -12,7 +13,6 @@ nav {
     background-color: #fff;
     padding: 5px 30px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    position: fixed;
     width: 100%;
     z-index: 1;
 }
@@ -180,30 +180,24 @@ header {
     background-color: #193075; 
     color: #ffffff;
     padding: 60px 0;
-    overflow: hidden;
     min-height: 650px; 
     position: relative;
 }
 
 .header-container {
-    position: relative;
-    width: 90%;
-    max-width: 1000px;
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    z-index: 2; 
 }
 
 .text-section {
-    position: relative;
-    left: -30px;
-    flex: 1;
-    max-width: 80%; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
     text-align: left;
-    z-index: 2;
 }
 
 .text-section h1 {
@@ -758,8 +752,6 @@ footer .container:last-child {
 .chat-bot-container:hover {
     background-color: #092A73;
 }
-
-
 
 .chat-bubble {
     position: fixed;

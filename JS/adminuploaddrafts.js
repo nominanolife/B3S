@@ -55,15 +55,31 @@ document.addEventListener('DOMContentLoaded', async function() {
                 // Fetch the draft data by ID
                 const draftData = await fetchDraftData(currentDraftId);
 
-                // Delete the draft and related files
-                await deleteDraftInfo(draftData, currentDraftId);
+                // If draft data exists, proceed with deletion
+                if (draftData) {
+                    // Delete the draft and related files
+                    await deleteDraftInfo(draftData, currentDraftId);
 
-                // Remove the draft card from the UI
-                const draftCard = document.querySelector(`.draft-container[data-id="${currentDraftId}"]`);
-                if (draftCard) draftCard.remove();
+                    // Remove the draft card from the UI
+                    const draftCard = document.querySelector(`.draft-container[data-id="${currentDraftId}"]`);
+                    if (draftCard) draftCard.remove();
 
+                    // Check if there are no remaining drafts
+                    const remainingDrafts = document.querySelectorAll('.draft-container');
+                    if (remainingDrafts.length === 0) {
+                        const draftListContainer = document.querySelector('.draft-list');
+                        draftListContainer.innerHTML = `<p>No drafts available</p>`; // Update to show "No drafts available"
+                    }
+
+                    // Show success notification
+                    document.getElementById('notificationModalBody').innerText = "Draft deleted successfully!";
+                    $('#notificationModal').modal('show');
+                }
             }
         } catch (error) {
+            // Show error notification
+            document.getElementById('notificationModalBody').innerText = "An error occurred. Please try again.";
+            $('#notificationModal').modal('show');
         }
     });
 
@@ -74,12 +90,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     async function fetchDraftData(draftId) {
         const draftDocRef = doc(db, 'onlineDrafts', draftId);
         const draftSnapshot = await getDoc(draftDocRef);
+    
         if (draftSnapshot.exists()) {
-            return draftSnapshot.data(); // Return the draft data
+            const draftData = draftSnapshot.data();  // Fetch the draft data
+            return draftData;  // Return the fetched data for further operations
         } else {
             throw new Error('Draft not found.');
         }
-    }
+    }    
 
     async function fetchDrafts() {
         try {
@@ -147,37 +165,50 @@ document.addEventListener('DOMContentLoaded', async function() {
             if (!draftId) {
                 throw new Error("Draft ID is undefined");
             }
-
-            // Delete draft video file if it exists in storage and is a valid string
+    
+            // Delete draft video file if it exists in storage
             if (draftData.videoURL && typeof draftData.videoURL === 'string' && draftData.videoURL.includes('dVideos')) {
                 const draftVideoRef = ref(storage, draftData.videoURL);
-                await deleteObject(draftVideoRef);
+                await deleteObject(draftVideoRef).catch(error => {
+                    console.error("Error deleting video file:", error);
+                    throw new Error("Failed to delete video file.");
+                });
             }
-
-            // Delete draft thumbnail file if it exists in storage and is a valid string
+    
+            // Delete draft thumbnail file if it exists in storage
             if (draftData.thumbnailURL && typeof draftData.thumbnailURL === 'string' && draftData.thumbnailURL.includes('dThumbnails')) {
                 const draftThumbnailRef = ref(storage, draftData.thumbnailURL);
-                await deleteObject(draftThumbnailRef);
+                await deleteObject(draftThumbnailRef).catch(error => {
+                    console.error("Error deleting thumbnail file:", error);
+                    throw new Error("Failed to delete thumbnail file.");
+                });
             }
-
-            // Delete draft quiz images if they exist in storage and are valid strings
+    
+            // Delete draft quiz images if they exist in storage
             if (draftData.quizQuestions) {
                 for (const question of draftData.quizQuestions) {
                     if (question.imageFile && typeof question.imageFile === 'string' && question.imageFile.includes('dQuiz_images')) {
                         const draftImageRef = ref(storage, question.imageFile);
-                        await deleteObject(draftImageRef);
+                        await deleteObject(draftImageRef).catch(error => {
+                            console.error("Error deleting quiz image file:", error);
+                            throw new Error("Failed to delete quiz image file.");
+                        });
                     }
                 }
             }
-
-            // Delete the draft document from Firestore using correct ID
+    
+            // Delete the draft document from Firestore
             const draftDocRef = doc(db, 'onlineDrafts', draftId);
-            await deleteDoc(draftDocRef);
-
+            await deleteDoc(draftDocRef).catch(error => {
+                console.error("Error deleting Firestore document:", error);
+                throw new Error("Failed to delete Firestore document.");
+            });
+    
         } catch (error) {
+            console.error("Error deleting draft data:", error);
             throw error;
         }
-    }
+    }    
 
     // Function to open a draft and populate the modal
     async function openDraft(draftId, draftData) {
@@ -408,6 +439,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     
         quizContent.appendChild(newQuestion);
     
+        // Add event listeners for validation on the new question's input fields
+        const questionInput = newQuestion.querySelector('.question-input input');
+        const optionInputs = newQuestion.querySelectorAll('.question-options input[type="text"]');
+        const radioButtons = newQuestion.querySelectorAll('.question-options input[type="radio"]');
+    
+        // Re-validate Step 2 when changes are made to the new question inputs
+        questionInput.addEventListener('input', validateStep2);
+        optionInputs.forEach(input => input.addEventListener('input', validateStep2));
+        radioButtons.forEach(radio => radio.addEventListener('change', validateStep2));
+    
+        // Trigger validation after adding a new question
+        validateStep2();
+    
         const imageUploadInput = newQuestion.querySelector(`#imageUpload${questionCount}`);
         const imageUploadBox = newQuestion.querySelector('.image-upload-box .image-upload-area');
     
@@ -427,10 +471,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         deleteButton.addEventListener('click', function () {
             quizContent.removeChild(newQuestion);
             updateQuestionNumbers();
+            validateStep2(); // Re-validate after deleting a question
         });
     
         updateQuestionNumbers(); // Call this to ensure question numbers are updated correctly
-    }
+    }    
     
     // Function to update question numbers dynamically
     function updateQuestionNumbers() {
@@ -613,16 +658,97 @@ document.addEventListener('DOMContentLoaded', async function() {
                 stepElement.classList.add('d-none');
             }
         });
-
+    
         const currentStepElement = document.getElementById(steps[stepIndex]);
         if (currentStepElement) currentStepElement.classList.remove('d-none');
-
+    
         updateButtonVisibility(stepIndex);
-
+    
+        // Call validateStep2 when displaying step2 to ensure correct button state
+        if (stepIndex === 1) {
+            validateStep2();
+        }
+    
         if (stepIndex === steps.length - 1) {
             updatePreview();
         }
+    }    
+
+    // Function to check if Step 1 is fulfilled
+    function validateStep1() {
+        // Check required fields in Step 1
+        const videoTitleInput = document.getElementById('videoTitleInput');
+        const category = document.querySelector('.category .selected').textContent.trim();
+        const thumbnailUpload = document.getElementById('thumbnailUpload');
+        const videoUpload = document.getElementById('videoUpload');
+    
+        // Validate if the video title is not empty, a category is selected, and a video is uploaded
+        const isValid = videoTitleInput.value.trim() !== '' && 
+                        category !== 'Select a category' &&
+                        (thumbnailUpload.files.length > 0 || window.draftData?.thumbnailURL) &&
+                        (videoUpload.files.length > 0 || window.draftData?.videoURL);
+    
+        // Enable or disable the next button based on validation
+        nextButton.disabled = !isValid;
     }
+
+    // Attach event listeners to the required fields in Step 1
+    const videoTitleInput = document.getElementById('videoTitleInput');
+    const categorySelect = document.querySelector('.category .selected');
+
+    if (videoTitleInput) {
+        videoTitleInput.addEventListener('input', validateStep1);
+    }
+
+    if (categorySelect) {
+        const observer = new MutationObserver(() => {
+            validateStep1(); // Call the validation whenever the category changes
+        });
+    
+        // Configure the observer to listen for subtree modifications (e.g., text changes)
+        observer.observe(categorySelect, { childList: true, subtree: true });
+    }    
+
+    if (thumbnailUpload) {
+        thumbnailUpload.addEventListener('change', validateStep1); // Validate when a new thumbnail is uploaded
+    }
+    
+    if (videoUpload) {
+        videoUpload.addEventListener('change', validateStep1); // Validate when a new video is uploaded
+    }
+    
+    // Call validateStep1 initially to ensure proper button state
+    validateStep1();
+
+    // Function to validate Step 2
+    function validateStep2() {
+        // Example of inputs that need to be validated in Step 2
+        const questionInputs = document.querySelectorAll('.quiz-container .question-input input');
+        const optionInputs = document.querySelectorAll('.quiz-container .question-options input[type="text"]');
+        const correctOptions = document.querySelectorAll('.quiz-container .question-options input[type="radio"]:checked');
+
+        // Check if all question inputs are filled
+        const areQuestionsFilled = Array.from(questionInputs).every(input => input.value.trim() !== '');
+
+        // Check if all option inputs are filled
+        const areOptionsFilled = Array.from(optionInputs).every(input => input.value.trim() !== '');
+
+        // Ensure each question has at least one correct option selected
+        const areCorrectOptionsSelected = Array.from(document.querySelectorAll('.quiz-container')).every(container => {
+            return container.querySelector('.question-options input[type="radio"]:checked');
+        });
+
+        // Enable or disable the next button based on validation
+        const isStep2Valid = areQuestionsFilled && areOptionsFilled && areCorrectOptionsSelected;
+        nextButton.disabled = !isStep2Valid;
+    }
+
+    // Attach event listeners to monitor changes in Step 2 inputs
+    document.addEventListener('input', function(event) {
+        if (event.target.closest('.quiz-container')) {
+            validateStep2();
+        }
+    });
 
     function updateButtonVisibility(stepIndex) {
         if (backButton) backButton.style.display = stepIndex > 0 ? 'inline-block' : 'none';
@@ -631,7 +757,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     saveButton.addEventListener('click', async function () {
-    
         const title = videoTitleInput.value.trim() || window.draftData?.title || '';  
         const category = document.querySelector('.category .selected').textContent.trim() || window.draftData?.category || ''; 
     
@@ -646,6 +771,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const videoDocRef = doc(collection(db, 'videos'));
             const videoDocId = videoDocRef.id;
     
+            // Handle video upload or draft video re-upload
             let videoURL = '';
             if (videoUpload.files.length > 0) {
                 const finalVideoRef = ref(storage, `videos/${videoDocId}`);
@@ -658,6 +784,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 videoURL = await getDownloadURL(finalVideoRef);
             }
     
+            // Handle thumbnail upload or draft thumbnail re-upload
             let thumbnailURL = '';
             if (thumbnailUpload.files.length > 0) {
                 const finalThumbnailRef = ref(storage, `thumbnails/${videoDocId}`);
@@ -670,6 +797,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 thumbnailURL = await getDownloadURL(finalThumbnailRef);
             }
     
+            // Process quiz questions
             const quizContainers = document.querySelectorAll('.quiz-container');
             let questions = [];
     
@@ -678,6 +806,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const options = container.querySelectorAll('.question-options input[type="text"]');
                 const correctOption = container.querySelector('.question-options input[type="radio"]:checked');
     
+                // Handle image upload or draft image re-upload
                 let questionImageURL = '';
                 if (container.querySelector(`#imageUpload${index + 1}`).files.length > 0) {
                     const finalImageRef = ref(storage, `quiz_images/${videoDocId}_${index}`);
@@ -703,6 +832,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 });
             }
     
+            // Save the final data to Firestore
             await setDoc(videoDocRef, {
                 title: title,
                 category: category,
@@ -719,6 +849,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 createdAt: new Date(),
             });
     
+            // Delete draft data from Firestore and Firebase Storage after successful upload
             await deleteDraftData(window.draftData, currentDraftId);
     
             // Remove the draft card from the UI after successful save and deletion
@@ -733,13 +864,16 @@ document.addEventListener('DOMContentLoaded', async function() {
             document.getElementById('notificationModalBody').innerText = "Uploaded successfully!";
             $('#notificationModal').modal('show');
     
-            // Optionally, you can also refetch the drafts list to update it dynamically
+            // Optionally, refresh the drafts list to update the view
             await fetchDrafts();  // Refresh the drafts list to reflect changes
         } catch (error) {
             // Hide loader in case of error
             document.getElementById('loader1').style.display = 'none';
+            // Show error notification
+            document.getElementById('notificationModalBody').innerText = "Upload failed. Please try again.";
+            $('#notificationModal').modal('show');
         }
-    });        
+    });              
 
     // Helper function to re-upload a file using the existing draft file URL
     async function reuploadUsingDraftFile(draftURL, finalRef) {
@@ -754,51 +888,65 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Function to delete Firestore document and associated storage files
     async function deleteDraftData(draftData, draftId) {
         try {
-
             if (!draftId) {
                 throw new Error("Draft ID is undefined or null");
             }
-
-            // Log to ensure draftData is defined and contains expected properties
+    
             if (!draftData) {
                 throw new Error("Draft data is undefined or invalid");
             }
-
-            // Delete draft video file if it exists in storage and is a valid string
-            if (draftData.videoURL && typeof draftData.videoURL === 'string' && draftData.videoURL.includes('dVideos')) {
+    
+            console.log("Deleting draft with ID:", draftId);
+    
+            // Temporarily stop any autosave or editing before deletion
+            if (autosaveInterval) {
+                clearInterval(autosaveInterval);
+                autosaveInterval = null;
+            }
+    
+            // Delete draft video file if it exists
+            if (draftData.videoURL && draftData.videoURL.includes('dVideos')) {
                 const draftVideoRef = ref(storage, draftData.videoURL);
                 await deleteObject(draftVideoRef);
+                console.log("Deleted video file:", draftData.videoURL);
             }
-
-            // Delete draft thumbnail file if it exists in storage and is a valid string
-            if (draftData.thumbnailURL && typeof draftData.thumbnailURL === 'string' && draftData.thumbnailURL.includes('dThumbnails')) {
+    
+            // Delete draft thumbnail file if it exists
+            if (draftData.thumbnailURL && draftData.thumbnailURL.includes('dThumbnails')) {
                 const draftThumbnailRef = ref(storage, draftData.thumbnailURL);
                 await deleteObject(draftThumbnailRef);
+                console.log("Deleted thumbnail file:", draftData.thumbnailURL);
             }
-
-            // Delete draft quiz images if they exist in storage and are valid strings
+    
+            // Delete draft quiz images if they exist
             if (draftData.quizQuestions && Array.isArray(draftData.quizQuestions)) {
                 for (const question of draftData.quizQuestions) {
-                    if (question.imageFile && typeof question.imageFile === 'string' && question.imageFile.includes('dQuiz_images')) {
+                    if (question.imageFile && question.imageFile.includes('dQuiz_images')) {
                         const draftImageRef = ref(storage, question.imageFile);
                         await deleteObject(draftImageRef);
+                        console.log("Deleted quiz image file:", question.imageFile);
                     }
                 }
             }
-
-            // Check if document still exists before attempting to delete it
+    
+            // Ensure the document is deleted only once
             const draftDocRef = doc(db, 'onlineDrafts', draftId);
             const draftSnapshot = await getDoc(draftDocRef);
-
+    
             if (draftSnapshot.exists()) {
                 await deleteDoc(draftDocRef);
+                console.log("Draft document deleted:", draftId);
             } else {
-
+                console.log(`Draft document with ID ${draftId} does not exist.`);
             }
-
+    
+            // Optionally refetch drafts to refresh the UI
+            await fetchDrafts();
+    
         } catch (error) {
+            console.error("Error deleting draft:", error);
             throw error;
-        } await fetchDrafts();
+        }
     }
 
     // Fetch initial drafts

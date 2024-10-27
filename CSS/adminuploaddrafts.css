@@ -1124,6 +1124,11 @@ h2 {
     background-color: #1B3286;
 }
 
+.next-btn:disabled {
+    background-color: #A9A9A9;
+    cursor: not-allowed;
+}
+
 .save-btn, .editSavebtn {
     font-family: Poppins;
     font-size: 14px;
