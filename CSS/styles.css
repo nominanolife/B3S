@@ -541,7 +541,7 @@ h5 {
 }
 
 .modal-header, .modal-body, .modal-footer {
-    border: none;
+    border: none !important;
 }
 
 .modal-dialog {
@@ -552,7 +552,7 @@ h5 {
 .modal-content {
     justify-content: space-evenly;
     font-family: Poppins;
-    border-radius: 20px;
+    border-radius: 20px !important;
     padding: 20px;
 }
 
@@ -563,6 +563,7 @@ h5 {
 
 .modal-body {
     font-size: 14px;
+    border:none;
 }
 
 /* Style for successful messages */
@@ -584,6 +585,18 @@ h5 {
 }
 
 .btn-secondary:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+.close-btn {
+    background-color: #142A74 !important;
+    color: #fff  !important;
+    border: none  !important;
+    border-radius: 10px  !important;
+    padding: 10px 20px  !important;
+}
+
+.close-btn:hover {
     background-color: #0d1d51 !important;
     color: white !important;
 }
@@ -742,4 +755,23 @@ h5 {
 
 .btn-primary:hover {
     background-color: #142a74ec;
+}
+/* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background of the scrollbar track */
+    border-radius: 10px; /* Optional: Rounded corners for the track */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #142A74; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Optional: Rounded corners for the thumb */
+    border: 3px solid #f1f1f1; /* Optional: Adds padding around the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d; /* Darker color on hover */
 }
