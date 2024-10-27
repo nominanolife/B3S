@@ -251,7 +251,7 @@ h2 {
 
 @media (max-width: 768px) {
     .tdc-tile, .pdc-tile {
-        width: 80%;
+        width: 100%;
         padding: 30px;
     }
 }

@@ -217,6 +217,7 @@ h2 {
         font-size: 20px;
     }
 }
+
 .page-content {
     display: flex;
     align-items: center;
@@ -230,7 +231,6 @@ h2 {
     border-radius: 20px;
     background-color: #ffffff;
     width: 100%;
-    height: 85%;
 }
 
 @media (max-width: 768px) {
@@ -296,11 +296,13 @@ h2 {
         padding: 10px;
     }
 }
+
 .top-info {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 130px;
+    gap: 10px;
 }
 
 @media (max-width: 768px) {
@@ -314,6 +316,7 @@ h2 {
     font-size: 32px;
     font-weight: bold;
     color: #2F2E2E;
+    margin: 0;
 }
 
 @media (max-width: 768px) {
@@ -327,7 +330,7 @@ h2 {
     font-size: 14px;
     font-weight: normal;
     color: #2f2e2ea2;
-    margin-top: 10px;
+    margin: 0;
 }
 
 @media (max-width: 768px) {
@@ -341,7 +344,6 @@ h2 {
     font-size: 14px;
     font-weight: normal;
     color: #ffffff;
-    margin-top: 20px;
     padding: 10px 30px;
     cursor: pointer;
     border: none;
@@ -363,7 +365,6 @@ h2 {
 .bottom-info {
     display: flex;
     flex-direction: column;
-    margin-top: 20px;
 }
 
 @media (max-width: 768px) {
@@ -376,7 +377,6 @@ h2 {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    margin-top: 20px;
     gap: 20px;
 }
 
@@ -391,7 +391,6 @@ h2 {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    margin-top: 30px;
     gap: 20px;
 }
 
@@ -419,6 +418,7 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: left;
+    width: 100%;
 }
 
 @media (max-width: 768px) {
@@ -429,7 +429,6 @@ h2 {
 /* Ensure placeholders have consistent styling */
 .info-block span.input-label1 {
     display: inline-block;
-    min-width: 475px;
     padding: 10px;
     background-color: #f5f5f5;
     border-radius: 10px;
@@ -442,7 +441,6 @@ h2 {
 
 .info-block span.input-label2 {
     display: inline-block;
-    min-width: 720px;
     padding: 10px;
     background-color: #f5f5f5;
     border-radius: 10px;
@@ -636,8 +634,8 @@ h2 {
 
 #uploadIcon {
     position: absolute;
-    top: 170px;
-    left: 660px;
+    top: 165px;
+    left: 52%;
     color: #ffffff;
     background-color: #2f3542;
     padding: 10px;
@@ -651,7 +649,16 @@ h2 {
 
 @media (max-width: 768px) {
     #uploadIcon {
-        left: 50%;
+        top: 150px;
+        left: 58%;
+        transform: translateX(-50%);
+    }
+}
+
+@media (max-width: 480px) {
+    #uploadIcon {
+        top: 150px;
+        left: 65%;
         transform: translateX(-50%);
     }
 }
