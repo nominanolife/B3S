@@ -367,10 +367,18 @@ header:hover .image-section {
     font-size: 68px;
 }
 
+.text-container {
+    max-width: 50%; 
+    margin-right: -100px; 
+    position: relative; 
+    top: -25px; 
+}
+
 .about-text {
-    font-size: 20px; 
+    font-size: 20px;
     font-weight: normal;
-    text-align: justify; 
+    text-align: justify;
+    margin-top: 0; 
 }
 
 .carousel-item img {
@@ -392,9 +400,15 @@ header:hover .image-section {
 }
 
 .read-more-btn {
-    background-color: #f6d92b; 
-    border-color: #f6d92b; 
+    background-color: #f6d92b;
+    border: 1px solid #f6d92b;
     color: #004085;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    margin-top: 65px;
 }
 
 .read-more-btn:hover {
