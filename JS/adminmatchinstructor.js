@@ -47,21 +47,32 @@ function setUpMatchedStudentsListener() {
         matchesUnsubscribe = onSnapshot(q, async (querySnapshot) => {
             const students = [];
 
-            querySnapshot.forEach((doc) => {
+            for (const doc of querySnapshot.docs) {
                 const matchData = doc.data();
-                students.push({
-                    studentId: doc.id,
-                    instructorId: matchData.instructorId,
-                    matchedAt: matchData.matchedAt
-                });
-            });
+                const { instructorId, matchedAt } = matchData;
+                const studentId = doc.id;
+
+                // Fetch course details and ignore if all courses are completed
+                const courseDetails = await fetchCourseAndAppointmentDateForStudent(studentId);
+
+                if (courseDetails !== null) { // Ignore students with only completed courses
+                    students.push({
+                        studentId,
+                        instructorId,
+                        matchedAt,
+                        ...courseDetails // Spread course details into the student object
+                    });
+                }
+            }
 
             await renderStudents(students);
             // Update pagination controls if necessary
         });
     } catch (error) {
+        console.error('Error setting up listener:', error);
     }
 }
+
 
 // Fetch student name and instructor name from Firestore
 async function fetchStudentAndInstructorDetails(studentId, instructorId) {
@@ -95,8 +106,8 @@ async function fetchCourseAndAppointmentDateForStudent(studentId) {
         const q = query(appointmentsRef);
         const querySnapshot = await getDocs(q);
 
-        let course = 'Unknown Course';
-        let appointmentDate = 'No Date';
+        let course = null;
+        let appointmentDate = null;
 
         querySnapshot.forEach((doc) => {
             const appointmentData = doc.data();
@@ -104,14 +115,20 @@ async function fetchCourseAndAppointmentDateForStudent(studentId) {
             if (appointmentData.bookings && Array.isArray(appointmentData.bookings)) {
                 const bookings = appointmentData.bookings;
 
-                bookings.forEach((booking) => {
-                    if (booking.userId === studentId && booking.progress !== 'Completed') {
-                        course = appointmentData.course || 'Unknown Course';
-                        appointmentDate = new Date(appointmentData.date).toLocaleDateString('en-US', dateOptions);
-                    }
-                });
+                // Check for active (non-completed) bookings
+                const activeBooking = bookings.find((booking) => booking.userId === studentId && booking.progress !== 'Completed');
+
+                if (activeBooking) {
+                    course = appointmentData.course || 'Unknown Course';
+                    appointmentDate = new Date(appointmentData.date).toLocaleDateString('en-US', dateOptions);
+                }
             }
         });
+
+        // If no active bookings found, return null
+        if (!course) {
+            return null;
+        }
 
         return { course, appointmentDate };
     } catch (error) {
