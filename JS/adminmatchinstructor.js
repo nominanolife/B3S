@@ -17,12 +17,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app); // Firestore instance
 const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
-let currentPage = 1;
-let totalPages = 1;
-const itemsPerPage = 10; // Limit of 10 students per page
-let lastVisibleStudent = null; // Keep track of the last fetched document for pagination
-const paginationControls = document.querySelector('.pagination-controls'); // Ensure this points to the correct element
-
 function showNotification(message) {
     document.getElementById('notificationModalBody').textContent = message;
     $('#notificationModal').modal('show');
@@ -66,13 +60,11 @@ function setUpMatchedStudentsListener() {
             }
 
             await renderStudents(students);
-            // Update pagination controls if necessary
         });
     } catch (error) {
         console.error('Error setting up listener:', error);
     }
 }
-
 
 // Fetch student name and instructor name from Firestore
 async function fetchStudentAndInstructorDetails(studentId, instructorId) {
@@ -152,8 +144,7 @@ async function fetchStudentTraits(studentId) {
 }
 
 // Render the list of students with their match details
-async function renderStudents(students) {
-    showLoader(); // Show loader before starting the rendering process
+async function renderStudents(students) { // Show loader before starting the rendering process
     const studentListContainer = document.querySelector('.student-list');
     studentListContainer.innerHTML = ''; // Clear any existing data
 
@@ -374,47 +365,6 @@ function renderInstructors(instructors, studentId) {
     document.querySelectorAll('.custom-btn').forEach(function(button) {
         button.addEventListener('click', handleReassignClick);
     });
-}
-
-// Pagination controls
-function updatePaginationControls() {
-    paginationControls.innerHTML = '';
-
-    // Previous button
-    const prevButton = document.createElement('i');
-    prevButton.className = 'bi bi-caret-left';
-    if (currentPage === 1) {
-        prevButton.classList.add('disabled');
-    }
-    prevButton.addEventListener('click', async () => {
-        if (currentPage > 1) {
-            currentPage--;
-            lastVisibleStudent = null;  // Reset lastVisibleStudent for fetching previous pages
-            await loadMatchedStudents();
-        }
-    });
-
-    // Next button
-    const nextButton = document.createElement('i');
-    nextButton.className = 'bi bi-caret-right';
-    if (currentPage === totalPages) {
-        nextButton.classList.add('disabled');
-    }
-    nextButton.addEventListener('click', async () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            await loadMatchedStudents();
-        }
-    });
-
-    // Page number display
-    const pageNumberDisplay = document.createElement('span');
-    pageNumberDisplay.className = 'page-number';
-    pageNumberDisplay.textContent = `Page ${currentPage} of ${totalPages}`;
-
-    paginationControls.appendChild(prevButton);
-    paginationControls.appendChild(pageNumberDisplay);
-    paginationControls.appendChild(nextButton);
 }
 
 // Function to load students with matches and update pagination controls
