@@ -78,17 +78,34 @@ document.addEventListener('DOMContentLoaded', function () {
     const chatInput = document.getElementById('chatInput');
     const chatbotMessages = document.getElementById('chatbotMessages');
     const chatBubble = document.getElementById('chatBubble');
+    const presetBubbles = document.querySelectorAll('.preset-bubble'); // Select preset bubbles
     const redIndicatorBadge = document.querySelector('.red-indicator-badge'); // Reference to the red badge
+
+    // Function to handle preset bubble click
+    function handlePresetClick(presetMessage) {
+        appendMessage('user', presetMessage);
+        sendMessageToBot(presetMessage);
+    }
+
+    // Attach event listeners to preset bubbles
+    if (presetBubbles) {
+        presetBubbles.forEach(function (bubble) {
+            bubble.addEventListener('click', function () {
+                const presetMessage = bubble.textContent.trim();
+                handlePresetClick(presetMessage);
+            });
+        });
+    }
 
     if (chatbot && closeChatbot && sendBtn && chatInput && chatbotMessages) {
         // Toggle chatbot visibility on click
         const chatBotContainer = document.querySelector('.chat-bot-container');
-        
+
         chatBotContainer.addEventListener('click', function() {
             // Toggle chatbot visibility
             if (chatbot.style.display === 'none' || chatbot.style.display === '') {
                 chatbot.style.display = 'flex'; // Show chatbot
-                
+
                 // Hide the chat bubble when the chatbot opens
                 if (chatBubble) {
                     chatBubble.style.display = 'none';
@@ -125,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
         function appendMessage(sender, message) {
             const messageElem = document.createElement('div');
             messageElem.classList.add('message', sender);
-        
+
             if (sender === 'bot') {
                 messageElem.innerHTML = `
                     <div class="bot-message-container">
@@ -138,10 +155,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 bubble.textContent = message;
                 messageElem.appendChild(bubble);
             }
-        
+
             chatbotMessages.appendChild(messageElem);
             chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-        }        
+        }
 
         const AI_SERVER_URL = 'https://chatbot-195867894399.asia-southeast1.run.app/chatbot'; // Updated URL for AI model
 
@@ -214,14 +231,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (chatBubble) {
         chatBubble.addEventListener('click', function () {
             chatBubble.style.display = 'none';
-            
+
             // Hide the red indicator badge when the chat bubble is clicked
             if (redIndicatorBadge) {
                 redIndicatorBadge.style.display = 'none';
             }
         });
     }
-    
+
     // Append initial bot message
     const initialMessage = document.createElement('div');
     initialMessage.classList.add('message', 'bot');
@@ -244,7 +261,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     chatbotMessages.scrollTop = chatbotMessages.scrollHeight; // Scroll to the bottom
 
+    const scrollLeftBtn = document.querySelector('.preset-scroll-left');
+    const scrollRightBtn = document.querySelector('.preset-scroll-right');
+    const presetBubblesContainer = document.querySelector('.preset-bubbles');
 
+    // Scroll the preset bubbles container to the left
+    scrollLeftBtn.addEventListener('click', function () {
+        if (presetBubblesContainer) {
+            // Use scrollBy with behavior 'smooth' for smooth scrolling
+            presetBubblesContainer.scrollBy({ left: -100, behavior: 'smooth' });
+        }
+    });
+
+    // Scroll the preset bubbles container to the right
+    scrollRightBtn.addEventListener('click', function () {
+        if (presetBubblesContainer) {
+            // Use scrollBy with behavior 'smooth' for smooth scrolling
+            presetBubblesContainer.scrollBy({ left: 100, behavior: 'smooth' });
+        }
+    });
 });
 
 // Toggle sidebar functionality

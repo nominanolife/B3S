@@ -277,8 +277,22 @@
 
         </div>
         <div class="chatbot-input">
-            <input type="text" id="chatInput" placeholder="Type a message..." />
-            <button id="sendBtn">Send</button>
+            <div class="preset-bubbles-container">
+                <i class="bi bi-caret-left preset-scroll-left"></i>
+                <div class="preset-bubbles">
+                    <button class="preset-bubble">Packages</button>
+                    <button class="preset-bubble">Operating hours</button>
+                    <button class="preset-bubble">LTO certified</button>
+                    <button class="preset-bubble">Location</button>
+                    <button class="preset-bubble">Contact details</button>
+                    <button class="preset-bubble">Enrollment</button>
+                </div>
+                <i class="bi bi-caret-right preset-scroll-right"></i>
+            </div>            
+            <div class="typing-container">
+                <input type="text" id="chatInput" placeholder="Type a message..." />
+                <button id="sendBtn">Send</button>
+            </div>
         </div>
         <div class="chatbot-footer">
             <p><i class="bi bi-info-circle"></i> AI may produce inaccurate information</p>
