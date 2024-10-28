@@ -1020,6 +1020,12 @@ input:checked + .slider .slider-label-on {
     flex-direction: column;
     font-family: 'Poppins', sans-serif;
 }
+@media (max-width: 768px) {
+    .loader1 {
+        width: 100%; 
+        padding: 20px;
+    }
+}
 
 .loader1 .car-loader {
     width: 80px;
@@ -1030,6 +1036,13 @@ input:checked + .slider .slider-label-on {
     animation: spin 2s linear infinite;
     position: relative;
 }
+@media (max-width: 768px) {
+    .loader1 .car-loader {
+        width: 60px;
+        height: 60px;
+        border-width: 3px;
+    }
+}
 
 .loader1 p {
     margin-top: 20px;
@@ -1037,11 +1050,21 @@ input:checked + .slider .slider-label-on {
     color: #142A74;
     position: relative;
 }
+@media (max-width: 768px) {
+    .loader1 p {
+        font-size: 16px;
+    }
+}
 
 .dots {
     display: inline-block;
     font-size: 18px;
     font-weight: bold;
+}
+@media (max-width: 768px) {
+    .dots {
+        font-size: 16px;
+    }
 }
 
 .dots::after {
