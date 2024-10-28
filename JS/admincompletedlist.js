@@ -271,7 +271,7 @@ document.getElementById('saveChangesBtn').addEventListener('click', async () => 
 
   // Update the Firestore document in the `applicants` collection with the new certificate control number
   try {
-      const applicantDocRef = doc(db, 'applicants', studentId); // Change the collection to 'applicants'
+      const applicantDocRef = doc(db, 'completedStudents', studentId); // Change the collection to 'applicants'
       await updateDoc(applicantDocRef, {
           certificateControlNumber: newCertNumber
       });
