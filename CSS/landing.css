@@ -1182,7 +1182,8 @@ footer .container:last-child {
 }
 @media (max-width: 480px) {
     .bot-message-container {
-        flex-direction: column;
+        display: flex;
+        align-items: flex-end;
     }
 }
 
