@@ -1,8 +1,9 @@
 /* Base styles */
 body {
-    font-family: Poppins, sans-serif;
+    font-family: Poppins;
     margin: 0;
     padding: 0;
+    width: 100%;
 }
 
 nav {
@@ -12,7 +13,6 @@ nav {
     background-color: #fff;
     padding: 5px 30px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    position: fixed;
     width: 100%;
     z-index: 1;
 }
@@ -175,35 +175,29 @@ nav {
 }
 
 header {
-    background: url('/Assets/b3sdriver.png') no-repeat right bottom; 
+    background: url('../Assets/b3sdriver.png') no-repeat right bottom; 
     background-size: contain; 
     background-color: #193075; 
     color: #ffffff;
     padding: 60px 0;
-    overflow: hidden;
     min-height: 650px; 
     position: relative;
 }
 
 .header-container {
-    position: relative;
-    width: 90%;
-    max-width: 1000px;
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    z-index: 2; 
 }
 
 .text-section {
-    position: relative;
-    left: -30px;
-    flex: 1;
-    max-width: 80%; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
     text-align: left;
-    z-index: 2;
 }
 
 .text-section h1 {
@@ -367,11 +361,24 @@ header:hover .image-section {
     font-size: 68px;
 }
 
-.about-text {
-    font-size: 20px; 
-    font-weight: normal;
-    text-align: justify; 
+.text-container {
+    max-width: 50%; 
+    margin-right: -100px; 
+    position: relative; 
+    top: -25px; 
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 110px;
 }
+
+.about-text  {
+    font-size: 20px;
+    font-weight: normal;
+    text-align: justify;
+    margin:0;
+}
+
 
 .carousel-item img {
     height: 300px;
@@ -392,9 +399,15 @@ header:hover .image-section {
 }
 
 .read-more-btn {
-    background-color: #f6d92b; 
-    border-color: #f6d92b; 
+    background-color: #f6d92b;
+    border: 1px solid #f6d92b;
     color: #004085;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    width: 20%;
 }
 
 .read-more-btn:hover {
@@ -748,18 +761,49 @@ footer .container:last-child {
     justify-content: center;
     align-items: center;
     z-index: 10;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
+
+/* Adjust size on smaller screens */
+@media (max-width: 768px) {
+    .chat-bot-container {
+        width: 40px;
+        height: 40px;
+        right: 25px; /* Slightly more right */
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-bot-container {
+        width: 35px;
+        height: 35px;
+        right: 30px; /* Further to the right */
+    }
+}
+
 
 .chat-bot-container i {
     color: white;
     font-size: 24px;
 }
 
-.chat-bot-container:hover {
-    background-color: #092A73;
+/* Adjust icon size for smaller devices */
+@media (max-width: 768px) {
+    .chat-bot-container i {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-bot-container i {
+        font-size: 18px;
+    }
 }
 
 
+.chat-bot-container:hover {
+    background-color: #092A73;
+}
 
 .chat-bubble {
     position: fixed;
@@ -777,7 +821,28 @@ footer .container:last-child {
     display: flex;
     align-items: center;
     z-index: 10;
+    transition: all 0.3s ease;
 }
+
+/* Adjust bubble size and position for smaller screens */
+@media (max-width: 768px) {
+    .chat-bubble {
+        bottom: 60px;
+        right: 50px;
+        max-width: 250px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-bubble {
+        bottom: 50px;
+        right: 40px;
+        max-width: 200px;
+        font-size: 12px;
+    }
+}
+
 
 .chat-bubble::after {
     content: "";
@@ -788,6 +853,21 @@ footer .container:last-child {
     border-style: solid;
     border-color: #007bff transparent transparent transparent;
 }
+
+/* Adjust arrow position on smaller screens */
+@media (max-width: 768px) {
+    .chat-bubble::after {
+        right: 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-bubble::after {
+        right: 20px;
+        border-width: 8px;
+    }
+}
+
 
 .bubble-content {
     display: flex;
@@ -827,9 +907,8 @@ footer .container:last-child {
     position: fixed;
     bottom: 20px;
     right: 90px;
-    width: 300px;
-    height: 100%;
-    max-height: 400px;
+    width: 340px;
+    height: 500px;
     border: 1px solid #ccc;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -837,6 +916,23 @@ footer .container:last-child {
     display: flex;
     flex-direction: column;
     background-color: white;
+}
+/* Medium screens (tablets, small desktops) */
+@media (max-width: 768px) {
+    #chatbot {
+        right: 50px; /* Slightly more right */
+        width: 300px;
+        height: 450px;
+    }
+}
+
+/* Small screens (phones) */
+@media (max-width: 480px) {
+    #chatbot {
+        right: 30px; /* Further to the right */
+        width: 260px;
+        height: 400px;
+    }
 }
 
 .chatbot-header {
@@ -869,11 +965,131 @@ footer .container:last-child {
 
 .chatbot-input {
     display: flex;
+    flex-direction: column;
     padding: 10px;
-    border-top: 1px solid #ccc;
+    gap: 10px;
 }
 
-.chatbot-input input {
+.preset-bubbles-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+@media (max-width: 480px) {
+    .preset-bubbles-container {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+.preset-bubbles {
+    display: flex;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    width: calc(100% - 40px);
+    padding: 5px 0;
+    gap: 5px;
+}
+
+/* For tablets and small desktops */
+@media (max-width: 768px) {
+    .preset-bubbles {
+        width: calc(100% - 30px);
+        gap: 4px;
+        padding: 0px;
+    }
+}
+
+/* For small phones (portrait mode) */
+@media (max-width: 480px) {
+    .preset-bubbles {
+        width: calc(100% - 20px);
+        gap: 3px;
+        padding: 0px;   
+    }
+}
+
+/* For extra small screens (≤360px) */
+@media (max-width: 360px) {
+    .preset-bubbles {
+        width: 100%;
+        padding: 0px;
+        gap: 2px;
+    }
+}
+
+
+.preset-scroll-left, .preset-scroll-right {
+    cursor: pointer;
+    font-size: 20px;
+    color: #142a76;
+    user-select: none;
+    transition: color 0.3s;
+    background: none;
+    border: none;
+}
+@media (max-width: 768px) {
+    .preset-scroll-left, .preset-scroll-right {
+        font-size: 18px;
+    }
+}
+
+/* For small phones (portrait mode) */
+@media (max-width: 480px) {
+    .preset-scroll-left, .preset-scroll-right {
+        font-size: 18px;
+    }
+}
+
+.preset-scroll-left:hover, .preset-scroll-right:hover {
+    color: #0f1e4f;
+}
+
+.preset-bubble {
+    background-color: #142a76;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    min-width: 170px;
+}
+@media (max-width: 768px) {
+    .preset-bubble {
+        min-width: 150px;
+        font-size: 13px;
+    }
+}
+
+/* For small phones (portrait mode) */
+@media (max-width: 480px) {
+    .preset-bubble {
+        min-width: 130px;
+        font-size: 12px;
+    }
+}
+
+.preset-bubble:hover {
+    background-color: #0f1e4f;
+}
+
+.preset-bubbles::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+
+.typing-container {
+    display: flex;
+    align-items: center;
+}
+@media (max-width: 480px) {
+    .typing-container button {
+        padding: 5px 8px;
+    }
+}
+
+.typing-container input {
     flex: 1;
     padding: 5px;
     border: 1px solid #ccc;
@@ -881,13 +1097,26 @@ footer .container:last-child {
     margin-right: 10px;
 }
 
-.chatbot-input button {
+.typing-container button {
     background-color: #142a76;
     color: white;
     border: none;
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
+}
+@media (max-width: 768px) {
+    .typing-container button {
+        padding: 4px 6px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .typing-container button {
+        padding: 2px 3px;
+        font-size: 11px;
+    }
 }
 
 .chatbot-footer {
@@ -922,6 +1151,19 @@ footer .container:last-child {
     border-radius: 15px;
     margin: 0;
 }
+@media (max-width: 768px) {
+    .message .bubble {
+        padding: 8px;
+        font-size: 13px; 
+    }
+}
+
+@media (max-width: 480px) {
+    .message .bubble {
+        padding: 6px;
+        font-size: 12px; 
+    }
+}
 
 .message.user .bubble {
     background-color: #142a76;
@@ -936,14 +1178,26 @@ footer .container:last-child {
 
 .bot-message-container {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
+}
+@media (max-width: 480px) {
+    .bot-message-container {
+        display: flex;
+        align-items: flex-end;
+    }
 }
 
 .chatbot-logo {
     width: 40px;
     height: 40px;
 }
-
+/* Reduce logo size for smaller screens */
+@media (max-width: 480px) {
+    .chatbot-logo {
+        width: 30px;
+        height: 30px;
+    }
+}
 /* Typing dots animation */
 .typing-indicator {
     display: flex;
