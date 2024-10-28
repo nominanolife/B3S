@@ -631,7 +631,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     saveButton.addEventListener('click', async function () {
-    
         const title = videoTitleInput.value.trim() || window.draftData?.title || '';  
         const category = document.querySelector('.category .selected').textContent.trim() || window.draftData?.category || ''; 
     
@@ -719,6 +718,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                 createdAt: new Date(),
             });
     
+            // Attempt to delete the draft
+            console.log("Attempting to delete draft with ID:", currentDraftId);
+            console.log("Draft Data:", window.draftData);
+    
             await deleteDraftData(window.draftData, currentDraftId);
     
             // Remove the draft card from the UI after successful save and deletion
@@ -737,9 +740,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             await fetchDrafts();  // Refresh the drafts list to reflect changes
         } catch (error) {
             // Hide loader in case of error
+            console.error("Error during save or deletion process:", error);
             document.getElementById('loader1').style.display = 'none';
         }
-    });        
+    });
+         
 
     // Helper function to re-upload a file using the existing draft file URL
     async function reuploadUsingDraftFile(draftURL, finalRef) {
@@ -751,56 +756,68 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // Function to delete Firestore document and associated storage files
     async function deleteDraftData(draftData, draftId) {
         try {
-
             if (!draftId) {
                 throw new Error("Draft ID is undefined or null");
             }
-
-            // Log to ensure draftData is defined and contains expected properties
+    
             if (!draftData) {
                 throw new Error("Draft data is undefined or invalid");
             }
-
-            // Delete draft video file if it exists in storage and is a valid string
-            if (draftData.videoURL && typeof draftData.videoURL === 'string' && draftData.videoURL.includes('dVideos')) {
+    
+            console.log("Deleting draft with ID:", draftId);
+    
+            // Temporarily stop any autosave or editing before deletion
+            if (autosaveInterval) {
+                clearInterval(autosaveInterval);
+                autosaveInterval = null;
+            }
+    
+            // Delete draft video file if it exists
+            if (draftData.videoURL && draftData.videoURL.includes('dVideos')) {
                 const draftVideoRef = ref(storage, draftData.videoURL);
                 await deleteObject(draftVideoRef);
+                console.log("Deleted video file:", draftData.videoURL);
             }
-
-            // Delete draft thumbnail file if it exists in storage and is a valid string
-            if (draftData.thumbnailURL && typeof draftData.thumbnailURL === 'string' && draftData.thumbnailURL.includes('dThumbnails')) {
+    
+            // Delete draft thumbnail file if it exists
+            if (draftData.thumbnailURL && draftData.thumbnailURL.includes('dThumbnails')) {
                 const draftThumbnailRef = ref(storage, draftData.thumbnailURL);
                 await deleteObject(draftThumbnailRef);
+                console.log("Deleted thumbnail file:", draftData.thumbnailURL);
             }
-
-            // Delete draft quiz images if they exist in storage and are valid strings
+    
+            // Delete draft quiz images if they exist
             if (draftData.quizQuestions && Array.isArray(draftData.quizQuestions)) {
                 for (const question of draftData.quizQuestions) {
-                    if (question.imageFile && typeof question.imageFile === 'string' && question.imageFile.includes('dQuiz_images')) {
+                    if (question.imageFile && question.imageFile.includes('dQuiz_images')) {
                         const draftImageRef = ref(storage, question.imageFile);
                         await deleteObject(draftImageRef);
+                        console.log("Deleted quiz image file:", question.imageFile);
                     }
                 }
             }
-
-            // Check if document still exists before attempting to delete it
+    
+            // Ensure the document is deleted only once
             const draftDocRef = doc(db, 'onlineDrafts', draftId);
             const draftSnapshot = await getDoc(draftDocRef);
-
+    
             if (draftSnapshot.exists()) {
                 await deleteDoc(draftDocRef);
+                console.log("Draft document deleted:", draftId);
             } else {
-
+                console.log(`Draft document with ID ${draftId} does not exist.`);
             }
-
+    
+            // Optionally refetch drafts to refresh the UI
+            await fetchDrafts();
+    
         } catch (error) {
+            console.error("Error deleting draft:", error);
             throw error;
-        } await fetchDrafts();
+        }
     }
-
     // Fetch initial drafts
     fetchDrafts();
 });
