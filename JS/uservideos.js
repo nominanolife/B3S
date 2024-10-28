@@ -59,9 +59,7 @@ const resetFadeOutTimer = (videoElement, controlsDiv, videoPlayer) => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  
-
-    const videoPlayer = document.getElementById('lesson-video'); // Define videoPlayer after DOM is loaded
+    const videoPlayer = document.getElementById('lesson-video'); 
 
     if (videoPlayer) {
         videoPlayer.addEventListener('mousemove', () => {
@@ -78,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Initial show of the controls and fade after a delay
         const controlsDiv = videoPlayer.querySelector('.video-controls');
         if (controlsDiv) {
             resetFadeOutTimer(videoPlayer.querySelector('video'), controlsDiv, videoPlayer);
@@ -87,46 +84,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-           
             const userId = user.uid;
-            let videoId = sessionStorage.getItem('selectedVideoId');
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryFilter = urlParams.get('category');
 
             try {
-                
                 const videosSnapshot = await getDocs(collection(db, 'videos'));
-
-                if (videosSnapshot.empty) {
-                    
-                    return;
-                }
-
                 const videos = videosSnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
-               
+                
                 const userProgressDocRef = doc(db, 'userProgress', userId);
 
                 onSnapshot(userProgressDocRef, (userProgressDoc) => {
                     globalUserProgress = userProgressDoc.exists() ? userProgressDoc.data() : {};
-                    
                     updateLessonList(videos, globalUserProgress, userId);
                 });
 
-                if (!videoId && videos.length > 0) {
-                    videoId = videos[0].id; // Default to the first video if no video is selected
-                    sessionStorage.setItem('selectedVideoId', videoId);
+                let videoId;
+
+                // Check for category-based video selection
+                if (categoryFilter) {
+                    const matchingVideo = videos.find(video => video.category === categoryFilter);
+                    if (matchingVideo) {
+                        videoId = matchingVideo.id;
+                    }
                 }
 
-                // Render video details for the selected video
+                if (!videoId && videos.length > 0) {
+                    videoId = videos[0].id; // Default to the first video if no video is selected
+                }
+
+                // Save selected video ID to sessionStorage and render
                 if (videoId) {
+                    sessionStorage.setItem('selectedVideoId', videoId);
                     renderVideoDetails(videoId, videos, userId);
                 }
             } catch (error) {
-                
+                console.error("Error fetching videos:", error);
             }
         } else {
-           
+            window.location.href = 'login.html';
         }
     });
 

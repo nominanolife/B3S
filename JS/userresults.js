@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, setDoc, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, setDoc, doc, getDoc, updateDoc, deleteDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Firebase configuration
@@ -216,8 +216,29 @@ function calculateOverallStatus(categoryScores) {
     const evaluation = passed ? "Passed" : "Failed";
     return { passed, totalScore, evaluation };
 }
+// Function to find video URL by category
+async function findVideoUrlByCategory(category) {
+    try {
+        const videosSnapshot = await getDocs(collection(db, 'videos'));
+        const videos = videosSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
 
-// Function to handle saving after the evaluation
+        // Search for a video document with the matching category
+        const matchedVideo = videos.find(video => video.category === category);
+
+        if (matchedVideo) {
+            return `uservideos.html?category=${encodeURIComponent(matchedVideo.category)}`;
+        } else {
+            return null; // No match found
+        }
+    } catch (error) {
+        console.error("Error fetching videos by category:", error);
+        return null;
+    }
+}
+
 async function handleSavingResults(categoryScores) {
     const fullName = await getUserFullName(currentUser.uid); // Get user's full name
     const { passed, totalScore, evaluation } = calculateOverallStatus(categoryScores);  // Determine if passed or failed
@@ -226,9 +247,17 @@ async function handleSavingResults(categoryScores) {
     const evaluationDetails = await Promise.all(Object.keys(categoryScores).map(async (category) => {
         const score = categoryScores[category];
         const result = await predictPerformanceAndFetchInsights(currentUser.uid, category, score);
-        const videoLink = result.predicted_performance === 'Poor' ? 
-            `<a href="uservideos.html?category=${encodeURIComponent(category)}">Click here to watch the video for ${category} improvement</a>` : 
-            '';
+
+        let videoLink = '';
+        if (result.predicted_performance === 'Poor') {
+            // Find video URL by category
+            const categoryLink = await findVideoUrlByCategory(category);
+            if (categoryLink) {
+                videoLink = `<a href="${categoryLink}">Click here to watch the video for ${category} improvement</a>`;
+            } else {
+                videoLink = `<p>Video not found for ${category}</p>`; // Fallback if no video exists
+            }
+        }
 
         return {
             category,
@@ -247,6 +276,7 @@ async function handleSavingResults(categoryScores) {
         await saveFinalUserResultsToFirestore(currentUser.uid, fullName, totalScore, certificateID, evaluationDetails); // Save result in userResults
     }
 }
+
 // In the button click handler (for fetching and calculating results)
 document.getElementById('seeResultsBtn').addEventListener('click', async function () {
     if (!currentUser) {
@@ -371,7 +401,6 @@ async function showPerformanceEvaluation(evaluationData) {
         <div class="result-header">
             <h3>Performance Evaluation</h3>
             <p>Here is your performance evaluation based on the data:</p>
-        </div>
     `;
 
     const performanceWrapper = document.createElement('div');
@@ -402,12 +431,18 @@ async function showPerformanceEvaluation(evaluationData) {
 
             let additionalResources = insights ? `<p><strong>Insights:</strong> ${insights}</p>` : '';
 
+            // If the performance is "Poor", find the video link by category
             if (predictedPerformance === 'Poor') {
-                additionalResources += `
-                    <p><a href="uservideos.html?category=${encodeURIComponent(item.category)}" style="color:${color}; text-decoration:underline;">
-                        Click here to watch the video for ${item.category} improvement
-                    </a></p>
-                `;
+                const categoryLink = await findVideoUrlByCategory(item.category);
+                if (categoryLink) {
+                    additionalResources += `
+                        <p><a href="${categoryLink}" style="color:${color}; text-decoration:underline;">
+                            Click here to watch the video for ${item.category} improvement
+                        </a></p>
+                    `;
+                } else {
+                    additionalResources += `<p style="color: #B60505;">No video available for ${item.category}.</p>`;
+                }
             }
 
             performanceBlock.innerHTML = `
@@ -498,15 +533,6 @@ async function getCertificateData(userId) {
         return { certificateID: 'N/A', totalScore: 0 };  // Return default values in case of error
     }
 }
-// JavaScript for sidebar toggle
-document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
-    const sidebar = document.querySelector('.sidebar');
-    const mainContent = document.querySelector('.main-content');
-
-    // Toggle the 'active' class to show or hide the sidebar
-    sidebar.classList.toggle('active');
-    mainContent.classList.toggle('active');
-});
 
 async function generateCertificate(fullName, totalScore, certificateID, completionDate) {
     const { jsPDF } = window.jspdf;
