@@ -369,7 +369,7 @@ header:hover .image-section {
     display: flex;
     justify-content: center;
     flex-direction: column;
-    gap: 110px;
+    gap: 20px;
 }
 
 .about-text  {
@@ -379,6 +379,53 @@ header:hover .image-section {
     margin:0;
 }
 
+@media (max-width: 768px) {
+    .text-container {
+        max-width: 100%; 
+        margin: 0;
+        gap: 20px;
+    }
+
+    .about-text {
+        margin: 0;
+    }
+
+    .read-more-btn {
+        background-color: #f6d92b;
+        border: 1px solid #f6d92b;
+        color: #004085;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .text-container {
+        max-width: 100%; 
+        margin: 0;
+        gap: 20px;
+    }
+
+    .about-text {
+        margin: 0;
+    }
+
+    .read-more-btn {
+        background-color: #f6d92b;
+        border: 1px solid #f6d92b;
+        color: #004085;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        width: auto;
+    }
+}
 
 .carousel-item img {
     height: 300px;
@@ -407,7 +454,7 @@ header:hover .image-section {
     cursor: pointer;
     border-radius: 5px;
     transition: background-color 0.3s ease;
-    width: 20%;
+    width: auto;
 }
 
 .read-more-btn:hover {
@@ -606,7 +653,6 @@ footer .container:last-child {
 /* Increase the size of the modal */
 .modal-dialog {
     max-width: 600px;
-    margin: 1.75rem auto;
 }
 
 .modal-content {
@@ -626,6 +672,12 @@ footer .container:last-child {
     justify-content: center;
     gap: 20px; /* Space between the options */
     flex-wrap: wrap; /* Wrap the options on smaller screens */
+}
+
+@media (max-width: 768px) {
+    .login-options {
+        flex-direction: column; /* Stack the options vertically */
+    }
 }
 
 .login-option {
@@ -917,10 +969,11 @@ footer .container:last-child {
     flex-direction: column;
     background-color: white;
 }
+
 /* Medium screens (tablets, small desktops) */
 @media (max-width: 768px) {
     #chatbot {
-        right: 50px; /* Slightly more right */
+        right: 70px; /* Slightly more right */
         width: 300px;
         height: 450px;
     }
@@ -929,7 +982,7 @@ footer .container:last-child {
 /* Small screens (phones) */
 @media (max-width: 480px) {
     #chatbot {
-        right: 30px; /* Further to the right */
+        right: 70px; /* Further to the right */
         width: 260px;
         height: 400px;
     }

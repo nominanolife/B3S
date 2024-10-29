@@ -230,7 +230,7 @@ h2 {
 
 .button-right {
     font-family: Poppins;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     border: 2px solid #142A74;
     background: linear-gradient(#102369 ,#18349C, #2045CF);
@@ -261,7 +261,7 @@ h2 {
     width: 200px;
     position: relative;
     font-family: Poppins;
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .selected {
@@ -346,7 +346,7 @@ h2 {
 
 .upcoming-list, .cancelled-list {
     font-family: Poppins;
-    font-size: 20px;
+    font-size: 16px;
     text-align: left;
 }
 

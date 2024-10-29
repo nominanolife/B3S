@@ -247,7 +247,7 @@ body {
     content: '\2714';
     position: absolute;
     left: 4px;
-    top: 0px;
+    top: -1px;
     font-size: 16px;
     color: #ffffff;
     opacity: 0;

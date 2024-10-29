@@ -231,7 +231,7 @@ h2 {
     width: 200px;
     position: relative;
     font-family: Poppins;
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .selected {
@@ -306,7 +306,7 @@ h2 {
 }
 
 .format i {
-    font-size: 20px;
+    font-size: 14px;
     color: #2F2E2E;
     padding: 10px;
     width: 40px;

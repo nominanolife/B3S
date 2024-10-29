@@ -12,7 +12,6 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-
     display: flex;
     flex-direction: column;
     width: 300px;
@@ -275,7 +274,7 @@ h2 {
 
 .student-list {
     font-family: Poppins;
-    font-size: 20px;
+    font-size: 14px;
     text-align: left;
 }
 

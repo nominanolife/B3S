@@ -391,8 +391,8 @@ span {
 .custom-checkbox input[type="checkbox"]:checked + .checkbox-label::after {
     content: '';
     position: absolute;
-    left: 6px; /* Position of checkmark */
-    top: 10px; /* Position of checkmark */
+    left: 7px; /* Position of checkmark */
+    top: 9px; /* Position of checkmark */
     width: 6px; /* Width of checkmark */
     height: 10px; /* Height of checkmark */
     border: solid white; /* Checkmark color */

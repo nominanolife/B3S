@@ -866,7 +866,7 @@ body {
 
 /* Adjust font size for content in the available slots section */
 .available-slots-body {
-    font-size: 18px; /* Adjust this value as needed */
+    font-size: 16px; /* Adjust this value as needed */
     background-color: white;
     padding: 15px;
     border-bottom-left-radius: 10px;

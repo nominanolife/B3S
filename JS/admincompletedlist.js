@@ -263,18 +263,23 @@ document.addEventListener('click', function(event) {
   }
 });
 
-// Saving the new certificate number and updating the `applicants` table
+// Saving the new certificate number and updating the applicants table
 document.getElementById('saveChangesBtn').addEventListener('click', async () => {
   const newCertNumber = document.getElementById('certificateControlNumberInput').value;
   const studentId = document.getElementById('saveChangesBtn').getAttribute('data-student-id');
 
-
-  // Update the Firestore document in the `applicants` collection with the new certificate control number
+  // Update the Firestore document in the applicants collection with the new certificate control number
   try {
-      const applicantDocRef = doc(db, 'completedStudents', studentId); // Change the collection to 'applicants'
+      const applicantDocRef = doc(db, 'applicants', studentId); // Ensure collection is 'applicants'
       await updateDoc(applicantDocRef, {
           certificateControlNumber: newCertNumber
       });
+
+      // Update local studentsData with the new certificate number
+      const studentIndex = studentsData.findIndex(student => student.id === studentId);
+      if (studentIndex !== -1) {
+          studentsData[studentIndex].certificateControlNumber = newCertNumber;
+      }
 
       // Show success modal or notification
       document.getElementById('successModalBody').innerHTML = 'Certificate Control Number updated successfully!';
@@ -283,14 +288,16 @@ document.getElementById('saveChangesBtn').addEventListener('click', async () => 
       // Close the edit modal
       $('#editCcnModal').modal('hide');
 
-      // Optionally, re-fetch or update the list to reflect the change
-      fetchCompletedStudents(); // You can also adjust this function if needed to refresh the display
+      // Re-render the student list to reflect the updated certificate number
+      renderStudents();
+
   } catch (error) {
       // Show error modal or notification
       document.getElementById('successModalBody').innerHTML = 'Failed to update the Certificate Control Number.';
       $('#successModal').modal('show');
   }
 });
+
 
 function filterByYear(selectedYear) {
   // Reset the current page to 1 when filtering
