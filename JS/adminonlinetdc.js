@@ -20,7 +20,6 @@ const db = getFirestore(app);
 let quizQuestions = []; // Declare this globally to be used across functions
 let editingVideoId = null;  // Holds the ID of the video being edited
 let videoIdToDelete = null;  // Track the videoId for deletion
-const DRAFT_LIMIT = 10; // Set the draft limit globally
 
 async function fetchSavedVideosAndQuizzes() {
     try {
@@ -1927,9 +1926,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const videoUpload = document.getElementById('videoUpload');
     const categorySelected = document.getElementById('selectedCategory');
     const quizContainerInputs = document.querySelectorAll('.quiz-container input');
-    const closeUploadModalButton = document.querySelector('#uploadModal .close');
-    const confirmDraftBtn = document.getElementById('confirmDraftBtn');
-    const draftsLink = document.getElementById('draftsLink');
 
     // Helper function to set form modified flag when input changes
     function setFormModified() {
@@ -1937,21 +1933,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Add event listeners to track changes on relevant inputs
-    if (videoTitleInput) videoTitleInput.addEventListener('input', setFormModified);
-    if (thumbnailUpload) thumbnailUpload.addEventListener('change', setFormModified);
-    if (videoUpload) videoUpload.addEventListener('change', setFormModified);
+    videoTitleInput.addEventListener('input', setFormModified);
+    thumbnailUpload.addEventListener('change', setFormModified);
+    videoUpload.addEventListener('change', setFormModified);
 
     // Track category selection
-    if (categorySelected) {
-        categorySelected.addEventListener('click', function () {
-            const optionsList = document.querySelectorAll('.dropdown-options .options');
-            optionsList.forEach(option => {
-                option.addEventListener('click', function () {
-                    setFormModified();  // Mark form as modified when a category is selected
-                });
+    categorySelected.addEventListener('click', function () {
+        const optionsList = document.querySelectorAll('.dropdown-options .options');
+        optionsList.forEach(option => {
+            option.addEventListener('click', function () {
+                setFormModified();  // Mark form as modified when a category is selected
             });
         });
-    }
+    });
 
     // Add event listener to question inputs inside quiz container
     function addQuizInputListeners() {
@@ -1960,59 +1954,60 @@ document.addEventListener('DOMContentLoaded', function () {
             input.addEventListener('input', setFormModified);
         });
     }
-    addQuizInputListeners(); // Initial call to set up listeners
 
-    // Function to update draft count and display the limit (Drafts (X/10))
-    async function updateDraftCount() {
-        try {
-            const draftsCollection = collection(db, 'onlineDrafts');
-            const draftsSnapshot = await getDocs(draftsCollection);
-            const draftCount = draftsSnapshot.size;
+    // Call this function whenever quiz content is updated (for example, when a new question is added)
+    addQuizInputListeners();
 
-            // Update the Drafts link text with the count and limit
-            if (draftsLink) draftsLink.textContent = `Drafts (${draftCount}/${DRAFT_LIMIT})`;
+    // Close button behavior with discard confirmation modal
+    const closeUploadModalButton = document.querySelector('#uploadModal .close');
 
-            return draftCount >= DRAFT_LIMIT; // Return true if limit reached
-        } catch (error) {
-            console.error("Error checking draft limit:", error);
-            showNotification('An error occurred while checking the draft limit.');
-            return false;
-        }
-    }
-
-    // Close button behavior with discard confirmation and draft limit notification
     if (closeUploadModalButton) {
-        closeUploadModalButton.addEventListener('click', async function (event) {
+        closeUploadModalButton.addEventListener('click', function (event) {
             event.preventDefault(); // Prevent default close action
-            const limitReached = await updateDraftCount(); // Check draft limit
-
-            if (limitReached) {
-                // Show draft limit notification if the limit is reached
-                showNotification('You have reached the maximum limit of 10 drafts. Please delete an existing draft to add a new one.');
-            } else if (isFormModified) {
-                // If form is modified and limit not reached, show the discard confirmation modal
+            if (isFormModified) {
+                // If form is modified, show the discard confirmation modal
                 $('#saveDraftConfirmationModal').modal('show');
             } else {
-                // If form is not modified and limit not reached, simply close the modal
+                // If form is not modified, close the upload modal
                 $('#uploadModal').modal('hide');
             }
         });
     }
 
     // If the user confirms discarding changes
-    if (confirmDraftBtn) {
-        confirmDraftBtn.addEventListener('click', function () {
-            $('#saveDraftConfirmationModal').modal('hide');
-            $('#uploadModal').modal('hide');
-            isFormModified = false; // Reset modification flag
-        });
-    }
+    document.getElementById('confirmDraftBtn').addEventListener('click', function () {
+        // Close both modals
+        $('#saveDraftConfirmationModal').modal('hide');
+        $('#uploadModal').modal('hide');
+
+        // Reset the form modified flag
+        isFormModified = false;
+    });
 
     // Reset the flag when the upload modal is closed or reset
     $('#uploadModal').on('hidden.bs.modal', function () {
         isFormModified = false; // Reset when modal is closed
     });
+});
 
-    // Initial call to update the draft count display on page load
+async function updateDraftCount() {
+    try {
+        // Query the 'onlineDrafts' collection in Firestore
+        const draftsCollection = collection(db, 'onlineDrafts');
+        const draftsSnapshot = await getDocs(draftsCollection);
+
+        // Count the number of drafts
+        const draftCount = draftsSnapshot.size;
+
+        // Update the Drafts link text with the count
+        const draftsLink = document.getElementById('draftsLink');
+        draftsLink.textContent = `Drafts (${draftCount})`;
+    } catch (error) {
+       
+    }
+}
+
+// Call the function to update the draft count
+document.addEventListener('DOMContentLoaded', function () {
     updateDraftCount();
 });
