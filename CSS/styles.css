@@ -7,6 +7,11 @@ body {
     background-size: cover;
     background-position: center;
 }
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto; 
+    }
+}
 
 nav {
     display: flex;
@@ -17,13 +22,29 @@ nav {
     width: 100%;
     z-index: 1;
 }
-
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 15px;
+    }
+}
 .navbar-left {
     display: flex;
     flex-direction: row;
     align-items: center;
     cursor: pointer;
+    position: fixed;
+    top: 0;
+    z-index: 10;
+    width: 100%;
+    transition: top 0.3s; /* Smooth hide/show transition */
 }
+
+.navbar-hidden {
+    top: -40px; /* Adjust based on navbar height to hide it */
+}
+
 
 .navbar-left:hover {
     text-decoration: none;
@@ -32,6 +53,19 @@ nav {
 .b3slogo {
     width: 55px;
     height: 55px;
+}
+@media (max-width: 768px) {
+    .b3slogo {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+@media (max-width: 480px) {
+    .b3slogo {
+        width: 35px;
+        height: 35px;
+    }
 }
 
 .brand-name {
@@ -48,12 +82,29 @@ nav {
     margin: 0;
     padding-left: 10px;
 }
+@media (max-width: 768px) {
+    .brand-title {
+        font-size: 18px;
+        padding-left: 0;
+    }
+}
 
+@media (max-width: 480px) {
+    .brand-title {
+        font-size: 16px;
+    }
+}
 .navbar-center {
     display: flex;
     flex-direction: row;
     align-items: center;
     margin-left: auto;
+}
+@media (max-width: 768px) {
+    .navbar-center {
+        flex-direction: row;
+        margin-left: 0;
+    }
 }
 
 .navbar-nav {
@@ -62,7 +113,12 @@ nav {
     align-items: center;
     padding-right: 50px;
 }
-
+@media (max-width: 768px) {
+    .navbar-nav {
+        flex-direction: row;
+        padding-right: 0;
+    }
+}
 .navbar-nav a {
     margin: 10px;
     padding: 10px;
@@ -71,6 +127,17 @@ nav {
     font-weight: bold;
     text-decoration: none;
     color: #2F2E2E;
+}
+@media (max-width: 768px) {
+    .navbar-nav a {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-nav a {
+        font-size: 10px;
+    }
 }
 
 .progress-container {
@@ -82,6 +149,22 @@ nav {
     max-width: 700px;
     width: 100%;
 }
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .progress-container {
+        flex-direction: row; 
+        padding: 15px;
+        margin-top: 20px; /* Move it down */
+    }
+}
+
+/* Optional: For even smaller screens */
+@media (max-width: 480px) {
+    .progress-container {
+        margin-top: 40px; /* Increase spacing on very small screens */
+        padding: 10px;
+    }
+}
 
 .step {
     display: flex;
@@ -90,6 +173,7 @@ nav {
     position: relative;
     width: 100%;
 }
+
 
 .step .bullet {
     display: flex;
@@ -121,6 +205,17 @@ nav {
     position: absolute;
     font-size: 12px;
 }
+@media (max-width: 480px) {
+    .step .bullet {
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+    }
+
+    .step.completed .bullet:before {
+        font-size: 10px;
+    }
+}
 
 .title {
     font-weight: 500;
@@ -131,6 +226,17 @@ nav {
     color: #2F2E2E;
     text-align: center;
     width: 100%;
+}
+@media (max-width: 768px) {
+    .step .title {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .step .title {
+        font-size: 10px;
+    }
 }
 
 .step.active .title {
@@ -164,6 +270,17 @@ nav {
 p {
     font-size: 16px;
 }
+@media (max-width: 768px) {
+    p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    p {
+        font-size: 12px;
+    }
+}
 
 .input-group-text, .btn-outline-secondary {
     cursor: pointer;
@@ -192,6 +309,17 @@ main {
     max-width: 700px;
     width: 100%;
 }
+@media (max-width: 768px) {
+    .card {
+        padding: 1.5rem; /* Reduce padding for tablets */
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 1rem; /* Reduce padding for smaller screens */
+    }
+}
 
 /* Updated button styles */
 .save-btn {
@@ -207,6 +335,11 @@ main {
     background-color: #0d1d51 !important;
     color: white !important;
 }
+@media (max-width: 480px) {
+    .save-btn {
+        padding: 8px 16px; /* Smaller padding for smaller screens */
+    }
+}
 
 /* Center the button container */
 .d-flex-center {
@@ -216,7 +349,11 @@ main {
     width: 100%;
     margin-top: 2rem;        /* Adjust margin as needed */
 }
-
+@media (max-width: 480px) {
+    .d-flex-center {
+        margin-top: 1.5rem;
+    }
+}
 /* Logo image styles */
 .login-logo {
     display: block;
@@ -228,6 +365,11 @@ main {
 .login-form {
     margin-top: 1rem;
     text-align: left;
+}
+@media (max-width: 480px) {
+    .login-form {
+        margin-top: 0.75rem;
+    }
 }
 
 span {
@@ -242,7 +384,11 @@ span {
     font-weight: bold;
     text-align: left;
 }
-
+@media (max-width: 480px) {
+    .form-label {
+        font-size: 12px;
+    }
+}
 /* Input styles */
 .form-control {
     border-radius: 8px;
@@ -250,17 +396,32 @@ span {
     padding: 0.75rem 1.25rem;
     font-size: 1rem;
 }
+@media (max-width: 480px) {
+    .form-control {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+}
 
 .input-group-text {
     border-radius: 8px 0 0 8px;
     background: #f8f9fa;
     border: 1px solid #ced4da;
 }
-
+@media (max-width: 480px) {
+    .input-group-text {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+}
 .input-group {
     margin-top: 0.5rem;
 }
-
+@media (max-width: 480px) {
+    .input-group {
+        margin-top: 0.25rem;
+    }
+}
 /* Password toggle button styles */
 .btn-outline-primary .toggle-password-icon {
     color: #142a74;
@@ -290,6 +451,7 @@ span {
     background-color: #0d1d51 !important;
     color: white !important;
 }
+
 
 .create-btn {
     font-family: Poppins !important;
@@ -411,6 +573,11 @@ form p {
     font-weight: 400;
     margin-top: 1rem;
 }
+@media (max-width: 480px) {
+    form p {
+        font-size: 12px;
+    }
+}
 
 .verification-code-input {
     width: 50px;
@@ -420,6 +587,25 @@ form p {
     margin: 0 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+/* Medium screens (tablets) */
+@media (max-width: 768px) {
+    .verification-code-input {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        margin: 0 4px;
+    }
+}
+
+/* Small screens (mobile) */
+@media (max-width: 480px) {
+    .verification-code-input {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+        margin: 0 3px;
+    }
 }
 
 /* Custom Radio Button Styles */
@@ -432,7 +618,13 @@ form p {
     height: 1.5em;
     appearance: none;
 }
-
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+    }
+}
 .form-check-input:checked {
     background-color: #142a74;
     border-color: #142a74;

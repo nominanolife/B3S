@@ -31,3 +31,16 @@ $(document).ready(function() {
         }
     });
 });
+let lastScrollY = window.scrollY;
+
+window.addEventListener("scroll", () => {
+    const navbar = document.querySelector(".navbar-left");
+    if (window.scrollY > lastScrollY) {
+        // Scrolling down
+        navbar.classList.add("navbar-hidden");
+    } else {
+        // Scrolling up
+        navbar.classList.remove("navbar-hidden");
+    }
+    lastScrollY = window.scrollY;
+});
