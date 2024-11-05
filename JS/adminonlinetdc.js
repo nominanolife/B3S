@@ -596,8 +596,12 @@ async function handleFileUpload(file, folder, docId, fileType) {
     return fileURL;
 }
 
-// Save the form data to session storage when relevant inputs change
+
+let isDrafting = false;
+
 function saveFormDataToSession() {
+    if (!isDrafting) return;  // Only save if drafting mode is active
+
     const videoFile = videoUploadInput.files[0] ? videoUploadInput.files[0].name : '';
     const thumbnailFile = thumbnailUploadInput.files[0] ? thumbnailUploadInput.files[0].name : '';
     const title = videoTitleInputField.value.trim();
@@ -612,13 +616,13 @@ function saveFormDataToSession() {
         const questionText = container.querySelector('.question-input input').value.trim();
         const options = Array.from(container.querySelectorAll('.question-options input[type="text"]')).map(input => input.value.trim());
         const correctOption = container.querySelector('.question-options input[type="radio"]:checked');
-
-        let imageFile = sessionStorage.getItem(`quizDraftImageURL_${index}`) || ''; // Draft-specific variable name
+        
+        let imageFile = sessionStorage.getItem(`quizDraftImageURL_${index}`) || '';
         quizQuestions.push({
             question: questionText || '',
             options: options || [],
             correctAnswer: correctOption ? Array.from(container.querySelectorAll('.question-options input[type="radio"]')).indexOf(correctOption) : null,
-            imageFile: imageFile  // Saving the draft-specific image file
+            imageFile: imageFile
         });
     });
 
@@ -629,12 +633,12 @@ function saveFormDataToSession() {
     draftData.quizQuestions = quizQuestions;
 
     sessionStorage.setItem('draftData', JSON.stringify(draftData));
-    
 }
 
-// Attach event listeners to input fields to save form data on changes
 document.querySelectorAll('#uploadModal input, #uploadModal select').forEach(element => {
-    element.addEventListener('input', saveFormDataToSession);
+    element.addEventListener('input', () => {
+        if (isDrafting) saveFormDataToSession();
+    });
 });
 
 // Immediate upload of thumbnail and video files
@@ -709,8 +713,23 @@ async function createDraftAndSetDocumentId() {
     await updateDraftCount();
 }
 
+function clearSessionStorage() {
+    sessionStorage.removeItem('draftData');
+    sessionStorage.removeItem('thumbnailURL');
+    sessionStorage.removeItem('videoURL');
+
+    Object.keys(sessionStorage).forEach(key => {
+        if (key.startsWith('quizImageURL_') || key.startsWith('quizDraftImageURL_')) {
+            sessionStorage.removeItem(key);
+        }
+    });
+}
+
 // Event listener for final submission to Firestore
 async function saveDraftFromSession() {
+    // Activate drafting mode
+    isDrafting = true;
+
     const draftData = JSON.parse(sessionStorage.getItem('draftData')) || {};
 
     // Ensure quizQuestions is always an array
@@ -764,10 +783,11 @@ async function saveDraftFromSession() {
 
         // Clear session storage after saving
         clearSessionStorage();
+        isDrafting = false;  // Deactivate drafting mode after save
     } catch (error) {
-        
         toggleLoader(false);
         showNotification('An error occurred while saving the draft. Please try again.');
+        isDrafting = false;  // Deactivate drafting mode in case of an error
     }
 }
 
@@ -791,9 +811,11 @@ function clearSessionStorage() {
 // Event listener for the "Yes" button in the confirmation modal
 document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFromSession);
 
+    // Show event for uploadModal: Initializes preview and drafting mode
     $('#uploadModal').on('shown.bs.modal', function () {
-        currentStep = 0; // Reset to Step 1
-        showStep(currentStep); // Ensure Step 1 is displayed
+        isDrafting = false;  // Ensure drafting is off during preview
+        currentStep = 0;
+        showStep(currentStep);  // Ensure Step 1 is displayed
 
         const addQuestionBtn = document.querySelector('#uploadModal .add-question');
         addQuestionBtn.removeEventListener('click', addQuestion);  // Ensure no duplicate listeners
