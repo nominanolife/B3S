@@ -1763,6 +1763,9 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
             toggleLoader(false);
             showNotification('Video and Quiz saved successfully.');
             $('#uploadModal').modal('hide');
+
+            // Clear session storage after successful save
+            clearSessionStorage();
     
             // Fetch updated saved videos and quizzes after successful save
             fetchSavedVideosAndQuizzes();
