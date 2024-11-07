@@ -488,6 +488,7 @@ function updateEditPreview() {
                 const correctOptionIndex = Array.from(container.querySelectorAll('.question-options input[type="radio"]')).findIndex(radio => radio.checked);
                 const imageUploadInput = container.querySelector(`#imageUpload${index + 1}`);
                 const imageFile = imageUploadInput ? imageUploadInput.files[0] : null;
+                const imageURL = imageFile ? URL.createObjectURL(imageFile) : null;
 
                 // Fetch the stored image URL if present
                 const savedImageUrl = quizQuestions[index].imageUrl || null;

@@ -895,8 +895,8 @@ async function fetchAndDisplayPerformanceSummary(studentId) {
             // Check if the user is enrolled in 4-wheels or motorcycle courses based on packageType
             const packageTypes = studentData.packageType || [];
 
-            const isEnrolledIn4Wheels = packageTypes.includes("PDC");
-            const isEnrolledInMotorcycle = packageTypes.includes("PDC");
+            const isEnrolledIn4Wheels = packageTypes.includes("PDC-4Wheels");
+            const isEnrolledInMotorcycle = packageTypes.includes("PDC-Motors");
 
             const WprocessedData = studentData.WprocessedData || {};
             const MprocessedData = studentData.MprocessedData || {};
