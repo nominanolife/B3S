@@ -1010,7 +1010,14 @@ h2 {
     }
 }
 
-.evaluation-table th, .evaluation-table td {
+.evaluation-table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    color: #2F2E2E;
+}
+
+.evaluation-table td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
@@ -1168,6 +1175,188 @@ tbody tr .main-text {
 
 #observationResult, #spaceManagementResult, #speedControlResult, #steeringResult, #communicationResult, #generalResult, #startTheEngine, #variousRoadUsers, #kindofJunctions {
     text-align: center;
+}
+
+.instructor-comments-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.instructor-comments-table th, .instructor-comments-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    color: #2F2E2E;
+}
+
+.instructor-comments-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: center;
+}
+
+.instructor-comments-table td:nth-child(1), .instructor-comments-table td:nth-child(2) {
+    vertical-align: top;
+}
+
+.comment-suggestion-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+}
+
+.custom-checkbox1 {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    vertical-align: top;
+    cursor: pointer;
+    margin: 0;
+}
+
+.custom-checkbox1 span {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border: 2px solid #2F2E2E;
+    border-radius: 4px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.custom-checkbox1 span::after {
+    content: '\2714';
+    position: relative;
+    left: 2px;
+    top: -2px;
+    font-size: 14px;
+    color: #ffffff;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.comment-suggestion-checkbox:checked + span {
+    background-color: #142A74;
+    border-color: #142A74;
+}
+
+.comment-suggestion-checkbox:checked + span::after {
+    opacity: 1;
+}
+
+.checkbox-checklist {
+    border: 1px solid #D9D9D9;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.checkbox-checklist h5 {
+    font-family: Poppins;
+    font-size: 20px;
+    font-weight: bold;
+    color: #2F2E2E;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.form-group2 {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 50px;
+}
+
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-checkbox input + .checkbox-label {
+    position: relative;
+    padding-left: 30px;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #2F2E2E;
+}
+
+.custom-checkbox input + .checkbox-label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #2F2E2E;
+    border-radius: 4px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+.custom-checkbox input:checked + .checkbox-label::before {
+    background-color: #142A74;
+    border-color: #142A74;
+}
+
+.custom-checkbox input + .checkbox-label::after {
+    content: '\2714';
+    position: absolute;
+    left: 4px;
+    top: 0px;
+    font-size: 14px;
+    color: #ffffff;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.custom-checkbox input:checked + .checkbox-label::after {
+    opacity: 1;
+}
+
+.next-btn {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+}
+
+.next-btn:hover {
+    background-color: #142a74ec;
+}
+
+.back-btn {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #B60505;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+}
+
+.back-btn:hover {
+    background-color: #b60505ec;
 }
 
 @keyframes popOut {
