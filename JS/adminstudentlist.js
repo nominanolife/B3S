@@ -322,6 +322,12 @@ function renderStudents() {
       rows.push(currentRow);
     }
 
+  // Get the earliest booking date
+  const earliestDate = student.bookings?.reduce((minDate, booking) => {
+    const bookingDate = new Date(booking.date);
+    return bookingDate < minDate ? bookingDate : minDate;
+  }, new Date())?.toLocaleDateString('en-US') || "N/A";
+
     // Render each row
     rows.forEach((row) => {
       let studentHtml = `
@@ -334,6 +340,7 @@ function renderStudents() {
             ${renderCourseStatus('TDC', row.TDC)} <!-- Render TDC status -->
             ${renderCourseStatus('PDC-4Wheels', row['PDC-4Wheels'])} <!-- Render 4-Wheels status -->
             ${renderCourseStatus('PDC-Motors', row['PDC-Motors'])} <!-- Render Motors status -->
+            <td class="table-row-content">${earliestDate}</td>
             <td class="table-row-content">${certificateControlNumber}</td> <!-- Render Certificate Control Number -->
             <td class="table-row-content">
                 <!-- Triple dot options -->
@@ -1812,7 +1819,6 @@ document.addEventListener('input', function (event) {
 });
 
 function filterStudents(searchTerm) {
-  // If there's no data in the studentsData array, show "No student/s yet"
   if (studentsData.length === 0) {
     document.getElementById('student-list').innerHTML = `
       <tr>
@@ -1822,15 +1828,19 @@ function filterStudents(searchTerm) {
     return;
   }
 
+  const lowerSearchTerm = searchTerm.toLowerCase();
+
   filteredStudentsData = studentsData.filter(student => {
     const fullName = `${student.personalInfo.first || ''} ${student.personalInfo.last || ''}`.toLowerCase();
-    return fullName.startsWith(searchTerm);
+    const packageName = (student.packageName || '').toLowerCase();
+    
+    // Use `includes` to match any part of the name or package
+    return fullName.includes(lowerSearchTerm) || packageName.includes(lowerSearchTerm);
   });
 
   currentPage = 1;
   totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
 
-  // Check if there are no results
   if (filteredStudentsData.length === 0) {
     document.getElementById('student-list').innerHTML = `
       <tr>
@@ -1838,8 +1848,8 @@ function filterStudents(searchTerm) {
       </tr>
     `;
   } else {
-    renderStudents();  // Render the filtered students
-    updatePaginationControls();  // Update the pagination controls
+    renderStudents();
+    updatePaginationControls();
   }
 }
 
