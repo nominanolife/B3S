@@ -403,11 +403,21 @@ document.addEventListener('DOMContentLoaded', async function() {
             : ['', '', '', '']; // Ensure an array with four empty options if not provided
         const correctAnswer = questionData?.correctAnswer ?? null;
         const questionImageURL = questionData?.imageURL || ''; // Use the imageURL if provided
+        const language = questionData?.language || 'Filipino'; // Set default language to 'English'
+
     
         // Use the incremented questionCount to display the question number right away
         newQuestion.innerHTML = `
             <div class="quiz-container-header">
                 <h5>Question ${questionCount}</h5>
+            </div>
+            <!-- Language dropdown -->
+            <div class="language-dropdown">
+                <label for="languageSelect${questionCount}">Language:</label>
+                <select id="languageSelect${questionCount}" class="language-select">
+                    <option value="English" ${language === 'English' ? 'selected' : ''}>English</option>
+                    <option value="Filipino" ${language === 'Filipino' ? 'selected' : ''}>Filipino</option>
+                </select>
             </div>
             <div class="quiz-question">
                 <div class="question-input">
@@ -559,6 +569,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const correctOption = container.querySelector('.question-options input[type="radio"]:checked');
             const imageUploadInput = container.querySelector(`#imageUpload${index + 1}`);
             const draftQuizImageURL = draftData.quizQuestions?.[index]?.imageFile || '';  // Use draft image URL if available
+            const language = container.querySelector('.language-select')?.value || draftData.quizQuestions?.[index]?.language || 'Filipino'; // Default to English if no data
     
             const quizPreviewItem = document.createElement('div');
             quizPreviewItem.classList.add('quiz-preview-item');
@@ -567,6 +578,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             const questionPreview = document.createElement('h4');
             questionPreview.textContent = `Question ${index + 1}. ${questionText || ''}`;
             quizPreviewItem.appendChild(questionPreview);
+
+            // Add language preview
+            const languagePreview = document.createElement('p');
+            languagePreview.textContent = `Language: ${language}`;
+            quizPreviewItem.appendChild(languagePreview);
     
             // Add question image preview if an image was uploaded or from draftData
             if (imageUploadInput && imageUploadInput.files.length > 0) {
@@ -805,6 +821,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const questionText = container.querySelector('.question-input input').value.trim() || window.draftData?.quizQuestions?.[index]?.question;
                 const options = container.querySelectorAll('.question-options input[type="text"]');
                 const correctOption = container.querySelector('.question-options input[type="radio"]:checked');
+
+                // Get selected language for the question
+                const languageSelect = container.querySelector('.language-select');
+                const language = languageSelect ? languageSelect.value : (window.draftData?.quizQuestions?.[index]?.language || 'English'); // Default to English if not found
     
                 // Handle image upload or draft image re-upload
                 let questionImageURL = '';
@@ -825,6 +845,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 }));
     
                 questions.push({
+                    language: language,
                     question: questionText,
                     options: formattedOptions,
                     correctAnswer: Array.from(options).findIndex(option => option === correctOption?.nextElementSibling),
