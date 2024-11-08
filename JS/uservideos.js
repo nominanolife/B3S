@@ -87,38 +87,44 @@ document.addEventListener('DOMContentLoaded', () => {
             const userId = user.uid;
             const urlParams = new URLSearchParams(window.location.search);
             const categoryFilter = urlParams.get('category');
-
+    
             try {
                 const videosSnapshot = await getDocs(collection(db, 'videos'));
                 const videos = videosSnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
-                
+    
                 const userProgressDocRef = doc(db, 'userProgress', userId);
-
+    
                 onSnapshot(userProgressDocRef, (userProgressDoc) => {
                     globalUserProgress = userProgressDoc.exists() ? userProgressDoc.data() : {};
                     updateLessonList(videos, globalUserProgress, userId);
                 });
-
-                let videoId;
-
-                // Check for category-based video selection
-                if (categoryFilter) {
+    
+                // Step 1: Check for a selectedVideoId in sessionStorage (priority if set by video card click)
+                let videoId = sessionStorage.getItem('selectedVideoId');
+    
+                // Step 2: If no videoId from sessionStorage, check if categoryFilter exists in URL
+                if (!videoId && categoryFilter) {
                     const matchingVideo = videos.find(video => video.category === categoryFilter);
                     if (matchingVideo) {
                         videoId = matchingVideo.id;
                     }
                 }
-
+    
+                // Step 3: If still no videoId, default to the first video in the list
                 if (!videoId && videos.length > 0) {
-                    videoId = videos[0].id; // Default to the first video if no video is selected
+                    videoId = videos[0].id;
                 }
-
-                // Save selected video ID to sessionStorage and render
-                if (videoId) {
+    
+                // Step 4: Save the selected videoId to sessionStorage only if it’s newly set
+                if (!sessionStorage.getItem('selectedVideoId') && videoId) {
                     sessionStorage.setItem('selectedVideoId', videoId);
+                }
+    
+                // Step 5: Render the video details using the resolved videoId
+                if (videoId) {
                     renderVideoDetails(videoId, videos, userId);
                 }
             } catch (error) {
@@ -127,6 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             window.location.href = 'login.html';
         }
+
+        // Clear selectedVideoId from sessionStorage when leaving the page
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.removeItem('selectedVideoId');
+        });
     });
 
     displayInitialBotMessages();

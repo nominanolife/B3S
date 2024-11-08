@@ -295,6 +295,14 @@ function populateQuizFields(questions) {
             <div class="quiz-container-header">
                 <h5>Question ${questionCount}</h5>
             </div>
+             <!-- Language dropdown -->
+                <div class="language-dropdown">
+                    <label for="languageSelect${questionCount}">Language:</label>
+                    <select id="languageSelect${questionCount}" class="language-select">
+                        <option value="English" ${question.language === 'English' ? 'selected' : ''}>English</option>
+                        <option value="Filipino" ${question.language === 'Filipino' ? 'selected' : ''}>Filipino</option>
+                    </select>
+                </div>
             <div class="quiz-question">
                 <div class="question-input">
                     <input type="text" value="${question.question}" placeholder="Enter your question..." data-index="${index}" class="question-text">
@@ -495,12 +503,21 @@ function updateEditPreview() {
 
                 // Use newly uploaded image URL or fallback to saved image URL
                 let imageUrl = imageFile ? URL.createObjectURL(imageFile) : savedImageUrl;
+                // Get the selected language for the question
+                const languageSelect = container.querySelector(`#languageSelect${index + 1}`);
+                const selectedLanguage = languageSelect ? languageSelect.value : 'Not specified';
 
                 const hasValidOptions = Array.from(options).some(option => option.value.trim() !== '');
 
                 if (questionText && hasValidOptions) {
                     const quizPreviewItem = document.createElement('div');
                     quizPreviewItem.classList.add('quiz-preview-item');
+
+                    // Display selected language
+                    const languagePreview = document.createElement('p');
+                    languagePreview.classList.add('language-preview');
+                    languagePreview.textContent = `Language: ${selectedLanguage}`;
+                    quizPreviewItem.appendChild(languagePreview);
 
                     // Add question text with number
                     const questionPreview = document.createElement('h4');
@@ -1274,11 +1291,20 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
             ? questionData.options 
             : [{ label: '', value: '' }, { label: '', value: '' }, { label: '', value: '' }, { label: '', value: '' }];
         const correctAnswer = questionData?.correctAnswer ?? null;
+        const language = questionData?.language || 'Filipino'; // Default to 'Filipino'
     
         // Create the new question HTML
         newQuestion.innerHTML = `
             <div class="quiz-container-header">
                 <h5>Question ${questionCount}</h5>  <!-- Initially set question number -->
+            </div>
+            <!-- Language dropdown -->
+            <div class="language-dropdown">
+                <label for="languageSelect${questionCount}">Language:</label>
+                <select id="languageSelect${questionCount}">
+                    <option value="Filipino" ${language === 'Filipino' ? 'selected' : ''}>Filipino</option>
+                    <option value="English" ${language === 'English' ? 'selected' : ''}>English</option>
+                </select>
             </div>
             <div class="quiz-question">
                 <div class="question-input">
@@ -1447,10 +1473,19 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
             { label: '', value: '' }
         ];
         const correctAnswer = questionData ? questionData.correctAnswer : null;
+        const language = questionData?.language || 'Filipino'; // Default to 'Filipino'
     
         newQuestion.innerHTML = `
             <div class="quiz-container-header">
                 <h5>Question ${currentQuestionCount + 1}</h5>  <!-- Set the question number based on current count -->
+            </div>
+            <!-- Language dropdown -->
+            <div class="language-dropdown">
+                <label for="languageSelect${currentQuestionCount + 1}">Language:</label>
+                <select id="languageSelect${currentQuestionCount + 1}">
+                    <option value="Filipino" ${language === 'Filipino' ? 'selected' : ''}>Filipino</option>
+                    <option value="English" ${language === 'English' ? 'selected' : ''}>English</option>
+                </select>
             </div>
             <div class="quiz-question">
                 <div class="question-input">
@@ -1619,6 +1654,8 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
             const options = container.querySelectorAll('.question-options input[type="text"]');
             const correctOption = container.querySelector('.question-options input[type="radio"]:checked');
             const imageUploadInput = container.querySelector(`#imageUpload${index + 1}`);
+            const languageSelect = container.querySelector(`#languageSelect${index + 1}`);
+            const selectedLanguage = languageSelect ? languageSelect.value : 'Not specified';
             const quizPreviewItem = document.createElement('div');
             quizPreviewItem.classList.add('quiz-preview-item');
         
@@ -1626,6 +1663,12 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
             const questionPreview = document.createElement('h4');
             questionPreview.textContent = `Question ${index + 1}. ${questionText}`;
             quizPreviewItem.appendChild(questionPreview);
+
+            // Add selected language preview
+            const languagePreview = document.createElement('p');
+            languagePreview.classList.add('language-preview');
+            languagePreview.textContent = `Language: ${selectedLanguage}`;
+            quizPreviewItem.appendChild(languagePreview);
         
             // Add question image preview if an image was uploaded
             if (imageUploadInput && imageUploadInput.files.length > 0) {
@@ -1715,6 +1758,9 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                 const questionText = container.querySelector('.question-input input').value.trim();
                 const options = container.querySelectorAll('.question-options input[type="text"]');
                 const correctOption = container.querySelector('.question-options input[type="radio"]:checked');
+                // Retrieve the selected language for each question
+                const languageSelect = container.querySelector('.language-dropdown select');
+                const language = languageSelect ? languageSelect.value : 'Not specified';
     
                 // Handle quiz image upload with custom file name using videoId and question index
                 const imageFileInput = container.querySelector('.image-upload input[type="file"]');
@@ -1728,6 +1774,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
                 }
     
                 let quizQuestion = {
+                    language: language,
                     question: questionText,
                     options: [],
                     correctAnswer: null,  // Will store the correct answer index
@@ -1891,6 +1938,10 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
             const questionText = container.querySelector('.question-input input').value.trim();
             const options = Array.from(container.querySelectorAll('.question-options input[type="text"]')).map(input => input.value.trim());
             const correctOptionIndex = Array.from(container.querySelectorAll('.question-options input[type="radio"]')).findIndex(radio => radio.checked);
+            // Capture the selected language for the question
+            const languageSelect = container.querySelector('.language-dropdown select');
+            const selectedLanguage = languageSelect ? languageSelect.value : 'Not specified';
+
     
             // Handle quiz image upload
             const imageFileInput = container.querySelector('.image-upload input[type="file"]');
@@ -1905,6 +1956,7 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
     
             if (questionText && options.length > 0) {
                 quizQuestions.push({
+                    language: selectedLanguage,
                     question: questionText,
                     options: options.map((option, idx) => ({ label: `Option ${idx + 1}`, value: option })),
                     correctAnswer: correctOptionIndex,
