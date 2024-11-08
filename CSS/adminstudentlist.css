@@ -213,26 +213,6 @@ h2 {
     background-color: #f5f5f5;
 }
 
-.complete {
-    font-family: Poppins;
-    font-size: 14px;
-    font-weight: bold;
-    color: #ffffff;
-    background-color: #142A74;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 30px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    text-decoration: none;
-}
-
-.complete:hover {
-    background-color: #142a74ec;
-    color: #ffffff;
-    text-decoration: none;
-}
-
 .page-content-header {
     display: flex;
     flex-direction: row;
@@ -268,6 +248,32 @@ h2 {
     background: linear-gradient(#102369, #18349C, #2045CF);
     color: #ffffff;
     border: 2px solid #142A74;
+}
+
+.right-bts {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.pending, .complete {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #1B3286;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+}
+
+.pending:hover, .complete:hover {
+    background-color: #142A74;
+    color: #ffffff;
+    text-decoration: none;
 }
 
 .page-body {

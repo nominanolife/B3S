@@ -274,7 +274,7 @@ function renderStudents() {
   if (studentsData.length === 0) {
     studentList.innerHTML = `
       <tr>
-        <td colspan="10" class="text-center">No student/s yet</td>
+        <td colspan="11" class="text-center">No student/s yet</td>
       </tr>
     `;
     return;
