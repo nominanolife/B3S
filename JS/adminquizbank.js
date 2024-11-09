@@ -264,3 +264,34 @@ function setupPublishButton() {
         }
     });
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    const languageFilter = document.getElementById("languageFilter");
+    const selectedLanguage = languageFilter.querySelector(".selected");
+    const dropdownOptions = languageFilter.querySelector(".dropdown-options");
+
+    // Toggle dropdown visibility on clicking the selected div
+    selectedLanguage.addEventListener("click", function() {
+        languageFilter.classList.toggle("open");
+    });
+
+    // Update selected language and close dropdown on selecting an option
+    dropdownOptions.addEventListener("click", function(event) {
+        const option = event.target.closest(".option");
+        if (option) {
+            const language = option.getAttribute("data-value");
+            selectedLanguage.textContent = option.textContent;
+            languageFilter.classList.remove("open");
+
+            // Optional: perform any action based on selected language, e.g., changing language-specific content
+            console.log("Selected language:", language);
+        }
+    });
+
+    // Close the dropdown if clicking outside
+    document.addEventListener("click", function(event) {
+        if (!languageFilter.contains(event.target)) {
+            languageFilter.classList.remove("open");
+        }
+    });
+});

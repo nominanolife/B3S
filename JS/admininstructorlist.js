@@ -25,10 +25,7 @@ const instructorModal = new bootstrap.Modal(instructorModalElement);
 const saveInstructorBtn = document.querySelector('.save-instructor');
 const closeModalButton = document.querySelector('.close-modal');
 const instructorNameInput = document.querySelector('.instructor-name');
-const instructorCourseInput = document.querySelector('.instructor-course');
 const paginationControls = document.querySelector('.pagination-controls');
-const traitsInput = document.querySelector('.traits-input');
-const addTraitButton = document.querySelector('.add-trait');
 const traitsList = document.querySelector('.traits-list');
 const loader = document.getElementById('loader1');
 let instructorIdToDelete = null; // Store the ID of the instructor to delete
@@ -90,6 +87,7 @@ function renderInstructors() {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td><img src="${instructor.imageUrl || 'Assets/default-profile.png'}">${instructor.name}</td>
+      <td></td>
       <td>${courses}</td>
       <td class="table-row-content">
         <div class="dropdown">
@@ -100,15 +98,6 @@ function renderInstructors() {
             <i class="dropdown-item delete-btn" data-id="${instructor.id}">Delete</i>
           </div>
         </div>
-      </td>
-      <td>
-        <label class="switch">
-          <input type="checkbox" class="slider-switch" data-id="${instructor.id}" ${instructor.active ? 'checked' : ''}>
-          <span class="slider">
-            <span class="slider-label-off">OFF</span>
-            <span class="slider-label-on">ON</span>
-          </span>
-        </label>
       </td>
     `;
     instructorList.appendChild(row);
@@ -357,36 +346,6 @@ document.addEventListener('DOMContentLoaded', function () {
   fetchInstructors();
 });
 
-// Function to add custom traits from the input
-addTraitButton.addEventListener('click', function(event) {
-  event.preventDefault();
-  let trait = traitsInput.value.trim();
-  if (trait) {
-    // Capitalize the first letter
-    trait = trait.charAt(0).toUpperCase() + trait.slice(1).toLowerCase();
-
-    // Create the trait item
-    const traitElement = document.createElement('div');
-    traitElement.classList.add('trait-item');
-    traitElement.textContent = trait;
-    
-    // Add the delete button and append
-    const deleteButton = document.createElement('i');
-    deleteButton.classList.add('remove-trait');
-    deleteButton.innerHTML = '<i class="bi bi-x"></i>';
-    deleteButton.addEventListener('click', function() {
-      traitsList.removeChild(traitElement);
-    });
-    traitElement.appendChild(deleteButton);
-    traitsList.appendChild(traitElement);
-
-    // Clear the input field
-    traitsInput.value = '';
-  } else {
-    showNotification("Please enter a trait before adding.");
-  }
-});
-
 // Save instructor logic
 async function saveInstructor(event) {
   event.preventDefault();
@@ -454,49 +413,6 @@ async function saveInstructor(event) {
     showNotification('An error occurred while saving the instructor. Please try again.');
   }
 }
-
-// Add event listener to the Add Trait button
-document.querySelector('.add-trait').addEventListener('click', function (event) {
-  event.preventDefault();
-  const traitInput = document.querySelector('.traits-input');
-  let traitValue = traitInput.value.trim();
-
-  if (traitValue) {
-    // Capitalize the first letter of the trait and ensure rest are lowercase
-    traitValue = traitValue.charAt(0).toUpperCase() + traitValue.slice(1).toLowerCase();
-
-    const traitItem = document.createElement('div');
-    traitItem.classList.add('trait-item');
-    traitItem.innerText = traitValue;
-
-    // Optionally add a delete button for each trait
-    const deleteButton = document.createElement('i');
-    deleteButton.classList.add('remove-trait');
-    deleteButton.innerHTML = '<i class="bi bi-x"></i>';
-
-    // Add event listener to remove the trait
-    deleteButton.addEventListener('click', function() {
-      traitItem.remove();
-    });
-
-    traitItem.appendChild(deleteButton);
-    document.querySelector('.traits-list').appendChild(traitItem);
-    traitInput.value = ''; // Clear input after adding
-  }
-});
-
-// Handle file input display logic
-document.getElementById('uploadIcon').addEventListener('click', () => {
-  document.getElementById('editProfilePic').click();
-});
-
-document.getElementById('editProfilePic').addEventListener('change', function () {
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    document.getElementById('profilePicPreview').src = e.target.result;
-  };
-  reader.readAsDataURL(this.files[0]);
-});
 
 // Function to reset the modal form fields
 function resetForm() {
@@ -616,18 +532,6 @@ async function editInstructor(event) {
   }
 }
 
-// Function to preview the image when a new image is selected
-document.getElementById('editProfilePic').addEventListener('change', function(event) {
-  const file = event.target.files[0];
-  if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-          document.getElementById('profilePicPreview').src = e.target.result;
-      }
-      reader.readAsDataURL(file);
-  }
-});
-
 // Store the delete confirmation modal instance
 const deleteConfirmationModalElement = document.getElementById('deleteConfirmationModal');
 const deleteConfirmationModal = new bootstrap.Modal(deleteConfirmationModalElement);
@@ -660,3 +564,19 @@ function showNotification(message) {
   notificationModal.show(); // Show the modal
 }
 
+document.querySelectorAll('.togglePassword').forEach(button => {
+  button.addEventListener('click', function () {
+      const passwordField = this.previousElementSibling;
+      const icon = this.querySelector('i');
+
+      if (passwordField.type === 'password') {
+          passwordField.type = 'text';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+      } else {
+          passwordField.type = 'password';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+      }
+  });
+});

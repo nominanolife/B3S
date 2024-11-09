@@ -22,16 +22,19 @@ const db = getFirestore(app);
 
 async function fetchArchivedStudents() {
   try {
+    // Show loader1
+    document.getElementById('loader1').style.display = 'flex';
+
     const studentList = document.getElementById('student-archives-list');
-    studentList.innerHTML = `<tr><td colspan="10" class="text-center">Loading...</td></tr>`; // Show loading state
+    studentList.innerHTML = ''; // Clear existing content
 
     // Query applicants where role = "student" and archived = true
     const applicantsSnapshot = await getDocs(query(
       collection(db, 'applicants'),
-      where('role', '==', 'student'), // First filter by role = "student"
-      where('archived', '==', true) // Then filter by archived = true
-    )
-  );  
+      where('role', '==', 'student'),
+      where('archived', '==', true)
+    ));
+
     const studentsMap = new Map();
 
     // Process applicants
@@ -58,14 +61,13 @@ async function fetchArchivedStudents() {
 
     completedBookingsSnapshot.forEach((doc) => {
       const bookingData = doc.data();
-      const userId = doc.id; // The document ID matches between collections
+      const userId = doc.id;
 
       if (studentsMap.has(userId) && Array.isArray(bookingData.completedBookings) && bookingData.completedBookings.length > 0) {
-        // Fetch the earliest date from the completedBookings array
-        const firstBooking = bookingData.completedBookings[0]; // Take the first booking from the array
+        const firstBooking = bookingData.completedBookings[0];
         const student = studentsMap.get(userId);
 
-        student.dateJoined = firstBooking.date || 'N/A'; // Use the date field from the first booking
+        student.dateJoined = firstBooking.date || 'N/A';
       }
     });
 
@@ -76,6 +78,9 @@ async function fetchArchivedStudents() {
     console.error('Error fetching archived students:', error);
     const studentList = document.getElementById('student-archives-list');
     studentList.innerHTML = `<tr><td colspan="10" class="text-center">Failed to load data</td></tr>`;
+  } finally {
+    // Hide loader1 after data is fetched and rendered
+    document.getElementById('loader1').style.display = 'none';
   }
 }
 

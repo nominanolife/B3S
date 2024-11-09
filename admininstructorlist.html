@@ -66,9 +66,9 @@
                             <thead class="table-headers">
                                 <tr class="table-headers-title">
                                     <th>NAME</th>
+                                    <th>EMAIL</th>
                                     <th>COURSE</th>
                                     <th>ACTION</th>
-                                    <th>AVAILABILITY</th>
                                 </tr>
                             </thead>
                             <tbody class="instructor-list">
@@ -81,94 +81,30 @@
         </div>
     </div>
 
+    <!-- Add Instructor Modal -->
     <div class="modal" id="instructorModal">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4>Add Instructor</h4>
                 </div>
-                <form class="modal-body">
-                    <div class="profile-pic-container">
-                        <img id="profilePicPreview" class="profile-pic-modal" src="Assets/default-profile.png" alt="Profile Picture">
-                        <i id="uploadIcon" class="fa fa-camera"></i>
-                        <input type="file" id="editProfilePic" accept="image/*" style="display: none;">
+                <div class="modal-body">
+                    <div class="credentials">
+                        <div class="email-input">
+                            <label for="email">Email</label>
+                            <input type="email" class="email" placeholder="Email" required>
+                        </div>
+                        <div class="password-input">
+                            <label for="password">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control password-field" placeholder="Password" required>
+                                <button class="btn btn-outline-white togglePassword" type="button">
+                                    <i class="fas fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>                        
                     </div>
-                    <div class="input-body">
-                        <input type="text" class="instructor-name" placeholder="Instructor Name" required>
-                        <div class="form-group-all">
-                            <!-- Courses Section -->
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="courses" id="course-tdc">
-                                    <span class="checkbox-label">TDC</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="courses" id="course-pdc4wheels">
-                                    <span class="checkbox-label">PDC-4Wheels</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="courses" id="course-pdcmotors">
-                                    <span class="checkbox-label">PDC-Motors</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="personal-traits">
-                        <h5>Personal Traits</h5>
-                        <div class="form-group-all">
-                            <!-- Predefined traits -->
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="traits" id="trait-friendly">
-                                    <span class="checkbox-label">Friendly</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="traits" id="trait-supportive">
-                                    <span class="checkbox-label">Supportive</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="traits" id="trait-patient">
-                                    <span class="checkbox-label">Patient</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="traits" id="trait-motivational">
-                                    <span class="checkbox-label">Motivational</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="traits" id="trait-relaxed">
-                                    <span class="checkbox-label">Relaxed</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="traits" id="trait-disciplined">
-                                    <span class="checkbox-label">Disciplined</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="traits">
-                            <div class="traits-input-container">
-                                <input type="text" class="traits-input" placeholder="Add personal traits" required>
-                                <button class="add-trait">Add</button>
-                            </div>
-                        </div>
-                        <div class="traits-list">
-
-                        </div>
-                    </div>  
-                </form>                
+                </div>                
                 <div class="modal-footer">
                     <button class="save-instructor" type="submit">Save</button>
                     <button class="close-modal" type="button" data-dismiss="modal">Cancel</button>
@@ -177,55 +113,30 @@
         </div>
     </div>
 
+    <!-- Edit Instructor Modal -->
     <div class="modal" id="editInstructorModal">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4>Edit Instructor</h4>
                 </div>
-                <form class="modal-body">
-                    <div class="profile-pic-container">
-                        <img id="profilePicPreview" class="profile-pic-modal" src="Assets/default-profile.png" alt="Profile Picture">
-                        <i id="uploadIcon" class="fa fa-camera"></i>
-                        <input type="file" id="editProfilePic" accept="image/*" style="display: none;">
-                    </div>
-                    <div class="input-body">
-                        <input type="text" class="instructor-name" placeholder="Instructor Name" required>
-                        <div class="form-group-all">
-                            <!-- Courses Section -->
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="courses" id="course-tdc">
-                                    <span class="checkbox-label">TDC</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="courses" id="course-pdc4wheels">
-                                    <span class="checkbox-label">PDC-4Wheels</span>
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" name="courses" id="course-pdcmotors">
-                                    <span class="checkbox-label">PDC-Motors</span>
-                                </label>
-                            </div>
+                <div class="modal-body">
+                    <div class="credentials">
+                        <div class="email-input">
+                            <label for="email">Email</label>
+                            <input type="email" class="email" placeholder="Email" required>
                         </div>
-                    </div>
-                    <div class="personal-traits">
-                        <h5>Personal Traits</h5>
-                        <div class="traits">
-                            <div class="traits-input-container">
-                                <input type="text" class="traits-input" placeholder="Add personal traits" required>
-                                <button class="add-trait">Add</button>
+                        <div class="password-input">
+                            <label for="password">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control password-field" placeholder="Password" required>
+                                <button class="btn btn-outline-white togglePassword" type="button">
+                                    <i class="fas fa-eye-slash"></i>
+                                </button>
                             </div>
-                        </div>
-                        <div class="traits-list">
-
-                        </div>
+                        </div>                        
                     </div>  
-                </form>                
+                </div>                
                 <div class="modal-footer">
                     <button class="save-instructor" type="submit">Save</button>
                     <button class="close-modal" type="button" data-dismiss="modal">Cancel</button>

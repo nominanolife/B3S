@@ -126,606 +126,610 @@
                 </div>
                 <div class="modal-body">
                     <div class="input-body">
-                        <div class="checkbox-checklist">
-                            <h5>Evaluation</h5>
-                            <table class="evaluation-table">
-                                <thead>
-                                    <tr>
-                                        <th>Category</th>
-                                        <th>Results</th>
-                                        <th>Comments</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="main">Observation</td>
-                                        <td id="observationResult"></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td class="main-text">Eye lead time</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="eyeLeadTime"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Left – Right / Scanning / Shoulder checks</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="leftRightScanning"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Mirrors / tracking traffic</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="mirrorsTracking"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td class="main">Space Management</td>
-                                        <td id="spaceManagementResult"></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td class="main-text">Following defensive distance</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="defensiveDistance"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Space at Stops</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="spaceAtStops"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Path of least resistance</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="leastResistance"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Right-of-way</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="rightOfWay"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td class="main">Speed Control</td>
-                                        <td id="speedControlResult"></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td class="main-text">Acceleration / Deceleration – Smoothness</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="acceleration"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Braking: Full Stops, smooth</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="braking"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Speed for Conditions</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="speedForConditions"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Speed and Traffic signs</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="trafficSigns"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td class="main">Steering</td>
-                                        <td id="steeringResult"></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td class="main-text">Lane / Turn Position / set-up</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="lanePosition"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Steering: hand position, smoothness</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="steering"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td class="main">Communication</td>
-                                        <td id="communicationResult"></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td class="main-text">Signals: timing and use</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="signals"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Other: i.e horn, eye contact</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="eyeContact"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td class="main">General</td>
-                                        <td id="generalResult"></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td class="main-text">Seating, head rest position, and mirror adjustment: seatbelt use</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="seating"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Parking / Backing</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="parking"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Anticipation: Adjusts</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="anticipation"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Judgment: decisions</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="judgment"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Timing: approach, Traffic interactions</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div class="static-text-score" id="timing"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div id="evaluationContainer">
+                            <div class="checkbox-checklist">
+                                <h5>Evaluation</h5>
+                                <table class="evaluation-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Results</th>
+                                            <th>Comments</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main">Observation</td>
+                                            <td id="observationResult"></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main-text">Eye lead time</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="eyeLeadTime"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Left – Right / Scanning / Shoulder checks</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="leftRightScanning"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Mirrors / tracking traffic</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="mirrorsTracking"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main">Space Management</td>
+                                            <td id="spaceManagementResult"></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main-text">Following defensive distance</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="defensiveDistance"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Space at Stops</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="spaceAtStops"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Path of least resistance</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="leastResistance"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Right-of-way</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="rightOfWay"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main">Speed Control</td>
+                                            <td id="speedControlResult"></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main-text">Acceleration / Deceleration – Smoothness</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="acceleration"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Braking: Full Stops, smooth</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="braking"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Speed for Conditions</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="speedForConditions"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Speed and Traffic signs</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="trafficSigns"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main">Steering</td>
+                                            <td id="steeringResult"></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main-text">Lane / Turn Position / set-up</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="lanePosition"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Steering: hand position, smoothness</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="steering"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main">Communication</td>
+                                            <td id="communicationResult"></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main-text">Signals: timing and use</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="signals"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Other: i.e horn, eye contact</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="eyeContact"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main">General</td>
+                                            <td id="generalResult"></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main-text">Seating, head rest position, and mirror adjustment: seatbelt use</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="seating"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Parking / Backing</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="parking"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Anticipation: Adjusts</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="anticipation"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Judgment: decisions</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="judgment"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Timing: approach, Traffic interactions</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div class="static-text-score" id="timing"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="checkbox-checklist">
-                            <h5>Comments / Suggestions</h5>
-                            <table class="instructor-comments-table">
-                                <thead>
-                                    <tr>
-                                        <th>Lesson</th>
-                                        <th>Topics</th>
-                                        <th>Checklist</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td rowspan="5"><b>Lesson 1: Start and Stop</b></td>
-                                        <td>
-                                            a. Pre-driving checks outside and inside the vehicle
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicA">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            b. Starting Procedure
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicB">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            c. Establishing a path
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicC"> 
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            d. Gear changing
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicD">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            e. Stopping the vehicle
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicE">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td rowspan="2"><b>Lesson 2: Backing ang Turning</b></td>
-                                        <td>
-                                            a. Turning right and left at an intersection
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson2TopicA">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            b. Backing in and out of side street
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson2TopicB">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td rowspan="2"><b>Lesson 3: Road Crossing and Light Traffic</b></td>
-                                        <td>
-                                            a. Road crossing
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson3TopicA">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            b. Driving at light traffic
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson3TopicB">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td><b>Lesson 4: Manuevering</b></td>
-                                        <td>
-                                            a. The “Y” turn and turnabout maneuvering style
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson4TopicA">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td><b>Lesson 5: Hanging</b></td>
-                                        <td>
-                                            a. Driving on an uphill and downhill on 3% grade
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson5TopicA">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td  rowspan="3"><b>Lesson 6: Garage Driving</b></td>
-                                        <td>
-                                            a. Driving into a garage
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicA">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            b. Driving out of the garage
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicB">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            c. Driving into the garage using the backing procedure
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicC">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td  rowspan="3"><b>Lesson 7: Parking</b></td>
-                                        <td>
-                                            a. Entering and Leaving angle parking space
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicA">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            b. Perpendicular parking
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicB">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            c. Parallel parking
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicC">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td><b>Lesson 8: Highway Driving</td>
-                                        <td>
-                                            a. Driving at highways to encounter different traffic situations
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson8TopicA">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td><b>Lesson 9: Heavy Traffic</b></td>
-                                        <td>
-                                            a. Acquaints student to actual driving condition in heavy traffic and develops correct driving attitudes
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson9TopicA">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td><b>Lesson 10: Night Driving</b></td>
-                                        <td>
-                                            a. Student must familiarize with the actual driving at night
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson10TopicA">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tbody>
-                                    <tr>
-                                        <td><b>Lesson 11: Review</b></td>
-                                        <td>
-                                            a. Students shall be tested on different traffic situations to observe their driving abilities
-                                        </td>
-                                        <td>
-                                            <label class="custom-checkbox1">
-                                                <input type="checkbox" class="comment-suggestion-checkbox" id="lesson11TopicA">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div id="commentsContainer" class="hidden">
+                            <div class="checkbox-checklist instructor-comments-table">
+                                <h5>Comments / Suggestions</h5>
+                                <table class="instructor-comments-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Lesson</th>
+                                            <th>Topics</th>
+                                            <th>Checklist</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td rowspan="5"><b>Lesson 1: Start and Stop</b></td>
+                                            <td>
+                                                a. Pre-driving checks outside and inside the vehicle
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                b. Starting Procedure
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicB">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                c. Establishing a path
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicC"> 
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                d. Gear changing
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicD">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                e. Stopping the vehicle
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicE">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td rowspan="2"><b>Lesson 2: Backing ang Turning</b></td>
+                                            <td>
+                                                a. Turning right and left at an intersection
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson2TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                b. Backing in and out of side street
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson2TopicB">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td rowspan="2"><b>Lesson 3: Road Crossing and Light Traffic</b></td>
+                                            <td>
+                                                a. Road crossing
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson3TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                b. Driving at light traffic
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson3TopicB">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 4: Manuevering</b></td>
+                                            <td>
+                                                a. The “Y” turn and turnabout maneuvering style
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson4TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 5: Hanging</b></td>
+                                            <td>
+                                                a. Driving on an uphill and downhill on 3% grade
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson5TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td  rowspan="3"><b>Lesson 6: Garage Driving</b></td>
+                                            <td>
+                                                a. Driving into a garage
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                b. Driving out of the garage
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicB">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                c. Driving into the garage using the backing procedure
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicC">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td  rowspan="3"><b>Lesson 7: Parking</b></td>
+                                            <td>
+                                                a. Entering and Leaving angle parking space
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                b. Perpendicular parking
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicB">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                c. Parallel parking
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicC">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 8: Highway Driving</td>
+                                            <td>
+                                                a. Driving at highways to encounter different traffic situations
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson8TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 9: Heavy Traffic</b></td>
+                                            <td>
+                                                a. Acquaints student to actual driving condition in heavy traffic and develops correct driving attitudes
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson9TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 10: Night Driving</b></td>
+                                            <td>
+                                                a. Student must familiarize with the actual driving at night
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson10TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 11: Review</b></td>
+                                            <td>
+                                                a. Students shall be tested on different traffic situations to observe their driving abilities
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson11TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="back-btn">Back</button>
-                            <button type="button" class="next-btn">Next</button>
+                            <button type="button" class="back-btn hidden" id="backButton">Back</button>
+                            <button type="button" class="next-btn" id="nextButton">Next</button>
                         </div>
                     </div>
                 </div>
@@ -744,304 +748,588 @@
                 </div>
                 <div class="modal-body">
                     <div class="input-body">
-                        <div class="checkbox-checklist">
-                            <h5>Evaluation</h5>
-                            <table class="evaluation-table">
-                                <thead>
-                                    <tr>
-                                        <th>Category</th>
-                                        <th>Results</th>
-                                        <th>Comments</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="main">Start the engine</td>
-                                        <td id="startTheEngine"></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Moving off, riding ahead and stopping</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="motorcycleMovingOff" class="static-text-score"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Positioning in different environments</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="motorcyclePositioning" class="static-text-score"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">5</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                     <!-- Choice of speed in different situations (low speed balancing) -->
-                                    <tr>
-                                        <td class="main">Choice of speed in different situations (low speed balancing)</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="lowSpeedBalancing" class="static-text-score"></div>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
+                        <div id="motorEvaluationContainer">
+                            <div class="checkbox-checklist">
+                                <h5>Evaluation</h5>
+                                <table class="evaluation-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Results</th>
+                                            <th>Comments</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="main">Start the engine</td>
+                                            <td id="startTheEngine"></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Moving off, riding ahead and stopping</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="motorcycleMovingOff" class="static-text-score"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Positioning in different environments</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="motorcyclePositioning" class="static-text-score"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">5</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
                                         <tr>
                                             <td></td>
                                             <td></td>
                                             <td></td>
                                         </tr>
-                                        <!-- Hill riding -->
-                                    <tr>
-                                        <td class="main">Hill riding</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="hillRiding" class="static-text-score"></div>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                      <!-- Riding along a curve or bend (cornering) -->
-                                    <tr>
-                                        <td class="main">Riding along a curve or bend (cornering)</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="cornering" class="static-text-score"></div>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                     <!-- Approaching and passing railway crossings -->
-                                    <tr>
-                                        <td class="main">Approaching and passing railway crossings</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="approaching" class="static-text-score"></div>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                     <!-- Lane shift and choice of lanes -->
-                                    <tr>
-                                        <td class="main">Lane shift and choice of lanes</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="laneShift" class="static-text-score"></div>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                     <!-- Turning and lane changing -->
-                                    <tr>
-                                        <td class="main">Turning and lane changing</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="turningLane" class="static-text-score"></div>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main">Interaction with various road users</td>
-                                        <td id="variousRoadUsers"></td>
-                                        <td></td>
-                                    </tr>
-                                    <!-- Passing stationary vehicles and pedestrians -->
-                                    <tr>
-                                        <td class="main-text">Passing stationary vehicles and pedestrians</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="motorcyclePassingVehicles" class="static-text-score"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">2</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                     <!-- Meeting oncoming traffic -->
-                                    <tr>
-                                        <td class="main-text">Meeting oncoming traffic</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="motorcycleOncomingTraffic" class="static-text-score"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">3</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Riding ahead of or behind other road users</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="ridingAheadorBehind" class="static-text-score"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">2</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Riding side by side</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="ridingSidebySide" class="static-text-score"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">3</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main">Overtaking</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="overTaking" class="static-text-score"></div>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main">Riding in different kinds of junctions</td>
-                                        <td id="kindofJunctions"></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Straight through</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="straightThrough" class="static-text-score"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">2</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">Turning Left or Right</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="turningLeftorRight" class="static-text-score"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">3</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">With or Without obligation to give the right of way</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="obligationsToGiveRightofWay" class="static-text-score"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">2</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main-text">ABC of passing junction</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="abcPassingJunction" class="static-text-score"></div>
-                                                <span class="static-text">/</span>
-                                                <span class="static-text">3</span>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main">Approaching, riding in and leaving roundabouts</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="leavingRoundabouts" class="static-text-score"></div>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main">Stopping and parking</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="stoppingAndParking" class="static-text-score"></div>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="main">Riding with a back ride</td>
-                                        <td class="score-input">
-                                            <div class="input-container">
-                                                <div id="backRiding" class="static-text-score"></div>
-                                            </div>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                        <!-- Choice of speed in different situations (low speed balancing) -->
+                                        <tr>
+                                            <td class="main">Choice of speed in different situations (low speed balancing)</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="lowSpeedBalancing" class="static-text-score"></div>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                            <!-- Hill riding -->
+                                        <tr>
+                                            <td class="main">Hill riding</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="hillRiding" class="static-text-score"></div>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <!-- Riding along a curve or bend (cornering) -->
+                                        <tr>
+                                            <td class="main">Riding along a curve or bend (cornering)</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="cornering" class="static-text-score"></div>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <!-- Approaching and passing railway crossings -->
+                                        <tr>
+                                            <td class="main">Approaching and passing railway crossings</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="approaching" class="static-text-score"></div>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <!-- Lane shift and choice of lanes -->
+                                        <tr>
+                                            <td class="main">Lane shift and choice of lanes</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="laneShift" class="static-text-score"></div>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <!-- Turning and lane changing -->
+                                        <tr>
+                                            <td class="main">Turning and lane changing</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="turningLane" class="static-text-score"></div>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main">Interaction with various road users</td>
+                                            <td id="variousRoadUsers"></td>
+                                            <td></td>
+                                        </tr>
+                                        <!-- Passing stationary vehicles and pedestrians -->
+                                        <tr>
+                                            <td class="main-text">Passing stationary vehicles and pedestrians</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="motorcyclePassingVehicles" class="static-text-score"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">2</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <!-- Meeting oncoming traffic -->
+                                        <tr>
+                                            <td class="main-text">Meeting oncoming traffic</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="motorcycleOncomingTraffic" class="static-text-score"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">3</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Riding ahead of or behind other road users</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="ridingAheadorBehind" class="static-text-score"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">2</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Riding side by side</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="ridingSidebySide" class="static-text-score"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">3</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main">Overtaking</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="overTaking" class="static-text-score"></div>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main">Riding in different kinds of junctions</td>
+                                            <td id="kindofJunctions"></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Straight through</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="straightThrough" class="static-text-score"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">2</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">Turning Left or Right</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="turningLeftorRight" class="static-text-score"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">3</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">With or Without obligation to give the right of way</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="obligationsToGiveRightofWay" class="static-text-score"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">2</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main-text">ABC of passing junction</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="abcPassingJunction" class="static-text-score"></div>
+                                                    <span class="static-text">/</span>
+                                                    <span class="static-text">3</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main">Approaching, riding in and leaving roundabouts</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="leavingRoundabouts" class="static-text-score"></div>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main">Stopping and parking</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="stoppingAndParking" class="static-text-score"></div>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="main">Riding with a back ride</td>
+                                            <td class="score-input">
+                                                <div class="input-container">
+                                                    <div id="backRiding" class="static-text-score"></div>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="motorCommentsContainer" class="hidden">
+                            <div class="checkbox-checklist instructor-comments-table">
+                                <h5>Comments / Suggestions</h5>
+                                <table class="instructor-comments-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Lesson</th>
+                                            <th>Topics</th>
+                                            <th>Checklist</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td rowspan="5"><b>Lesson 1: Start and Stop</b></td>
+                                            <td>
+                                                a. Pre-driving checks outside and inside the vehicle
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                b. Starting Procedure
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicB">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                c. Establishing a path
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicC"> 
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                d. Gear changing
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicD">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                e. Stopping the vehicle
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson1TopicE">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td rowspan="2"><b>Lesson 2: Backing ang Turning</b></td>
+                                            <td>
+                                                a. Turning right and left at an intersection
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson2TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                b. Backing in and out of side street
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson2TopicB">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td rowspan="2"><b>Lesson 3: Road Crossing and Light Traffic</b></td>
+                                            <td>
+                                                a. Road crossing
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson3TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                b. Driving at light traffic
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson3TopicB">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 4: Manuevering</b></td>
+                                            <td>
+                                                a. The “Y” turn and turnabout maneuvering style
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson4TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 5: Hanging</b></td>
+                                            <td>
+                                                a. Driving on an uphill and downhill on 3% grade
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson5TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td  rowspan="3"><b>Lesson 6: Garage Driving</b></td>
+                                            <td>
+                                                a. Driving into a garage
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                b. Driving out of the garage
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicB">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                c. Driving into the garage using the backing procedure
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson6TopicC">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td  rowspan="3"><b>Lesson 7: Parking</b></td>
+                                            <td>
+                                                a. Entering and Leaving angle parking space
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                b. Perpendicular parking
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicB">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                c. Parallel parking
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson7TopicC">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 8: Highway Driving</td>
+                                            <td>
+                                                a. Driving at highways to encounter different traffic situations
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson8TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 9: Heavy Traffic</b></td>
+                                            <td>
+                                                a. Acquaints student to actual driving condition in heavy traffic and develops correct driving attitudes
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson9TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 10: Night Driving</b></td>
+                                            <td>
+                                                a. Student must familiarize with the actual driving at night
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson10TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Lesson 11: Review</b></td>
+                                            <td>
+                                                a. Students shall be tested on different traffic situations to observe their driving abilities
+                                            </td>
+                                            <td>
+                                                <label class="custom-checkbox1">
+                                                    <input type="checkbox" class="comment-suggestion-checkbox" id="lesson11TopicA">
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="back-btn hidden" id="motorBackButton">Back</button>
+                    <button type="button" class="next-btn" id="motorNextButton">Next</button>
                 </div>
             </div>
         </div>

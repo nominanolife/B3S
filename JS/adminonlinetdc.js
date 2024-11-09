@@ -295,15 +295,14 @@ function populateQuizFields(questions) {
             <div class="quiz-container-header">
                 <h5>Question ${questionCount}</h5>
             </div>
-             <!-- Language dropdown -->
+            <div class="quiz-question">
                 <div class="language-dropdown">
                     <label for="languageSelect${questionCount}">Language:</label>
                     <select id="languageSelect${questionCount}" class="language-select">
-                        <option value="English" ${question.language === 'English' ? 'selected' : ''}>English</option>
-                        <option value="Filipino" ${question.language === 'Filipino' ? 'selected' : ''}>Filipino</option>
+                        <option class="option" value="English" ${question.language === 'English' ? 'selected' : ''}>English</option>
+                        <option class="option" value="Filipino" ${question.language === 'Filipino' ? 'selected' : ''}>Filipino</option>
                     </select>
                 </div>
-            <div class="quiz-question">
                 <div class="question-input">
                     <input type="text" value="${question.question}" placeholder="Enter your question..." data-index="${index}" class="question-text">
                 </div>
@@ -1298,15 +1297,14 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
             <div class="quiz-container-header">
                 <h5>Question ${questionCount}</h5>  <!-- Initially set question number -->
             </div>
-            <!-- Language dropdown -->
-            <div class="language-dropdown">
-                <label for="languageSelect${questionCount}">Language:</label>
-                <select id="languageSelect${questionCount}">
-                    <option value="Filipino" ${language === 'Filipino' ? 'selected' : ''}>Filipino</option>
-                    <option value="English" ${language === 'English' ? 'selected' : ''}>English</option>
-                </select>
-            </div>
             <div class="quiz-question">
+                <div class="language-dropdown">
+                    <label for="languageSelect${questionCount}">Language:</label>
+                    <select id="languageSelect${questionCount}">
+                        <option class="option" value="Filipino" ${language === 'Filipino' ? 'selected' : ''}>Filipino</option>
+                        <option class="option" value="English" ${language === 'English' ? 'selected' : ''}>English</option>
+                    </select>
+                </div>
                 <div class="question-input">
                     <input type="text" value="${questionText}" placeholder="Type your question here...">
                 </div>
@@ -1479,15 +1477,14 @@ document.getElementById('confirmDraftBtn').addEventListener('click', saveDraftFr
             <div class="quiz-container-header">
                 <h5>Question ${currentQuestionCount + 1}</h5>  <!-- Set the question number based on current count -->
             </div>
-            <!-- Language dropdown -->
-            <div class="language-dropdown">
-                <label for="languageSelect${currentQuestionCount + 1}">Language:</label>
-                <select id="languageSelect${currentQuestionCount + 1}">
-                    <option value="Filipino" ${language === 'Filipino' ? 'selected' : ''}>Filipino</option>
-                    <option value="English" ${language === 'English' ? 'selected' : ''}>English</option>
-                </select>
-            </div>
             <div class="quiz-question">
+                <div class="language-dropdown">
+                    <label for="languageSelect${currentQuestionCount + 1}">Language:</label>
+                    <select id="languageSelect${currentQuestionCount + 1}">
+                        <option class="option" value="Filipino" ${language === 'Filipino' ? 'selected' : ''}>Filipino</option>
+                        <option class="option" value="English" ${language === 'English' ? 'selected' : ''}>English</option>
+                    </select>
+                </div>
                 <div class="question-input">
                     <input type="text" value="${questionText}" placeholder="Type your question here...">
                 </div>

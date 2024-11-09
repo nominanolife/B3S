@@ -411,15 +411,14 @@ document.addEventListener('DOMContentLoaded', async function() {
             <div class="quiz-container-header">
                 <h5>Question ${questionCount}</h5>
             </div>
-            <!-- Language dropdown -->
-            <div class="language-dropdown">
-                <label for="languageSelect${questionCount}">Language:</label>
-                <select id="languageSelect${questionCount}" class="language-select">
-                    <option value="English" ${language === 'English' ? 'selected' : ''}>English</option>
-                    <option value="Filipino" ${language === 'Filipino' ? 'selected' : ''}>Filipino</option>
-                </select>
-            </div>
             <div class="quiz-question">
+                <div class="language-dropdown">
+                    <label for="languageSelect${questionCount}">Language:</label>
+                    <select id="languageSelect${questionCount}" class="language-select">
+                        <option value="English" ${language === 'English' ? 'selected' : ''}>English</option>
+                        <option value="Filipino" ${language === 'Filipino' ? 'selected' : ''}>Filipino</option>
+                    </select>
+                </div>
                 <div class="question-input">
                     <input type="text" value="${questionText}" placeholder="Type your question here...">
                 </div>

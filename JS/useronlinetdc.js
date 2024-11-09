@@ -162,7 +162,7 @@ document.getElementById('continueButton').addEventListener('click', function () 
 // Event listener for the confirm button in the modal
 confirmStartQuizBtn.addEventListener('click', function () {
     // Redirect to the exam page when the confirm button is clicked
-    window.location.href = 'userquiz.html';
+    window.location.href = 'userlanguageselector.html';
 });
 // JavaScript for sidebar toggle
 document.getElementById('toggleSidebarBtn').addEventListener('click', function() {

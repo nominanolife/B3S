@@ -414,6 +414,7 @@ h2 {
     padding: 8px 12px;
     text-decoration: none;
     display: block;
+    text-align: left;
 }
 
 .dropdown-content i:hover {
@@ -676,181 +677,45 @@ input:checked + .slider .slider-label-on {
     padding: 20px;
 }
 
-#profilePicPreview {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    display: block;
-    margin: 20px auto;
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    background-color: #dfe4ea;
-}
-
-#uploadIcon {
-    position: absolute;
-    top: 150px;
-    left: 260px;
-    color: #ffffff;
-    background-color: #2f3542;
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-#uploadIcon:hover {
-    background-color: #57606f;
-}
-
-.instructor-name {
-    width: 100%;
-    margin-bottom: 20px;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-}
-
-.form-group-all {
-    margin-left: 20px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-
-.custom-checkbox {
+.credentials {
     display: flex;
-    align-items: center;
-    cursor: pointer;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.custom-checkbox input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
+.email-input, .password-input {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-.custom-checkbox input + .checkbox-label {
-    position: relative;
-    padding-left: 30px;
-    font-family: Poppins;
+.email-input label, .password-input label {
     font-size: 14px;
-    font-weight: normal;
+    font-weight: bold;
     color: #2F2E2E;
 }
 
-.custom-checkbox input + .checkbox-label::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #2F2E2E;
-    border-radius: 4px;
-    background-color: #fff;
-    transition: all 0.3s ease;
-}
-
-.custom-checkbox input:checked + .checkbox-label::before {
-    background-color: #142A74;
-    border-color: #142A74;
-}
-
-.custom-checkbox input + .checkbox-label::after {
-    content: '\2714';
-    position: absolute;
-    left: 4px;
-    top: 0px;
-    font-size: 14px;
-    color: #ffffff;
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-.custom-checkbox input:checked + .checkbox-label::after {
-    opacity: 1;
-}
-
-.personal-traits {
-    margin-bottom: 20px;
-}
-
-.personal-traits h5 {
+.email-input input, .password-input input {
     font-family: Poppins;
-    font-size: 18px;
-    font-weight: bold;
-    color: #142A74;
-    margin-bottom: 15px;
-}
-
-.traits {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-.traits-input-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    position: relative;
-}
-
-.traits-input {
-    outline: none;
-    width: 100%;
-    padding: 10px;
-    border: none;
-}
-
-.add-trait {
-    position: absolute;
-    right: 0;
-    background-color: #142A74;
-    color: #ffffff;
-    padding: 10px;
-    border: none;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    cursor: pointer;
-}
-
-.traits-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px;
-}
-
-.trait-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 5px;
-    flex-basis: calc(33.33% - 10px);
-    max-width: calc(33.33% - 10px);
+    font-size: 14px;
     padding: 5px;
+    border: 1px solid #D9D9D9;
+    border-radius: 10px;
+}
+
+.togglePassword {
+    border-radius: 0 8px 8px 0;
     border: 1px solid #ced4da;
-    border-radius: 5px;
+    background-color: #f8f9fa;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease; /* Smooth transition */
 }
 
-.remove-trait {
-    background: none;
-    border: none;
+.togglePassword:hover {
+    background-color: #142a74; /* Background color on hover */
 }
 
-.remove-trait i {
-    vertical-align: middle;
-    color: #B60505;
-    background: none;
-    border: none;
-    cursor: pointer;
+.togglePassword:hover {
+    color: #fff; /* Icon color on hover */
 }
 
 .save-instructor {

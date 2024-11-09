@@ -223,9 +223,9 @@ h2 {
     min-height: 760px;
 }
 
-.student-list {
+#student-archives-list {
     font-family: Poppins;
-    font-size: 16px;
+    font-size: 14px;
     text-align: left;
 }
 
@@ -703,118 +703,6 @@ h2 {
 .selected:hover, .selected:focus {
     border-color: #142A74;
     box-shadow: 0px 0px 4px 2px rgba(20, 42, 116, 0.5);
-}
-
-.evaluation-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-.evaluation-table th, .evaluation-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-    color: #2F2E2E;
-}
-
-.evaluation-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
-
-.evaluation-table td:nth-child(1) {
-    vertical-align: middle;
-}
-
-.evaluation-table thead th {
-    text-align: center;
-}
-
-.evaluation-table td input {
-    padding: 5px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 14px;
-}
-
-.evaluation-table td textarea {
-    padding: 5px;
-    border: none;
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.main {
-    font-weight: 600;
-}
-
-tbody tr .main-text {
-    padding-left: 50px;
-}
-
-.form-control.numeric-input {
-    width: 100%;
-    padding: 5px;
-    text-align: center;
-    color: #142A74;
-}
-
-.form-control.numeric-input:focus {
-    outline: none;
-}
-
-.score-input {
-    width: 10%;
-}
-
-.input-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-evenly;
-    width: 100%;
-}
-
-.static-text {
-    pointer-events: none;
-    color: #2F2E2E;
-    padding: 5px;
-    width: 100%;
-    text-align: center;
-}
-
-.form-control.comment-input {
-    width: 100%;
-    padding: 5px;
-    color: #142A74;
-    padding: 5px;
-    border: 1px solid #D9D9D9;
-    resize: none;
-    overflow: hidden;
-}
-
-.instructor-comments-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-.instructor-comments-table th, .instructor-comments-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-    color: #2F2E2E;
-}
-
-.instructor-comments-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-    text-align: center;
-}
-
-.instructor-comments-table td:nth-child(1), .instructor-comments-table td:nth-child(2) {
-    vertical-align: top;
 }
 
 .comment-suggestion-checkbox {

@@ -1046,3 +1046,28 @@ document.getElementById('toggleSidebarBtn').addEventListener('click', function()
     sidebar.classList.toggle('active');
     mainContent.classList.toggle('active');
 });
+
+function toggleSections(evaluationId, commentsId, nextBtnId, backBtnId, showComments) {
+    document.getElementById(evaluationId).classList.toggle('hidden', showComments);
+    document.getElementById(commentsId).classList.toggle('hidden', !showComments);
+    document.getElementById(nextBtnId).classList.toggle('hidden', showComments);
+    document.getElementById(backBtnId).classList.toggle('hidden', !showComments);
+}
+
+// Event listeners for WheelsModal
+document.getElementById('nextButton').addEventListener('click', function () {
+    toggleSections('evaluationContainer', 'commentsContainer', 'nextButton', 'backButton', true);
+});
+
+document.getElementById('backButton').addEventListener('click', function () {
+    toggleSections('evaluationContainer', 'commentsContainer', 'nextButton', 'backButton', false);
+});
+
+// Event listeners for MotorsModal
+document.getElementById('motorNextButton').addEventListener('click', function () {
+    toggleSections('motorEvaluationContainer', 'motorCommentsContainer', 'motorNextButton', 'motorBackButton', true);
+});
+
+document.getElementById('motorBackButton').addEventListener('click', function () {
+    toggleSections('motorEvaluationContainer', 'motorCommentsContainer', 'motorNextButton', 'motorBackButton', false);
+});

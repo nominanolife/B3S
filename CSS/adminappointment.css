@@ -233,8 +233,32 @@ h2 {
 .right-container {
     display: flex;
     flex-direction: column;
+    align-items: center;
     width: 100%;
     height: auto;
+    gap: 10px;
+}
+
+.btn {
+    display: inline-flex;
+}
+
+.btn a {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #142a74;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    text-decoration: none;
+}
+
+.btn a:hover {
+    background-color: #0e1d4d;
 }
 
 .course-section {
@@ -243,8 +267,6 @@ h2 {
     width: 100%;
     max-width: 500px;
     height: auto;
-    margin: 0 auto;
-    margin-bottom: 20px;
 }
 
 .course-body {
@@ -325,8 +347,6 @@ h2 {
     flex-direction: column;
     width: 100%;
     max-width: 500px;
-    height: auto;
-    margin: 0 auto;
 }
 
 .slots-body {
