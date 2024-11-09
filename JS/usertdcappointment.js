@@ -24,7 +24,6 @@ const prevBtn = document.querySelector(".prev");
 const todayBtn = document.querySelector(".today");
 const monthElement = document.querySelector(".month");
 const timeBody = document.querySelector(".time-body");
-const bookButton = document.getElementById('btn-book');
 
 // Month names
 const months = [
@@ -40,7 +39,6 @@ let appointments = [];
 let currentUserUid = null;
 let hasActiveBooking = false; // Track if the user has an active/incomplete booking
 
-// Listen for real-time updates in the appointments collection
 onSnapshot(collection(db, "appointments"), (snapshot) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Normalize to the start of the day for accurate comparison
@@ -54,19 +52,60 @@ onSnapshot(collection(db, "appointments"), (snapshot) => {
     return appointmentDate >= today; // Include today's and future appointments only
   });
 
-  // Check if the user has any active bookings (i.e., status is 'Booked' or 'In Progress')
-  hasActiveBooking = appointments.some(app => 
-    app.bookings && 
-    app.bookings.some(booking => 
-      booking.userId === currentUserUid && 
-      (booking.status === 'Booked' || booking.status === 'In Progress') // Only consider these statuses as active
+  // Check if the user has any active bookings
+  const userBooking = appointments.find(app =>
+    app.bookings?.some(booking =>
+      booking.userId === currentUserUid && booking.status === 'Booked'
     )
   );
+
+  hasActiveBooking = !!userBooking;
+
+  if (userBooking) {
+    const { date, timeStart, timeEnd, bookings } = userBooking;
+    const timeSlot = `${timeStart} - ${timeEnd}`;
+    const appointmentDate = new Date(date);
+    const currentDate = new Date();
+    const timeDifference = (appointmentDate - currentDate) / (1000 * 60 * 60 * 24); // Time difference in days
+    const activeBooking = bookings.find((b) => b.userId === currentUserUid && b.status === 'Booked');
+  
+    const disableButtons = timeDifference < 2; // Disable if less than 2 days
+    const cannotModifyNotice = timeDifference < 1; // Notice if 1 day or less
+    
+    if (activeBooking) {
+    timeBody.innerHTML = `
+      <div>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Time:</strong> ${timeSlot}</p>
+        <p><strong>Slot Number:</strong> ${bookings.length}</p>
+        <button id="rescheduleButton" class="btn btn-warning" ${disableButtons ? 'disabled' : ''}>Reschedule</button>
+        <button id="cancelButton" class="btn btn-danger" ${disableButtons ? 'disabled' : ''}>Cancel</button>
+        ${
+          cannotModifyNotice
+            ? `<p style="color: red; margin-top: 10px;"><strong>Note:</strong> You cannot modify your schedule less than 1 day before the appointment date.</p>`
+            : ''
+        }
+      </div>
+    `;
+  
+    // Add event listeners for buttons
+    if (!disableButtons) {
+      document.getElementById('rescheduleButton').addEventListener('click', () => {
+        showActionConfirmationModal('Reschedule', userBooking);
+      });
+  
+      document.getElementById('cancelButton').addEventListener('click', () => {
+        showActionConfirmationModal('Cancel', userBooking);
+      });
+    }
+  } else {
+    timeBody.innerHTML = '<p>Please Select a Date first</p>';
+  }
+}
 
   renderCalendar(currentMonth, currentYear); // Re-render the calendar to reflect updates
 });
 
-// Render the calendar
 function renderCalendar(month, year) {
   daysContainer.innerHTML = "";
   const firstDay = new Date(year, month, 1).getDay();
@@ -76,6 +115,7 @@ function renderCalendar(month, year) {
 
   const today = new Date();
 
+  // Generate days for previous month
   for (let i = firstDay - 1; i >= 0; i--) {
     const prevMonthDay = document.createElement("div");
     prevMonthDay.classList.add("day", "prev");
@@ -83,45 +123,46 @@ function renderCalendar(month, year) {
     daysContainer.appendChild(prevMonthDay);
   }
 
+  // Generate days for the current month
   for (let i = 1; i <= lastDay; i++) {
     const dayDiv = document.createElement("div");
     dayDiv.classList.add("day");
     const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-    
-    // Find all appointments for the current date
-    const appointmentsForDate = appointments.filter(app => app.date === fullDate && app.course === 'TDC');
+
+    const appointmentsForDate = appointments.filter(
+      (app) => app.date === fullDate && app.course === 'TDC'
+    );
 
     if (appointmentsForDate.length > 0) {
       let hasAvailableSlots = false;
-    
-      // Loop through all appointments to check for any available slots
+      let firstAvailableAppointment = null;
+
+      // Check availability
       for (const appointment of appointmentsForDate) {
         const totalSlots = appointment.slots;
         const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
-    
+
         if (bookedSlots < totalSlots) {
           hasAvailableSlots = true;
-          break;  // Stop checking further if there's availability
+          firstAvailableAppointment = appointment; // Store the first available appointment
+          break;
         }
       }
-    
-      // Set the background color based on availability
+
+      // Update tile appearance and behavior
       dayDiv.style.backgroundColor = hasAvailableSlots ? "green" : "red";
-    
-      const appointmentDate = new Date(fullDate);
-      if (appointmentDate.toDateString() === today.toDateString()) {
-        // Disable the tile if it's the day of the appointment
-        dayDiv.style.pointerEvents = 'none';  // Disable click events
-        dayDiv.style.opacity = '0.5';  // Dim the tile to indicate it's disabled
-        dayDiv.title = 'Booking not allowed on the day of the appointment';
-      } else if (!hasAvailableSlots) {
-        // Disable the tile if it has no available slots
-        dayDiv.style.pointerEvents = 'none';
-        dayDiv.title = 'No available slots';
-      } else {
-        dayDiv.addEventListener('click', () => showAppointmentDetails(fullDate));
+
+      if (hasAvailableSlots) {
+        dayDiv.addEventListener("click", () => {
+          console.log('Clicked green tile:', fullDate, firstAvailableAppointment);
+          if (firstAvailableAppointment) {
+            handleBooking(firstAvailableAppointment.id);
+          } else {
+            showNotification('No available appointment found for this date.');
+          }
+        });
       }
-    }    
+    }
 
     if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
       dayDiv.classList.add("today");
@@ -131,6 +172,7 @@ function renderCalendar(month, year) {
     daysContainer.appendChild(dayDiv);
   }
 
+  // Generate days for next month
   const totalDays = firstDay + lastDay;
   const remainingDays = 7 - (totalDays % 7);
   if (remainingDays < 7) {
@@ -143,88 +185,76 @@ function renderCalendar(month, year) {
   }
 }
 
+
 async function updateTimeSection(date) {
   const selectedAppointments = appointments.filter(app => app.date === date && app.course === 'TDC');
   timeBody.innerHTML = '';
 
   if (selectedAppointments.length === 0) {
     timeBody.innerHTML = '<p>No available slots for this date.</p>';
-    bookButton.style.display = 'none';
     return;
   }
 
-  let userHasBooked = false;
-
-  selectedAppointments.forEach((appointment, index) => {
+  selectedAppointments.forEach((appointment) => {
     const { timeStart, timeEnd, slots, bookings } = appointment;
     const availableSlots = slots - (bookings ? bookings.length : 0);
-    const currentDate = new Date();
-    const appointmentDateObj = new Date(date);
-
-    // Check if the user has previously booked and canceled or rescheduled this slot
-    const userBooking = bookings ? bookings.find(booking => 
-      booking.userId === currentUserUid && 
-      booking.timeSlot === `${timeStart} - ${timeEnd}` && 
-      (booking.status === 'Cancelled' || booking.status === 'Rescheduled')) : null;
-
-    if (userBooking) {
-      if (availableSlots > 0 && appointmentDateObj > currentDate) {
-        // Allow rebooking if slots are available and the appointment date is in the future
-        userHasBooked = false; // Reset so the user can rebook
-      } else {
-        userHasBooked = true;
-      }
+  
+    // Create the time slot container
+    const slotDiv = document.createElement('div');
+    slotDiv.classList.add('slot');
+    slotDiv.innerHTML = `
+      <p>${convertTo12Hour(timeStart)} - ${convertTo12Hour(timeEnd)}</p>
+      <p>${availableSlots} slots left</p>
+    `;
+  
+    // Check if the user already booked this slot
+    const userBooking = bookings.find(booking => booking.userId === currentUserUid);
+    if (!userBooking) {
+      // Show confirmation modal for new booking
+      slotDiv.addEventListener('click', () => {
+        showConfirmationModal({
+          date,
+          time: `${convertTo12Hour(timeStart)} - ${convertTo12Hour(timeEnd)}`,
+          remainingSlots: availableSlots,
+        }, () => proceedWithBooking(appointment));
+      });
     } else {
-      userHasBooked = bookings && bookings.some(booking => booking.userId === currentUserUid);
-    }
-
-    // Create the radio input element
-    const radioInput = document.createElement('input');
-    radioInput.type = 'radio';
-    radioInput.name = 'time-slot';
-    radioInput.value = `${timeStart} - ${timeEnd}`;
-    
-    // Use a unique id for each radio input
-    radioInput.id = `time-slot-${index}-${timeStart}-${timeEnd}`;
-    
-    radioInput.dataset.date = date;
-    radioInput.dataset.appointmentId = appointment.id;
-
-    // Apply the custom-radio class to the radio input's parent label
-    const label = document.createElement('label');
-    label.classList.add('custom-radio');
-    
-    // Ensure the label's `for` attribute matches the radio input's unique `id`
-    label.htmlFor = radioInput.id;
-
-    // Create the custom radio button styling
-    const radioBtnSpan = document.createElement('span');
-    radioBtnSpan.classList.add('radio-btn');
-
-    // Set the label text content
-    label.textContent = `${convertTo12Hour(timeStart)} - ${convertTo12Hour(timeEnd)} (${availableSlots} slots left)`;
-
-    // Append the radio input and the styled span to the label
-    label.insertBefore(radioInput, label.firstChild);
-    label.appendChild(radioBtnSpan);
-
-    // Append the label to the timeBody container
-    timeBody.appendChild(label);
-
-    // Add a line break for spacing (optional)
-    timeBody.appendChild(document.createElement('br'));
-
-    // Add an event listener for the radio input
-    radioInput.addEventListener('click', () => {
-      if (userHasBooked) {
-        showNotification('You have already booked this slot.');
-        radioInput.checked = false;
+      // Add reschedule and cancel buttons for existing bookings
+      const rescheduleButton = document.createElement('button');
+      rescheduleButton.classList.add('btn', 'btn-warning');
+      rescheduleButton.textContent = 'Reschedule';
+  
+      const cancelButton = document.createElement('button');
+      cancelButton.classList.add('btn', 'btn-danger');
+      cancelButton.textContent = 'Cancel';
+  
+      const appointmentDateObj = new Date(date);
+      const today = new Date();
+      const timeDifference = (appointmentDateObj - today) / (1000 * 60 * 60 * 24); // Days difference
+  
+      // Disable buttons if less than 2 days
+      if (timeDifference < 2) {
+        rescheduleButton.disabled = true;
+        cancelButton.disabled = true;
       }
-    });
+  
+      slotDiv.appendChild(rescheduleButton);
+      slotDiv.appendChild(cancelButton);
+  
+      // Add event listeners for buttons
+      rescheduleButton.addEventListener('click', () => {
+        showNotification('Rescheduling is under development.');
+      });
+  
+      cancelButton.addEventListener('click', async () => {
+        await cancelBooking(appointment.id);
+      });
+    }
+  
+    timeBody.appendChild(slotDiv);
   });
-
-  bookButton.style.display = userHasBooked ? 'none' : 'block';
 }
+
 
 // Show appointment details and time slots when a date is clicked
 function showAppointmentDetails(date) {  
@@ -253,117 +283,266 @@ function showNotification(message) {
   }
 }
 
-async function handleBooking() {
-  // Check if the user has an active booking when they try to book a slot
+async function handleBooking(appointmentId) {
   if (hasActiveBooking) {
-    showNotification('You already have an active or incomplete appointment. Please complete or cancel it before booking a new one.');
-    return; // Stop the booking process if an active booking exists
-  }
-
-  const selectedSlot = document.querySelector('input[name="time-slot"]:checked');
-  if (!selectedSlot) {
-    showNotification('Please select a time slot.');
+    showNotification('You can only book one schedule at a time. Please Cancel or Reschedule your current booking to book another.');
     return;
   }
 
-  const timeSlot = selectedSlot.value;
-  const appointmentDate = selectedSlot.dataset.date;
-  const appointmentId = selectedSlot.dataset.appointmentId;
-  const appointment = appointments.find(app => app.id === appointmentId);
-
+  const appointment = appointments.find((app) => app.id === appointmentId);
   if (!appointment) {
-    showNotification('No appointment found for the selected date.');
+    showNotification('No appointment found. Please refresh and try again.');
     return;
   }
 
-  if (!currentUserUid) {
-    showNotification('You must be logged in to book an appointment.');
-    return;
-  }
+  const timeSlot = `${appointment.timeStart} - ${appointment.timeEnd}`;
 
-  const currentDate = new Date();
-  const appointmentDateObj = new Date(appointmentDate);
-
-  if (appointmentDateObj <= currentDate.setDate(currentDate.getDate() + 1)) {
-    // Show the confirmation modal
-    showConfirmationModal(async () => {
-      await proceedWithBooking(selectedSlot, appointment);
-    });
-    return;
-  }
-
-  await proceedWithBooking(selectedSlot, appointment);
+  showConfirmationModal(
+    {
+      date: appointment.date,
+      time: timeSlot, // Pass the formatted timeSlot to the modal
+      remainingSlots: appointment.slots - (appointment.bookings?.length || 0),
+      appointmentId: appointment.id,
+      timeSlot, // Pass timeSlot explicitly
+    },
+    async (id) => {
+      // Confirmed, proceed with booking
+      await proceedWithBooking(timeSlot, id); // Pass timeSlot and appointmentId
+    }
+  );
 }
 
-// Function to show the confirmation modal
-function showConfirmationModal(callback) {
+function showConfirmationModal(data, onConfirm) {
   const confirmButton = document.getElementById('confirmBooking');
-  
-  // Show the modal
+  const cancelButton = document.getElementById('cancelBooking');
+  const modalSelectedDate = document.getElementById('modalSelectedDate');
+  const modalSelectedTime = document.getElementById('modalSelectedTime');
+  const modalRemainingSlots = document.getElementById('modalRemainingSlots');
+
+  // Populate modal with appointment details
+  modalSelectedDate.textContent = data.date;
+  modalSelectedTime.textContent = data.time;
+  modalRemainingSlots.textContent = `${data.remainingSlots} slots remaining`;
+
+  // Create a Bootstrap modal instance
   const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-  confirmationModal.show();
 
   // Attach event listener to the confirm button
-  confirmButton.addEventListener('click', function handleConfirm() {
-    // Execute the callback function when the user confirms
-    callback();
-    
-    // Hide the modal
-    confirmationModal.hide();
-    
-    // Clean up the event listener to avoid multiple triggers
-    confirmButton.removeEventListener('click', handleConfirm);
+  function handleConfirm() {
+    onConfirm(data.appointmentId); // Pass the appointmentId to the callback
+    confirmationModal.hide(); // Close the modal
+    confirmButton.removeEventListener('click', handleConfirm); // Clean up the event listener
+  }
+
+  confirmButton.addEventListener('click', handleConfirm);
+
+  // Attach event listener to the cancel button
+  cancelButton.addEventListener('click', () => {
+    console.log('Booking cancelled by user');
+    confirmationModal.hide(); // Manually close the modal
   });
+
+  // Show the modal
+  confirmationModal.show();
 }
 
-// Function to proceed with the booking
-async function proceedWithBooking(selectedSlot, appointment) {
-  const timeSlot = selectedSlot.value;
-  const appointmentId = selectedSlot.dataset.appointmentId;
+async function proceedWithBooking(timeSlot, appointmentId) {
+  if (!appointmentId) {
+    showNotification('No appointment found. Please refresh and try again.');
+    return;
+  }
 
-  const bookedSlots = appointment.bookings ? appointment.bookings.length : 0;
+  if (!timeSlot) {
+    console.error('Invalid timeSlot:', timeSlot);
+    showNotification('Invalid time slot selected. Please refresh and try again.');
+    return;
+  }
+
+  const appointment = appointments.find((app) => app.id === appointmentId);
+  if (!appointment) {
+    showNotification('No appointment found for the selected slot.');
+    return;
+  }
+
+  const bookedSlots = appointment.bookings?.length || 0;
+
   if (bookedSlots >= appointment.slots) {
     showNotification('This appointment is already fully booked.');
     return;
   }
 
   try {
-    const appointmentRef = doc(db, "appointments", appointment.id);
+    const appointmentRef = doc(db, 'appointments', appointment.id);
 
-    // Calculate current time and booking time ranges
-    const currentDate = new Date();
-    const bookingStartDate = new Date(`${appointment.date}T${appointment.timeStart}:00.000Z`);
-    const bookingEndDate = new Date(`${appointment.date}T${appointment.timeEnd}:00.000Z`);
+    // Update bookings
+    const updatedBookings = [
+      ...(appointment.bookings || []),
+      {
+        timeSlot, // Include the timeSlot in the booking
+        userId: currentUserUid,
+        status: 'Booked',
+        progress: 'Not yet Started', // Default progress
+      },
+    ];
 
-    // Determine the correct progress status based on the current time
-    let progressStatus = "Not yet Started";  // Default
-    if (currentDate >= bookingStartDate && currentDate <= bookingEndDate) {
-      progressStatus = "In Progress";
-    } else if (currentDate > bookingEndDate) {
-      progressStatus = "Completed";
-    }
+    await updateDoc(appointmentRef, { bookings: updatedBookings });
 
-    await updateDoc(appointmentRef, {
-      bookings: [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: progressStatus }]
-    });
-
-    const totalSlots = appointment.slots;
-    const updatedBookings = [...(appointment.bookings || []), { timeSlot, userId: currentUserUid, status: "Booked", progress: progressStatus }];
-    
-    if (updatedBookings.length >= totalSlots) {
+    // Mark as full if all slots are booked
+    if (updatedBookings.length >= appointment.slots) {
       await updateDoc(appointmentRef, { status: 'full' });
-      const appointmentElement = document.querySelector(`[data-date="${appointment.date}"]`);
-      if (appointmentElement) {
-        appointmentElement.style.backgroundColor = "red";
-      }
     }
 
-    showNotification('Booking successful!');
+    // Determine time difference to enable/disable buttons
+    const currentDate = new Date();
+    const appointmentDate = new Date(appointment.date);
+    const timeDifference = (appointmentDate - currentDate) / (1000 * 60 * 60 * 24); // Time difference in days
 
+    const disableButtons = timeDifference < 2; // Disable if less than 2 days
+    const cannotModifyNotice = timeDifference < 1; // Notice if 1 day or less
+
+    // Populate the right container with appointment details and buttons
+    timeBody.innerHTML = `
+      <div>
+        <p><strong>Date:</strong> ${appointment.date}</p>
+        <p><strong>Time:</strong> ${timeSlot}</p>
+        <p><strong>Slot Number:</strong> ${bookedSlots + 1}</p>
+        <button id="rescheduleButton" class="btn btn-warning" ${disableButtons ? 'disabled' : ''}>Reschedule</button>
+        <button id="cancelButton" class="btn btn-danger" ${disableButtons ? 'disabled' : ''}>Cancel</button>
+        ${
+          cannotModifyNotice
+            ? `<p style="color: red; margin-top: 10px;"><strong>Note:</strong> You cannot modify your schedule less than 1 day before the appointment date.</p>`
+            : ''
+        }
+      </div>
+    `;
+
+    // Add event listeners for the buttons
+    if (!disableButtons) {
+      document.getElementById('rescheduleButton').addEventListener('click', () => {
+        showActionConfirmationModal('Reschedule', appointment);
+      });
+      
+      document.getElementById('cancelButton').addEventListener('click', () => {
+        showActionConfirmationModal('Cancel', appointment);
+      });
+    }
+
+    showSuccessModal('Booking Successful!');
+    renderCalendar(currentMonth, currentYear); // Refresh calendar
   } catch (error) {
-    
+    console.error('Error during booking:', error);
     showNotification('Failed to book appointment. Please try again later.');
   }
+}
+
+// Cancel Booking Function
+async function cancelBooking(appointment) {
+  try {
+    const appointmentRef = doc(db, 'appointments', appointment.id);
+
+    // Mark the user's booking as cancelled
+    const updatedBookings = appointment.bookings.map((booking) => {
+      if (booking.userId === currentUserUid) {
+        return { ...booking, status: 'Cancelled' }; // Update status to Cancelled
+      }
+      return booking;
+    });
+
+    // Increment slots (only count active bookings)
+    const activeBookings = updatedBookings.filter((b) => b.status === 'Booked');
+    const updatedSlots = appointment.slots - activeBookings.length;
+
+    // Update Firestore
+    await updateDoc(appointmentRef, {
+      bookings: updatedBookings,
+      slots: updatedSlots, // Recalculate available slots
+    });
+
+    showNotification('Booking Cancelled Successfully.');
+    renderCalendar(currentMonth, currentYear); // Refresh calendar UI
+    timeBody.innerHTML = '<p>Please Select a Date First</p>'; // Reset container
+  } catch (error) {
+    console.error('Error during booking cancellation:', error);
+    showNotification('Failed to cancel booking. Please try again later.');
+  }
+}
+
+function calculateAvailableSlots(appointment) {
+  const activeBookings = appointment.bookings.filter((b) => b.status === 'Booked');
+  return appointment.slots - activeBookings.length;
+}
+
+// Reschedule Booking Function
+async function reschedBooking(appointment) {
+  try {
+    const appointmentRef = doc(db, 'appointments', appointment.id);
+
+    // Mark the user's booking as rescheduled
+    const updatedBookings = appointment.bookings.map((booking) => {
+      if (booking.userId === currentUserUid) {
+        return { ...booking, status: 'Rescheduled' }; // Update status to Rescheduled
+      }
+      return booking;
+    });
+
+    // Increment slots (only count active bookings)
+    const activeBookings = updatedBookings.filter((b) => b.status === 'Booked');
+    const updatedSlots = appointment.slots - activeBookings.length;
+
+    // Update Firestore
+    await updateDoc(appointmentRef, {
+      bookings: updatedBookings,
+      slots: updatedSlots, // Recalculate available slots
+    });
+
+    showNotification('Booking Rescheduled Successfully.');
+    renderCalendar(currentMonth, currentYear); // Refresh calendar UI
+    timeBody.innerHTML = '<p>Please Select a Date First</p>'; // Reset container
+  } catch (error) {
+    console.error('Error during booking reschedule:', error);
+    showNotification('Failed to reschedule booking. Please try again later.');
+  }
+}
+
+function showActionConfirmationModal(action, appointment) {
+  const modal = document.getElementById('confModal');
+  const modalTitle = document.getElementById('confModalTitle');
+  const modalBody = document.getElementById('confModalBody');
+  const confirmButton = document.getElementById('confirmAction');
+
+  // Update modal content based on action
+  modalTitle.textContent = `${action} Confirmation`;
+  modalBody.textContent = `Are you sure you want to ${action.toLowerCase()} this appointment?`;
+
+  // Add click event listener for confirmation
+  confirmButton.onclick = async () => {
+    if (action === 'Cancel') {
+      await cancelBooking(appointment); // Call cancelBooking for cancel action
+    } else if (action === 'Reschedule') {
+      await reschedBooking(appointment); // Call reschedBooking for reschedule action
+    }
+
+    // Close the modal after action
+    const bootstrapModal = bootstrap.Modal.getInstance(modal);
+    bootstrapModal.hide();
+  };
+
+  // Show the modal
+  const bootstrapModal = new bootstrap.Modal(modal);
+  bootstrapModal.show();
+}
+
+function showSuccessModal(message) {
+  const modalBody = document.getElementById('successModalBody');
+  modalBody.textContent = message;
+
+  const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+  successModal.show();
+
+  // Reload the page after the modal closes to update the interface
+  document.getElementById('successModal').addEventListener('hidden.bs.modal', () => {
+    window.location.reload();
+  });
 }
 
 // Event Listeners
@@ -390,10 +569,6 @@ todayBtn.addEventListener("click", () => {
   currentYear = date.getFullYear();
   renderCalendar(currentMonth, currentYear);
 });
-
-if (bookButton) {
-  bookButton.addEventListener('click', handleBooking);
-}
 
 onAuthStateChanged(auth, (user) => {
   currentUserUid = user ? user.uid : null;

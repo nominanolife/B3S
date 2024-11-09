@@ -144,6 +144,11 @@ async function fetchUserAppointments(userId) {
         onSnapshot(appointmentsRef, (snapshot) => {
             snapshot.forEach((doc) => {
                 const appointment = doc.data();
+
+                 // Exclude TDC course
+                    if (appointment.course === 'TDC') {
+                        return; // Skip this appointment
+                    }
                 
                 if (Array.isArray(appointment.bookings)) {
                     const userBookings = appointment.bookings.filter(booking => booking.userId === userId);
@@ -243,6 +248,11 @@ function updateAppointmentData(activeBookingsMap, appointmentsData, userId) {
 }
 
 function renderAppointmentRow(appointment, booking, docId, isCompleted = false) {
+
+     // Skip TDC course
+     if (appointment.course === 'TDC') {
+        return;
+    }
     
     const row = document.createElement('tr');
 
