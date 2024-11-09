@@ -1,0 +1,579 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.whole-page {
+    display: flex;
+    flex-direction: row;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    height: 100vh;
+    padding: 30px 30px;
+    background-color: #ffffff;
+    border-right: 1px solid #D9D9D9;
+}
+
+.sidebar-content {
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.b3slogo {
+    width: 55px;
+    height: 55px;
+}
+
+.brand-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #2F2E2E;
+}
+
+.brand-title {
+    font-family: Poppins; 
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.sidebar-dashboard {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    padding: 20px 0;
+}
+
+.sidebar-dashboard a {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    text-decoration: none;
+    color: #2F2E2E;
+    margin-top: 20px;
+    padding: 20px 30px;
+}
+
+.sidebar-dashboard a:hover {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.sidebar-dashboard::after {
+    content: "";
+    display: block;
+    margin-top: 20px;
+    border-bottom: 1px solid #D9D9D9;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-menu a {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    text-decoration: none;
+    color: #2F2E2E;
+    margin-top: 20px;
+    padding: 20px 30px;
+}
+
+.sidebar-menu a:hover {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.sidebar-menu::after {
+    content: "";
+    display: block;
+    margin-top: 20px;
+    border-bottom: 1px solid #D9D9D9;
+}
+
+.sidebar-dashboard i, .sidebar-menu i, .sidebar-account i {
+    margin-right: 10px;
+}
+
+.sidebar-account {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar a.active, .sidebar button.active {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.profile, .logout {
+    border: none;
+    background: none;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    text-decoration: none;
+    text-align: left;
+    margin-top: 20px;
+    padding: 20px 30px;
+}
+
+.profile:hover, .logout:hover {
+    background-color: #142A74;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    max-height: 100%;
+    width: calc(100% - 300px);
+    margin-left: 300px;
+}
+
+h3 {
+    font-family: Poppins;
+    font-size: 22px;
+    font-weight: bold;
+    color: #2F2E2E;
+}
+
+h2 {
+    font-family: Poppins;
+    font-size: 24px;
+    font-weight: normal;
+    color: #2F2E2E;
+}
+
+.page-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 30px;
+    background-color: #f5f5f5;
+    height: 100%;
+}
+
+@keyframes popOut {
+    0% {
+        opacity: 0;
+        transform: scale(0.5); /* Starts smaller */
+    }
+    80% {
+        transform: scale(1.05); /* Slight overshoot for a popping effect */
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1); /* Full size */
+    }
+}
+
+.modal-content {
+    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
+}
+
+.modal-header, .modal-body, .input-body, .modal-footer {
+    border: none;
+}
+
+.modal-header h4{
+    font-family: Poppins;
+    font-weight: bold;
+    color: #142A74;
+}
+
+.modal-title {
+    font-family: Poppins;
+    font-weight: bold;
+    color: #142A74;
+}
+
+.modal-dialog {
+    top: auto;
+    left: 5%;
+    border-radius: 20px;
+}
+
+.modal-content {
+    font-family: Poppins;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+}
+
+.close {
+    font-size: 24px;
+    color: #142A74;
+    cursor: pointer;
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px 0px #D9D9D9;
+    width: 100%;
+}
+
+.container-header {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-pic {
+    min-width: 300px;
+    min-height: 300px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    margin: 0 auto;
+    margin-top: 10px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+    background-color: #dfe4ea;
+}
+
+.container-body {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    width: 100%;
+    gap: 20px;
+}
+
+.top-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.name {
+    font-family: Poppins;
+    font-size: 32px;
+    font-weight: bold;
+    color: #2F2E2E;
+    margin: 0;
+}
+
+
+.email {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #2f2e2ea2;
+    margin: 0;
+}
+
+.edit {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #ffffff;
+    padding: 10px 30px;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    background-color: #142A74;
+}
+
+.edit:hover {
+    background-color: #142a74ec;
+}
+
+.bottom-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    gap: 5px;
+}
+
+.courses, .personality-traits {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    padding: 10px;
+    width: 45%;
+}
+
+.courses h5, .personality-traits h5 {
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: bold;
+    color: #142A74;
+    margin: 0;
+}
+
+.course-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    width: 100%;
+}
+
+.traits-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    width: 100%;
+}
+
+.trait {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    flex-basis: calc(33.33% - 10px);
+    max-width: calc(33.33% - 10px);
+    padding: 5px;
+}
+
+.course-list span, .traits-list span {
+    font-family: Poppins;
+    font-size: 16px;
+    font-weight: normal;
+    color: #2F2E2E;
+}
+
+#profilePicPreview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: block;
+    margin: 20px auto;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #dfe4ea;
+}
+
+#uploadIcon {
+    position: absolute;
+    top: 150px;
+    left: 260px;
+    color: #ffffff;
+    background-color: #2f3542;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#uploadIcon:hover {
+    background-color: #57606f;
+}
+
+.instructor-name {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+
+.form-group-all {
+    margin-left: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-checkbox input + .checkbox-label {
+    position: relative;
+    padding-left: 30px;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: normal;
+    color: #2F2E2E;
+}
+
+.custom-checkbox input + .checkbox-label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #2F2E2E;
+    border-radius: 4px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+.custom-checkbox input:checked + .checkbox-label::before {
+    background-color: #142A74;
+    border-color: #142A74;
+}
+
+.custom-checkbox input + .checkbox-label::after {
+    content: '\2714';
+    position: absolute;
+    left: 4px;
+    top: 0px;
+    font-size: 14px;
+    color: #ffffff;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.custom-checkbox input:checked + .checkbox-label::after {
+    opacity: 1;
+}
+
+.personal-traits {
+    margin-bottom: 20px;
+}
+
+.personal-traits h5 {
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: bold;
+    color: #142A74;
+    margin-bottom: 15px;
+}
+
+.traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.traits-input-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    position: relative;
+}
+
+.traits-input {
+    outline: none;
+    width: 100%;
+    padding: 10px;
+    border: none;
+}
+
+.add-trait {
+    position: absolute;
+    right: 0;
+    background-color: #142A74;
+    color: #ffffff;
+    padding: 10px;
+    border: none;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    cursor: pointer;
+}
+
+.traits-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+}
+
+.trait-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    flex-basis: calc(33.33% - 10px);
+    max-width: calc(33.33% - 10px);
+    padding: 5px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+}
+
+.remove-trait {
+    background: none;
+    border: none;
+}
+
+.remove-trait i {
+    vertical-align: middle;
+    color: #B60505;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.save-instructor {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+}
+
+.save-instructor:hover {
+    background-color: #142a74ec;
+}
+
+.close-modal{
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #B60505;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+}
+
+.close-modal:hover {
+    background-color: #b60505ec;
+}
