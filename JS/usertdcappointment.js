@@ -61,9 +61,16 @@ onSnapshot(collection(db, "appointments"), (snapshot) => {
 
   hasActiveBooking = !!userBooking;
 
+  function convertTo12HourFormat(time24) {
+    const [hour, minute] = time24.split(':').map(Number);
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12; // Convert '0' hour to '12'
+    return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`;
+  }  
+
   if (userBooking) {
     const { date, timeStart, timeEnd, bookings } = userBooking;
-    const timeSlot = `${timeStart} - ${timeEnd}`;
+    const timeSlot = `${convertTo12HourFormat(timeStart)} - ${convertTo12HourFormat(timeEnd)}`;
     const appointmentDate = new Date(date);
     const currentDate = new Date();
     const timeDifference = (appointmentDate - currentDate) / (1000 * 60 * 60 * 24); // Time difference in days
@@ -74,15 +81,19 @@ onSnapshot(collection(db, "appointments"), (snapshot) => {
     
     if (activeBooking) {
     timeBody.innerHTML = `
-      <div>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Time:</strong> ${timeSlot}</p>
-        <p><strong>Slot Number:</strong> ${bookings.length}</p>
-        <button id="rescheduleButton" class="btn btn-warning" ${disableButtons ? 'disabled' : ''}>Reschedule</button>
-        <button id="cancelButton" class="btn btn-danger" ${disableButtons ? 'disabled' : ''}>Cancel</button>
+      <div class="time-body-content">
+        <div class="time-body-content-upper">
+          <p><strong>Date:</strong> ${new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+          <p><strong>Time:</strong> ${convertTo12HourFormat(timeStart)} - ${convertTo12HourFormat(timeEnd)}</p>
+          <p><strong>Slot Number:</strong> ${bookings.length}</p>
+        </div>
+        <div class="time-body-content-lower">
+          <button id="rescheduleButton" class="btn btn-warning" ${disableButtons ? 'disabled' : ''}>Reschedule</button>
+          <button id="cancelButton" class="btn btn-danger" ${disableButtons ? 'disabled' : ''}>Cancel</button>
+        </div>
         ${
           cannotModifyNotice
-            ? `<p style="color: red; margin-top: 10px;"><strong>Note:</strong> You cannot modify your schedule less than 1 day before the appointment date.</p>`
+            ? `<p style="color: red; margin: 0px;"><strong>Note:</strong> You cannot modify your schedule less than 1 day before the appointment date.</p>`
             : ''
         }
       </div>
@@ -185,7 +196,6 @@ function renderCalendar(month, year) {
   }
 }
 
-
 async function updateTimeSection(date) {
   const selectedAppointments = appointments.filter(app => app.date === date && app.course === 'TDC');
   timeBody.innerHTML = '';
@@ -274,13 +284,6 @@ function showNotification(message) {
   const modalBody = document.getElementById('notificationModalBody');
   modalBody.textContent = message;
   $('#notificationModal').modal('show');
-
-  // Redirect to usersched.html after the notification modal closes, if the message indicates success
-  if (message.includes('Booking successful')) {
-    $('#notificationModal').on('hidden.bs.modal', function () {
-      window.location.href = 'usersched.html';
-    });
-  }
 }
 
 async function handleBooking(appointmentId) {
@@ -312,6 +315,13 @@ async function handleBooking(appointmentId) {
   );
 }
 
+function convertTo12HourFormat(time24) {
+  const [hour, minute] = time24.split(':').map(Number);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12; // Convert '0' hour to '12'
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`;
+}
+
 function showConfirmationModal(data, onConfirm) {
   const confirmButton = document.getElementById('confirmBooking');
   const cancelButton = document.getElementById('cancelBooking');
@@ -319,9 +329,16 @@ function showConfirmationModal(data, onConfirm) {
   const modalSelectedTime = document.getElementById('modalSelectedTime');
   const modalRemainingSlots = document.getElementById('modalRemainingSlots');
 
+  // Format date and time
+  const appointmentDate = new Date(data.date);
+  const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+    month: 'long', day: 'numeric', year: 'numeric'
+  });
+  const formattedTime = convertTo12HourFormat(data.time.split(' - ')[0]) + ' - ' + convertTo12HourFormat(data.time.split(' - ')[1]);
+
   // Populate modal with appointment details
-  modalSelectedDate.textContent = data.date;
-  modalSelectedTime.textContent = data.time;
+  modalSelectedDate.textContent = formattedDate;
+  modalSelectedTime.textContent = formattedTime;
   modalRemainingSlots.textContent = `${data.remainingSlots} slots remaining`;
 
   // Create a Bootstrap modal instance
@@ -402,15 +419,19 @@ async function proceedWithBooking(timeSlot, appointmentId) {
 
     // Populate the right container with appointment details and buttons
     timeBody.innerHTML = `
-      <div>
-        <p><strong>Date:</strong> ${appointment.date}</p>
-        <p><strong>Time:</strong> ${timeSlot}</p>
-        <p><strong>Slot Number:</strong> ${bookedSlots + 1}</p>
-        <button id="rescheduleButton" class="btn btn-warning" ${disableButtons ? 'disabled' : ''}>Reschedule</button>
-        <button id="cancelButton" class="btn btn-danger" ${disableButtons ? 'disabled' : ''}>Cancel</button>
+      <div class="time-body-content">
+        <div class="time-body-content-upper">
+          <p><strong>Date:</strong> ${new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+          <p><strong>Time:</strong> ${convertTo12HourFormat(timeStart)} - ${convertTo12HourFormat(timeEnd)}</p>
+          <p><strong>Slot Number:</strong> ${bookings.length}</p>
+        </div>
+        <div class="time-body-content-lower">
+          <button id="rescheduleButton" class="btn btn-warning" ${disableButtons ? 'disabled' : ''}>Reschedule</button>
+          <button id="cancelButton" class="btn btn-danger" ${disableButtons ? 'disabled' : ''}>Cancel</button>
+        </div>
         ${
           cannotModifyNotice
-            ? `<p style="color: red; margin-top: 10px;"><strong>Note:</strong> You cannot modify your schedule less than 1 day before the appointment date.</p>`
+            ? `<p style="color: red; margin: 0px;"><strong>Note:</strong> You cannot modify your schedule less than 1 day before the appointment date.</p>`
             : ''
         }
       </div>
@@ -427,7 +448,7 @@ async function proceedWithBooking(timeSlot, appointmentId) {
       });
     }
 
-    showSuccessModal('Booking Successful!');
+    showNotification('Booking Successful!');
     renderCalendar(currentMonth, currentYear); // Refresh calendar
   } catch (error) {
     console.error('Error during booking:', error);
@@ -458,7 +479,7 @@ async function cancelBooking(appointment) {
       slots: updatedSlots, // Recalculate available slots
     });
 
-    showNotification('Booking Cancelled Successfully.');
+    showNotification('Cancelled Booking Successfully.');
     renderCalendar(currentMonth, currentYear); // Refresh calendar UI
     timeBody.innerHTML = '<p>Please Select a Date First</p>'; // Reset container
   } catch (error) {
@@ -530,19 +551,6 @@ function showActionConfirmationModal(action, appointment) {
   // Show the modal
   const bootstrapModal = new bootstrap.Modal(modal);
   bootstrapModal.show();
-}
-
-function showSuccessModal(message) {
-  const modalBody = document.getElementById('successModalBody');
-  modalBody.textContent = message;
-
-  const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-  successModal.show();
-
-  // Reload the page after the modal closes to update the interface
-  document.getElementById('successModal').addEventListener('hidden.bs.modal', () => {
-    window.location.reload();
-  });
 }
 
 // Event Listeners
