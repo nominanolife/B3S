@@ -20,36 +20,42 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show the loader when login starts
         document.getElementById('loader1').style.display = 'flex';
 
-        var name = document.getElementById('name').value;
+        var identifier = document.getElementById('name').value; // Can be email or name
         var password = document.getElementById('password').value;
 
-        if (name && password) {
-            db.collection("admin").doc("admin").get().then((doc) => {
-                if (doc.exists) {
-                    var adminData = doc.data();
+        if (identifier && password) {
+            db.collection("admin").get().then((querySnapshot) => {
+                let validUser = false;
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    
+                    // Match identifier to either email or name
+                    if ((userData.email === identifier || userData.name === identifier) && userData.password === password) {
+                        validUser = true;
 
-                    if (adminData.name !== name) {
-                        hideLoader();  // Hide the loader
-                        showModal("Email is incorrect");
-                    } else if (adminData.password !== password) {
-                        hideLoader();  // Hide the loader
-                        showModal("Password is incorrect");
-                    } else {
-                        // Redirect to admin dashboard
-                        hideLoader();  // Hide the loader before redirect
-                        window.location.href = "admindashboard.html";
+                        // Check the user's role
+                        if (userData.role === 'admin') {
+                            // Redirect to admin dashboard
+                            window.location.href = "admindashboard.html";
+                        } else if (userData.role === 'instructor') {
+                            // Redirect to instructor profile
+                            window.location.href = "instructorpofile.html";
+                        }
                     }
-                } else {
-                    hideLoader();  // Hide the loader
-                    showModal("No such document!");
+                });
+
+                if (!validUser) {
+                    hideLoader(); // Hide the loader
+                    showModal("Invalid credentials. Please try again.");
                 }
             }).catch((error) => {
-                hideLoader();  // Hide the loader
-                showModal("Error logging in");
+                hideLoader(); // Hide the loader
+                showModal("Error logging in. Please try again later.");
+                console.error("Error fetching users:", error);
             });
         } else {
-            hideLoader();  // Hide the loader
-            showModal("Please fill in both fields");
+            hideLoader(); // Hide the loader
+            showModal("Please fill in both fields.");
         }
     });
 

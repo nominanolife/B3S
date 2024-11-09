@@ -36,32 +36,31 @@
             <div class="page-content">
                 <div class="profile-container">
                     <div class="container-header">
+                        <!-- Placeholder for profile picture -->
                         <img class="profile-pic" src="Assets/default-profile.png" alt="profile picture">
                     </div>
                     <div class="container-body">
                         <div class="top-info">
-                            <span class="name">Wilmer Concepcion</span>
-                            <span class="email">wilmerconcepcion2@gmail.com</span>
-                            <button class="edit" type="button" data-toggle="modal" data-target="#editInstructorProfileModal">Edit Profile <i class="bi bi-pencil-square"></i></button>
+                            <!-- Placeholder for instructor's name -->
+                            <span class="name">Loading...</span>
+                            <!-- Edit Profile Button -->    
+                            <button class="edit" type="button" data-toggle="modal" data-target="#editInstructorProfileModal">
+                                Edit Profile <i class="bi bi-pencil-square"></i>
+                            </button>
                         </div>
                         <div class="bottom-info">
+                            <!-- Courses Section -->
                             <div class="courses">
                                 <h5>Course</h5>
                                 <div class="course-list">
-                                    <span class="course">TDC</span>
-                                    <span class="course">PDC-4Wheels</span>
-                                    <span class="course">PDC-Motors</span>
+                                    <!-- Course items will be added dynamically -->
                                 </div>
                             </div>
+                            <!-- Personality Traits Section -->
                             <div class="personality-traits">
                                 <h5>Personal Traits</h5>
-                                <div class="traits-list">
-                                    <span class="trait">Friendly</span>
-                                    <span class="trait">Supportive</span>
-                                    <span class="trait">Patient</span>
-                                    <span class="trait">Motivational</span>
-                                    <span class="trait">Relaxed</span>
-                                    <span class="trait">Disciplined</span>
+                                <div class="saved-traits-list">
+                                    <!-- Trait items will be added dynamically -->
                                 </div>
                             </div>
                         </div>
@@ -80,7 +79,7 @@
                 <form class="modal-body">
                     <div class="profile-pic-container">
                         <img id="profilePicPreview" class="profile-pic-modal" src="Assets/default-profile.png" alt="Profile Picture">
-                        <i id="uploadIcon" class="fa fa-camera"></i>
+                        <label id="uploadIcon" class="fa fa-camera" for="editProfilePic"></label>
                         <input type="file" id="editProfilePic" accept="image/*" style="display: none;">
                     </div>
                     <div class="input-body">
@@ -151,11 +150,11 @@
                         <div class="traits">
                             <div class="traits-input-container">
                                 <input type="text" class="traits-input" placeholder="Add personal traits" required>
-                                <button class="add-trait">Add</button>
+                                <button class="add-trait" type="button">Add</button>
                             </div>
-                        </div>
-                        <div class="traits-list">
-
+                            <div class="traits-list">
+                                <!-- Custom traits will appear here -->
+                            </div>
                         </div>
                     </div>  
                 </form>                

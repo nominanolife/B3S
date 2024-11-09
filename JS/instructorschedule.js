@@ -109,8 +109,4 @@ if (bookButton) {
   bookButton.addEventListener('click', handleBooking);
 }
 
-onAuthStateChanged(auth, (user) => {
-  currentUserUid = user ? user.uid : null;
-});
-
 renderCalendar(currentMonth, currentYear);
