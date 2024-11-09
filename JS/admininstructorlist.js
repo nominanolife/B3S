@@ -1,6 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js';
+import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
@@ -14,569 +13,144 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 // DOM Elements
-const instructorList = document.querySelector('.instructor-list');
-const searchInput = document.querySelector('.search');
 const addInstructorButton = document.querySelector('.add-instructor');
+const saveInstructorButton = document.querySelector('.save-instructor'); // Save button
 const instructorModalElement = document.getElementById('instructorModal');
 const instructorModal = new bootstrap.Modal(instructorModalElement);
-const saveInstructorBtn = document.querySelector('.save-instructor');
-const closeModalButton = document.querySelector('.close-modal');
-const instructorNameInput = document.querySelector('.instructor-name');
-const paginationControls = document.querySelector('.pagination-controls');
-const traitsList = document.querySelector('.traits-list');
 const loader = document.getElementById('loader1');
-let instructorIdToDelete = null; // Store the ID of the instructor to delete
-let currentInstructorId = null; // Store the current instructor's ID for editing
+const instructorsList = document.querySelector('.instructor-list'); // Target tbody for instructors
 
-let instructors = []; // Store all instructors data
-let filteredInstructors = []; // Store filtered instructors data
-let currentPage = 1; // Tracks the current page
-const itemsPerPage = 10; // Number of items per page
-let totalPages = 1; // Total number of pages
-
-// Fetch and display instructors
+// Fetch and Display Existing Instructors
 async function fetchInstructors() {
-  loader.style.display = 'flex'; // Show loader when fetching instructors
   try {
-    const querySnapshot = await getDocs(collection(db, 'instructors'));
-    instructors = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    filteredInstructors = instructors; // Initialize with all instructors
-    totalPages = Math.ceil(filteredInstructors.length / itemsPerPage);
-    renderInstructors(); // Render the first page
-    updatePaginationControls(); // Update pagination controls
-  } catch (error) {
-  } finally {
-    loader.style.display = 'none'; // Hide loader after fetching instructors
-  }
-}
+    loader.style.display = 'flex'; // Show loader
 
-// Render instructors in the table
-function renderInstructors() {
-  instructorList.innerHTML = ''; // Clear the list before rendering
+    const querySnapshot = await getDocs(collection(db, 'admin')); // Get all documents in the 'admin' collection
+    instructorsList.innerHTML = ''; // Clear existing list
 
-  // Case when there are no instructors in the database
-  if (instructors.length === 0) {
-    instructorList.innerHTML = `
-      <tr>
-        <td colspan="4" class="text-center">No instructor/s yet</td>
-      </tr>
-    `;
-    return; // Exit since there is nothing to render
-  }
+    if (!querySnapshot.empty) {
+      querySnapshot.forEach((doc) => {
+        // Skip the special 'admin' document
+        if (doc.id === 'admin') return;
 
-  // Case when search results return no matches
-  if (filteredInstructors.length === 0) {
-    instructorList.innerHTML = `
-      <tr>
-        <td colspan="4" class="text-center">No instructor/s found</td>
-      </tr>
-    `;
-    return; // Exit since there is nothing to render
-  }
-
-  const start = (currentPage - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  const paginatedInstructors = filteredInstructors.slice(start, end);
-
-  paginatedInstructors.forEach(instructor => {
-    const courses = Array.isArray(instructor.courses) ? instructor.courses.join(' || ') : 'No courses assigned';
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td><img src="${instructor.imageUrl || 'Assets/default-profile.png'}">${instructor.name}</td>
-      <td></td>
-      <td>${courses}</td>
-      <td class="table-row-content">
-        <div class="dropdown">
-          <i class="bi bi-three-dots"></i>
-          <div class="dropdown-content">
-            <i class="dropdown-item feedback-btn" data-id="${instructor.id}">Feedbacks</i>
-            <i class="dropdown-item edit-btn" data-id="${instructor.id}">Edit</i>
-            <i class="dropdown-item delete-btn" data-id="${instructor.id}">Delete</i>
-          </div>
-        </div>
-      </td>
-    `;
-    instructorList.appendChild(row);
-  });
-
-  handleDropdowns();
-  handleSliderSwitch();
-  handleFeedbacks(); // Add this line to handle feedback modal functionality
-}
-
-// Handle dropdown functionality
-function handleDropdowns() {
-  document.querySelectorAll('.dropdown').forEach(dropdown => {
-    const button = dropdown.querySelector('.bi-three-dots');
-    const content = dropdown.querySelector('.dropdown-content');
-
-    button.addEventListener('click', function(e) {
-      e.stopPropagation(); // Prevent event from bubbling up
-
-      const isDropdownOpen = content.classList.contains('show');
-
-      closeAllDropdowns(); // Close any other open dropdowns
-
-      // Toggle the clicked dropdown
-      if (!isDropdownOpen) {
-        content.classList.add('show');
-      } else {
-        content.classList.remove('show');
-      }
-    });
-  });
-
-  function closeAllDropdowns() {
-    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
-      dropdown.classList.remove('show');
-    });
-  }
-
-  // Close dropdowns when clicking outside
-  document.addEventListener('click', function(event) {
-    if (!event.target.closest('.dropdown')) {
-      closeAllDropdowns();
-    }
-  });
-}
-
-function handleFeedbacks() {
-  document.querySelectorAll('.feedback-btn').forEach(button => {
-      button.addEventListener('click', async function () {
-          const instructorId = this.dataset.id;
-
-          // Show the feedback modal
-          const feedbackOverviewModal = new bootstrap.Modal(document.getElementById('feedbackOverviewModal'));
-          feedbackOverviewModal.show();
-
-          // Clear previous feedback data
-          const modalBody = document.querySelector('#feedbackOverviewModal .modal-body');
-          modalBody.innerHTML = ''; // Clear previous content
-
-          try {
-              // Fetch instructor data from Firestore
-              const instructorRef = doc(db, 'instructors', instructorId);
-              const instructorSnap = await getDoc(instructorRef);
-
-              if (instructorSnap.exists()) {
-                  const instructorData = instructorSnap.data();
-                  const feedbacks = instructorData.comments || []; // Get comments (feedback)
-
-                  if (feedbacks.length === 0) {
-                      modalBody.innerHTML = '<p class="text-center">No feedbacks available</p>';
-                  } else {
-                      feedbacks.forEach((feedback, index) => {
-                          // Create HTML for each feedback entry
-                          const commentDate = new Date(feedback.timestamp).toLocaleDateString();
-                          let starsHtml = '';
-                          for (let i = 0; i < feedback.rating; i++) {
-                              starsHtml += '<i class="bi bi-star-fill"></i>';
-                          }
-                          for (let i = feedback.rating; i < 5; i++) {
-                              starsHtml += '<i class="bi bi-star"></i>';
-                          }
-
-                          const feedbackHtml = `
-                              <div class="comment">
-                                  <div class="feedback-section">
-                                      <p>by Student ${index + 1} ${starsHtml}</p>
-                                      <p class="feedback-date">${commentDate}</p>
-                                  </div>
-                                  <span>${feedback.comment}</span>
-                                  <hr>
-                              </div>
-                          `;
-                          modalBody.insertAdjacentHTML('beforeend', feedbackHtml); // Insert the feedback
-                      });
-                  }
-              } else {
-                  modalBody.innerHTML = '<p class="text-center">Instructor data not found</p>';
-              }
-          } catch (error) {
-              modalBody.innerHTML = '<p class="text-center">An error occurred while loading feedbacks</p>';
-          }
+        const instructor = doc.data();
+        instructorsList.insertAdjacentHTML(
+          'beforeend',
+          `<tr>
+            <td></td>
+            <td>${instructor.email}</td>
+            </td>
+          </tr>`
+        );
       });
-  });
-}
 
-// Handle slider switch functionality
-function handleSliderSwitch() {
-  document.querySelectorAll('.slider-switch').forEach(switchElement => {
-    switchElement.addEventListener('change', async function () {
-      const instructorId = this.dataset.id;
-      const isChecked = this.checked;
-      
-      try {
-        await updateDoc(doc(db, 'instructors', instructorId), {
-          active: isChecked
+      // Attach delete functionality to the buttons
+      document.querySelectorAll('.delete-instructor').forEach(button => {
+        button.addEventListener('click', async (event) => {
+          const instructorId = event.target.getAttribute('data-id');
+          await deleteInstructor(instructorId);
         });
-      } catch (error) {
-      }
-    });
-  });
+      });
+    } else {
+      instructorsList.innerHTML = `<tr><td colspan="3" class="text-center">No instructors found.</td></tr>`;
+    }
+  } catch (error) {
+    console.error('Error fetching instructors:', error);
+  } finally {
+    loader.style.display = 'none'; // Hide loader
+  }
 }
 
-// Update pagination controls
-function updatePaginationControls() {
-  paginationControls.innerHTML = '';
+// Save Instructor to Firestore as a new document
+async function saveInstructor() {
+  const emailInput = document.querySelector('.email');
+  const passwordInput = document.querySelector('.password-field');
 
-  // Previous button
-  const prevButton = document.createElement('i');
-  prevButton.className = 'bi bi-caret-left';
-  if (currentPage === 1) {
-    prevButton.classList.add('disabled');
+  if (!emailInput.value.trim() || !passwordInput.value.trim()) {
+    alert('Please fill out both email and password fields.');
+    return;
   }
-  prevButton.addEventListener('click', () => {
-    if (currentPage > 1) {
-      currentPage--;
-      renderInstructors();
-      updatePaginationControls();
-    }
-  });
-
-  // Next button
-  const nextButton = document.createElement('i');
-  nextButton.className = 'bi bi-caret-right';
-  if (currentPage === totalPages) {
-    nextButton.classList.add('disabled');
-  }
-  nextButton.addEventListener('click', () => {
-    if (currentPage < totalPages) {
-      currentPage++;
-      renderInstructors();
-      updatePaginationControls();
-    }
-  });
-
-  // Page number display
-  const pageNumberDisplay = document.createElement('span');
-  pageNumberDisplay.className = 'page-number';
-  pageNumberDisplay.textContent = `Page ${currentPage} of ${totalPages}`;
-
-  paginationControls.appendChild(prevButton);
-  paginationControls.appendChild(pageNumberDisplay);
-  paginationControls.appendChild(nextButton);
-}
-
-// Upload image to Firebase Storage and return the download URL
-async function uploadImage(file, instructorId) {
-  if (!file) return null; // If no file is selected, return null
-
-  // Use the instructorId as the file name to ensure uniqueness
-  const storageRef = ref(storage, `instructor_pictures/${instructorId}.jpg`); // Save with instructor UID as the image name
 
   try {
-    const snapshot = await uploadBytes(storageRef, file); // Upload the file
-    const downloadURL = await getDownloadURL(snapshot.ref); // Get the file's URL
-    return downloadURL; // Return the image URL
+    loader.style.display = 'flex'; // Show loader
+
+    const newInstructor = {
+      email: emailInput.value.trim(),
+      password: passwordInput.value.trim(),
+      role: 'instructor',
+    };
+
+    await addDoc(collection(db, 'admin'), newInstructor);
+
+    console.log('Instructor added as a new document.');
+    emailInput.value = '';
+    passwordInput.value = '';
+
+    instructorModal.hide();
+    showNotification('Instructor saved successfully.');
+    fetchInstructors();
   } catch (error) {
-    return null;
+    console.error('Error saving instructor:', error);
+    showNotification('An error occurred while saving the instructor.');
+  } finally {
+    loader.style.display = 'none'; // Hide loader
   }
 }
 
-// Search instructors by name
-function searchInstructors(event) {
-  const query = event.target.value.toLowerCase();
-  filteredInstructors = instructors.filter(instructor =>
-    instructor.name.toLowerCase().startsWith(query)
-  );
-  currentPage = 1; // Reset to first page after search
-  totalPages = Math.ceil(filteredInstructors.length / itemsPerPage);
-  renderInstructors();
-  updatePaginationControls();
+// Delete Instructor
+async function deleteInstructor(id) {
+  try {
+    loader.style.display = 'flex'; // Show loader
+
+    const instructorDocRef = doc(db, 'admin', id);
+    await deleteDoc(instructorDocRef);
+    console.log('Instructor deleted.');
+    showNotification('Instructor deleted successfully.');
+
+    fetchInstructors();
+  } catch (error) {
+    console.error('Error deleting instructor:', error);
+    showNotification('An error occurred while deleting the instructor.');
+  } finally {
+    loader.style.display = 'none'; // Hide loader
+  }
+}
+
+// Toggle Password Visibility
+document.querySelectorAll('.togglePassword').forEach(button => {
+  button.addEventListener('click', function () {
+    const passwordField = this.previousElementSibling;
+    const icon = this.querySelector('i');
+
+    if (passwordField.type === 'password') {
+      passwordField.type = 'text';
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    } else {
+      passwordField.type = 'password';
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    }
+  });
+});
+
+// Notification Modal
+function showNotification(message) {
+  const notificationModalBody = document.getElementById('notificationModalBody');
+  notificationModalBody.textContent = message;
+  const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+  notificationModal.show();
 }
 
 // Event Listener for Add Instructor Button
 addInstructorButton.addEventListener('click', () => {
   instructorModal.show();
-  
-  // Clear instructor name input
-  if (instructorNameInput) {
-    instructorNameInput.value = '';
-  }
-
-  // Uncheck all course-related checkboxes
-  document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(checkbox => {
-    checkbox.checked = false; // Uncheck the checkbox
-  });
-
-  // Reset profile picture to default
-  const profilePicPreview = document.getElementById('profilePicPreview');
-  if (profilePicPreview) {
-    profilePicPreview.src = 'Assets/default-profile.png'; // Reset to default profile picture
-  }
-
-  currentInstructorId = null; // Reset current instructor ID
 });
 
-closeModalButton.addEventListener('click', () => instructorModal.hide());
-searchInput.addEventListener('input', searchInstructors);
-instructorList.addEventListener('click', function (event) {
-  if (event.target.classList.contains('dropdown-item')) {
-    if (event.target.textContent.includes('Edit')) {
-      editInstructor(event);
-    } else if (event.target.textContent.includes('Delete')) {
-      deleteInstructor(event); // Trigger the delete modal
-    }
-    
-    // Close the dropdown after an option is selected
-    const dropdownContent = event.target.closest('.dropdown-content');
-    if (dropdownContent) {
-      dropdownContent.classList.remove('show');
-    }
-  }
-});
-
-// Handle sidebar button active state
-document.addEventListener('DOMContentLoaded', function () {
-  const buttons = document.querySelectorAll('.button-right');
-
-  buttons.forEach(button => {
-    button.addEventListener('click', function () {
-      buttons.forEach(btn => btn.classList.remove('active'));
-      this.classList.add('active');
-    });
-  });
-
-  // Fetch and display instructors on page load
-  fetchInstructors();
-});
-
-// Save instructor logic
-async function saveInstructor(event) {
-  event.preventDefault();
-
-  const name = document.querySelector('.instructor-name').value.trim();
-  const selectedCourses = Array.from(document.querySelectorAll('input[name="courses"]:checked')).map(input => input.nextElementSibling.innerText);
-  
-  // Get predefined traits (checkbox checked)
-  const predefinedTraits = Array.from(document.querySelectorAll('input[name="traits"]:checked')).map(input => input.nextElementSibling.innerText);
-  
-  // Get custom traits from the list
-  const customTraits = Array.from(document.querySelectorAll('.traits-list .trait-item')).map(item => item.textContent.trim());
-
-  // Combine both predefined and custom traits
-  const allTraits = [...predefinedTraits, ...customTraits];
-  
-  const file = document.getElementById('editProfilePic').files[0];
-
-  if (!name || selectedCourses.length === 0) {
-    showNotification('Please fill in all the required fields.');
-    return;
-  }
-
-  try {
-    let imageUrl = null;
-
-    if (currentInstructorId) {
-      // Editing an existing instructor
-      if (file) {
-        imageUrl = await uploadImage(file, currentInstructorId);
-      }
-
-      await updateDoc(doc(db, 'instructors', currentInstructorId), {
-        name: name,
-        courses: selectedCourses,
-        instructor_traits: allTraits, // Save all traits
-        ...(imageUrl && { imageUrl: imageUrl })
-      });
-
-      showNotification('Instructor updated successfully.');
-
-    } else {
-      // Adding a new instructor
-      const docRef = await addDoc(collection(db, 'instructors'), {
-        name: name,
-        courses: selectedCourses,
-        instructor_traits: allTraits, // Save all traits
-        active: false,
-        imageUrl: ''
-      });
-
-      imageUrl = await uploadImage(file, docRef.id);
-
-      await updateDoc(doc(db, 'instructors', docRef.id), {
-        imageUrl: imageUrl
-      });
-
-      showNotification('Instructor added successfully.');
-    }
-
-    instructorModal.hide();
-    fetchInstructors();
-    resetForm();
-  } catch (error) {
-    showNotification('An error occurred while saving the instructor. Please try again.');
-  }
-}
-
-// Function to reset the modal form fields
-function resetForm() {
-  // Clear instructor name input
-  if (instructorNameInput) {
-    instructorNameInput.value = '';
-  }
-
-  // Uncheck all course-related checkboxes
-  document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(checkbox => {
-    checkbox.checked = false; // Uncheck all checkboxes
-  });
-
-  // Reset profile picture to default
-  const profilePicPreview = document.getElementById('profilePicPreview');
-  if (profilePicPreview) {
-    profilePicPreview.src = 'Assets/default-profile.png'; // Reset to default profile picture
-  }
-
-  // Clear the traits list
-  if (traitsList) {
-    traitsList.innerHTML = ''; // Remove all previously added traits
-  }
-
-  // Reset the current instructor ID to indicate a new entry
-  currentInstructorId = null;
-}
-
-// Event Listener for Add Instructor Button
-addInstructorButton.addEventListener('click', () => {
-  resetForm(); // Call the reset function to clear previous data
-  instructorModal.show(); // Show the modal
-});
-
-// Event listener for the save button in the modal
-saveInstructorBtn.removeEventListener('click', saveInstructor); // Remove previous listener
-saveInstructorBtn.addEventListener('click', saveInstructor);
+// Event Listener for Save Button
+saveInstructorButton.addEventListener('click', saveInstructor);
 
 // Fetch instructors on page load
-window.onload = fetchInstructors;
-
-// Edit instructor function
-async function editInstructor(event) {
-  const id = event.target.dataset.id;
-  const instructor = instructors.find(instructor => instructor.id === id);
-  if (instructor) {
-    currentInstructorId = id; // Set the current instructor ID for editing
-
-    // Set the instructor's name
-    if (instructorNameInput) {
-      instructorNameInput.value = instructor.name;
-    }
-
-    // Uncheck all checkboxes before setting values
-    document.querySelectorAll('.custom-checkbox input[type="checkbox"]').forEach(checkbox => {
-      checkbox.checked = false; // Uncheck all checkboxes initially
-    });
-
-    // Check the appropriate checkboxes based on the instructor's courses array
-    if (Array.isArray(instructor.courses)) {
-      instructor.courses.forEach(course => {
-        const checkbox = Array.from(document.querySelectorAll('.custom-checkbox')).find(label => 
-          label.innerText.trim() === course.trim()
-        );
-        if (checkbox) {
-          checkbox.querySelector('input[type="checkbox"]').checked = true; // Check the matching checkbox
-        }
-      });
-    }
-
-    // Check the appropriate predefined traits
-    if (Array.isArray(instructor.instructor_traits)) {
-      instructor.instructor_traits.forEach(trait => {
-        const checkbox = Array.from(document.querySelectorAll('input[name="traits"]')).find(input => 
-          input.nextElementSibling.innerText.trim() === trait.trim()
-        );
-        if (checkbox) {
-          checkbox.checked = true; // Check the matching trait checkbox
-        }
-      });
-    }
-
-    // Populate the custom traits list
-    const traitsList = document.querySelector('.traits-list');
-    if (traitsList) {
-      traitsList.innerHTML = ''; // Clear existing custom traits
-
-      // Populate custom traits that are not part of the predefined ones
-      instructor.instructor_traits.forEach(trait => {
-        const isPredefined = Array.from(document.querySelectorAll('input[name="traits"]')).some(input => input.nextElementSibling.innerText.trim() === trait.trim());
-
-        if (!isPredefined) {
-          const traitElement = document.createElement('div');
-          traitElement.classList.add('trait-item');
-          traitElement.textContent = trait;
-
-          const deleteButton = document.createElement('i');
-          deleteButton.classList.add('remove-trait');
-          deleteButton.innerHTML = '<i class="bi bi-x"></i>';
-          deleteButton.addEventListener('click', function() {
-            traitsList.removeChild(traitElement);
-          });
-
-          traitElement.appendChild(deleteButton);
-          traitsList.appendChild(traitElement);
-        }
-      });
-    }
-
-    // Set the profile picture or use the default
-    const profilePicPreview = document.getElementById('profilePicPreview');
-    if (profilePicPreview) {
-      profilePicPreview.src = instructor.imageUrl || 'Assets/default-profile.png';
-    }
-
-    instructorModal.show();
-  }
-}
-
-// Store the delete confirmation modal instance
-const deleteConfirmationModalElement = document.getElementById('deleteConfirmationModal');
-const deleteConfirmationModal = new bootstrap.Modal(deleteConfirmationModalElement);
-
-// Handle Delete button click in the dropdown
-function deleteInstructor(event) {
-    instructorIdToDelete = event.target.dataset.id; // Capture the ID of the instructor to delete
-    deleteConfirmationModal.show(); // Show the delete confirmation modal
-}
-
-// Confirm deletion of the instructor
-document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
-  if (instructorIdToDelete) {
-    try {
-      await deleteDoc(doc(db, 'instructors', instructorIdToDelete));
-      fetchInstructors(); // Refresh the list after deletion
-      deleteConfirmationModal.hide(); // Hide the modal after successful deletion
-      instructorIdToDelete = null; // Reset the variable
-      showNotification('Instructor deleted successfully.'); // Show success notification after delete
-    } catch (error) {
-      showNotification('An error occurred while deleting the instructor. Please try again.');
-    }
-  }
-});
-
-function showNotification(message) {
-  const notificationModalBody = document.getElementById('notificationModalBody');
-  notificationModalBody.textContent = message; // Set the message content
-  const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal')); // Initialize the modal
-  notificationModal.show(); // Show the modal
-}
-
-document.querySelectorAll('.togglePassword').forEach(button => {
-  button.addEventListener('click', function () {
-      const passwordField = this.previousElementSibling;
-      const icon = this.querySelector('i');
-
-      if (passwordField.type === 'password') {
-          passwordField.type = 'text';
-          icon.classList.remove('fa-eye-slash');
-          icon.classList.add('fa-eye');
-      } else {
-          passwordField.type = 'password';
-          icon.classList.remove('fa-eye');
-          icon.classList.add('fa-eye-slash');
-      }
-  });
-});
+document.addEventListener('DOMContentLoaded', fetchInstructors);

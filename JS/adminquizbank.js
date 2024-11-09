@@ -17,46 +17,87 @@ const db = getFirestore(app);
 
 let changesToApply = {};  // Track changes until publish is clicked
 
-// Fetch quiz questions from Firestore and render them grouped by category
-document.addEventListener('DOMContentLoaded', () => {
-    fetchQuizQuestions();  // Call the function to fetch quizzes when the page is loaded
-});
+document.addEventListener("DOMContentLoaded", async function () {
+    const selectedLanguageElement = document.querySelector('.selected');
+    const dropdownOptions = document.querySelector('.dropdown-options');
+    const languageFilter = document.getElementById('languageFilter');
 
-/// Fetch and render quiz questions grouped by category
-async function fetchQuizQuestions() {
+    // Initially show all questions
+    await fetchQuizQuestions(); // Default fetch without filtering
+
+    // Toggle dropdown visibility
+    selectedLanguageElement.addEventListener('click', function () {
+        console.log('Toggling dropdown'); // Debugging log
+        if (languageFilter.classList.contains('open')) {
+            languageFilter.classList.remove('open'); // Hide dropdown
+        } else {
+            languageFilter.classList.add('open'); // Show dropdown
+        }
+    });
+
+    // Handle dropdown selection
+    dropdownOptions.addEventListener('click', async function (event) {
+        const option = event.target.closest('.option');
+        if (option) {
+            const selectedLanguage = option.getAttribute('data-value');
+            selectedLanguageElement.textContent = option.textContent; // Update displayed language
+            languageFilter.classList.remove('open'); // Close dropdown
+
+            // Fetch and render questions based on the selected language
+            if (selectedLanguage === "all") {
+                await fetchQuizQuestions(); // Show all questions
+            } else {
+                await fetchQuizQuestions(selectedLanguage); // Filter by selected language
+            }
+        }
+    });
+
+    // Close the dropdown when clicking outside
+    document.addEventListener('click', function (event) {
+        if (!languageFilter.contains(event.target)) {
+            languageFilter.classList.remove('open'); // Close dropdown
+        }
+    });
+});
+async function fetchQuizQuestions(selectedLanguage = null) {
     const quizList = document.querySelector('.container-wrapper');
     quizList.innerHTML = ''; // Clear the quiz container
 
     try {
         const querySnapshot = await getDocs(collection(db, "quizzes"));
         const quizzes = {};
-
-        // Keep track of quiz document IDs
         const quizDocuments = [];
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             const category = data.category;
-        
-            // Ensure that the 'questions' field exists in the document before proceeding
-            if (data.questions && Array.isArray(data.questions)) {
-                quizDocuments.push({ id: doc.id, data: data });  // Store document ID
-        
-                if (!quizzes[category]) {
-                    quizzes[category] = [];
-                }
-        
-                quizzes[category].push(...data.questions);
-            } else {
-              
-            }
-        });        
 
-        // Render the questions grouped by category
+            if (data.questions && Array.isArray(data.questions)) {
+                // Filter questions if a specific language is selected
+                const filteredQuestions = selectedLanguage
+                    ? data.questions.filter(question => {
+                          return question.language &&
+                                 typeof question.language === "string" &&
+                                 question.language.toLowerCase() === selectedLanguage.toLowerCase();
+                      })
+                    : data.questions; // Show all questions if no language is selected
+
+                if (filteredQuestions.length > 0) {
+                    quizDocuments.push({ id: doc.id, data: { ...data, questions: filteredQuestions } });
+
+                    if (!quizzes[category]) {
+                        quizzes[category] = [];
+                    }
+
+                    quizzes[category].push(...filteredQuestions);
+                }
+            }
+        });
+
+        // Render questions grouped by category
         quizDocuments.forEach((quizDoc, index) => {
             const category = quizDoc.data.category;
 
-            // Insert Category Header
             quizList.insertAdjacentHTML('beforeend', `
                 <div class="container-wrapper-wrap">
                     <div class="header-container">
@@ -71,8 +112,6 @@ async function fetchQuizQuestions() {
             `);
 
             const categoryBox = document.getElementById(`category-${index}`);
-
-            // Check if all questions in the category are active
             let allActive = true;
 
             quizDoc.data.questions.forEach((question, questionIndex) => {
@@ -80,15 +119,14 @@ async function fetchQuizQuestions() {
                     <p>${String.fromCharCode(65 + i)}. ${option.value}</p>
                 `).join('');
 
-                // If any question is inactive, the "Select All" checkbox should not be checked
                 if (!question.active) {
                     allActive = false;
                 }
 
-                // Render each question with its active status (checked if active)
                 categoryBox.insertAdjacentHTML('beforeend', `
                     <div class="question">
                         <div class="question-header">
+                            <p>Language: ${question.language || "Not specified"}</p> <!-- Display language above question -->
                             <p>Question ${questionIndex + 1}: ${question.question}</p>
                             <label class="custom-checkbox">
                                 <input type="checkbox" name="select_${category}_${questionIndex}" class="question-checkbox" data-quiz-id="${quizDoc.id}" data-question-index="${questionIndex}" ${question.active ? 'checked' : ''}> 
@@ -102,13 +140,14 @@ async function fetchQuizQuestions() {
                 `);
             });
 
-            // Set the "Select All" checkbox based on whether all questions are active
             const selectAllCheckbox = document.getElementById(`selectAll${index}`);
             selectAllCheckbox.checked = allActive;
         });
 
         // Add the footer dynamically after questions are rendered
-        addFooterWithPublishButton();
+        if (!document.querySelector('.footer')) { // Prevent duplicate footers
+            addFooterWithPublishButton();
+        }
 
         // Event listener for individual "Select All" in each category
         document.querySelectorAll('.select-all-checkbox').forEach((selectAllCheckbox) => {
@@ -127,9 +166,11 @@ async function fetchQuizQuestions() {
         setupCheckboxListeners();
 
     } catch (error) {
-
+        console.error("Error fetching or rendering quiz questions:", error);
     }
 }
+
+
 
 // Track changes for batch write
 function trackQuestionChange(quizId, questionIndex, isActive) {
@@ -264,34 +305,3 @@ function setupPublishButton() {
         }
     });
 }
-
-document.addEventListener("DOMContentLoaded", function() {
-    const languageFilter = document.getElementById("languageFilter");
-    const selectedLanguage = languageFilter.querySelector(".selected");
-    const dropdownOptions = languageFilter.querySelector(".dropdown-options");
-
-    // Toggle dropdown visibility on clicking the selected div
-    selectedLanguage.addEventListener("click", function() {
-        languageFilter.classList.toggle("open");
-    });
-
-    // Update selected language and close dropdown on selecting an option
-    dropdownOptions.addEventListener("click", function(event) {
-        const option = event.target.closest(".option");
-        if (option) {
-            const language = option.getAttribute("data-value");
-            selectedLanguage.textContent = option.textContent;
-            languageFilter.classList.remove("open");
-
-            // Optional: perform any action based on selected language, e.g., changing language-specific content
-            console.log("Selected language:", language);
-        }
-    });
-
-    // Close the dropdown if clicking outside
-    document.addEventListener("click", function(event) {
-        if (!languageFilter.contains(event.target)) {
-            languageFilter.classList.remove("open");
-        }
-    });
-});

@@ -26,8 +26,10 @@ let userId = null; // Variable to store user ID
 async function fetchAndRandomizeQuizzes() {
     // Show loader before fetching quizzes
     document.getElementById('loader1').style.display = 'flex';
-    
+
     try {
+        const selectedLanguage = localStorage.getItem('selectedLanguage'); // Retrieve the stored language choice
+
         const quizzesSnapshot = await getDocs(collection(db, 'quizzes'));
         quizzesSnapshot.forEach(doc => {
             const quizData = doc.data();
@@ -35,7 +37,8 @@ async function fetchAndRandomizeQuizzes() {
             // Check if the 'questions' field exists and is an array
             if (quizData.questions && Array.isArray(quizData.questions)) {
                 quizData.questions
-                    .filter(question => question.active) // Only include active questions
+                    // Filter questions by language and active status
+                    .filter(question => question.language === selectedLanguage && question.active)
                     .forEach(question => {
                         questions.push({
                             ...question,
@@ -43,26 +46,26 @@ async function fetchAndRandomizeQuizzes() {
                         });
                     });
             } else {
-               
+                console.log('No questions found or invalid structure in quiz:', doc.id);
             }
         });
-        
+
         // Shuffle questions after filtering
         questions = questions.sort(() => Math.random() - 0.5);
-        
+
         if (questions.length > 0) {
             renderQuestion(currentQuestionIndex); // Render the first question
         } else {
-           
+            alert('No questions available for the selected language.');
+            console.log('Final Questions Array is empty:', questions);
         }
     } catch (error) {
-       
+        console.error('Error fetching quizzes:', error);
     } finally {
         // Hide loader once the quiz is loaded
         document.getElementById('loader1').style.display = 'none';
     }
 }
-
 // Save User Answer in Firestore
 async function saveUserAnswerToFirestore(index) {
     const selectedOption = document.querySelector('input[name="questionanswer"]:checked');

@@ -19,7 +19,7 @@ if (!getApps().length) {
   app = getApps()[0];
 }
 const db = getFirestore(app);
-
+// Fetch and render archived students
 async function fetchArchivedStudents() {
   try {
     // Show loader1
@@ -73,7 +73,16 @@ async function fetchArchivedStudents() {
 
     const archivedStudents = Array.from(studentsMap.values());
 
+    // Render the students and attach them to the search functionality
     renderArchivedStudents(archivedStudents);
+
+    // Attach search functionality directly to the rendered students
+    const searchBar = document.querySelector('.search');
+    if (searchBar) {
+      searchBar.addEventListener('input', (event) => {
+        filterArchivedStudents(event.target.value, archivedStudents);
+      });
+    }
   } catch (error) {
     console.error('Error fetching archived students:', error);
     const studentList = document.getElementById('student-archives-list');
@@ -85,17 +94,17 @@ async function fetchArchivedStudents() {
 }
 
 // Render archived students
-function renderArchivedStudents(archivedStudents) {
+function renderArchivedStudents(students) {
   const studentList = document.getElementById('student-archives-list');
   studentList.innerHTML = ''; // Clear the table
 
-  if (archivedStudents.length === 0) {
+  if (students.length === 0) {
     studentList.innerHTML = `<tr><td colspan="10" class="text-center">No archived students found</td></tr>`;
     return;
   }
 
   // Render rows for each archived student
-  archivedStudents.forEach((student) => {
+  students.forEach((student) => {
     const row = `
       <tr>
         <td>${student.name}</td>
@@ -113,6 +122,22 @@ function renderArchivedStudents(archivedStudents) {
     studentList.insertAdjacentHTML('beforeend', row);
   });
 }
-  
+
+// Filter archived students dynamically based on search term
+function filterArchivedStudents(searchTerm, students) {
+  const lowerSearchTerm = searchTerm.toLowerCase();
+
+  const filteredStudents = students.filter(student => {
+    const fullName = (student.name || '').toLowerCase();
+    const packageName = (student.packageName || '').toLowerCase();
+
+    // Use `includes` to match any part of the name or package
+    return fullName.includes(lowerSearchTerm) || packageName.includes(lowerSearchTerm);
+  });
+
+  // Render the filtered students
+  renderArchivedStudents(filteredStudents);
+}
+
 // Call fetchArchivedStudents on page load
 document.addEventListener('DOMContentLoaded', fetchArchivedStudents);
