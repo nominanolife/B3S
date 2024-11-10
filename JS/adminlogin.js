@@ -1,96 +1,86 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
-        authDomain: "authentication-d6496.firebaseapp.com",
-        databaseURL: "https://authentication-d6496-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "authentication-d6496",
-        storageBucket: "authentication-d6496.appspot.com",
-        messagingSenderId: "195867894399",
-        appId: "1:195867894399:web:596fb109d308aea8b6154a"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    var db = firebase.firestore();
+// Import Firebase modules
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-    // Add event listener to the login button
-    document.getElementById('loginBtn').addEventListener('click', function(event) {
-        event.preventDefault();
-        
-        // Show the loader when login starts
-        document.getElementById('loader1').style.display = 'flex';
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
+  authDomain: "authentication-d6496.firebaseapp.com",
+  projectId: "authentication-d6496",
+  storageBucket: "authentication-d6496.appspot.com",
+  messagingSenderId: "195867894399",
+  appId: "1:195867894399:web:596fb109d308aea8b6154a"
+};
 
-        var identifier = document.getElementById('name').value; // Can be email or name
-        var password = document.getElementById('password').value;
+// Initialize Firebase App
+const app = initializeApp(firebaseConfig);
 
-        if (identifier && password) {
-            db.collection("admin").get().then((querySnapshot) => {
-                let validUser = false;
-                querySnapshot.forEach((doc) => {
-                    const userData = doc.data();
-                    
-                    // Match identifier to either email or name
-                    if ((userData.email === identifier || userData.name === identifier) && userData.password === password) {
-                        validUser = true;
+// Initialize Firebase Auth and Firestore
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-                        // Check the user's role
-                        if (userData.role === 'admin') {
-                            // Redirect to admin dashboard
-                            window.location.href = "admindashboard.html";
-                        } else if (userData.role === 'instructor') {
-                            // Redirect to instructor profile
-                            window.location.href = "instructorpofile.html";
-                        }
-                    }
-                });
+document.getElementById('loginBtn').addEventListener('click', async function (event) {
+  event.preventDefault();
 
-                if (!validUser) {
-                    hideLoader(); // Hide the loader
-                    showModal("Invalid credentials. Please try again.");
-                }
-            }).catch((error) => {
-                hideLoader(); // Hide the loader
-                showModal("Error logging in. Please try again later.");
-                console.error("Error fetching users:", error);
-            });
-        } else {
-            hideLoader(); // Hide the loader
-            showModal("Please fill in both fields.");
-        }
+  const identifier = document.getElementById('name').value.trim();
+  const password = document.getElementById('password').value.trim();
+
+  if (!identifier || !password) {
+    showModal("Please fill in both fields.");
+    return;
+  }
+
+  document.getElementById('loader1').style.display = 'flex'; // Show loader
+
+  try {
+    // Step 1: Check if the user is an admin
+    const isAdmin = await checkAdminCredentials(identifier, password);
+
+    if (isAdmin) {
+      // Admin credentials matched; redirect to admin dashboard
+      window.location.href = "admindashboard.html";
+      return;
+    }
+
+    // Step 2: If not an admin, attempt Firebase Authentication for instructors
+    const userCredential = await signInWithEmailAndPassword(auth, identifier, password);
+    const user = userCredential.user;
+
+    // Step 3: Redirect instructors to their profile
+    window.location.href = "instructorpofile.html";
+  } catch (error) {
+    console.error("Login error:", error);
+    showModal("Invalid credentials. Please try again.");
+  } finally {
+    document.getElementById('loader1').style.display = 'none'; // Hide loader
+  }
+});
+
+// Function to check admin credentials in Firestore
+async function checkAdminCredentials(identifier, password) {
+  try {
+    const querySnapshot = await getDocs(collection(db, "admin"));
+    let isAdmin = false;
+
+    querySnapshot.forEach((doc) => {
+      const userData = doc.data();
+
+      if ((userData.email === identifier || userData.name === identifier) && userData.password === password && userData.role === "admin") {
+        isAdmin = true;
+      }
     });
 
-    // Function to hide the loader
-    function hideLoader() {
-        document.getElementById('loader1').style.display = 'none';
-    }
+    return isAdmin;
+  } catch (error) {
+    console.error("Error checking admin credentials:", error);
+    return false;
+  }
+}
 
-    // Function to set up password toggle
-    function setupPasswordToggle(toggleId, passwordId) {
-        const togglePassword = document.getElementById(toggleId);
-        if (togglePassword) {
-            togglePassword.addEventListener('click', function () {
-                const passwordInput = document.getElementById(passwordId);
-                const icon = this.querySelector('i');
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                } else {
-                    passwordInput.type = 'password';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                }
-            });
-        }
-    }
-
-    // Function to show the modal with a specific message
-    function showModal(message) {
-        document.getElementById('notificationMessage').textContent = message;
-        const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
-        notificationModal.show();
-    }
-
-    // Call the function with the appropriate IDs
-    setupPasswordToggle('togglePassword', 'password');
-});
+// Function to show error messages in a modal
+function showModal(message) {
+  document.getElementById('notificationMessage').textContent = message;
+  const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+  notificationModal.show();
+}

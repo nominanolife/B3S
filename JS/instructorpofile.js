@@ -19,6 +19,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 
+
 // Select elements from the DOM
 const saveButton = document.querySelector('.save-instructor');
 const profilePicInput = document.getElementById('editProfilePic');

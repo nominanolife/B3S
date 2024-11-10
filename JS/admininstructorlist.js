@@ -1,5 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { getFirestore, collection, setDoc, getDocs, doc, deleteDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
@@ -13,6 +14,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth();
 
 // DOM Elements
 const addInstructorButton = document.querySelector('.add-instructor');
@@ -22,39 +24,56 @@ const instructorModal = new bootstrap.Modal(instructorModalElement);
 const loader = document.getElementById('loader1');
 const instructorsList = document.querySelector('.instructor-list'); // Target tbody for instructors
 
-// Fetch and Display Existing Instructors
 async function fetchInstructors() {
   try {
     loader.style.display = 'flex'; // Show loader
-
-    const querySnapshot = await getDocs(collection(db, 'admin')); // Get all documents in the 'admin' collection
     instructorsList.innerHTML = ''; // Clear existing list
 
-    if (!querySnapshot.empty) {
-      querySnapshot.forEach((doc) => {
-        // Skip the special 'admin' document
-        if (doc.id === 'admin') return;
+    // Step 1: Fetch all documents from the admin collection
+    const adminSnapshot = await getDocs(collection(db, 'admin'));
 
-        const instructor = doc.data();
+    // Step 2: Loop through the admin collection and fetch corresponding data from the instructors table
+    if (!adminSnapshot.empty) {
+      for (const adminDoc of adminSnapshot.docs) {
+        const adminData = adminDoc.data();
+
+        // Skip admin role users
+        if (adminData.role !== 'instructor') continue;
+
+        // Fetch corresponding data from instructors table using UID
+        const instructorDoc = await getDoc(doc(db, 'instructors', adminDoc.id));
+        const instructorData = instructorDoc.exists() ? instructorDoc.data() : {};
+
+        // Merge data from both collections
+        const instructorDetails = {
+          email: adminData.email || 'N/A',
+          name: instructorData.name || 'N/A',
+          courses: instructorData.courses ? instructorData.courses.join(', ') : 'N/A',
+        };
+
+        // Insert data into the table
         instructorsList.insertAdjacentHTML(
           'beforeend',
           `<tr>
-            <td></td>
-            <td>${instructor.email}</td>
+            <td>${instructorDetails.name}</td>
+            <td>${instructorDetails.email}</td>
+            <td>${instructorDetails.courses}</td>
+            <td>
+              <button class="btn btn-danger delete-instructor" data-id="${adminDoc.id}">Delete</button>
             </td>
           </tr>`
         );
-      });
+      }
 
       // Attach delete functionality to the buttons
-      document.querySelectorAll('.delete-instructor').forEach(button => {
+      document.querySelectorAll('.delete-instructor').forEach((button) => {
         button.addEventListener('click', async (event) => {
           const instructorId = event.target.getAttribute('data-id');
           await deleteInstructor(instructorId);
         });
       });
     } else {
-      instructorsList.innerHTML = `<tr><td colspan="3" class="text-center">No instructors found.</td></tr>`;
+      instructorsList.innerHTML = `<tr><td colspan="4" class="text-center">No instructors found.</td></tr>`;
     }
   } catch (error) {
     console.error('Error fetching instructors:', error);
@@ -63,7 +82,6 @@ async function fetchInstructors() {
   }
 }
 
-// Save Instructor to Firestore as a new document
 async function saveInstructor() {
   const emailInput = document.querySelector('.email');
   const passwordInput = document.querySelector('.password-field');
@@ -76,18 +94,26 @@ async function saveInstructor() {
   try {
     loader.style.display = 'flex'; // Show loader
 
+    // Step 1: Create user in Firebase Authentication
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      emailInput.value.trim(),
+      passwordInput.value.trim()
+    );
+    const newUser = userCredential.user;
+
+    // Step 2: Save the user details in Firestore using the UID
     const newInstructor = {
-      email: emailInput.value.trim(),
-      password: passwordInput.value.trim(),
+      email: newUser.email,
+      uid: newUser.uid, // Store the UID
       role: 'instructor',
     };
 
-    await addDoc(collection(db, 'admin'), newInstructor);
+    await setDoc(doc(db, 'admin', newUser.uid), newInstructor);
 
-    console.log('Instructor added as a new document.');
+    console.log('Instructor added successfully.');
     emailInput.value = '';
     passwordInput.value = '';
-
     instructorModal.hide();
     showNotification('Instructor saved successfully.');
     fetchInstructors();
