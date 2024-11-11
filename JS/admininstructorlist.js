@@ -24,63 +24,127 @@ const instructorModal = new bootstrap.Modal(instructorModalElement);
 const loader = document.getElementById('loader1');
 const instructorsList = document.querySelector('.instructor-list'); // Target tbody for instructors
 
+// DOM Elements for Modals
+const editInstructorModalElement = document.getElementById('editInstructorModal');
+const feedbackOverviewModalElement = document.getElementById('feedbackOverviewModal');
+const deleteConfirmationModalElement = document.getElementById('deleteConfirmationModal');
+
+const editInstructorModal = new bootstrap.Modal(editInstructorModalElement);
+const feedbackOverviewModal = new bootstrap.Modal(feedbackOverviewModalElement);
+const deleteConfirmationModal = new bootstrap.Modal(deleteConfirmationModalElement);
+
+// Fetch instructors with dropdown functionality for edit, feedback, and delete
 async function fetchInstructors() {
   try {
     loader.style.display = 'flex'; // Show loader
     instructorsList.innerHTML = ''; // Clear existing list
 
-    // Step 1: Fetch all documents from the admin collection
     const adminSnapshot = await getDocs(collection(db, 'admin'));
 
-    // Step 2: Loop through the admin collection and fetch corresponding data from the instructors table
     if (!adminSnapshot.empty) {
       for (const adminDoc of adminSnapshot.docs) {
         const adminData = adminDoc.data();
-
-        // Skip admin role users
         if (adminData.role !== 'instructor') continue;
 
-        // Fetch corresponding data from instructors table using UID
         const instructorDoc = await getDoc(doc(db, 'instructors', adminDoc.id));
         const instructorData = instructorDoc.exists() ? instructorDoc.data() : {};
 
-        // Merge data from both collections
         const instructorDetails = {
           email: adminData.email || 'N/A',
           name: instructorData.name || 'N/A',
           courses: instructorData.courses ? instructorData.courses.join(', ') : 'N/A',
         };
 
-        // Insert data into the table
         instructorsList.insertAdjacentHTML(
           'beforeend',
           `<tr>
             <td>${instructorDetails.name}</td>
             <td>${instructorDetails.email}</td>
             <td>${instructorDetails.courses}</td>
-            <td>
-              <button class="btn btn-danger delete-instructor" data-id="${adminDoc.id}">Delete</button>
+            <td class="table-row-content">
+              <div class="dropdown">
+                <i class="bi bi-three-dots"></i>
+                <div class="dropdown-content">
+                  <i class="dropdown-item feedback-btn">Feedbacks</i>
+                  <i class="dropdown-item edit-btn" data-id="${adminDoc.id}">Edit</i>
+                  <i class="dropdown-item delete-btn" data-id="${adminDoc.id}">Delete</i>
+                </div>
+              </div>
             </td>
           </tr>`
         );
       }
 
-      // Attach delete functionality to the buttons
-      document.querySelectorAll('.delete-instructor').forEach((button) => {
-        button.addEventListener('click', async (event) => {
-          const instructorId = event.target.getAttribute('data-id');
-          await deleteInstructor(instructorId);
-        });
-      });
+      // Attach functionality to dropdown actions
+      handleDropdowns();
     } else {
       instructorsList.innerHTML = `<tr><td colspan="4" class="text-center">No instructors found.</td></tr>`;
     }
   } catch (error) {
     console.error('Error fetching instructors:', error);
   } finally {
-    loader.style.display = 'none'; // Hide loader
+    loader.style.display = 'none';
   }
 }
+
+function handleDropdowns() {
+  document.querySelectorAll('.dropdown').forEach(dropdown => {
+    const button = dropdown.querySelector('.bi-three-dots');
+    const content = dropdown.querySelector('.dropdown-content');
+
+    button.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const isDropdownOpen = content.classList.contains('show');
+      closeAllDropdowns();
+      if (!isDropdownOpen) {
+        content.classList.add('show');
+      } else {
+        content.classList.remove('show');
+      }
+    });
+
+    // Event Listener for Edit Button
+    dropdown.querySelector('.edit-btn').addEventListener('click', () => {
+      editInstructorModal.show();
+      content.classList.remove('show'); // Close dropdown after selection
+      // Load instructor data in edit modal if needed
+    });
+
+    // Event Listener for Feedback Button
+    dropdown.querySelector('.feedback-btn').addEventListener('click', () => {
+      feedbackOverviewModal.show();
+      content.classList.remove('show'); // Close dropdown after selection
+    });
+
+    // Event Listener for Delete Button
+    dropdown.querySelector('.delete-btn').addEventListener('click', (event) => {
+      const instructorId = event.target.getAttribute('data-id');
+      document.getElementById('confirmDeleteBtn').setAttribute('data-id', instructorId);
+      deleteConfirmationModal.show();
+      content.classList.remove('show'); // Close dropdown after selection
+    });
+  });
+
+  function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+      dropdown.classList.remove('show');
+    });
+  }
+
+  document.addEventListener('click', function(event) {
+    if (!event.target.closest('.dropdown')) {
+      closeAllDropdowns();
+    }
+  });
+}
+
+// Event Listener for Confirm Delete Button
+document.getElementById('confirmDeleteBtn').addEventListener('click', async (event) => {
+  const instructorId = event.target.getAttribute('data-id');
+  await deleteInstructor(instructorId);
+  deleteConfirmationModal.hide();
+});
+
 
 async function saveInstructor() {
   const emailInput = document.querySelector('.email');

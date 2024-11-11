@@ -1244,7 +1244,7 @@ h2 {
     position: fixed;
     bottom: 0;
     right: 0;
-    width: 84.3%;
+    width: 100%;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.8);
     z-index: 9999;
@@ -1253,12 +1253,6 @@ h2 {
     align-items: center;
     flex-direction: column;
     font-family: 'Poppins', sans-serif;
-}
-@media (max-width: 768px) {
-    .loader1 {
-        width: 100%; 
-        padding: 20px;
-    }
 }
 
 .loader1 .car-loader {
@@ -1270,13 +1264,6 @@ h2 {
     animation: spin 2s linear infinite;
     position: relative;
 }
-@media (max-width: 768px) {
-    .loader1 .car-loader {
-        width: 60px;
-        height: 60px;
-        border-width: 3px;
-    }
-}
 
 .loader1 p {
     margin-top: 20px;
@@ -1284,23 +1271,12 @@ h2 {
     color: #142A74;
     position: relative;
 }
-@media (max-width: 768px) {
-    .loader1 p {
-        font-size: 16px;
-    }
-}
 
 .dots {
     display: inline-block;
     font-size: 18px;
     font-weight: bold;
 }
-@media (max-width: 768px) {
-    .dots {
-        font-size: 16px;
-    }
-}
-
 .dots::after {
     content: '';
     display: inline-block;

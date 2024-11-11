@@ -401,6 +401,7 @@ async function showPerformanceEvaluation(evaluationData) {
         <div class="result-header">
             <h3>Performance Evaluation</h3>
             <p>Here is your performance evaluation based on the data:</p>
+        </div>
     `;
 
     const performanceWrapper = document.createElement('div');
@@ -431,20 +432,6 @@ async function showPerformanceEvaluation(evaluationData) {
 
             let additionalResources = insights ? `<p><strong>Insights:</strong> ${insights}</p>` : '';
 
-            // If the performance is "Poor", find the video link by category
-            if (predictedPerformance === 'Poor') {
-                const categoryLink = await findVideoUrlByCategory(item.category);
-                if (categoryLink) {
-                    additionalResources += `
-                        <p><a href="${categoryLink}" style="color:${color}; text-decoration:underline;">
-                            Click here to watch the video for ${item.category} improvement
-                        </a></p>
-                    `;
-                } else {
-                    additionalResources += `<p style="color: #B60505;">No video available for ${item.category}.</p>`;
-                }
-            }
-
             performanceBlock.innerHTML = `
                 <div style="border: 1px solid ${color}; border-radius: 10px; padding: 15px; margin-bottom: 10px;">
                     <p style="display: flex; gap: 5px">
@@ -462,10 +449,10 @@ async function showPerformanceEvaluation(evaluationData) {
         }
     }
 
+    // Add the performanceWrapper to the result content
     resultContent.appendChild(performanceWrapper);
     resultContainer.appendChild(resultContent);
 
-    // Reattach the event listener after the performance evaluation is rendered
     attachToggleListeners();
 
     const categoryScores = calculateCategoryScores();

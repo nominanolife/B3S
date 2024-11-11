@@ -1053,6 +1053,20 @@ h2 {
     }
 }
 
+.evaluation-table tfoot td {
+    padding: 8px;
+    text-align: center;
+    font-weight: bold;
+    color: #142A74;
+}
+
+.evaluation-table tfoot td span {
+    padding: 8px;
+    text-align: center;
+    font-weight: bold;
+    color: #FFA500;
+}
+
 .evaluation-table td input {
     padding: 5px;
     text-align: center;
@@ -1638,4 +1652,44 @@ tbody tr .main-text {
 
 .hidden {
     display: none;
+}
+
+.performance-legend {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.legend-color {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+.poor {
+    background-color: #B60505;
+}
+
+.excellent {
+    background-color: green;
+}
+
+.great {
+    background-color: #142A74;
+}
+
+.passing {
+    background-color: #FFA500;
+}
+
+.legend-item span {
+    font-family: Poppins;
+    font-size: 13px;
+    color: #2F2E2E;
 }

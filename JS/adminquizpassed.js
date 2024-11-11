@@ -324,10 +324,13 @@ async function generateCertificate(fullName, totalScore, certificateID, completi
     doc.setFontSize(32);
     doc.text(fullName, pageWidth / 2, 115, { align: 'center' });
 
+    // Format date to "Month Day, Year"
+    const formattedDate = new Date(completionDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
     // Add quiz completion details dynamically (total score and certificate ID)
     doc.setFont("Helvetica");
     doc.setFontSize(15);
-    doc.text(`Has successfully passed the theoretical driving course on ${completionDate}`, pageWidth / 2, 130, { align: 'center' });
+    doc.text(`Has successfully passed the theoretical driving course on ${formattedDate}`, pageWidth / 2, 130, { align: 'center' });
     doc.text(`with a quiz result of ${totalScore}%, earning Quiz Passing ID ${certificateID}`, pageWidth / 2, 140, { align: 'center' });
 
     // Add the signature and line for admin signature

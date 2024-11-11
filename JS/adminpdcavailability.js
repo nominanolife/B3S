@@ -41,6 +41,17 @@ let currentYear = date.getFullYear();
 // Unique instructor colors
 let instructorColors = {};
 
+// Ensure loader is visible on initial load
+document.addEventListener("DOMContentLoaded", () => {
+  const loader = document.getElementById("loader1");
+  loader.style.display = "flex"; // Show the loader
+
+  // Fetch data and then hide loader
+  fetchInstructorsAndAvailability().then(() => {
+    loader.style.display = "none"; // Hide the loader after content loads
+  });
+});
+
 // Fetch instructors and availability
 async function fetchInstructorsAndAvailability() {
   const instructorSnapshot = await getDocs(collection(db, "instructors"));
@@ -135,6 +146,16 @@ function renderCalendar(month, year, instructors, availability) {
   }
 }
 
+// Helper function to convert 24-hour time to 12-hour format with AM/PM
+function convertTo12HourFormat(time) {
+  const [hour, minute] = time.split(":");
+  const hourInt = parseInt(hour, 10);
+  const amPm = hourInt >= 12 ? "PM" : "AM";
+  const hour12 = hourInt % 12 || 12; // Convert 0 or 12 to 12, otherwise use hour % 12
+
+  return `${hour12}:${minute} ${amPm}`;
+}
+
 // Updated Show Modal for a Specific Date
 function showModalForDate(date, instructors, availability) {
   const modalTableBody = modalBody.querySelector("tbody");
@@ -154,12 +175,16 @@ function showModalForDate(date, instructors, availability) {
         const instructor = instructors[instructorId];
         const instructorName = instructor?.name || "Unknown";
 
+        // Convert timeStart and timeEnd to 12-hour format
+        const timeStart12 = convertTo12HourFormat(booking.timeStart);
+        const timeEnd12 = convertTo12HourFormat(booking.timeEnd);
+
         const row = `
           <tr>
             <td>${instructorName}</td>
             <td>${booking.course}</td>
-            <td>${booking.timeStart}</td>
-            <td>${booking.timeEnd}</td>
+            <td>${timeStart12}</td>
+            <td>${timeEnd12}</td>
           </tr>
         `;
         modalTableBody.innerHTML += row;
@@ -186,15 +211,16 @@ function populateInstructorTable(instructors) {
   for (const instructorId in instructors) {
     const instructor = instructors[instructorId];
 
-    // Check active status and set availability message
+    // Check active status and set availability message and color
     const availabilityStatus = instructor.active ? "Active" : "Unavailable";
+    const availabilityColor = instructor.active ? "green" : "#B60505";
 
     // Create table row with instructor information
     const row = `
       <tr>
         <td>${instructor.name}</td>
-        <td>${instructor.courses.join(", ")}</td>
-        <td>${availabilityStatus}</td>
+        <td>${instructor.courses.join(" || ")}</td>
+        <td style="color: ${availabilityColor};">${availabilityStatus}</td>
       </tr>
     `;
 
