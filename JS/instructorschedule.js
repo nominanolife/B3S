@@ -17,6 +17,10 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+function showNotification(message) {
+  document.getElementById('notificationModalBody').textContent = message;
+  $('#notificationModal').modal('show');
+}
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
@@ -133,14 +137,14 @@ async function saveAvailability() {
 
   // Input validation
   if (!course || !date || !timeStart || !timeEnd) {
-    alert("Please fill out all fields.");
+    showNotification("Please fill out all fields.");
     return;
   }
 
   // Get the logged-in user
   const user = auth.currentUser;
   if (!user) {
-    alert("You must be logged in to book an appointment.");
+    showNotification("You must be logged in to book an appointment.");
     return;
   }
 
@@ -168,9 +172,9 @@ async function saveAvailability() {
         // Update the instructor's active status
         await updateDoc(instructorDoc, { active: bookings.length > 0 });
 
-        alert("Availability updated successfully!");
+        showNotification("Availability updated successfully!");
       } else {
-        alert("No bookings found for this instructor.");
+        showNotification("No bookings found for this instructor.");
       }
     } else {
       // Add a new booking
@@ -204,11 +208,11 @@ async function saveAvailability() {
         // Set the instructor's active status to true
         await updateDoc(instructorDoc, { active: true });
       }
-      alert("Availability saved successfully!");
+      showNotification("Availability saved successfully!");
     }
   } catch (error) {
     console.error("Error saving/updating availability: ", error);
-    alert("Failed to save/update availability. Please try again.");
+    showNotification("Failed to save/update availability. Please try again.");
   }
 
   // Clear the form and reset state
@@ -216,6 +220,21 @@ async function saveAvailability() {
   renderTable(); // Refresh the table
   editId = null; // Reset the editId
   addButton.textContent = "Add"; // Change the button back to "Add"
+}
+
+function formatDateToMonthDayYear(dateString) {
+  const date = new Date(dateString);
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return date.toLocaleDateString('en-US', options);
+}
+
+// Utility function to format time in AM/PM
+function formatTimeToAMPM(time24) {
+  const [hours, minutes] = time24.split(":");
+  const hoursInt = parseInt(hours);
+  const period = hoursInt >= 12 ? "PM" : "AM";
+  const hours12 = hoursInt % 12 || 12;
+  return `${hours12}:${minutes} ${period}`;
 }
 
 async function renderTable() {
@@ -238,10 +257,14 @@ async function renderTable() {
 
       bookings.forEach((booking, index) => {
         const row = document.createElement("tr");
+        const formattedDate = formatDateToMonthDayYear(booking.date); // Format the booking date here
+        const formattedStartTime = formatTimeToAMPM(booking.timeStart); // Format start time to AM/PM
+        const formattedEndTime = formatTimeToAMPM(booking.timeEnd); // Format end time to AM/PM
+
         row.innerHTML = `
           <td>${booking.course}</td>
-          <td>${booking.date}</td>
-          <td>${booking.timeStart} - ${booking.timeEnd}</td>
+          <td>${formattedDate}</td>
+          <td>${formattedStartTime} - ${formattedEndTime}</td>
           <td>
             <button class="btn btn-warning btn-edit" data-index="${index}">Edit</button>
             <button class="btn btn-danger btn-delete" data-index="${index}">Delete</button>
@@ -249,12 +272,10 @@ async function renderTable() {
         `;
         tableBody.appendChild(row);
 
-        // Add event listener for Edit button
+        // Event listeners
         row.querySelector(".btn-edit").addEventListener("click", () => {
           populateFormForEdit(index, booking);
         });
-
-        // Add event listener for Delete button
         row.querySelector(".btn-delete").addEventListener("click", () => {
           deleteBooking(index);
         });
@@ -284,37 +305,50 @@ function populateFormForEdit(index, booking) {
   addButton.classList.add("btn-update");
 }
 
+// Modify deleteBooking to use deleteModal for confirmation
 async function deleteBooking(index) {
-  if (confirm("Are you sure you want to delete this booking?")) {
-    const user = auth.currentUser;
-    if (!user) {
-      console.error("No user logged in");
-      return;
-    }
+  // Store the index of the booking to be deleted in a global variable
+  window.currentDeleteIndex = index;
 
-    const instructorId = user.uid;
-    const instructorRef = doc(db, "availability", instructorId);
-
-    try {
-      const docSnapshot = await getDoc(instructorRef);
-
-      if (docSnapshot.exists()) {
-        const bookings = docSnapshot.data().bookings || [];
-        bookings.splice(index, 1); // Remove the booking at the specified index
-
-        // Update the document in Firestore
-        await updateDoc(instructorRef, { bookings });
-        alert("Booking deleted successfully!");
-
-        // Re-render the table
-        renderTable();
-      }
-    } catch (error) {
-      console.error("Error deleting booking:", error);
-      alert("Failed to delete booking. Please try again.");
-    }
-  }
+  // Show the delete confirmation modal
+  $('#deleteModal').modal('show');
 }
+
+// Event listener for the confirmDeleteBtn in deleteModal
+document.getElementById("confirmDeleteBtn").addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    console.error("No user logged in");
+    return;
+  }
+
+  const instructorId = user.uid;
+  const instructorRef = doc(db, "availability", instructorId);
+
+  try {
+    const docSnapshot = await getDoc(instructorRef);
+    if (docSnapshot.exists()) {
+      const bookings = docSnapshot.data().bookings || [];
+      // Use the global variable currentDeleteIndex to identify the booking to delete
+      bookings.splice(window.currentDeleteIndex, 1); // Remove the booking at the specified index
+
+      // Update Firestore with the modified bookings array
+      await updateDoc(instructorRef, { bookings });
+
+      showNotification("Booking deleted successfully!");
+
+      // Close the modal
+      $('#deleteModal').modal('hide');
+
+      // Re-render the table and calendar
+      renderTable();
+      renderCalendar(currentMonth, currentYear);
+    }
+  } catch (error) {
+    console.error("Error deleting booking:", error);
+    showNotification("Failed to delete booking. Please try again.");
+  }
+});
 
 // Event listener for the "Clear" button
 const clearButton = document.getElementById("btn-clear");
@@ -401,3 +435,7 @@ addButton.addEventListener("click", async () => {
 // Fetch availability on page load
 fetchAvailability();
 renderCalendar(currentMonth, currentYear);
+
+document.getElementById("profileBtn").addEventListener("click", () => {
+  window.location.href = "instructorprofile.html"; // Replace with the actual URL of the profile page
+});

@@ -52,7 +52,7 @@ async function fetchInstructors() {
         const instructorDetails = {
           email: adminData.email || 'N/A',
           name: instructorData.name || 'N/A',
-          courses: instructorData.courses ? instructorData.courses.join(', ') : 'N/A',
+          courses: instructorData.courses ? instructorData.courses.join(' || ') : 'N/A',
         };
 
         instructorsList.insertAdjacentHTML(

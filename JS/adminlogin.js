@@ -48,7 +48,7 @@ document.getElementById('loginBtn').addEventListener('click', async function (ev
     const user = userCredential.user;
 
     // Step 3: Redirect instructors to their profile
-    window.location.href = "instructorpofile.html";
+    window.location.href = "instructorprofile.html";
   } catch (error) {
     console.error("Login error:", error);
     showModal("Invalid credentials. Please try again.");
@@ -84,3 +84,26 @@ function showModal(message) {
   const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
   notificationModal.show();
 }
+
+// Function to set up password toggle
+function setupPasswordToggle(toggleId, passwordId) {
+  const togglePassword = document.getElementById(toggleId);
+  if (togglePassword) {
+      togglePassword.addEventListener('click', function () {
+          const passwordInput = document.getElementById(passwordId);
+          const icon = this.querySelector('i');
+          if (passwordInput.type === 'password') {
+              passwordInput.type = 'text';
+              icon.classList.remove('fa-eye-slash');
+              icon.classList.add('fa-eye');
+          } else {
+              passwordInput.type = 'password';
+              icon.classList.remove('fa-eye');
+              icon.classList.add('fa-eye-slash');
+          }
+      });
+  }
+}
+
+// Call the function with the appropriate IDs
+setupPasswordToggle('togglePassword', 'password');

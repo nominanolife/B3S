@@ -342,13 +342,13 @@ h2 {
 
 .course-list {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row;
+    justify-content: space-evenly;
     padding: 10px;
     width: 100%;
 }
 
-.traits-list {
+.saved-traits-list, .traits-list {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -366,7 +366,7 @@ h2 {
     padding: 5px;
 }
 
-.course-list span, .traits-list span {
+.course-list span, .saved-traits-list span {
     font-family: Poppins;
     font-size: 16px;
     font-weight: normal;
@@ -518,7 +518,7 @@ h2 {
     cursor: pointer;
 }
 
-.traits-list {
+.saved-traits-list {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -575,5 +575,32 @@ h2 {
 }
 
 .close-modal:hover {
+    background-color: #b60505ec;
+}
+
+.btn-primary {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+}
+
+.btn-primary:hover {
+    background-color: #142a74ec;
+}
+
+.btn-secondary {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #B60505;
+    border-radius: 30px;
+    padding: 10px 30px;
+}
+
+.btn-secondary:hover {
     background-color: #b60505ec;
 }
