@@ -39,20 +39,39 @@ def fetch_data():
 
     return students, instructors, appointments
 
-def get_student_course(student_id, appointments):
-    # Define the list of preferred courses
+def fetch_availability():
+    availability_ref = db.collection('availability').stream()
+    availability = {doc.id: doc.to_dict() for doc in availability_ref}
+    return availability
+
+def get_student_course(student_id, appointments, availability):
     preferred_courses = ["PDC-4Wheels", "PDC-Motors"]
-    
-    # Iterate through all appointments to find the student's active booking
+
+    # Step 1: Find the student's appointment
     for appointment_id, appointment in appointments.items():
         bookings = appointment.get('bookings', [])
-        
-        # Check each booking for the student ID and a valid course
         for booking in bookings:
             if booking.get('userId') == student_id:
-                course = appointment.get('course', '')  # Fetch course from appointment itself
-                if course in preferred_courses:
-                    return course
+                course = appointment.get('course', '')
+                date = appointment.get('date', '')
+
+
+                if course not in preferred_courses:
+                    continue
+
+                # Step 2: Check instructor availability
+                for avail_id, avail_data in availability.items():
+                    avail_bookings = avail_data.get('bookings', [])
+                    for avail_booking in avail_bookings:
+                        # Debug log to check the data being compared
+                        print(f"Checking availability: {avail_booking}")
+                        if (
+                            avail_booking.get('course') == course and
+                            avail_booking.get('date') == date
+
+                        ):
+                            print(f"Valid match found for course {course} on date {date}")
+                            return course  # Return course if valid availability is found
     return None
 
 def load_complementary_traits():
@@ -83,14 +102,14 @@ def calculate_match_score(student_traits, instructor_traits, complementary_trait
 
     return total_score
 
-def match_students_instructors(students, instructors, appointments, logged_in_student_id, complementary_traits):
+def match_students_instructors(students, instructors, appointments, logged_in_student_id, complementary_traits, availability):
     # Retrieve the student's data
     student = students.get(logged_in_student_id)
     if not student:
         return {"status": "error", "message": f"Student ID {logged_in_student_id} not found."}
 
     # Retrieve the student's preferred course
-    course = get_student_course(logged_in_student_id, appointments)
+    course = get_student_course(logged_in_student_id, appointments, availability)  # Pass availability here
     if not course:
         return {"status": "error", "message": "No course found for student."}
 
@@ -101,9 +120,18 @@ def match_students_instructors(students, instructors, appointments, logged_in_st
     # Only instructors that satisfy the course and active status will be considered
     eligible_instructors = {}
     for instructor_id, instructor in instructors.items():
+        # Ensure the instructor is active and offers the required course
         if course in instructor.get('courses', []) and instructor.get('active', False):
-            match_vars[instructor_id] = model.NewBoolVar(f"match_{logged_in_student_id}_{instructor_id}")
-            eligible_instructors[instructor_id] = instructor
+            # Check if the instructor has valid availability for the course and time
+            avail_data = availability.get(instructor_id, {})
+            avail_bookings = avail_data.get('bookings', [])
+            valid_availability = any(
+                avail_booking.get('course') == course
+                for avail_booking in avail_bookings
+            )
+            if valid_availability:
+                match_vars[instructor_id] = model.NewBoolVar(f"match_{logged_in_student_id}_{instructor_id}")
+                eligible_instructors[instructor_id] = instructor
 
     if not eligible_instructors:
         return {"status": "error", "message": f"No eligible instructors found for course {course}."}
@@ -144,14 +172,16 @@ def match_students_instructors(students, instructors, appointments, logged_in_st
     else:
         return {"status": "error", "message": "No suitable instructor found."}
 
+
 def main(logged_in_student_id):
     complementary_traits = load_complementary_traits()
     students, instructors, appointments = fetch_data()
+    availability = fetch_availability()  # Fetch availability here
 
     if not students or not instructors:
         return {"status": "error", "message": "No students or instructors available for matching."}
 
-    result = match_students_instructors(students, instructors, appointments, logged_in_student_id, complementary_traits)
+    result = match_students_instructors(students, instructors, appointments, logged_in_student_id, complementary_traits, availability)
     return result
 
 if __name__ == "__main__":

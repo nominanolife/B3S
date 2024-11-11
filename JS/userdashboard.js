@@ -700,13 +700,17 @@ async function fetchAndDisplayPerformance(studentId) {
             const studentData = studentDoc.data();
 
             const WassessmentData = studentData.WassessmentData || {};
-            const WprocessedData = studentData.WprocessedData || {};  // Get WprocessedData
-            
+            const WprocessedData = studentData.WprocessedData || {};
+            const Wchecklist = studentData.Wchecklist || {}; // Fetch Wchecklist
+
             // Populate the WheelsModal with both score and performance data
             populateWheelsModal(WassessmentData, WprocessedData);
+            updateLessonCheckboxes(Wchecklist); // Ensure Wchecklist is passed correctly
+        } else {
+            console.error('Student document does not exist.');
         }
     } catch (error) {
-
+        console.error('Error fetching student data:', error);
     }
 }
 
@@ -752,6 +756,12 @@ function populateWheelsModal(assessmentData, WprocessedData) {
                 if (scoreElement) {
                     scoreElement.textContent = item.score; // Populate the score
                 }
+
+                // Populate comment
+                const commentElement = document.getElementById(`${fieldId}-comment`);
+                if (commentElement) {
+                    commentElement.textContent = item.comment || "No comment provided."; // Fallback if no comment
+                }
             }
         });
     });
@@ -778,12 +788,35 @@ function populateWheelsModal(assessmentData, WprocessedData) {
     });
 }
 
+function updateLessonCheckboxes(Wchecklist) {
+    console.log('Updating checkboxes with data:', Wchecklist);
+
+    // Get the container for the checkboxes
+    const commentsContainer = document.getElementById('commentsContainer');
+    if (!commentsContainer) {
+        console.error('Comments container not found!');
+        return;
+    }
+
+    // Iterate through Wchecklist to update checkboxes
+    Object.keys(Wchecklist).forEach(checklistKey => {
+        // Find the checkbox within the container
+        const checkbox = commentsContainer.querySelector(`#${checklistKey}`);
+        if (checkbox) {
+            checkbox.checked = Wchecklist[checklistKey]; // Set the checked state
+            checkbox.disabled = true; // Disable the checkbox
+        } else {
+            console.warn(`Checkbox with ID ${checklistKey} not found in the comments container.`);
+        }
+    });
+}
+
 $('#WheelsModal').on('show.bs.modal', function () {
     const loggedInStudentId = auth.currentUser.uid; // Get the logged-in student's ID
     fetchAndDisplayPerformance(loggedInStudentId);  // Fetch and display the performance data
 });
 
-// Fetch and display motorcycle performance data
+// Fetch and display motorcycle performance data and checklist
 async function fetchAndDisplayMotorPerformance(studentId) {
     try {
         const studentDocRef = doc(db, "applicants", studentId); // Fetch the correct document
@@ -795,23 +828,26 @@ async function fetchAndDisplayMotorPerformance(studentId) {
             // Fetch the MassessmentData and MprocessedData if they exist in the document
             const MassessmentData = studentData.MassessmentData || {}; 
             const MprocessedData = studentData.MprocessedData || {};  
-
-            // Check if data is available
-            if (Object.keys(MassessmentData).length === 0) {
-
-            }
-
-            if (Object.keys(MprocessedData).length === 0) {
-
-            }
+            const Mchecklist = studentData.Mchecklist || {}; // Fetch the checklist data
 
             // Populate the modal with the fetched data
-            populateMotorsModal(MassessmentData, MprocessedData);
-        } else {
+            if (Object.keys(MassessmentData).length > 0 && Object.keys(MprocessedData).length > 0) {
+                populateMotorsModal(MassessmentData, MprocessedData);
+            } else {
+                console.warn("Motorcycle assessment or processed data is missing.");
+            }
 
+            // Populate the checklist if it exists
+            if (Object.keys(Mchecklist).length > 0) {
+                updateMotorLessonCheckboxes(Mchecklist);
+            } else {
+                console.warn("Motorcycle checklist data is missing.");
+            }
+        } else {
+            console.error(`No document found for student ID: ${studentId}`);
         }
     } catch (error) {
-
+        console.error('Error fetching motorcycle performance data:', error);
     }
 }
 
@@ -854,26 +890,64 @@ function populateMotorsModal(assessmentData, processedData) {
                 if (scoreElement) {
                     scoreElement.textContent = item.score;  // Set the numeric score
                 }
+
+                // Populate comment
+                const commentElement = document.getElementById(`${fieldId}-comment`);
+                if (commentElement) {
+                    commentElement.textContent = item.comment || "No comment provided."; // Fallback for no comment
+                }
             }
         });
     });
 
-    // Populate performance data (e.g., "Excellent", "Great", "Poor") and set the color
-    Object.keys(categoryMapping).forEach(category => {
-        const performanceResult = processedData[category] || 'N/A'; // Fallback to 'N/A' if no data
-        const resultElement = document.getElementById(categoryMapping[category]);
+     // Populate performance results and comments for categories
+     Object.keys(categoryMapping).forEach(category => {
+        const performanceResult = processedData[category] || 'N/A'; // Fallback for performance
+        const categoryComment = processedData[`${category}-comment`] || "No comment provided."; // Fallback for category comment
 
+        // Update performance result
+        const resultElement = document.getElementById(categoryMapping[category]);
         if (resultElement) {
-            resultElement.textContent = performanceResult; // Set the performance result
+            resultElement.textContent = performanceResult; // Set performance result
             if (performanceResult === 'Poor') {
-                resultElement.style.color = '#B60505'; // Set color to red for 'Poor'
+                resultElement.style.color = '#B60505'; // Red for 'Poor'
             } else if (performanceResult === 'Great') {
-                resultElement.style.color = '#142A74'; // Set color to green for 'Great'
+                resultElement.style.color = '#142A74'; // Blue for 'Great'
             } else if (performanceResult === 'Excellent') {
-                resultElement.style.color = 'green'; // Set color to green for 'Excellent'
+                resultElement.style.color = 'green'; // Green for 'Excellent'
             } else {
-                resultElement.style.color = ''; // Default color for 'N/A' or unknown
+                resultElement.style.color = ''; // Default color
             }
+        }
+
+        // Update category comment
+        const commentElement = document.getElementById(`${categoryMapping[category]}-comment`);
+        if (commentElement) {
+            commentElement.textContent = categoryComment; // Set category comment
+        }
+    });
+}
+
+function updateMotorLessonCheckboxes(Mchecklist) {
+    console.log('Updating motorcycle checkboxes with data:', Mchecklist);
+
+    // Get the container for the checkboxes
+    const motorCommentsContainer = document.getElementById('motorCommentsContainer');
+    if (!motorCommentsContainer) {
+        console.error('Motor comments container not found!');
+        return;
+    }
+
+    // Iterate through Mchecklist to update checkboxes
+    Object.keys(Mchecklist).forEach(checklistKey => {
+        // Find the checkbox within the container
+        const checkbox = motorCommentsContainer.querySelector(`#${checklistKey}`);
+        if (checkbox) {
+            checkbox.checked = Mchecklist[checklistKey]; // Set the checked state
+            checkbox.disabled = true; // Disable the checkbox
+            console.log(`Updated checkbox ${checklistKey}: checked = ${Mchecklist[checklistKey]}`);
+        } else {
+            console.warn(`Checkbox with ID ${checklistKey} not found in the motor comments container.`);
         }
     });
 }
@@ -1054,8 +1128,7 @@ function toggleSections(evaluationId, commentsId, nextBtnId, backBtnId, showComm
     document.getElementById(backBtnId).classList.toggle('hidden', !showComments);
 }
 
-// Event listeners for WheelsModal
-document.getElementById('nextButton').addEventListener('click', function () {
+document.getElementById('nextButton').addEventListener('click', async function () {
     toggleSections('evaluationContainer', 'commentsContainer', 'nextButton', 'backButton', true);
 });
 
