@@ -747,7 +747,10 @@ function populateWheelsModal(assessmentData, WprocessedData) {
         'General': 'generalResult'
     };
 
-    // Populate scores in the modal fields
+    let totalScore = 0; // Initialize total score
+    let maxScore = 0; // Initialize maximum possible score
+
+    // Populate scores and calculate total
     assessmentData.categories.forEach(category => {
         category.items.forEach(item => {
             const fieldId = sentenceToFieldIdMap[item.sentence];
@@ -762,6 +765,10 @@ function populateWheelsModal(assessmentData, WprocessedData) {
                 if (commentElement) {
                     commentElement.textContent = item.comment || "No comment provided."; // Fallback if no comment
                 }
+
+                // Calculate total and max scores
+                totalScore += item.score;
+                maxScore += 5; // Assuming each item has a max score of 5
             }
         });
     });
@@ -778,7 +785,7 @@ function populateWheelsModal(assessmentData, WprocessedData) {
             if (performanceResult === 'Poor') {
                 resultElement.style.color = '#B60505'; // Set color to red for 'Poor'
             } else if (performanceResult === 'Great') {
-                resultElement.style.color = '#142A74'; // Set color to green for 'Great'
+                resultElement.style.color = '#142A74'; // Set color to blue for 'Great'
             } else if (performanceResult === 'Excellent') {
                 resultElement.style.color = 'green'; // Set color to green for 'Excellent'
             } else {
@@ -786,6 +793,25 @@ function populateWheelsModal(assessmentData, WprocessedData) {
             }
         }
     });
+
+    // Calculate percentage and determine Pass/Fail
+    const totalScorePercentage = ((totalScore / maxScore) * 100).toFixed(2); // Calculate percentage
+    const passThreshold = 84; // Define pass threshold (percentage or points)
+    const passFailComment = totalScorePercentage >= passThreshold ? "Passed" : "Failed";
+
+    // Update Total Score Percentage
+    const totalScorePercentageElement = document.querySelector('tfoot tr:nth-child(2) td:nth-child(2) span');
+    if (totalScorePercentageElement) {
+        totalScorePercentageElement.textContent = `${totalScorePercentage}%`; // Update percentage
+    }
+
+    // Update Comments Column with "Passed" or "Failed"
+    const commentsColumn = document.querySelector('tfoot tr:nth-child(2) td:nth-child(3)');
+    if (commentsColumn) {
+        commentsColumn.style.fontWeight = "Normal";
+        commentsColumn.style.color = totalScorePercentage >= passThreshold ? "green" : "#B60505";
+        commentsColumn.textContent = passFailComment; // Update the comments column
+    }
 }
 
 function updateLessonCheckboxes(Wchecklist) {
@@ -869,7 +895,7 @@ function populateMotorsModal(assessmentData, processedData) {
         'Approaching and passing railway crossings': 'approaching',
         'Approaching, riding in and leaving roundabouts': 'leavingRoundabouts',
         'Choice of speed in different situations (low speed balancing)': 'lowSpeedBalancing',
-        'Hill riding':'hillRiding',
+        'Hill riding': 'hillRiding',
         'Interaction with various road users': 'variousRoadUsers',
         'Lane shift and choice of lanes': 'laneShift',
         'Overtaking': 'overTaking',
@@ -878,8 +904,11 @@ function populateMotorsModal(assessmentData, processedData) {
         'Riding with a back ride': 'backRiding',
         'Start the engine': 'startTheEngine',
         'Stopping and parking': 'stoppingAndParking',
-        'Turning and lane changing': 'turningLane',
+        'Turning and lane changing': 'turningLane'
     };
+
+    let totalScore = 0; // Initialize total score
+    let maxScore = 0; // Initialize maximum possible score
 
     // Populate numeric scores
     assessmentData.categories.forEach(category => {
@@ -896,12 +925,16 @@ function populateMotorsModal(assessmentData, processedData) {
                 if (commentElement) {
                     commentElement.textContent = item.comment || "No comment provided."; // Fallback for no comment
                 }
+
+                // Calculate total score and max score
+                totalScore += item.score;
+                maxScore += 5; // Assuming each item has a max score of 5
             }
         });
     });
 
-     // Populate performance results and comments for categories
-     Object.keys(categoryMapping).forEach(category => {
+    // Populate performance results and comments for categories
+    Object.keys(categoryMapping).forEach(category => {
         const performanceResult = processedData[category] || 'N/A'; // Fallback for performance
         const categoryComment = processedData[`${category}-comment`] || "No comment provided."; // Fallback for category comment
 
@@ -926,6 +959,25 @@ function populateMotorsModal(assessmentData, processedData) {
             commentElement.textContent = categoryComment; // Set category comment
         }
     });
+
+    // Calculate percentage and determine Pass/Fail
+    const totalScorePercentage = ((totalScore / maxScore) * 100).toFixed(2); // Calculate percentage
+    const passThreshold = 84; // Define pass threshold (percentage or points)
+    const passFailComment = totalScorePercentage >= passThreshold ? "Passed" : "Failed";
+
+    // Update Total Score Percentage
+    const totalScorePercentageElement = document.querySelector('#MotorsModal tfoot tr:nth-child(2) td:nth-child(2) span');
+    if (totalScorePercentageElement) {
+        totalScorePercentageElement.textContent = `${totalScorePercentage}%`; // Update percentage
+    }
+
+    // Update Comments Column with "Passed" or "Failed"
+    const commentsColumn = document.querySelector('#MotorsModal tfoot tr:nth-child(2) td:nth-child(3)');
+    if (commentsColumn) {
+        commentsColumn.style.fontWeight = "Normal";
+        commentsColumn.style.color = totalScorePercentage >= passThreshold ? "green" : "#B60505";
+        commentsColumn.textContent = passFailComment; // Update the comments column
+    }
 }
 
 function updateMotorLessonCheckboxes(Mchecklist) {

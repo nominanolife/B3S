@@ -116,7 +116,7 @@ async function fetchInstructors() {
       instructorsList.insertAdjacentHTML(
         'beforeend',
         `<tr>
-          <td>${instructorDetails.name}</td>
+          <td><img src="${'Assets/default-profile.png'}">${instructorDetails.name}</td>
           <td>${instructorDetails.email}</td>
           <td>${instructorDetails.courses}</td>
           <td class="table-row-content">
