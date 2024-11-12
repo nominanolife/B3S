@@ -51,8 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchAppointments() {
   try {
     const studentsMap = new Map();
-    const today = new Date(); // Current date for comparison
-    const oneMonthInMillis = 30 * 24 * 60 * 60 * 1000; // One month in milliseconds
 
     // Unsubscribe from the previous snapshot if it exists
     if (unsubscribeApplicants) {
@@ -67,52 +65,17 @@ async function fetchAppointments() {
         const applicantData = applicantDoc.data();
         applicantData.id = applicantDoc.id; // Ensure this is set consistently
 
-        // **Only Process Students**
+        // Only process if the role is "student"
         if (applicantData.role === "student") {
           applicantData.bookings = [];
           applicantData.has4WheelsCourse = false; // Initialize flag for 4-Wheels
           applicantData.hasMotorsCourse = false; // Initialize flag for Motors
 
-          // Fetch completed bookings for the student
-          const studentCompletedBookingsSnapshot = await getDoc(doc(db, "completedBookings", applicantDoc.id));
-          let latestCompletedDate = null;
-
-          if (studentCompletedBookingsSnapshot.exists()) {
-            const completedBookings = studentCompletedBookingsSnapshot.data().completedBookings || [];
-            completedBookings.forEach((booking) => {
-              const bookingDate = new Date(booking.date);
-              if (!latestCompletedDate || bookingDate > latestCompletedDate) {
-                latestCompletedDate = bookingDate; // Update to the most recent completion date
-              }
-            });
+          if (applicantData.TDCStatus === "Completed" ||
+              applicantData["PDC-4WheelsStatus"] === "Completed" ||
+              applicantData["PDC-MotorsStatus"] === "Completed") {
+            studentsMap.set(applicantDoc.id, applicantData);
           }
-
-          // Validation: Archive student if no activity for over 30 days
-          if (latestCompletedDate) {
-            const timeSinceLastCompletion = today - latestCompletedDate;
-
-            if (timeSinceLastCompletion > oneMonthInMillis) {
-              // Archive student after 30 days of inactivity
-              await updateDoc(doc(db, "applicants", applicantDoc.id), { archived: true });
-              continue; // Skip archived students
-            } else {
-              // Ensure active students are not archived
-              await updateDoc(doc(db, "applicants", applicantDoc.id), { archived: false });
-            }
-          } else {
-            // Fallback: Archive based on `dateJoined` if no completed bookings exist
-            const dateJoined = new Date(applicantData.dateJoined || 0); // Default to epoch if missing
-            const timeSinceJoined = today - dateJoined;
-
-            if (timeSinceJoined > oneMonthInMillis && (!applicantData.bookings || applicantData.bookings.length === 0)) {
-              await updateDoc(doc(db, "applicants", applicantDoc.id), { archived: true });
-              continue; // Skip archived students
-            } else {
-              await updateDoc(doc(db, "applicants", applicantDoc.id), { archived: false });
-            }
-          }
-
-          studentsMap.set(applicantDoc.id, applicantData);
         }
       }
 
@@ -135,31 +98,20 @@ async function fetchAppointments() {
             if (studentData.role === "student") {
               if (!studentsMap.has(booking.userId)) {
                 studentData.bookings = [];
-                studentData.has4WheelsCourse = false;
-                studentData.hasMotorsCourse = false;
+                studentData.has4WheelsCourse = false; // Initialize flag for 4-Wheels
+                studentData.hasMotorsCourse = false; // Initialize flag for Motors
                 studentsMap.set(booking.userId, studentData);
               }
 
               const student = studentsMap.get(booking.userId);
-
-              // Update dateJoined to the earliest booking date
-              const bookingDate = new Date(appointmentData.date);
-              const currentJoinedDate = new Date(student.dateJoined || bookingDate); // Use current or default to booking date
-              if (bookingDate < currentJoinedDate) {
-                await updateDoc(studentDocRef, { dateJoined: bookingDate.toISOString() });
-                student.dateJoined = bookingDate.toISOString();
-              }
-
-              if (!student.bookings.some(b => b.appointmentId === appointment.id && b.course === appointmentData.course)) {
-                student.bookings.push({
-                  ...booking,
-                  appointmentId: appointment.id,
-                  course: appointmentData.course,
-                  date: appointmentData.date,
-                  timeStart: appointmentData.timeStart,
-                  timeEnd: appointmentData.timeEnd,
-                });
-              }
+              student.bookings.push({
+                ...booking,
+                appointmentId: appointment.id,
+                course: appointmentData.course,
+                date: appointmentData.date,
+                timeStart: appointmentData.timeStart,
+                timeEnd: appointmentData.timeEnd,
+              });
 
               // Check course type and set flags
               if (appointmentData.course === "PDC-4Wheels") {
@@ -173,9 +125,9 @@ async function fetchAppointments() {
         }
       }
 
-      // Process completedBookings for overall logic
-      const globalCompletedBookingsSnapshot = await getDocs(collection(db, "completedBookings"));
-      for (const doc of globalCompletedBookingsSnapshot.docs) {
+      // Process completedBookings
+      const completedBookingsSnapshot = await getDocs(collection(db, "completedBookings"));
+      for (const doc of completedBookingsSnapshot.docs) {
         const completedBookings = doc.data().completedBookings || [];
         const userId = doc.id;
 
@@ -191,7 +143,7 @@ async function fetchAppointments() {
         }
       }
 
-      // Fetch instructor information from matches collection
+      // Now, fetch instructor information from matches collection
       const matchesSnapshot = await getDocs(collection(db, "matches"));
       const instructorMap = new Map();
 
@@ -214,10 +166,11 @@ async function fetchAppointments() {
         }
       }
 
-      // Filter out archived students
-      studentsData = Array.from(studentsMap.values()).filter(student => !student.archived);
+      // Update the global arrays
+      studentsData = Array.from(studentsMap.values());
       filteredStudentsData = studentsData;
       totalPages = Math.ceil(filteredStudentsData.length / itemsPerPage);
+
 
       renderStudents();
       updatePaginationControls();
@@ -226,11 +179,10 @@ async function fetchAppointments() {
       const loader = document.getElementById('loader1');
       loader.style.display = 'none';
     });
+
   } catch (error) {
-    console.error("Error fetching appointments:", error);
   }
 }
-
 
 document.getElementById('saveChangesBtn').onclick = async (event) => {
   event.preventDefault(); // Prevent page refresh
@@ -316,7 +268,7 @@ document.getElementById('saveBtn').addEventListener('click', async function() {
 
 function renderStudents() {
   const studentList = document.getElementById('student-list');
-  studentList.innerHTML = '';  // Clear the list before rendering new data
+  studentList.innerHTML = ''; // Clear the list before rendering new data
 
   // If there's no data to render, show "No student/s yet"
   if (studentsData.length === 0) {
@@ -330,7 +282,7 @@ function renderStudents() {
 
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
-  const paginatedStudents = filteredStudentsData.slice(start, end);  // Paginated data
+  const paginatedStudents = filteredStudentsData.slice(start, end); // Paginated data
 
   if (paginatedStudents.length === 0) {
     studentList.innerHTML = `
@@ -341,14 +293,15 @@ function renderStudents() {
     return;
   }
 
+  const today = new Date();
+  const oneMonthInMillis = 30 * 24 * 60 * 60 * 1000; // One month in milliseconds
+
   paginatedStudents.forEach((student, index) => {
-    const personalInfo = student.personalInfo || {};  // Fallback if personalInfo is missing
-    const certificateControlNumber = student.certificateControlNumber || '';  // Default to empty string if undefined
+    const personalInfo = student.personalInfo || {}; // Fallback if personalInfo is missing
+    const certificateControlNumber = student.certificateControlNumber || ''; // Default to empty string if undefined
 
     // Create an array of rows for the student
     let rows = [];
-
-    // Initialize an empty row to start filling appointments
     let currentRow = { TDC: null, 'PDC-4Wheels': null, 'PDC-Motors': null };
 
     // Process each booking
@@ -358,7 +311,7 @@ function renderStudents() {
       // If the course already exists in the current row, push the current row and start a new one
       if (currentRow[course]) {
         rows.push(currentRow);
-        currentRow = { TDC: null, 'PDC-4Wheels': null, 'PDC-Motors': null };  // New row
+        currentRow = { TDC: null, 'PDC-4Wheels': null, 'PDC-Motors': null }; // New row
       }
 
       // Fill the appropriate course in the current row
@@ -370,59 +323,70 @@ function renderStudents() {
       rows.push(currentRow);
     }
 
-  // Get the earliest booking date
-  const earliestDate = student.bookings?.reduce((minDate, booking) => {
-    const bookingDate = new Date(booking.date);
-    return bookingDate < minDate ? bookingDate : minDate;
-  }, new Date())?.toLocaleDateString('en-US') || "N/A";
+    // Get the latest booking date (to determine active status)
+    const latestBookingDate = student.bookings?.reduce((maxDate, booking) => {
+      const bookingDate = new Date(booking.date);
+      return bookingDate > maxDate ? bookingDate : maxDate;
+    }, new Date(0)); // Default to epoch if no bookings
 
-    // Render each row
-    rows.forEach((row) => {
-      let studentHtml = `
-        <tr class="table-row">
-            <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td> <!-- Handle missing names -->
-            <td class="table-row-content">${student.email}</td>
-            <td class="table-row-content">${student.phoneNumber || ''}</td>
-            <td class="table-row-content">${student.packageName || ''}</td> <!-- Handle missing package name -->
-            <td class="table-row-content">&#8369; ${student.packagePrice || ''}</td> <!-- Handle missing price -->
-            ${renderCourseStatus('TDC', row.TDC)} <!-- Render TDC status -->
-            ${renderCourseStatus('PDC-4Wheels', row['PDC-4Wheels'])} <!-- Render 4-Wheels status -->
-            ${renderCourseStatus('PDC-Motors', row['PDC-Motors'])} <!-- Render Motors status -->
-            <td class="table-row-content">${earliestDate}</td>
-            <td class="table-row-content">${certificateControlNumber}</td> <!-- Render Certificate Control Number -->
-            <td class="table-row-content">
-                <!-- Triple dot options -->
-                <i class="bi bi-three-dots" data-toggle="options" data-index="${index}"></i>
-                <div class="triple-dot-options" style="display: none;">
-                    <i class="option-dropdown" data-modal="editCcnModal" data-index="${index}">Certificate Control Number</i>
-                    <i class="option-dropdown" data-modal="edit4WheelsModal" data-index="${index}">4-Wheels Course Checklist</i>
-                    <i class="option-dropdown" data-modal="editMotorsModal" data-index="${index}">Motorcycle Course Checklist</i>
-                </div>
-            </td>
-        </tr>
-      `;
+    // Determine if the student is inactive or active
+    const timeSinceLastBooking = today - latestBookingDate;
 
-      studentList.insertAdjacentHTML('beforeend', studentHtml);  // Append the generated HTML to the list
-    });
+    if (timeSinceLastBooking > oneMonthInMillis) {
+      student.archived = true; // Mark as archived if inactive for over 30 days
+    } else {
+      student.archived = false; // Mark as active if they have recent activity
+    }
+
+    // Render each row if the student is not archived
+    if (!student.archived) {
+      rows.forEach((row) => {
+        let studentHtml = `
+          <tr class="table-row">
+              <td class="table-row-content">${personalInfo.first || ''} ${personalInfo.last || ''}</td> <!-- Handle missing names -->
+              <td class="table-row-content">${student.email}</td>
+              <td class="table-row-content">${student.phoneNumber || ''}</td>
+              <td class="table-row-content">${student.packageName || ''}</td> <!-- Handle missing package name -->
+              <td class="table-row-content">&#8369; ${student.packagePrice || ''}</td> <!-- Handle missing price -->
+              ${renderCourseStatus('TDC', row.TDC)} <!-- Render TDC status -->
+              ${renderCourseStatus('PDC-4Wheels', row['PDC-4Wheels'])} <!-- Render 4-Wheels status -->
+              ${renderCourseStatus('PDC-Motors', row['PDC-Motors'])} <!-- Render Motors status -->
+              <td class="table-row-content">${latestBookingDate.toLocaleDateString('en-US')}</td>
+              <td class="table-row-content">${certificateControlNumber}</td> <!-- Render Certificate Control Number -->
+              <td class="table-row-content">
+                  <!-- Triple dot options -->
+                  <i class="bi bi-three-dots" data-toggle="options" data-index="${index}"></i>
+                  <div class="triple-dot-options" style="display: none;">
+                      <i class="option-dropdown" data-modal="editCcnModal" data-index="${index}">Certificate Control Number</i>
+                      <i class="option-dropdown" data-modal="edit4WheelsModal" data-index="${index}">4-Wheels Course Checklist</i>
+                      <i class="option-dropdown" data-modal="editMotorsModal" data-index="${index}">Motorcycle Course Checklist</i>
+                  </div>
+              </td>
+          </tr>
+        `;
+
+        studentList.insertAdjacentHTML('beforeend', studentHtml); // Append the generated HTML to the list
+      });
+    }
   });
 
-  setupStatusToggleListeners();  // Call this after rendering the student list
+  setupStatusToggleListeners(); // Call this after rendering the student list
 }
 
 function renderCourseStatus(course, booking) {
+  // Return an empty column if there's no booking for this course
   if (!booking || booking.course !== course) {
     return '<td class="table-row-content"></td>';
   }
 
+  // Render the status of the course booking
   return `
     <td class="table-row-content">
       <label class="status-label">
-        <input type="checkbox" class="status-toggle" 
-               ${booking.status === "Completed" ? 'checked' : ''} 
+        <input type="checkbox" class="status-toggle" ${booking.status === "Completed" ? 'checked' : ''} 
                data-booking-id="${booking.appointmentId}" 
                data-user-id="${booking.userId}" 
-               data-column="${course}" 
-               data-unique-id="${booking.appointmentId}-${course}">
+               data-column="${course}">
       </label>
     </td>
   `;
@@ -441,20 +405,18 @@ async function handleStatusToggle(event) {
 
   if (isUpdatingFirestore) return; // Skip if Firestore is being updated
 
-  const uniqueId = event.target.dataset.uniqueId; // Fetch the unique identifier
   const appointmentId = event.target.dataset.bookingId;
   const userId = event.target.dataset.userId;
   const course = event.target.dataset.column;
   const isCompleted = event.target.checked;
 
-  // Find the exact booking using the unique identifier
+
+  // Update local state immediately
   const student = studentsData.find(student => student.id === userId);
   if (student) {
-    const booking = student.bookings.find(
-      b => `${b.appointmentId}-${b.course}` === uniqueId
-    );
+    const booking = student.bookings.find(b => b.appointmentId === appointmentId);
     if (booking) {
-      booking.status = isCompleted ? "Completed" : "Booked";
+      booking.status = isCompleted ? "Completed" : "Booked"; // Update booking status locally
     }
   }
 
@@ -476,18 +438,19 @@ async function handleStatusToggle(event) {
 
     // Show the loader after confirmation
     const loader = document.getElementById('loader1');
-    loader.style.display = 'flex'; // Show loader after confirmation
+    loader.style.display = 'flex';  // Show loader after confirmation
 
     isUpdatingFirestore = true; // Set flag to avoid repopulation
 
     try {
-      // Perform Firestore update for appointment status
+      // Perform Firestore update
       await toggleCompletionStatus(userId, course, isCompleted, appointmentId);
 
       // Reload the page after a successful update to simulate a "refresher"
       window.location.reload();
 
     } catch (error) {
+
       // If update fails, revert the checkbox state
       event.target.checked = !isCompleted;
 
