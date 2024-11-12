@@ -1063,7 +1063,7 @@ h2 {
 .evaluation-table tfoot td span {
     padding: 8px;
     text-align: center;
-    font-weight: bold;
+    font-weight: 500;
     color: #FFA500;
 }
 
@@ -1134,7 +1134,7 @@ tbody tr .main-text {
     }
 }
 
-.input-container {
+.input-container, .input-container2 {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -1189,7 +1189,7 @@ tbody tr .main-text {
 
 #observationResult, #spaceManagementResult, #speedControlResult, #steeringResult, #communicationResult, #generalResult, #startTheEngine, #variousRoadUsers, #kindofJunctions {
     text-align: center;
-}
+} 
 
 .instructor-comments-table {
     width: 100%;
