@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
+    <link rel="stylesheet" href="CSS/adminforgotpass.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap">
+    <link rel="icon" href="Assets/logo.png" type="image/x-icon">
+</head>
+<body>
+    <main class="d-flex align-items-center">
+        <div class="container d-flex justify-content-center">
+            <div class="card login-card">
+                <div class="card-body">
+                    <form id="forgotPasswordForm" class="login-form" novalidate>
+                        <div class="back-icon">
+                            <a href="login.html"><i class="fas fa-arrow-left"></i></a>
+                        </div>
+                        <div class="text-center mb-4">
+                            <img src="Assets/forgot.png" alt="Forgot Password" class="img-fluid" style="height: 110px;">
+                        </div>
+                        <h3 class="text-center mb-4">Forgot Password</h3>
+                        <p class="text-center mb-4">Enter your registered email address for sending of OTP.</p>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="Email" required>
+                            <div id="emailError" class="text-danger mt-2"></div>
+                        </div>                  
+                        <div class="d-flex justify-content-center">
+                            <button type="button" class="btn btn-outline-primary login-btn" id="sendCodeButton">SEND OTP</button>
+                        </div>
+                        <div id="message" class="text-center mt-3">
+                            <p class="text-center mt-3">
+                                Didn't receive a code? <a href="#" id="resendCode" class="text-dark" style="pointer-events: none; color: gray;">Resend Code</a>
+                            </p>
+                            <p id="resendCountdown" class="text-center mt-3" style="display: none;"></p> <!-- Countdown element -->
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notification Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
+                </div>
+                <div class="modal-body" id="modalMessage">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="JS/adminforgotpass.js"></script>
+</body>
+</html>

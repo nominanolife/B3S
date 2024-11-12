@@ -31,6 +31,54 @@ const deleteConfirmationModalElement = document.getElementById('deleteConfirmati
 const feedbackOverviewModal = new bootstrap.Modal(feedbackOverviewModalElement);
 const deleteConfirmationModal = new bootstrap.Modal(deleteConfirmationModalElement);
 
+// Attach search functionality to the search bar
+document.getElementById('searchBar').addEventListener('input', searchInstructors);
+
+// Search Instructors
+function searchInstructors() {
+  const searchInput = document.getElementById('searchBar').value.toLowerCase().trim();
+  const rows = document.querySelectorAll('.instructor-list tr:not(.no-results-row)');
+  let hasResults = false;
+
+  rows.forEach(row => {
+    const nameCell = row.querySelector('td:first-child'); // The first cell contains the name
+    if (nameCell) {
+      const name = nameCell.textContent.toLowerCase();
+      if (name.includes(searchInput)) {
+        row.style.display = ''; // Show matching row
+        hasResults = true;
+      } else {
+        row.style.display = 'none'; // Hide non-matching row
+      }
+    }
+  });
+
+  // Check if we need to display the "No instructor/s found" row
+  let noResultsRow = document.querySelector('.no-results-row');
+  if (!hasResults && searchInput) {
+    // If no rows match and the input is not empty, show the "No instructor/s found" row
+    if (!noResultsRow) {
+      const noResultsHTML = `
+        <tr class="no-results-row">
+          <td colspan="4" class="text-center">No instructor/s found</td>
+        </tr>`;
+      document.querySelector('.instructor-list').insertAdjacentHTML('beforeend', noResultsHTML);
+    }
+  } else {
+    // Remove the "No instructor/s found" row if present
+    if (noResultsRow) {
+      noResultsRow.remove();
+    }
+  }
+
+  // Show all rows when the search bar is cleared
+  if (!searchInput) {
+    rows.forEach(row => {
+      row.style.display = '';
+    });
+  }
+}
+
 // Fetch instructors with dropdown functionality for edit, feedback, and delete
 async function fetchInstructors() {
   try {
@@ -39,43 +87,60 @@ async function fetchInstructors() {
 
     const adminSnapshot = await getDocs(collection(db, 'admin'));
 
-    if (!adminSnapshot.empty) {
-      for (const adminDoc of adminSnapshot.docs) {
-        const adminData = adminDoc.data();
-        if (adminData.role !== 'instructor') continue;
+    if (adminSnapshot.empty) {
+      // Show "No instructor/s yet" if there are no documents
+      instructorsList.innerHTML = `
+        <tr>
+          <td colspan="4" class="text-center">No instructor/s yet</td>
+        </tr>`;
+      return; // Exit early since there are no instructors
+    }
 
-        const instructorDoc = await getDoc(doc(db, 'instructors', adminDoc.id));
-        const instructorData = instructorDoc.exists() ? instructorDoc.data() : {};
+    let hasInstructors = false;
 
-        const instructorDetails = {
-          email: adminData.email || 'N/A',
-          name: instructorData.name || 'N/A',
-          courses: instructorData.courses ? instructorData.courses.join(' || ') : 'N/A',
-        };
+    for (const adminDoc of adminSnapshot.docs) {
+      const adminData = adminDoc.data();
+      if (adminData.role !== 'instructor') continue;
 
-        instructorsList.insertAdjacentHTML(
-          'beforeend',
-          `<tr>
-            <td>${instructorDetails.name}</td>
-            <td>${instructorDetails.email}</td>
-            <td>${instructorDetails.courses}</td>
-            <td class="table-row-content">
-              <div class="dropdown">
-                <i class="bi bi-three-dots"></i>
-                <div class="dropdown-content">
-                  <i class="dropdown-item feedback-btn">Feedbacks</i>
-                  <i class="dropdown-item delete-btn" data-id="${adminDoc.id}">Delete</i>
-                </div>
+      hasInstructors = true; // Set flag if at least one instructor exists
+
+      const instructorDoc = await getDoc(doc(db, 'instructors', adminDoc.id));
+      const instructorData = instructorDoc.exists() ? instructorDoc.data() : {};
+
+      const instructorDetails = {
+        email: adminData.email || 'N/A',
+        name: instructorData.name || 'N/A',
+        courses: instructorData.courses ? instructorData.courses.join(' || ') : 'N/A',
+      };
+
+      instructorsList.insertAdjacentHTML(
+        'beforeend',
+        `<tr>
+          <td>${instructorDetails.name}</td>
+          <td>${instructorDetails.email}</td>
+          <td>${instructorDetails.courses}</td>
+          <td class="table-row-content">
+            <div class="dropdown">
+              <i class="bi bi-three-dots"></i>
+              <div class="dropdown-content">
+                <i class="dropdown-item feedback-btn">Feedbacks</i>
+                <i class="dropdown-item delete-btn" data-id="${adminDoc.id}">Delete</i>
               </div>
-            </td>
-          </tr>`
-        );
-      }
+            </div>
+          </td>
+        </tr>`
+      );
+    }
 
-      // Attach functionality to dropdown actions
-      handleDropdowns();
+    if (!hasInstructors) {
+      // If no instructors found after filtering, display the message
+      instructorsList.innerHTML = `
+        <tr>
+          <td colspan="4" class="text-center">No instructor/s yet</td>
+        </tr>`;
     } else {
-      instructorsList.innerHTML = `<tr><td colspan="4" class="text-center">No instructors found.</td></tr>`;
+      // Attach functionality to dropdown actions if instructors are present
+      handleDropdowns();
     }
   } catch (error) {
     console.error('Error fetching instructors:', error);
@@ -144,7 +209,6 @@ async function handleFeedbackButtonClick(instructorId) {
   }
 }
 
-
 function handleDropdowns() {
   document.querySelectorAll('.dropdown').forEach(dropdown => {
     const button = dropdown.querySelector('.bi-three-dots');
@@ -195,13 +259,12 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', async (eve
   deleteConfirmationModal.hide();
 });
 
-
 async function saveInstructor() {
   const emailInput = document.querySelector('.email');
   const passwordInput = document.querySelector('.password-field');
 
   if (!emailInput.value.trim() || !passwordInput.value.trim()) {
-    alert('Please fill out both email and password fields.');
+    showNotification('Please fill out both email and password fields.');
     return;
   }
 
@@ -288,8 +351,6 @@ async function deleteInstructor(id) {
     loader.style.display = 'none'; // Hide loader
   }
 }
-
-
 
 // Toggle Password Visibility
 document.querySelectorAll('.togglePassword').forEach(button => {
