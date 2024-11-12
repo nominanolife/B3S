@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getFirestore, collection, setDoc, getDocs, doc, deleteDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
-import { getAuth, createUserWithEmailAndPassword, updatePassword} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import { getFirestore, collection, setDoc, getDocs, doc, deleteDoc, getDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { getAuth, createUserWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
@@ -256,7 +256,7 @@ async function deleteInstructor(id) {
     // Step 3.1: Remove matches associated with the instructor using a query
     const matchesQuery = collection(db, 'matches');
     const matchesSnapshot = await getDocs(matchesQuery);
-    const batch = db.batch();
+    const batch = writeBatch(db); // Correct batching initialization
 
     matchesSnapshot.forEach((matchDoc) => {
       const matchData = matchDoc.data();
