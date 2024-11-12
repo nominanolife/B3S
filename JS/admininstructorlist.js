@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
 import { getFirestore, collection, setDoc, getDocs, doc, deleteDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, updatePassword} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBflGD3TVFhlOeUBUPaX3uJTuB-KEgd0ow",
@@ -24,12 +24,10 @@ const instructorModal = new bootstrap.Modal(instructorModalElement);
 const loader = document.getElementById('loader1');
 const instructorsList = document.querySelector('.instructor-list'); // Target tbody for instructors
 
-// DOM Elements for Modals
-const editInstructorModalElement = document.getElementById('editInstructorModal');
+// DOM Elements for Modal
 const feedbackOverviewModalElement = document.getElementById('feedbackOverviewModal');
 const deleteConfirmationModalElement = document.getElementById('deleteConfirmationModal');
 
-const editInstructorModal = new bootstrap.Modal(editInstructorModalElement);
 const feedbackOverviewModal = new bootstrap.Modal(feedbackOverviewModalElement);
 const deleteConfirmationModal = new bootstrap.Modal(deleteConfirmationModalElement);
 
@@ -66,7 +64,6 @@ async function fetchInstructors() {
                 <i class="bi bi-three-dots"></i>
                 <div class="dropdown-content">
                   <i class="dropdown-item feedback-btn">Feedbacks</i>
-                  <i class="dropdown-item edit-btn" data-id="${adminDoc.id}">Edit</i>
                   <i class="dropdown-item delete-btn" data-id="${adminDoc.id}">Delete</i>
                 </div>
               </div>
@@ -87,6 +84,67 @@ async function fetchInstructors() {
   }
 }
 
+// Fetch Feedbacks from the 'comments' Array in the Instructors Table
+async function getFeedbacks(instructorId) {
+  try {
+    // Access the instructor document
+    const instructorDocRef = doc(db, 'instructors', instructorId);
+    const instructorDoc = await getDoc(instructorDocRef);
+
+    if (!instructorDoc.exists()) {
+      throw new Error('Instructor not found.');
+    }
+
+    // Extract comments array
+    const instructorData = instructorDoc.data();
+    const feedbacks = instructorData.comments || []; // Default to an empty array if no comments
+
+    // Map feedbacks to the desired structure
+    return feedbacks.map(feedback => ({
+      comment: feedback.comment || 'No comment provided.',
+      rating: feedback.rating || '0',
+      timestamp: feedback.timestamp || new Date().toISOString(),
+    }));
+  } catch (error) {
+    console.error('Error fetching feedbacks:', error);
+    return [];
+  }
+}
+
+// Event Listener for Feedback Button
+async function handleFeedbackButtonClick(instructorId) {
+  try {
+    // Fetch feedbacks for the given instructor
+    const feedbacks = await getFeedbacks(instructorId);
+
+    // Clear existing feedback in the modal
+    const feedbackListElement = document.getElementById('feedbackList');
+    feedbackListElement.innerHTML = '';
+
+    if (feedbacks.length === 0) {
+      feedbackListElement.innerHTML = '<p>No feedbacks available for this instructor.</p>';
+    } else {
+      feedbacks.forEach(feedback => {
+        const feedbackItem = `
+          <div class="feedback-item">
+            <p><strong>${'⭐'.repeat(parseInt(feedback.rating))}</strong> (${feedback.rating} Stars)</p>
+            <p>${feedback.comment}</p>
+            <p class="text-muted">${new Date(feedback.timestamp).toLocaleDateString()}</p>
+          </div>
+          <hr>`;
+        feedbackListElement.insertAdjacentHTML('beforeend', feedbackItem);
+      });
+    }
+
+    // Show the feedback modal
+    feedbackOverviewModal.show();
+  } catch (error) {
+    console.error('Error handling feedback button click:', error);
+    showNotification('An error occurred while loading feedback.');
+  }
+}
+
+
 function handleDropdowns() {
   document.querySelectorAll('.dropdown').forEach(dropdown => {
     const button = dropdown.querySelector('.bi-three-dots');
@@ -102,17 +160,9 @@ function handleDropdowns() {
         content.classList.remove('show');
       }
     });
-
-    // Event Listener for Edit Button
-    dropdown.querySelector('.edit-btn').addEventListener('click', () => {
-      editInstructorModal.show();
-      content.classList.remove('show'); // Close dropdown after selection
-      // Load instructor data in edit modal if needed
-    });
-
-    // Event Listener for Feedback Button
-    dropdown.querySelector('.feedback-btn').addEventListener('click', () => {
-      feedbackOverviewModal.show();
+    dropdown.querySelector('.feedback-btn').addEventListener('click', async (event) => {
+      const instructorId = event.target.closest('.dropdown').querySelector('.delete-btn').getAttribute('data-id');
+      await handleFeedbackButtonClick(instructorId);
       content.classList.remove('show'); // Close dropdown after selection
     });
 
@@ -189,17 +239,48 @@ async function saveInstructor() {
   }
 }
 
-// Delete Instructor
 async function deleteInstructor(id) {
   try {
     loader.style.display = 'flex'; // Show loader
 
-    const instructorDocRef = doc(db, 'admin', id);
-    await deleteDoc(instructorDocRef);
-    console.log('Instructor deleted.');
-    showNotification('Instructor deleted successfully.');
+    // Step 1: Fetch the instructor's data from the `admin` collection
+    const userDoc = await getDoc(doc(db, 'admin', id));
+    if (!userDoc.exists()) {
+      throw new Error("Instructor does not exist in the database.");
+    }
 
-    fetchInstructors();
+    // Step 2: Delete the instructor's record from the `admin` collection
+    await deleteDoc(doc(db, 'admin', id));
+    console.log(`Instructor ${id} deleted from the 'admin' collection.`);
+
+    // Step 3.1: Remove matches associated with the instructor using a query
+    const matchesQuery = collection(db, 'matches');
+    const matchesSnapshot = await getDocs(matchesQuery);
+    const batch = db.batch();
+
+    matchesSnapshot.forEach((matchDoc) => {
+      const matchData = matchDoc.data();
+      if (matchData.instructorId === id) {
+        batch.delete(doc(db, 'matches', matchDoc.id));
+        console.log(`Queued match ${matchDoc.id} for deletion.`);
+      }
+    });
+
+    // Commit the batch deletions for matches
+    await batch.commit();
+    console.log('All matches associated with the instructor have been deleted.');
+
+    // Step 3.2: Remove the instructor's document from the `instructors` collection
+    const instructorRef = doc(db, 'instructors', id);
+    const instructorSnapshot = await getDoc(instructorRef);
+    if (instructorSnapshot.exists()) {
+      await deleteDoc(instructorRef);
+      console.log(`Deleted instructor document: ${id}`);
+    }
+
+    // Notify user of success
+    showNotification('Instructor deleted successfully.');
+    fetchInstructors(); // Refresh the list
   } catch (error) {
     console.error('Error deleting instructor:', error);
     showNotification('An error occurred while deleting the instructor.');
@@ -207,6 +288,8 @@ async function deleteInstructor(id) {
     loader.style.display = 'none'; // Hide loader
   }
 }
+
+
 
 // Toggle Password Visibility
 document.querySelectorAll('.togglePassword').forEach(button => {
@@ -243,4 +326,6 @@ addInstructorButton.addEventListener('click', () => {
 saveInstructorButton.addEventListener('click', saveInstructor);
 
 // Fetch instructors on page load
-document.addEventListener('DOMContentLoaded', fetchInstructors);
+document.addEventListener('DOMContentLoaded', () => {
+  fetchInstructors();
+});

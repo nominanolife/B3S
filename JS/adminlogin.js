@@ -43,11 +43,18 @@ document.getElementById('loginBtn').addEventListener('click', async function (ev
       return;
     }
 
-    // Step 2: If not an admin, attempt Firebase Authentication for instructors
+    // Step 2: Check if the instructor account exists and is active in Firestore
+    const isInstructorActive = await checkInstructorStatus(identifier);
+    if (!isInstructorActive) {
+      showModal("Your account has been removed. Please contact the administrator.");
+      return;
+    }
+
+    // Step 3: Attempt Firebase Authentication for instructors
     const userCredential = await signInWithEmailAndPassword(auth, identifier, password);
     const user = userCredential.user;
 
-    // Step 3: Redirect instructors to their profile
+    // Step 4: Redirect instructors to their profile
     window.location.href = "instructorprofile.html";
   } catch (error) {
     console.error("Login error:", error);
@@ -56,6 +63,27 @@ document.getElementById('loginBtn').addEventListener('click', async function (ev
     document.getElementById('loader1').style.display = 'none'; // Hide loader
   }
 });
+
+// Function to check if the instructor exists and is active in Firestore
+async function checkInstructorStatus(email) {
+  try {
+    const querySnapshot = await getDocs(collection(db, "admin"));
+    let isActive = false;
+
+    querySnapshot.forEach((doc) => {
+      const userData = doc.data();
+      // Check if the email matches and the role is "instructor"
+      if (userData.email === email && userData.role === "instructor") {
+        isActive = true; // Mark as active if found in Firestore
+      }
+    });
+
+    return isActive;
+  } catch (error) {
+    console.error("Error checking instructor status:", error);
+    return false;
+  }
+}
 
 // Function to check admin credentials in Firestore
 async function checkAdminCredentials(identifier, password) {
@@ -66,7 +94,11 @@ async function checkAdminCredentials(identifier, password) {
     querySnapshot.forEach((doc) => {
       const userData = doc.data();
 
-      if ((userData.email === identifier || userData.name === identifier) && userData.password === password && userData.role === "admin") {
+      if (
+        (userData.email === identifier || userData.name === identifier) &&
+        userData.password === password &&
+        userData.role === "admin"
+      ) {
         isAdmin = true;
       }
     });
@@ -80,8 +112,10 @@ async function checkAdminCredentials(identifier, password) {
 
 // Function to show error messages in a modal
 function showModal(message) {
-  document.getElementById('notificationMessage').textContent = message;
-  const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+  document.getElementById("notificationMessage").textContent = message;
+  const notificationModal = new bootstrap.Modal(
+    document.getElementById("notificationModal")
+  );
   notificationModal.show();
 }
 
@@ -89,21 +123,21 @@ function showModal(message) {
 function setupPasswordToggle(toggleId, passwordId) {
   const togglePassword = document.getElementById(toggleId);
   if (togglePassword) {
-      togglePassword.addEventListener('click', function () {
-          const passwordInput = document.getElementById(passwordId);
-          const icon = this.querySelector('i');
-          if (passwordInput.type === 'password') {
-              passwordInput.type = 'text';
-              icon.classList.remove('fa-eye-slash');
-              icon.classList.add('fa-eye');
-          } else {
-              passwordInput.type = 'password';
-              icon.classList.remove('fa-eye');
-              icon.classList.add('fa-eye-slash');
-          }
-      });
+    togglePassword.addEventListener("click", function () {
+      const passwordInput = document.getElementById(passwordId);
+      const icon = this.querySelector("i");
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      } else {
+        passwordInput.type = "password";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      }
+    });
   }
 }
 
 // Call the function with the appropriate IDs
-setupPasswordToggle('togglePassword', 'password');
+setupPasswordToggle("togglePassword", "password");
