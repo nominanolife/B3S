@@ -1,0 +1,969 @@
+body {
+    font-family: Poppins;
+    margin: 0;
+    min-height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(#E4EfE9 ,#93A5CF, #6594d3);
+    background-size: cover;
+    background-position: center;
+}
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto; 
+    }
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    background-color: none;
+    padding: 5px 30px 5px 30px;
+    position: fixed;
+    width: 100%;
+    z-index: 1;
+}
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 15px;
+    }
+}
+.navbar-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    position: fixed;
+    top: 0;
+    z-index: 10;
+    width: 100%;
+    transition: top 0.3s; /* Smooth hide/show transition */
+}
+
+.navbar-hidden {
+    top: -40px; /* Adjust based on navbar height to hide it */
+}
+
+
+.navbar-left:hover {
+    text-decoration: none;
+}
+
+.b3slogo {
+    width: 55px;
+    height: 55px;
+}
+@media (max-width: 768px) {
+    .b3slogo {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+@media (max-width: 480px) {
+    .b3slogo {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+.brand-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #2F2E2E;
+}
+
+.brand-title {
+    font-family: Poppins; 
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 10px;
+}
+@media (max-width: 768px) {
+    .brand-title {
+        font-size: 18px;
+        padding-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-title {
+        font-size: 16px;
+    }
+}
+.navbar-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+}
+@media (max-width: 768px) {
+    .navbar-center {
+        flex-direction: row;
+        margin-left: 0;
+    }
+}
+
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-right: 50px;
+}
+@media (max-width: 768px) {
+    .navbar-nav {
+        flex-direction: row;
+        padding-right: 0;
+    }
+}
+.navbar-nav a {
+    margin: 10px;
+    padding: 10px;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #2F2E2E;
+}
+@media (max-width: 768px) {
+    .navbar-nav a {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-nav a {
+        font-size: 10px;
+    }
+}
+
+.progress-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 700px;
+    width: 100%;
+}
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .progress-container {
+        flex-direction: row; 
+        padding: 15px;
+        margin-top: 20px; /* Move it down */
+    }
+}
+
+/* Optional: For even smaller screens */
+@media (max-width: 480px) {
+    .progress-container {
+        margin-top: 40px; /* Increase spacing on very small screens */
+        padding: 10px;
+    }
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
+
+
+.step .bullet {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    background-color: #EAEAEA;
+    border-radius: 50%;
+    font-weight: bold;
+    color: #2F2E2E;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.step.active .bullet {
+    background-color: #142A74;
+    color: white;
+}
+
+.step.completed .bullet {
+    background-color: #142A74;
+    color: white;
+}
+
+.step.completed .bullet:before {
+    content: "✔";
+    position: absolute;
+    font-size: 12px;
+}
+@media (max-width: 480px) {
+    .step .bullet {
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+    }
+
+    .step.completed .bullet:before {
+        font-size: 10px;
+    }
+}
+
+.title {
+    font-weight: 500;
+}
+
+.step .title {
+    font-size: 12px;
+    color: #2F2E2E;
+    text-align: center;
+    width: 100%;
+}
+@media (max-width: 768px) {
+    .step .title {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .step .title {
+        font-size: 10px;
+    }
+}
+
+.step.active .title {
+    color: #142A74;
+}
+
+.line {
+    height: 2px;
+    background-color: #777;
+    width: 100%;
+}
+
+.line.completed {
+    background-color: #142A74;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .navbar-nav-slide {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .navbar-collapse {
+        display: flex;
+        flex-direction: column;
+    }
+}
+p {
+    font-size: 16px;
+}
+@media (max-width: 768px) {
+    p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    p {
+        font-size: 12px;
+    }
+}
+
+.input-group-text, .btn-outline-secondary {
+    cursor: pointer;
+}
+
+.login-logo {
+    width: 50%;
+    height: auto;
+}
+
+/* Main container styles */
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Card styles */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    padding: 2rem;
+    max-width: 700px;
+    width: 100%;
+}
+@media (max-width: 768px) {
+    .card {
+        padding: 1.5rem; /* Reduce padding for tablets */
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 1rem; /* Reduce padding for smaller screens */
+    }
+}
+
+/* Updated button styles */
+.save-btn {
+    background-color: #142A74;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.save-btn:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+@media (max-width: 480px) {
+    .save-btn {
+        padding: 8px 16px; /* Smaller padding for smaller screens */
+    }
+}
+
+/* Center the button container */
+.d-flex-center {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;     /* Center vertically (if needed) */
+    width: 100%;
+    margin-top: 2rem;        /* Adjust margin as needed */
+}
+@media (max-width: 480px) {
+    .d-flex-center {
+        margin-top: 1.5rem;
+    }
+}
+/* Logo image styles */
+.login-logo {
+    display: block;
+    margin: 0 auto;
+    width: 200px; /* Adjust as needed */
+}
+
+/* Form styles */
+.login-form {
+    margin-top: 1rem;
+    text-align: left;
+}
+@media (max-width: 480px) {
+    .login-form {
+        margin-top: 0.75rem;
+    }
+}
+
+span {
+    font-family: Poppins;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.form-label {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: left;
+}
+@media (max-width: 480px) {
+    .form-label {
+        font-size: 12px;
+    }
+}
+/* Input styles */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+}
+@media (max-width: 480px) {
+    .form-control {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+.input-group-text {
+    border-radius: 8px 0 0 8px;
+    background: #f8f9fa;
+    border: 1px solid #ced4da;
+}
+@media (max-width: 480px) {
+    .input-group-text {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+}
+.input-group {
+    margin-top: 0.5rem;
+}
+@media (max-width: 480px) {
+    .input-group {
+        margin-top: 0.25rem;
+    }
+}
+/* Password toggle button styles */
+.btn-outline-primary .toggle-password-icon {
+    color: #142a74;
+}
+
+.btn-outline-secondary {
+    border-radius: 0 8px 8px 0;
+}
+
+.btn-outline-secondary i {
+    font-size: 1.5rem;
+}
+
+.login-btn {
+    font-family: Poppins;
+    font-weight: bold;
+    background-color: #142A74;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+
+
+.create-btn {
+    font-family: Poppins !important;
+    font-weight: bold !important;
+    background-color: #142A74 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 10px 20px !important;
+    margin-top: 20px !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.create-btn:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+.save-btn {
+    font-family: Poppins !important;
+    font-weight: bold !important;
+    background-color: #142A74 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 10px 20px !important;
+    margin-top: 20px !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.save-btn:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+
+.btn-primary:hover {
+    background-color: #142a74ec;
+}
+
+.dec-btn{
+    font-family: Poppins !important;
+    font-weight: bold !important;
+    background-color: #b60505ec !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 10px 20px !important;
+    margin-top: 20px !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.dec-btn:hover {
+    background-color: #b60505ec  !important;
+}
+
+.btn[disabled] {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed; /* Change the cursor to indicate it's not clickable */
+}
+/* Hide the default checkbox */
+.custom-checkbox input[type="checkbox"] {
+    display: none; /* Hide the default checkbox */
+}
+
+/* Create a custom checkbox */
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.custom-checkbox .checkbox-label {
+    position: relative;
+    padding-left: 30px; /* Space for the custom checkbox */
+    cursor: pointer;
+}
+
+/* Create the custom checkbox */
+.custom-checkbox .checkbox-label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px; /* Width of the custom checkbox */
+    height: 20px; /* Height of the custom checkbox */
+    border: 2px solid #142a74; /* Border color */
+    border-radius: 4px; /* Rounded corners */
+    background-color: white; /* Background color when unchecked */
+}
+
+/* Checkbox checked state */
+.custom-checkbox input[type="checkbox"]:checked + .checkbox-label::before {
+    background-color: #142a74; /* Background color when checked */
+    border-color: #142a74; /* Border color when checked */
+}
+
+/* Checkmark */
+.custom-checkbox input[type="checkbox"]:checked + .checkbox-label::after {
+    content: '';
+    position: absolute;
+    left: 7px; /* Position of checkmark */
+    top: 9px; /* Position of checkmark */
+    width: 6px; /* Width of checkmark */
+    height: 10px; /* Height of checkmark */
+    border: solid white; /* Checkmark color */
+    border-width: 0 2px 2px 0; /* Create the checkmark */
+    transform: rotate(45deg); /* Rotate the checkmark */
+}
+
+/* Link styles */
+.text-dark {
+    text-decoration: underline;
+}
+
+form p {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 1rem;
+}
+@media (max-width: 480px) {
+    form p {
+        font-size: 12px;
+    }
+}
+
+.verification-code-input {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    font-size: 24px;
+    margin: 0 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+/* Medium screens (tablets) */
+@media (max-width: 768px) {
+    .verification-code-input {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        margin: 0 4px;
+    }
+}
+
+/* Small screens (mobile) */
+@media (max-width: 480px) {
+    .verification-code-input {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+        margin: 0 3px;
+    }
+}
+
+/* Custom Radio Button Styles */
+.form-check-input {
+    border: 2px solid #142a74;
+    background-color: #fff;
+    border-radius: 50%;
+    position: relative;
+    width: 1.5em;
+    height: 1.5em;
+    appearance: none;
+}
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+    }
+}
+.form-check-input:checked {
+    background-color: #142a74;
+    border-color: #142a74;
+}
+
+/* Password toggle button styles */
+#togglePassword, #toggleNewPassword, #toggleConfirmPassword  {
+    border-radius: 0 8px 8px 0;
+    border: 1px solid #ced4da;
+    background-color: #f8f9fa;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease; /* Smooth transition */
+}
+
+#togglePassword:hover, #toggleNewPassword:hover, #toggleConfirmPassword:hover {
+    background-color: #142a74; /* Background color on hover */
+}
+
+#togglePassword:hover, #toggleNewPassword:hover, #toggleConfirmPassword:hover i {
+    color: #fff; /* Icon color on hover */
+}
+
+/* Back Icon Styles */
+.back-icon {
+    position: absolute;
+    top: -20px; /* Move upwards by adjusting this value */
+    left: 10px;
+    z-index: 10;
+}
+
+.back-icon a {
+    font-size: 24px;
+    color: #142a74;
+    text-decoration: none;
+}
+
+.back-icon a:hover {
+    color: #0d1d51;
+}
+
+/* Ensure the form is positioned relative to contain the back icon */
+.login-form {
+    position: relative;
+}
+
+.return-icon {
+    position: absolute;
+    top: 20px; /* Adjust this value as needed */
+    left: 20px;
+    z-index: 10;
+}
+
+.return-icon a {
+    font-size: 24px;
+    color: #142a74;
+    text-decoration: none;
+}
+
+.return-icon a:hover {
+    color: #0d1d51;
+}
+
+/* Ensure the card body is positioned relative to contain the return icon */
+.card-body {
+    position: relative;
+}
+
+/* Error message styles */
+h5 {
+    font-family: Poppins;
+    font-size: 16px;
+    font-weight: bold;
+    color: #dc3545;
+}
+
+#modalMessage, #notificationMessage {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Ensure error messages are styled clearly */
+#error-message {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #dc3545; /* Red color for errors */
+    margin-top: 1rem;
+}
+
+@keyframes popOut {
+    0% {
+        opacity: 0;
+        transform: scale(0.5); /* Starts smaller */
+    }
+    80% {
+        transform: scale(1.05); /* Slight overshoot for a popping effect */
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1); /* Full size */
+    }
+}
+
+.modal-content {
+    animation: popOut 0.4s ease; /* Duration of the pop-out animation */
+}
+
+.modal-header, .modal-body, .modal-footer {
+    border: none !important;
+}
+
+.modal-dialog {
+    top: 30%;
+    border-radius: 20px;
+}
+
+.modal-content {
+    justify-content: space-evenly;
+    font-family: Poppins;
+    border-radius: 20px !important;
+    padding: 20px;
+}
+
+.modal-title {
+    font-weight: bold;
+    color: #142A74;
+}
+
+.modal-body {
+    font-size: 14px;
+    border:none;
+}
+
+/* Style for successful messages */
+.success-message {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #28a745; /* Green color for success */
+    margin-top: 1rem;
+}
+
+
+.btn-secondary {
+    background-color: #142A74;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+}
+
+.btn-secondary:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+.close-btn {
+    background-color: #142A74 !important;
+    color: #fff  !important;
+    border: none  !important;
+    border-radius: 10px  !important;
+    padding: 10px 20px  !important;
+}
+
+.close-btn:hover {
+    background-color: #0d1d51 !important;
+    color: white !important;
+}
+
+/* Password strength meter styles */
+.requirement {
+    display: flex;
+    align-items: center;
+}
+.requirement i {
+    margin-right: 10px;
+}
+.requirement p {
+    font-family: Poppins;
+    font-size: 12px;
+}
+.requirement.valid i {
+    color: green;
+}
+.requirement.invalid i {
+    color: red;
+}
+.disabled-link {
+    pointer-events: none; /* Prevents clicks */
+    color: #ccc; /* Grey out text */
+    text-decoration: none; /* Remove underline */
+}
+
+#passwordRequirements {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.loader1 {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Poppins', sans-serif;
+}
+
+.loader1 .car-loader {
+    width: 80px;
+    height: 80px;
+    border: 4px solid #ccc;
+    border-radius: 50%;
+    border-top: 4px solid #142A74;
+    animation: spin 2s linear infinite;
+    position: relative;
+}
+
+.loader1 p {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #142A74;
+    position: relative;
+}
+
+.dots {
+    display: inline-block;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.dots::after {
+    content: '';
+    display: inline-block;
+    animation: dot-flashing 1.5s infinite linear;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes dot-flashing {
+    0% {
+        content: '.';
+    }
+    25% {
+        content: '..';
+    }
+    50% {
+        content: '...';
+    }
+    75% {
+        content: '..';
+    }
+    100% {
+        content: '.';
+    }
+}
+
+#privacyModal .modal-dialog {
+    top: 5%;
+    left: 0;
+    width: 100%;
+    max-width: 1000px;
+}
+
+@media (max-width: 768px) {
+    #privacyModal .modal-dialog {
+        max-width: 95%;
+        left: 2%;
+        top: 0;
+    }
+}
+
+#privacyModal .modal-content {
+    padding: 20px;
+    border-radius: 30px;
+}
+
+#privacyModal .modal-header {
+    display: flex;
+    flex-direction: column;
+}
+
+#privacyModal .modal-header h4 {
+    font-size: 14px;
+}
+@media (max-width: 768px) {
+    #privacyModal .modal-header h4 {
+        font-size: 12px;
+    }
+}
+
+#privacyModal .modal-footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-primary {
+    font-family: Poppins;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #142A74;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+}
+@media (max-width: 480px) {
+    .btn-primary {
+        padding: 8px 20px;
+    }
+}
+
+.btn-primary:hover {
+    background-color: #142a74ec;
+}
+/* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background of the scrollbar track */
+    border-radius: 10px; /* Optional: Rounded corners for the track */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #142A74; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Optional: Rounded corners for the thumb */
+    border: 3px solid #f1f1f1; /* Optional: Adds padding around the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d; /* Darker color on hover */
+}
