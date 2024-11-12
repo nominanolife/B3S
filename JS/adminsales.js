@@ -790,8 +790,6 @@ function renderPackageBarChart(packageData) {
   const labels = packageData.map(item => item.packageName);
   const data = packageData.map(item => item.count);
 
-
-
   const ctx = document.getElementById('packageBarChart').getContext('2d');
   if(window.packageBarChartInstance) {
       window.packageBarChartInstance.destroy(); // Destroy previous instance if exists
@@ -835,7 +833,7 @@ function renderPackageBarChart(packageData) {
                   },
                   ticks: {
                       font: {
-                          size: 16 // Adjust the font size of the package names
+                          size: 11 // Adjust the font size of the package names
                       }
                   }
               }
