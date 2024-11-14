@@ -747,10 +747,7 @@ function populateWheelsModal(assessmentData, WprocessedData) {
         'General': 'generalResult'
     };
 
-    let totalScore = 0; // Initialize total score
-    let maxScore = 0; // Initialize maximum possible score
-
-    // Populate scores and calculate total
+    // Populate scores in the modal fields
     assessmentData.categories.forEach(category => {
         category.items.forEach(item => {
             const fieldId = sentenceToFieldIdMap[item.sentence];
@@ -765,10 +762,6 @@ function populateWheelsModal(assessmentData, WprocessedData) {
                 if (commentElement) {
                     commentElement.textContent = item.comment || "No comment provided."; // Fallback if no comment
                 }
-
-                // Calculate total and max scores
-                totalScore += item.score;
-                maxScore += 5; // Assuming each item has a max score of 5
             }
         });
     });
@@ -785,7 +778,7 @@ function populateWheelsModal(assessmentData, WprocessedData) {
             if (performanceResult === 'Poor') {
                 resultElement.style.color = '#B60505'; // Set color to red for 'Poor'
             } else if (performanceResult === 'Great') {
-                resultElement.style.color = '#142A74'; // Set color to blue for 'Great'
+                resultElement.style.color = '#142A74'; // Set color to green for 'Great'
             } else if (performanceResult === 'Excellent') {
                 resultElement.style.color = 'green'; // Set color to green for 'Excellent'
             } else {
@@ -793,25 +786,6 @@ function populateWheelsModal(assessmentData, WprocessedData) {
             }
         }
     });
-
-    // Calculate percentage and determine Pass/Fail
-    const totalScorePercentage = ((totalScore / maxScore) * 100).toFixed(2); // Calculate percentage
-    const passThreshold = 84; // Define pass threshold (percentage or points)
-    const passFailComment = totalScorePercentage >= passThreshold ? "Passed" : "Failed";
-
-    // Update Total Score Percentage
-    const totalScorePercentageElement = document.querySelector('tfoot tr:nth-child(2) td:nth-child(2) span');
-    if (totalScorePercentageElement) {
-        totalScorePercentageElement.textContent = `${totalScorePercentage}%`; // Update percentage
-    }
-
-    // Update Comments Column with "Passed" or "Failed"
-    const commentsColumn = document.querySelector('tfoot tr:nth-child(2) td:nth-child(3)');
-    if (commentsColumn) {
-        commentsColumn.style.fontWeight = "Normal";
-        commentsColumn.style.color = totalScorePercentage >= passThreshold ? "green" : "#B60505";
-        commentsColumn.textContent = passFailComment; // Update the comments column
-    }
 }
 
 function updateLessonCheckboxes(Wchecklist) {
@@ -852,8 +826,8 @@ async function fetchAndDisplayMotorPerformance(studentId) {
             const studentData = studentDoc.data();
 
             // Fetch the MassessmentData and MprocessedData if they exist in the document
-            const MassessmentData = studentData.MassessmentData || {}; 
-            const MprocessedData = studentData.MprocessedData || {};  
+            const MassessmentData = studentData.MassessmentData || {};
+            const MprocessedData = studentData.MprocessedData || {};
             const Mchecklist = studentData.Mchecklist || {}; // Fetch the checklist data
 
             // Populate the modal with the fetched data
@@ -910,51 +884,93 @@ function populateMotorsModal(assessmentData, processedData) {
     let totalScore = 0; // Initialize total score
     let maxScore = 0; // Initialize maximum possible score
 
-    // Populate numeric scores
+    // Fetch scores for each category
     assessmentData.categories.forEach(category => {
-        category.items.forEach(item => {
-            const fieldId = sentenceToFieldIdMap[item.sentence];
-            if (fieldId) {
-                const scoreElement = document.getElementById(fieldId);
-                if (scoreElement) {
-                    scoreElement.textContent = item.score;  // Set the numeric score
+        const categoryId = categoryMapping[category.category]; // Map category to HTML field ID
+
+        if (categoryId) {
+            const performanceElement = document.getElementById(categoryId); // Performance ID
+            const scoreElement = document.getElementById(`${categoryId}-score`); // Updated score ID
+            const commentElement = document.getElementById(`${categoryId}-comment`); // Comment ID
+
+            // Fetch and display the score for each category
+            if (category.items.length === 1) {
+                const item = category.items[0];
+                if (performanceElement) {
+                    performanceElement.textContent = item.score || 0; // Default to 0 if no score
+                    totalScore += item.score || 0;
                 }
 
-                // Populate comment
-                const commentElement = document.getElementById(`${fieldId}-comment`);
+                if (scoreElement) {
+                    scoreElement.textContent = item.score || 0; // Display the score
+                }
+
                 if (commentElement) {
                     commentElement.textContent = item.comment || "No comment provided."; // Fallback for no comment
                 }
 
-                // Calculate total score and max score
-                totalScore += item.score;
-                maxScore += 5; // Assuming each item has a max score of 5
+                // Dynamically adjust max score per category
+                const maxScoreElement = scoreElement?.closest('.score-input')?.querySelector('.static-text:last-child');
+                if (maxScoreElement) {
+                    maxScore += parseInt(maxScoreElement.textContent) || 0; // Get max score from HTML
+                }
+            } else {
+                // Handle categories with subfields
+                category.items.forEach(item => {
+                    const subFieldId = sentenceToFieldIdMap[item.sentence];
+                    if (subFieldId) {
+                        const subPerformanceElement = document.getElementById(subFieldId); // Subfield performance
+                        const subScoreElement = document.getElementById(`${subFieldId}-score`); // Subfield score
+                        const subCommentElement = document.getElementById(`${subFieldId}-comment`); // Subfield comment
+
+                        if (subPerformanceElement) {
+                            subPerformanceElement.textContent = item.score || 0;
+                            totalScore += item.score || 0;
+                            maxScore += 5; // Assuming max score for subfields is 5
+                        }
+
+                        if (subScoreElement) {
+                            subScoreElement.textContent = item.score || 0; // Update subfield score
+                        }
+
+                        if (subCommentElement) {
+                            subCommentElement.textContent = item.comment || "No comment provided.";
+                        }
+                    }
+                });
             }
-        });
+        }
     });
 
-    // Populate performance results and comments for categories
+    // Populate performance results, comments, and scores for categories
     Object.keys(categoryMapping).forEach(category => {
         const performanceResult = processedData[category] || 'N/A'; // Fallback for performance
         const categoryComment = processedData[`${category}-comment`] || "No comment provided."; // Fallback for category comment
 
-        // Update performance result
-        const resultElement = document.getElementById(categoryMapping[category]);
-        if (resultElement) {
-            resultElement.textContent = performanceResult; // Set performance result
+        const performanceElement = document.getElementById(categoryMapping[category]); // Performance ID
+        const scoreElement = document.getElementById(`${categoryMapping[category]}-score`); // Updated score ID
+        const commentElement = document.getElementById(`${categoryMapping[category]}-comment`); // Comment ID
+
+        if (performanceElement) {
+            performanceElement.textContent = performanceResult; // Set performance result
             if (performanceResult === 'Poor') {
-                resultElement.style.color = '#B60505'; // Red for 'Poor'
+                performanceElement.style.color = '#B60505'; // Red for 'Poor'
             } else if (performanceResult === 'Great') {
-                resultElement.style.color = '#142A74'; // Blue for 'Great'
+                performanceElement.style.color = '#142A74'; // Blue for 'Great'
             } else if (performanceResult === 'Excellent') {
-                resultElement.style.color = 'green'; // Green for 'Excellent'
+                performanceElement.style.color = 'green'; // Green for 'Excellent'
             } else {
-                resultElement.style.color = ''; // Default color
+                performanceElement.style.color = ''; // Default color
             }
         }
 
-        // Update category comment
-        const commentElement = document.getElementById(`${categoryMapping[category]}-comment`);
+        if (scoreElement) {
+            const categoryScoreData = assessmentData.categories.find(cat => cat.category === category); // Find matching category
+            if (categoryScoreData && categoryScoreData.items.length === 1) {
+                scoreElement.textContent = categoryScoreData.items[0].score || 0; // Update score
+            }
+        }
+
         if (commentElement) {
             commentElement.textContent = categoryComment; // Set category comment
         }
@@ -979,6 +995,7 @@ function populateMotorsModal(assessmentData, processedData) {
         commentsColumn.textContent = passFailComment; // Update the comments column
     }
 }
+
 
 function updateMotorLessonCheckboxes(Mchecklist) {
     console.log('Updating motorcycle checkboxes with data:', Mchecklist);
