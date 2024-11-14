@@ -189,21 +189,10 @@ body {
     z-index: 1000;
 }
 
-h3 {
-    font-family: Poppins;
-    font-size: 22px;
-    font-weight: bold;
-    color: #2F2E2E;
-}
-
-h2 {
-    font-family: Poppins;
-    font-size: 24px;
-    font-weight: normal;
-    color: #2F2E2E;
-}
-
 .page-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     padding: 30px 30px;
     background-color: #f5f5f5;
 }
@@ -222,10 +211,79 @@ h2 {
     align-items: center;
 }
 
-.dashboard-bttns {
+.analytics {
     display: flex;
     flex-direction: row;
+    gap: 20px;
+}
+
+.analytics a:hover {
+    text-decoration: none;
+}
+
+.analytics-card, .analytics-card1 {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    border: 2px solid #142A74;
+    background: linear-gradient(#102369 ,#18349C, #2045CF);
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 10px 60px;
+    cursor: pointer;
+}
+
+.analytics-card:hover, .analytics-card1:hover {
+    text-decoration: none;
+    background: #ffffff;
+}
+
+.analytics-card:hover p, .analytics-card:hover h3, .analytics-card:hover i, .analytics-card1:hover p, .analytics-card1:hover h3, .analytics-card1:hover i {
+    color: #142A74
+}
+
+.analytics-card p, .analytics-card1 p {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 0;
+}
+
+.analytics-card-data {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     justify-content: space-between;
+    gap: 10px;
+}
+
+.analytics-card-data h3 {
+    font-family: Poppins;
+    font-size: 40px;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 0;
+}
+
+.peso-sign {
+    font-family: Arial;
+    font-size: 40px;
+    font-weight: bold;
+    color: #142A74;
+}
+
+.analytics-card-data i {
+    font-size: 32px;
+    color: #ffffff;
+}
+
+.dashboard-bttns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
 }
 
 .button-right {
@@ -236,8 +294,8 @@ h2 {
     background: linear-gradient(#102369 ,#18349C, #2045CF);
     color: #ffffff;
     border-radius: 10px;
-    padding: 20px 60px;
-    margin: 10px;
+    padding: 10px 60px;
+    text-align: center;
 }
 
 .button-right:hover {
@@ -247,7 +305,9 @@ h2 {
 
 .page-body {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
 }
 
 .page-body h2 {
@@ -261,12 +321,12 @@ h2 {
     width: 200px;
     position: relative;
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 11px;
 }
 
 .selected {
     border: 1px solid #D9D9D9;
-    padding: 10px;
+    padding: 6px;
     border-radius: 8px;
     color: #2F2E2E;
     cursor: pointer;
@@ -332,7 +392,9 @@ h2 {
     border: 1px solid #D9D9D9;
     border-radius: 20px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    min-height: 760px;
+    min-height: 720px;
+    width: 100%;
+    gap: 10px;
 }
 
 .table-headers-title {
@@ -346,7 +408,7 @@ h2 {
 
 .upcoming-list, .cancelled-list {
     font-family: Poppins;
-    font-size: 16px;
+    font-size: 12px;
     text-align: left;
 }
 
@@ -364,7 +426,7 @@ h2 {
 
 .table th {
     font-family: Poppins;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: bold;
     color: #585353;
     text-align: left;
@@ -391,30 +453,35 @@ h2 {
 .title-header {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    justify-content: space-between;
+}
+
+.title-header h2 {
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: bold;
+    color: #585353;
 }
 
 .cancelled-container {
     display: flex;
     flex-direction: column;
-    margin-top: 20px;
     padding: 30px;
     border: 1px solid #D9D9D9;
     border-radius: 20px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    min-height: 760px;
+    min-height: 720px;
+    width: 100%;
+    gap: 10px;
 }
 
 .search-container {
     display: flex;
     align-items: center;
-    width: 30%;
     background-color: #F4F4F4;
     border-radius: 30px;
-    position: relative;
-    padding-left: 10px;
+    padding: 0 0 0 10px;
     border: 1px solid #D9D9D9;
 }
 
@@ -423,7 +490,7 @@ h2 {
     color: #2F2E2E;
     outline: none;
     width: 100%;
-    padding: 10px;
+    padding: 5px;
     border: none;
     border-radius: 30px;
 }
@@ -446,7 +513,7 @@ h2 {
     display: flex;
     align-items: center;
     font-family: Poppins;
-    font-size: 14px;
+    font-size: 11px;
     font-weight: 600;
     color: #2F2E2E;
     margin-left: auto;
@@ -459,7 +526,7 @@ h2 {
 }
 
 .pagination-controls .bi-caret-left, .pagination-controls .bi-caret-right {
-    font-size: 32px;
+    font-size: 26px;
     color: #142A74;
     border: none;
     background: none;
