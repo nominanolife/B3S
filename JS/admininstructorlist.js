@@ -284,6 +284,7 @@ async function saveInstructor() {
       email: newUser.email,
       uid: newUser.uid, // Store the UID
       role: 'instructor',
+      dateCreated: new Date().toISOString(),
     };
 
     await setDoc(doc(db, 'admin', newUser.uid), newInstructor);

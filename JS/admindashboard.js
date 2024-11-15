@@ -26,7 +26,7 @@ let totalPagesCancelled = 1;
 let allBookingsCancelled = [];
 
 // Items per page
-const itemsPerPage = 10;
+const itemsPerPage = 6;
 const loader = document.getElementById('loader1');
 
 // Fetch and render the bookings
@@ -345,9 +345,255 @@ fetchBookings();
 
 // Call the function to update the appointments card on page load
 document.addEventListener('DOMContentLoaded', () => {
+    renderInstructorBarChart();
+    renderStudentBarChart();
     updateSalesCard();
     updateAppointmentsCard();
+    updateInstructorCard();
+    updateStudentCard();
 });
+
+// Function to render the student bar chart
+async function renderStudentBarChart() {
+    const ctx = document.querySelector('.student-graph canvas').getContext('2d');
+
+    // Destroy the previous chart instance if it exists
+    if (window.studentBarChartInstance) {
+        window.studentBarChartInstance.destroy();
+    }
+
+    try {
+        const applicantsSnapshot = await getDocs(collection(db, "applicants")); // Fetch all applicants
+        const students = [];
+
+        // Filter students with role "student" and a valid "dateEnrolled"
+        applicantsSnapshot.forEach(doc => {
+            const applicantData = doc.data();
+            if (
+                applicantData.role === "student" && // Role is "student"
+                applicantData.packageName && // Package is enrolled
+                applicantData.dateEnrolled // Ensure dateEnrolled exists
+            ) {
+                // Convert Firestore timestamp to JavaScript Date object
+                students.push(applicantData.dateEnrolled.toDate());
+            }
+        });
+
+        // Debugging: Log the filtered students' dates
+        console.log("Filtered Students Dates:", students);
+
+        // Current date for calculations
+        const currentDate = new Date();
+
+        // Weekly count
+        const weeklyCount = students.filter(date => {
+            const diffTime = Math.abs(currentDate - date);
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+            return diffDays <= 7; // Within the last 7 days
+        }).length;
+
+        // Monthly count
+        const monthlyCount = students.filter(date => {
+            return (
+                date.getMonth() === currentDate.getMonth() && // Same month
+                date.getFullYear() === currentDate.getFullYear() // Same year
+            );
+        }).length;
+
+        // Yearly count
+        const yearlyCount = students.filter(date => {
+            return date.getFullYear() === currentDate.getFullYear(); // Same year
+        }).length;
+
+        // Debugging: Log the counts
+        console.log("Weekly Count:", weeklyCount);
+        console.log("Monthly Count:", monthlyCount);
+        console.log("Yearly Count:", yearlyCount);
+
+        // Chart data
+        const labels = ['Weekly', 'Monthly', 'Yearly'];
+        const data = [weeklyCount, monthlyCount, yearlyCount];
+
+        // Render the chart
+        window.studentBarChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Students Added',
+                    data: data,
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(33, 102, 255, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(33, 102, 255, 1)'
+                    ],
+                    borderWidth: 1,
+                    barThickness: 100,
+                    borderRadius: 3,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Number of Students',
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        },
+                        beginAtZero: true
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time Period',
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'rectRounded',
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });        
+    } catch (error) {
+        console.error("Error rendering student bar chart:", error);
+    }
+}
+
+// Function to render the instructor bar chart
+async function renderInstructorBarChart() {
+    const ctx = document.querySelector('.instructor-graph canvas').getContext('2d');
+
+    // Destroy the previous chart instance if it exists
+    if (window.instructorBarChartInstance) {
+        window.instructorBarChartInstance.destroy();
+    }
+
+    try {
+        const adminSnapshot = await getDocs(collection(db, "admin"));
+        const instructors = [];
+
+        adminSnapshot.forEach(doc => {
+            const adminData = doc.data();
+            if (adminData.role === "instructor" && adminData.dateCreated) {
+                instructors.push(new Date(adminData.dateCreated));
+            }
+        });
+
+        // Current date for calculations
+        const currentDate = new Date();
+
+        // Calculate weekly, monthly, and yearly counts
+        const weeklyCount = instructors.filter(date => {
+            const diffTime = Math.abs(currentDate - date);
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+            return diffDays <= 7;
+        }).length;
+
+        const monthlyCount = instructors.filter(date => {
+            return (
+                date.getMonth() === currentDate.getMonth() &&
+                date.getFullYear() === currentDate.getFullYear()
+            );
+        }).length;
+
+        const yearlyCount = instructors.filter(date => {
+            return date.getFullYear() === currentDate.getFullYear();
+        }).length;
+
+        // Chart data
+        const labels = ['Weekly', 'Monthly', 'Yearly'];
+        const data = [weeklyCount, monthlyCount, yearlyCount];
+
+        // Render the chart
+        window.instructorBarChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Weekly', 'Monthly', 'Yearly'],
+                datasets: [
+                    {
+                        label: 'Instructors Added',
+                        data: [weeklyCount, monthlyCount, yearlyCount],
+                        backgroundColor: [
+                            'rgba(50, 150, 250, 0.6)',
+                            'rgba(30, 100, 200, 0.6)',
+                            'rgba(10, 50, 150, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(50, 150, 250, 1)',
+                            'rgba(30, 100, 200, 1)',
+                            'rgba(10, 50, 150, 1)'
+                        ],
+                        borderWidth: 2,
+                        barThickness: 100,
+                        borderRadius: 5,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Number of Instructors',
+                            font: {
+                                size: 12,
+                                weight: 'bold',
+                            },
+                        },
+                        beginAtZero: true,
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time Period',
+                            font: {
+                                size: 12,
+                                weight: 'bold',
+                            },
+                        },
+                    },
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'rectRounded',
+                            font: {
+                                size: 11,
+                            },
+                        },
+                    },
+                },
+            },
+        });        
+    } catch (error) {
+        console.error("Error fetching instructor data for the chart: ", error);
+    }
+}
 
 // Function to dynamically update the appointments card
 async function updateAppointmentsCard() {
@@ -421,5 +667,63 @@ async function updateSalesCard() {
     } catch (error) {
         console.error("Error fetching sales data: ", error);
         salesAmountElement.textContent = "Error";
+    }
+}
+
+// Function to dynamically update the instructors card
+async function updateInstructorCard() {
+    const instructorCardTitle = document.querySelector('.analytics-card2 p'); // Title in the instructor card
+    const instructorCardData = document.querySelector('.analytics-card2 h3'); // Number of instructors
+  
+    // Set the card title dynamically
+    instructorCardTitle.textContent = 'Number of Instructors';
+  
+    try {
+      // Fetch all admin users from Firestore
+      const adminSnapshot = await getDocs(collection(db, "admin"));
+      let instructorCount = 0;
+  
+      // Count the instructors based on their role
+      adminSnapshot.forEach(doc => {
+        const adminData = doc.data();
+        if (adminData.role === "instructor") {
+          instructorCount++;
+        }
+      });
+  
+      // Update the card with the count
+      instructorCardData.textContent = `${instructorCount}`;
+    } catch (error) {
+      console.error("Error fetching instructor data: ", error);
+      instructorCardData.textContent = "Error";
+    }
+}
+
+// Function to dynamically update the students card
+async function updateStudentCard() {
+    const studentCardTitle = document.querySelector('.analytics-card3 p');
+    const studentCardData = document.querySelector('.analytics-card3 h3');
+
+    // Set the card title dynamically
+    studentCardTitle.textContent = 'Number of Students';
+
+    try {
+        // Fetch all applicants from Firestore
+        const studentsSnapshot = await getDocs(collection(db, "applicants"));
+        let studentCount = 0;
+
+        // Filter documents with role "student"
+        studentsSnapshot.forEach(doc => {
+            const studentData = doc.data();
+            if (studentData.role === "student") {
+                studentCount++;
+            }
+        });
+
+        // Update the card with the count
+        studentCardData.textContent = `${studentCount}`;
+    } catch (error) {
+        console.error("Error fetching student data: ", error);
+        studentCardData.textContent = "Error";
     }
 }
