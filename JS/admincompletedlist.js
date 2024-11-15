@@ -20,11 +20,18 @@ let filteredStudentsData = [];  // Array to hold filtered student data
 let currentPage = 1;
 const itemsPerPage = 10;
 let totalPages = 1;
+let currentSelectedYear = new Date().getFullYear();
+let currentSearchTerm = '';  // Initially empty
 
-document.addEventListener('DOMContentLoaded', () => {
-  fetchAllStudents();  // Fetch both completed and passed TDC students
-  setupYearDropdown();  // Setup year filtering
-  setupSearch();  // Setup search functionality
+document.addEventListener('DOMContentLoaded', async () => {
+  await fetchAllStudents();  // Fetch both completed and passed TDC students
+  setupYearDropdown();       // Setup year filtering and apply default year filter
+  setupSearch();             // Setup search functionality
+
+  // Set current year as default and apply filter after data is loaded
+  const currentYear = new Date().getFullYear();
+  document.getElementById('yearSelectedFilter').textContent = currentYear;
+  filterByYear(currentYear);  // Apply filter for the current year
 });
 
 // Fetch both passed TDC and completed students
@@ -102,6 +109,10 @@ function setupYearDropdown() {
   const yearOptionsFilter = document.getElementById('yearOptionsFilter');
   const yearSelectedFilter = document.getElementById('yearSelectedFilter');
 
+  // Set the current year as the default selected year
+  yearSelectedFilter.textContent = currentYear;  // Set default text to current year
+  filterByYear(currentYear);  // Apply the filter for the current year on page load
+
   years.forEach(year => {
     const li = document.createElement('li');
     li.className = 'option';  // Add "option" class for styling
@@ -127,21 +138,30 @@ function setupYearDropdown() {
   });
 }
 
-// Function to filter students based on the search input
-function filterStudents(searchTerm) {
-  if (searchTerm === '') {
-    filteredStudentsData = [];  // Reset filtered data
-    renderStudents();  // Re-render the full student list
-    return;
-  }
 
-  // Filter based on the search term
+function filterStudents(searchTerm) {
+  currentSearchTerm = searchTerm.toLowerCase();  // Update the global search term
+  applyFilters();  // Apply both filters
+}
+
+function applyFilters() {
   filteredStudentsData = studentsData.filter(student => {
-    const fullName = `${student.name || ''}`.toLowerCase();  // Adjust based on your Firestore structure
-    return fullName.startsWith(searchTerm);
+    // Check if the student has a booking in the selected year
+    const hasBookingInYear = (student.completedBookings || []).some(booking => {
+      const completionDate = booking.completionDate ? new Date(booking.completionDate) : null;
+      return completionDate && completionDate.getFullYear() === currentSelectedYear;
+    });
+
+    // Check if the search term matches the student's name or package name
+    const fullName = `${student.name || ''}`.toLowerCase();
+    const packageName = (student.packageName || '').toLowerCase();
+    const matchesSearch = currentSearchTerm === '' || fullName.includes(currentSearchTerm) || packageName.includes(currentSearchTerm);
+
+    // Only include students that match both the year and the search term
+    return hasBookingInYear && matchesSearch;
   });
 
-  renderStudents();  // Render the filtered students
+  renderStudents();
 }
 
 // Setup search functionality
@@ -153,61 +173,29 @@ function setupSearch() {
   });
 }
 
-// Render students and ensure certificate control number is fetched from applicants
-async function renderStudents() {
+function renderStudents() {
   const studentList = document.getElementById('student-list');
   studentList.innerHTML = '';  // Clear previous data
 
-  const studentsToRender = filteredStudentsData.length > 0 ? filteredStudentsData : studentsData;
+  const studentsToRender = filteredStudentsData;
 
   if (studentsToRender.length === 0) {
     studentList.innerHTML = `
       <tr>
-        <td colspan="10" class="text-center">No complete student/s yet</td>
+        <td colspan="10" class="text-center">No student/s found</td>
       </tr>
     `;
     return;
   }
 
-  // Fetch all certificate control numbers first, if needed
-  const studentsWithCertificates = await Promise.all(studentsToRender.map(async (student) => {
-    let certificateControlNumber = student.certificateControlNumber || 'N/A';
-
-    if (certificateControlNumber === 'N/A') {
-      try {
-        const applicantDoc = await getDoc(doc(db, 'applicants', student.id));
-        if (applicantDoc.exists()) {
-          certificateControlNumber = applicantDoc.data().certificateControlNumber || 'N/A';
-        }
-      } catch (error) {
-      }
-    }
-
-    return {
-      ...student,
-      certificateControlNumber
-    };
-  }));
-
-  // Proceed with rendering the table rows
-  studentsWithCertificates.forEach(student => {
+  // Render each student in the filtered list
+  studentsToRender.forEach(student => {
     const completedBookings = student.completedBookings || [];
-    
-    if (completedBookings.length === 0) {
-      studentList.innerHTML += `
-        <tr class="table-row">
-          <td class="table-row-content">${student.name || 'N/A'}</td>
-          <td class="table-row-content">${student.email || 'N/A'}</td>
-          <td class="table-row-content">${student.phoneNumber || 'N/A'}</td>
-          <td class="table-row-content">${student.packageName || 'N/A'}</td>
-          <td class="table-row-content package-price">${student.packagePrice || 'N/A'}</td>
-          <td class="table-row-content" colspan="4" class="text-center">No completed bookings available</td>
-        </tr>
-      `;
-    } else {
-      completedBookings.forEach(booking => {
+    completedBookings.forEach(booking => {
+      const completionDate = booking.completionDate ? new Date(booking.completionDate) : null;
+      if (completionDate && completionDate.getFullYear() === currentSelectedYear) {
         const formattedCompletionDate = formatCompletionDate(booking.completionDate);
-        
+
         studentList.innerHTML += `
           <tr class="table-row">
             <td class="table-row-content">${student.name || 'N/A'}</td>
@@ -222,8 +210,8 @@ async function renderStudents() {
             <td class="table-row-content"><i class="bi bi-pencil-square edit-cert-btn" data-student-id="${student.id}" data-certificate-number="${student.certificateControlNumber}"></i></td>
           </tr>
         `;
-      });
-    }
+      }
+    });
   });
 }
 
@@ -300,12 +288,11 @@ document.getElementById('saveChangesBtn').addEventListener('click', async () => 
 
 
 function filterByYear(selectedYear) {
-  // Reset the current page to 1 when filtering
-  currentPage = 1;
+  currentSelectedYear = selectedYear;  // Update the global year variable
 
-  // Filter the studentsData array by the selected year
+  // Filter students who have at least one booking in the selected year
   filteredStudentsData = studentsData.filter(student => {
-    const completedBookings = student.completedBookings || []; // Get completed bookings array
+    const completedBookings = student.completedBookings || [];
     return completedBookings.some(booking => {
       const completionDate = booking.completionDate ? new Date(booking.completionDate) : null;
       return completionDate && completionDate.getFullYear() === selectedYear;
@@ -321,9 +308,10 @@ function filterByYear(selectedYear) {
       </tr>
     `;
   } else {
-    renderStudents();  // Re-render the filtered students
+    renderStudents(selectedYear);  // Pass the selected year to renderStudents
   }
 }
+
 
 // Format the completion date for display
 function formatCompletionDate(completionDate) {
