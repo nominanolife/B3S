@@ -342,3 +342,84 @@ function filterByCourse(selectedCourse, type = 'upcoming') {
 searchBookings();
 filterByCourse();
 fetchBookings();
+
+// Call the function to update the appointments card on page load
+document.addEventListener('DOMContentLoaded', () => {
+    updateSalesCard();
+    updateAppointmentsCard();
+});
+
+// Function to dynamically update the appointments card
+async function updateAppointmentsCard() {
+    const analyticsCardTitle = document.querySelector('.analytics-card p'); // Title in the appointments card
+    const analyticsCardData = document.querySelector('.analytics-card h3'); // Number of appointments
+    const currentDate = new Date();
+    const currentMonth = currentDate.toLocaleString('default', { month: 'long' }); // Current month name
+    const currentYear = currentDate.getFullYear(); // Current year
+
+    // Update the title dynamically
+    analyticsCardTitle.textContent = `Appointments this ${currentMonth} ${currentYear}`;
+
+    try {
+        // Fetch all appointments from Firestore
+        const appointmentsSnapshot = await getDocs(collection(db, "appointments"));
+        let appointmentCount = 0;
+
+        // Count appointments for the current month and year
+        appointmentsSnapshot.forEach(doc => {
+            const appointmentData = doc.data();
+            const appointmentDate = new Date(appointmentData.date);
+
+            if (
+                appointmentDate.getMonth() === currentDate.getMonth() && // Same month
+                appointmentDate.getFullYear() === currentYear // Same year
+            ) {
+                appointmentCount++;
+            }
+        });
+
+        // Update the card with the count
+        analyticsCardData.textContent = `${appointmentCount}`;
+    } catch (error) {
+        console.error("Error fetching appointments: ", error);
+        analyticsCardData.textContent = "Error";
+    }
+}
+
+// Update sales data dynamically
+async function updateSalesCard() {
+    const salesCardElement = document.querySelector('.analytics-card1 p'); // Sales card title
+    const salesAmountElement = document.querySelector('.analytics-card1 h3'); // Sales card amount
+    const currentDate = new Date();
+    const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
+    const currentYear = currentDate.getFullYear();
+
+    // Set the card title dynamically
+    salesCardElement.textContent = `Sales this ${currentMonth} ${currentYear}`;
+
+    let totalSales = 0;
+
+    try {
+        // Fetch sales data from the Firestore collection
+        const salesSnapshot = await getDocs(collection(db, "sales"));
+        salesSnapshot.forEach(doc => {
+            const sale = doc.data();
+            if (sale.paymentDate) {
+                const paymentDate = new Date(sale.paymentDate);
+                const paymentMonth = paymentDate.toLocaleString('default', { month: 'long' });
+                const paymentYear = paymentDate.getFullYear();
+
+                // Check if the sale is in the current month and year
+                if (paymentMonth === currentMonth && paymentYear === currentYear) {
+                    totalSales += parseFloat(sale.amountPaid || 0); // Add the sale amount
+                }
+            }
+        });
+
+        // Update the card dynamically
+        salesAmountElement.textContent = `${totalSales.toLocaleString()}`;
+    } catch (error) {
+        console.error("Error fetching sales data: ", error);
+        salesAmountElement.textContent = "Error";
+    }
+}
