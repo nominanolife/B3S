@@ -353,85 +353,168 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStudentCard();
 });
 
+// Default selected month and year for students and instructors
+let selectedStudentMonth = 'January';
+let selectedStudentYear = new Date().getFullYear();
+let selectedInstructorMonth = 'January';
+let selectedInstructorYear = new Date().getFullYear();
+
+// Function to populate year dropdown for students from 2020 to the current year
+const studentYearDropdown = document.querySelectorAll('.student-graph-section .filter-date .custom-dropdown')[1].querySelector('.dropdown-options');
+const currentYear = new Date().getFullYear();
+for (let year = 2022; year <= currentYear; year++) {
+    const yearOption = document.createElement('li');
+    yearOption.classList.add('option');
+    yearOption.setAttribute('data-value', year);
+    yearOption.textContent = year;
+    studentYearDropdown.appendChild(yearOption);
+}
+
+// Function to populate year dropdown for instructors from 2020 to the current year
+const instructorYearDropdown = document.querySelectorAll('.instructor-graph-section .filter-date .custom-dropdown')[1].querySelector('.dropdown-options');
+for (let year = 2022; year <= currentYear; year++) {
+    const yearOption = document.createElement('li');
+    yearOption.classList.add('option');
+    yearOption.setAttribute('data-value', year);
+    yearOption.textContent = year;
+    instructorYearDropdown.appendChild(yearOption);
+}
+
+// Event listeners for student dropdowns
+document.querySelectorAll('.student-graph-section .filter-date .custom-dropdown').forEach((dropdown, index) => {
+    const selected = dropdown.querySelector('.selected');
+    const options = dropdown.querySelector('.dropdown-options');
+
+    // Toggle dropdown visibility on click
+    selected.addEventListener('click', () => {
+        options.style.display = options.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Update the selected value and close the dropdown when an option is clicked
+    options.querySelectorAll('.option').forEach(option => {
+        option.addEventListener('click', () => {
+            selected.textContent = option.textContent;
+            options.style.display = 'none';
+
+            // Update selectedStudentMonth or selectedStudentYear based on the dropdown
+            if (index === 0) {
+                selectedStudentMonth = option.dataset.value;
+            } else {
+                selectedStudentYear = parseInt(option.dataset.value);
+            }
+            updateStudentChart(); // Call update function whenever student month or year changes
+        });
+    });
+});
+
+// Event listeners for instructor dropdowns
+document.querySelectorAll('.instructor-graph-section .filter-date .custom-dropdown').forEach((dropdown, index) => {
+    const selected = dropdown.querySelector('.selected');
+    const options = dropdown.querySelector('.dropdown-options');
+
+    // Toggle dropdown visibility on click
+    selected.addEventListener('click', () => {
+        options.style.display = options.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Update the selected value and close the dropdown when an option is clicked
+    options.querySelectorAll('.option').forEach(option => {
+        option.addEventListener('click', () => {
+            selected.textContent = option.textContent;
+            options.style.display = 'none';
+
+            // Update selectedInstructorMonth or selectedInstructorYear based on the dropdown
+            if (index === 0) {
+                selectedInstructorMonth = option.dataset.value;
+            } else {
+                selectedInstructorYear = parseInt(option.dataset.value);
+            }
+            updateInstructorChart(); // Call update function whenever instructor month or year changes
+        });
+    });
+});
+
+// Close the dropdown if clicked outside
+document.addEventListener('click', (event) => {
+    document.querySelectorAll('.filter-date .custom-dropdown').forEach(dropdown => {
+        const options = dropdown.querySelector('.dropdown-options');
+        if (!dropdown.contains(event.target)) {
+            options.style.display = 'none';
+        }
+    });
+});
+
+// Function to update the student chart based on selected month and year
+function updateStudentChart() {
+    renderStudentBarChart(selectedStudentMonth, selectedStudentYear);
+}
+
+// Function to update the instructor chart based on selected month and year
+function updateInstructorChart() {
+    renderInstructorBarChart(selectedInstructorMonth, selectedInstructorYear);
+}
+
+const currentDate = new Date();
+const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
+
+// Set default month and year in student dropdown
+document.querySelector('.student-graph-section .filter-date .custom-dropdown .selected').textContent = currentMonth;
+document.querySelectorAll('.student-graph-section .filter-date .custom-dropdown .selected')[1].textContent = currentYear;
+
+// Set default month and year in instructor dropdown
+document.querySelector('.instructor-graph-section .filter-date .custom-dropdown .selected').textContent = currentMonth;
+document.querySelectorAll('.instructor-graph-section .filter-date .custom-dropdown .selected')[1].textContent = currentYear;
+
+// Assign these as default values for dropdown filtering
+selectedStudentMonth = currentMonth;
+selectedStudentYear = currentYear;
+selectedInstructorMonth = currentMonth;
+selectedInstructorYear = currentYear;
+
+updateStudentChart();
+updateInstructorChart();
+
 // Function to render the student bar chart
-async function renderStudentBarChart() {
+async function renderStudentBarChart(month, year) {
     const ctx = document.querySelector('.student-graph canvas').getContext('2d');
 
-    // Destroy the previous chart instance if it exists
     if (window.studentBarChartInstance) {
         window.studentBarChartInstance.destroy();
     }
 
-    try {
-        const applicantsSnapshot = await getDocs(collection(db, "applicants")); // Fetch all applicants
-        const students = [];
+    // Update labels based on selected month and year
+    const weeklyLabel = `Weekly`;
+    const monthlyLabel = `${month}`;
+    const yearlyLabel = `${year}`;
 
-        // Filter students with role "student" and a valid "dateEnrolled"
+    try {
+        // Fetch and filter data as before
+        const applicantsSnapshot = await getDocs(collection(db, "applicants"));
+        const students = [];
         applicantsSnapshot.forEach(doc => {
             const applicantData = doc.data();
-            if (
-                applicantData.role === "student" && // Role is "student"
-                applicantData.packageName && // Package is enrolled
-                applicantData.dateEnrolled // Ensure dateEnrolled exists
-            ) {
-                // Convert Firestore timestamp to JavaScript Date object
+            if (applicantData.role === "student" && applicantData.dateEnrolled) {
                 students.push(applicantData.dateEnrolled.toDate());
             }
         });
 
-        // Debugging: Log the filtered students' dates
-        console.log("Filtered Students Dates:", students);
+        const monthIndex = new Date(`${month} 1, ${year}`).getMonth();
+        const filteredStudents = students.filter(date => date.getMonth() === monthIndex && date.getFullYear() === year);
 
-        // Current date for calculations
-        const currentDate = new Date();
+        const weeklyCount = filteredStudents.filter(date => (new Date() - date) / (1000 * 60 * 60 * 24) <= 7).length;
+        const monthlyCount = filteredStudents.length;
+        const yearlyCount = students.filter(date => date.getFullYear() === year).length;
 
-        // Weekly count
-        const weeklyCount = students.filter(date => {
-            const diffTime = Math.abs(currentDate - date);
-            const diffDays = diffTime / (1000 * 60 * 60 * 24);
-            return diffDays <= 7; // Within the last 7 days
-        }).length;
-
-        // Monthly count
-        const monthlyCount = students.filter(date => {
-            return (
-                date.getMonth() === currentDate.getMonth() && // Same month
-                date.getFullYear() === currentDate.getFullYear() // Same year
-            );
-        }).length;
-
-        // Yearly count
-        const yearlyCount = students.filter(date => {
-            return date.getFullYear() === currentDate.getFullYear(); // Same year
-        }).length;
-
-        // Debugging: Log the counts
-        console.log("Weekly Count:", weeklyCount);
-        console.log("Monthly Count:", monthlyCount);
-        console.log("Yearly Count:", yearlyCount);
-
-        // Chart data
-        const labels = ['Weekly', 'Monthly', 'Yearly'];
-        const data = [weeklyCount, monthlyCount, yearlyCount];
-
-        // Render the chart
+        // Render the chart with dynamic labels
         window.studentBarChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: labels,
+                labels: [weeklyLabel, monthlyLabel, yearlyLabel],
                 datasets: [{
                     label: 'Students Added',
-                    data: data,
-                    backgroundColor: [
-                        'rgba(75, 192, 192, 0.6)',
-                        'rgba(54, 162, 235, 0.6)',
-                        'rgba(33, 102, 255, 0.6)'
-                    ],
-                    borderColor: [
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(33, 102, 255, 1)'
-                    ],
+                    data: [weeklyCount, monthlyCount, yearlyCount],
+                    backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(33, 102, 255, 0.6)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(54, 162, 235, 1)', 'rgba(33, 102, 255, 1)'],
                     borderWidth: 1,
                     barThickness: 100,
                     borderRadius: 3,
@@ -482,13 +565,17 @@ async function renderStudentBarChart() {
 }
 
 // Function to render the instructor bar chart
-async function renderInstructorBarChart() {
+async function renderInstructorBarChart(month, year) {
     const ctx = document.querySelector('.instructor-graph canvas').getContext('2d');
 
-    // Destroy the previous chart instance if it exists
     if (window.instructorBarChartInstance) {
         window.instructorBarChartInstance.destroy();
     }
+
+    // Update labels based on selected month and year
+    const weeklyLabel = `Weekly`;
+    const monthlyLabel = `${month}`;
+    const yearlyLabel = `${year}`;
 
     try {
         const adminSnapshot = await getDocs(collection(db, "admin"));
@@ -501,55 +588,28 @@ async function renderInstructorBarChart() {
             }
         });
 
-        // Current date for calculations
-        const currentDate = new Date();
+        const monthIndex = new Date(`${month} 1, ${year}`).getMonth();
+        const filteredInstructors = instructors.filter(date =>
+            date.getMonth() === monthIndex && date.getFullYear() === year
+        );
 
-        // Calculate weekly, monthly, and yearly counts
-        const weeklyCount = instructors.filter(date => {
-            const diffTime = Math.abs(currentDate - date);
-            const diffDays = diffTime / (1000 * 60 * 60 * 24);
-            return diffDays <= 7;
-        }).length;
+        const weeklyCount = filteredInstructors.filter(date => (new Date() - date) / (1000 * 60 * 60 * 24) <= 7).length;
+        const monthlyCount = filteredInstructors.length;
+        const yearlyCount = instructors.filter(date => date.getFullYear() === year).length;
 
-        const monthlyCount = instructors.filter(date => {
-            return (
-                date.getMonth() === currentDate.getMonth() &&
-                date.getFullYear() === currentDate.getFullYear()
-            );
-        }).length;
-
-        const yearlyCount = instructors.filter(date => {
-            return date.getFullYear() === currentDate.getFullYear();
-        }).length;
-
-        // Chart data
-        const labels = ['Weekly', 'Monthly', 'Yearly'];
-        const data = [weeklyCount, monthlyCount, yearlyCount];
-
-        // Render the chart
         window.instructorBarChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Weekly', 'Monthly', 'Yearly'],
-                datasets: [
-                    {
-                        label: 'Instructors Added',
-                        data: [weeklyCount, monthlyCount, yearlyCount],
-                        backgroundColor: [
-                            'rgba(50, 150, 250, 0.6)',
-                            'rgba(30, 100, 200, 0.6)',
-                            'rgba(10, 50, 150, 0.6)'
-                        ],
-                        borderColor: [
-                            'rgba(50, 150, 250, 1)',
-                            'rgba(30, 100, 200, 1)',
-                            'rgba(10, 50, 150, 1)'
-                        ],
-                        borderWidth: 2,
-                        barThickness: 100,
-                        borderRadius: 5,
-                    },
-                ],
+                labels: [weeklyLabel, monthlyLabel, yearlyLabel],
+                datasets: [{
+                    label: 'Instructors Added',
+                    data: [weeklyCount, monthlyCount, yearlyCount],
+                    backgroundColor: ['rgba(50, 150, 250, 0.6)', 'rgba(30, 100, 200, 0.6)', 'rgba(10, 50, 150, 0.6)'],
+                    borderColor: ['rgba(50, 150, 250, 1)', 'rgba(30, 100, 200, 1)', 'rgba(10, 50, 150, 1)'],
+                    borderWidth: 2,
+                    barThickness: 100,
+                    borderRadius: 5,
+                }]
             },
             options: {
                 responsive: true,
@@ -591,7 +651,7 @@ async function renderInstructorBarChart() {
             },
         });        
     } catch (error) {
-        console.error("Error fetching instructor data for the chart: ", error);
+        console.error("Error fetching instructor data for the chart:", error);
     }
 }
 

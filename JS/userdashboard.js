@@ -747,7 +747,10 @@ function populateWheelsModal(assessmentData, WprocessedData) {
         'General': 'generalResult'
     };
 
-    // Populate scores in the modal fields
+    let totalScore = 0; // Initialize total score
+    let maxScore = 0; // Initialize maximum possible score
+
+    // Populate scores and calculate total
     assessmentData.categories.forEach(category => {
         category.items.forEach(item => {
             const fieldId = sentenceToFieldIdMap[item.sentence];
@@ -762,6 +765,10 @@ function populateWheelsModal(assessmentData, WprocessedData) {
                 if (commentElement) {
                     commentElement.textContent = item.comment || "No comment provided."; // Fallback if no comment
                 }
+
+                // Calculate total and max scores
+                totalScore += item.score;
+                maxScore += 5; // Assuming each item has a max score of 5
             }
         });
     });
@@ -778,7 +785,7 @@ function populateWheelsModal(assessmentData, WprocessedData) {
             if (performanceResult === 'Poor') {
                 resultElement.style.color = '#B60505'; // Set color to red for 'Poor'
             } else if (performanceResult === 'Great') {
-                resultElement.style.color = '#142A74'; // Set color to green for 'Great'
+                resultElement.style.color = '#142A74'; // Set color to blue for 'Great'
             } else if (performanceResult === 'Excellent') {
                 resultElement.style.color = 'green'; // Set color to green for 'Excellent'
             } else {
@@ -786,6 +793,25 @@ function populateWheelsModal(assessmentData, WprocessedData) {
             }
         }
     });
+
+    // Calculate percentage and determine Pass/Fail
+    const totalScorePercentage = ((totalScore / maxScore) * 100).toFixed(2); // Calculate percentage
+    const passThreshold = 84; // Define pass threshold (percentage or points)
+    const passFailComment = totalScorePercentage >= passThreshold ? "Passed" : "Failed";
+
+    // Update Total Score Percentage
+    const totalScorePercentageElement = document.querySelector('tfoot tr:nth-child(2) td:nth-child(2) span');
+    if (totalScorePercentageElement) {
+        totalScorePercentageElement.textContent = `${totalScorePercentage}%`; // Update percentage
+    }
+
+    // Update Comments Column with "Passed" or "Failed"
+    const commentsColumn = document.querySelector('tfoot tr:nth-child(2) td:nth-child(3)');
+    if (commentsColumn) {
+        commentsColumn.style.fontWeight = "Normal";
+        commentsColumn.style.color = totalScorePercentage >= passThreshold ? "green" : "#B60505";
+        commentsColumn.textContent = passFailComment; // Update the comments column
+    }
 }
 
 function updateLessonCheckboxes(Wchecklist) {
@@ -995,7 +1021,6 @@ function populateMotorsModal(assessmentData, processedData) {
         commentsColumn.textContent = passFailComment; // Update the comments column
     }
 }
-
 
 function updateMotorLessonCheckboxes(Mchecklist) {
     console.log('Updating motorcycle checkboxes with data:', Mchecklist);
