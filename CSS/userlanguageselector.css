@@ -84,6 +84,12 @@ h2 {
     height: 100%;
     gap: 10px;
 }
+@media (max-width: 768px) {
+    .page-content {
+        padding: 20px;
+        gap: 5px;
+    }
+}
 
 .page-content-body {
     display: flex;
@@ -95,6 +101,13 @@ h2 {
     height: 100%;
     width: 100%;
     gap: 30px;
+}
+@media (max-width: 768px) {
+    .page-content-body {
+        flex-direction: column;
+        padding: 20px;
+        gap: 15px;
+    }
 }
 
 .filipino, .english {
@@ -109,6 +122,20 @@ h2 {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+@media (max-width: 768px) {
+    .filipino, .english {
+        height: auto;
+        width: 90%;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .filipino, .english {
+        padding: 10px;
+        border-radius: 8px;
+    }
+}
 
 .filipino:hover, .english:hover {
     cursor: pointer;
@@ -116,12 +143,29 @@ h2 {
     transform: scale(1.05);
     transition: transform 0.3s ease-in-out;
 }
+@media (max-width: 480px) {
+    .filipino:hover, .english:hover {
+        transform: scale(1.02);
+    }
+}
 
 
 .filipino i, .english i {
     font-size: 100px;
     color: #142A74;
 }
+@media (max-width: 768px) {
+    .filipino i, .english i {
+        font-size: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .filipino i, .english i {
+        font-size: 60px;
+    }
+}
+
 
 .filipino h3, .english h3 {
     font-family: Poppins;
@@ -129,6 +173,17 @@ h2 {
     font-weight: bold;
     color: #142A74;
     margin: 0;
+}
+@media (max-width: 768px) {
+    .filipino h3, .english h3 {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .filipino h3, .english h3 {
+        font-size: 20px;
+    }
 }
 
 @keyframes popOut {
@@ -160,7 +215,12 @@ h2 {
     flex-direction: column;
     font-family: 'Poppins', sans-serif;
 }
-
+@media (max-width: 768px) {
+    .loader1 {
+        width: 100%; 
+        padding: 20px;
+    }
+}
 .loader1 .car-loader {
     width: 80px;
     height: 80px;
@@ -170,18 +230,34 @@ h2 {
     animation: spin 2s linear infinite;
     position: relative;
 }
-
+@media (max-width: 768px) {
+    .loader1 .car-loader {
+        width: 60px;
+        height: 60px;
+        border-width: 3px;
+    }
+}
 .loader1 p {
     margin-top: 20px;
     font-size: 18px;
     color: #142A74;
     position: relative;
 }
+@media (max-width: 768px) {
+    .loader1 p {
+        font-size: 16px;
+    }
+}
 
 .dots {
     display: inline-block;
     font-size: 18px;
     font-weight: bold;
+}
+@media (max-width: 768px) {
+    .dots {
+        font-size: 16px;
+    }
 }
 
 .dots::after {
