@@ -52,7 +52,35 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// Fetch instructors and availability
+// Add an event listener to the filter dropdown
+const filterContainer = document.querySelector('.filter-container');
+const filterSelected = document.querySelector('.filter-container .selected');
+const filterOptions = document.querySelectorAll('.filter-container .dropdown-options .option');
+
+let selectedFilter = ""; // To track the selected filter option
+
+filterSelected.addEventListener('click', () => {
+  filterContainer.classList.toggle('open');
+});
+
+document.addEventListener('click', (event) => {
+  if (!filterContainer.contains(event.target) && filterContainer.classList.contains('open')) {
+    filterContainer.classList.remove('open'); // Close the dropdown if clicked outside
+  }
+});
+
+// Listen for each option click to update selected filter
+filterOptions.forEach(option => {
+  option.addEventListener('click', () => {
+    selectedFilter = option.dataset.value; // Update the filter value
+    filterSelected.innerText = option.innerText; // Show selected option
+    filterContainer.classList.remove('open');
+    
+    fetchInstructorsAndAvailability(); // Re-fetch and apply filter
+  });
+});
+
+// Modify fetchInstructorsAndAvailability function to apply filter
 async function fetchInstructorsAndAvailability() {
   const instructorSnapshot = await getDocs(collection(db, "instructors"));
   const availabilitySnapshot = await getDocs(collection(db, "availability"));
@@ -68,8 +96,27 @@ async function fetchInstructorsAndAvailability() {
   });
 
   assignColorsToInstructors(instructors);
-  renderCalendar(currentMonth, currentYear, instructors, availability);
-  populateInstructorTable(instructors, availability); // Populate the table
+
+  // Apply filter before rendering calendar and table
+  const filteredAvailability = applyFilter(availability);
+  renderCalendar(currentMonth, currentYear, instructors, filteredAvailability);
+  populateInstructorTable(instructors, filteredAvailability); // Populate the table
+}
+
+// Filter the availability based on selected filter
+function applyFilter(availability) {
+  if (!selectedFilter || selectedFilter === 'All') return availability;
+
+  const filtered = {};
+  for (const instructorId in availability) {
+    const bookings = availability[instructorId]?.bookings || [];
+    const filteredBookings = bookings.filter(booking => booking.course === selectedFilter);
+    
+    if (filteredBookings.length) {
+      filtered[instructorId] = { bookings: filteredBookings };
+    }
+  }
+  return filtered;
 }
 
 // Assign unique colors to instructors
@@ -85,7 +132,6 @@ function assignColorsToInstructors(instructors) {
     colorIndex++;
   }
 }
-
 
 // Render the calendar
 function renderCalendar(month, year, instructors, availability) {
