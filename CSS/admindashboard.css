@@ -192,7 +192,7 @@ body {
 .page-content {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
     padding: 30px 30px;
     background-color: #f5f5f5;
 }
@@ -206,43 +206,46 @@ body {
 
 .page-content-header {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .analytics {
     display: flex;
     flex-direction: row;
-    gap: 20px;
+    gap: 10px;
+}
+
+.analytics a {
+    width: 100%;
 }
 
 .analytics a:hover {
     text-decoration: none;
 }
 
-.analytics-card, .analytics-card1 {
+.analytics-card, .analytics-card1, .analytics-card2, .analytics-card3 {
     font-family: Poppins;
     font-size: 14px;
     font-weight: bold;
     border: 2px solid #142A74;
-    background: linear-gradient(#102369 ,#18349C, #2045CF);
+    background: #142A74;
     color: #ffffff;
     border-radius: 10px;
-    padding: 10px 60px;
+    padding: 20px;
     cursor: pointer;
 }
 
-.analytics-card:hover, .analytics-card1:hover {
+.analytics-card:hover, .analytics-card1:hover, .analytics-card2:hover, .analytics-card3:hover {
     text-decoration: none;
     background: #ffffff;
 }
 
-.analytics-card:hover p, .analytics-card:hover h3, .analytics-card:hover i, .analytics-card1:hover p, .analytics-card1:hover h3, .analytics-card1:hover i {
+.analytics-card:hover p, .analytics-card:hover h3, .analytics-card:hover i, .analytics-card1:hover p, .analytics-card1:hover h3, .analytics-card1:hover i, .analytics-card2:hover p, .analytics-card2:hover h3, .analytics-card2:hover i, .analytics-card3:hover p, .analytics-card3:hover h3, .analytics-card3:hover i {
     color: #142A74
 }
 
-.analytics-card p, .analytics-card1 p {
+.analytics-card p, .analytics-card1 p, .analytics-card2 p, .analytics-card3 p {
     font-family: Poppins;
     font-size: 14px;
     font-weight: bold;
@@ -279,11 +282,9 @@ body {
 }
 
 .dashboard-bttns {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: row;
     gap: 10px;
-    justify-content: center;
-    align-items: center;
 }
 
 .button-right {
@@ -291,11 +292,12 @@ body {
     font-size: 14px;
     font-weight: bold;
     border: 2px solid #142A74;
-    background: linear-gradient(#102369 ,#18349C, #2045CF);
+    background: #142A74;
     color: #ffffff;
     border-radius: 10px;
     padding: 10px 60px;
     text-align: center;
+    width: 100%;
 }
 
 .button-right:hover {
@@ -305,7 +307,7 @@ body {
 
 .page-body {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     gap: 10px;
 }
@@ -315,6 +317,113 @@ body {
     font-size: 18px;
     font-weight: bold;
     color: #585353;
+}
+
+.graph-section {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+}
+
+.student-graph-section, .instructor-graph-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.filter-date {
+    display: flex;
+    flex-direction: row;
+    width: 50%;
+    gap: 10px;
+}
+
+.custom-dropdown {
+    position: relative;
+    width: 50%;
+    cursor: pointer;
+    font-family: Poppins;
+    font-size: 14px;
+}
+
+.selected {
+    border: 1px solid #D9D9D9;
+    padding: 10px 20px;
+    height: 30px;
+    border-radius: 10px;
+    color: #2F2E2E;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.selected:after {
+    content: '\25BC';
+    font-size: 12px;
+    color: #142A74;
+    margin-left: 10px;
+    position: absolute;
+    right: 10px;
+}
+
+.dropdown-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background-color: #FFFFFF;
+    border: 1px solid #D9D9D9;
+    border-radius: 8px;
+    position: absolute;
+    width: 100%;
+    top: calc(100% + 5px);
+    left: 0;
+    z-index: 10;
+    display: none;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.option {
+    padding: 10px;
+    color: #2F2E2E;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.option:hover {
+    background-color: #142A74;
+    color: #ffffff;
+}
+
+.custom-dropdown.open .dropdown-options {
+    display: block;
+}
+
+.selected:hover, .selected:focus {
+    border-color: #142A74;
+    box-shadow: 0px 0px 4px 2px rgba(20, 42, 116, 0.5);
+}
+
+.student-graph, .instructor-graph {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    border: 1px solid #D9D9D9;
+    border-radius: 20px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    min-height: 300px;
+    width: 100%;
+    gap: 10px;
+}
+
+.container-section {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
 }
 
 .filter-container {
@@ -385,6 +494,16 @@ body {
     box-shadow: 0px 0px 4px 2px rgba(20, 42, 116, 0.5);
 }
 
+.upcomming-container i {
+    font-size: 12px;
+    color: #2F2E2E;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: flex-end;
+}
+
 .upcomming-container {
     display: flex;
     flex-direction: column;
@@ -392,7 +511,7 @@ body {
     border: 1px solid #D9D9D9;
     border-radius: 20px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    min-height: 720px;
+    min-height: 500px;
     width: 100%;
     gap: 10px;
 }
@@ -464,6 +583,16 @@ body {
     color: #585353;
 }
 
+.cancelled-container i {
+    font-size: 12px;
+    color: #2F2E2E;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: flex-end;
+}
+
 .cancelled-container {
     display: flex;
     flex-direction: column;
@@ -471,7 +600,7 @@ body {
     border: 1px solid #D9D9D9;
     border-radius: 20px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    min-height: 720px;
+    min-height: 500px;
     width: 100%;
     gap: 10px;
 }

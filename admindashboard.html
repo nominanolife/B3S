@@ -43,6 +43,12 @@
             <div class="page-content">
                 <h2>Welcome Back, <b>Admin</b></h2>
                 <div class="page-content-header">
+                    <div class="dashboard-bttns">
+                        <a href="adminapplicantlist.html" class="button-right">APPLICANT LIST</a>
+                        <a href="adminstudentlist.html" class="button-right">STUDENT LIST</a>
+                        <a href="admininstructorlist.html" class="button-right">INSTRUCTOR LIST</a>
+                        <a href="adminquizpassed.html" class="button-right">PASSED STUDENTS</a>
+                    </div>
                     <div class="analytics">
                         <a href="adminappointment.html">
                             <div class="analytics-card">
@@ -62,80 +68,156 @@
                                 </div>
                             </div>
                         </a>
-                    </div>
-                    <div class="dashboard-bttns">
-                        <a href="adminapplicantlist.html" class="button-right">APPLICANT LIST</a>
-                        <a href="adminstudentlist.html" class="button-right">STUDENT LIST</a>
-                        <a href="admininstructorlist.html" class="button-right">INSTRUCTOR LIST</a>
-                        <a href="adminquizpassed.html" class="button-right">PASSED STUDENTS</a>
+                        <a href="admininstructorlist.html">
+                            <div class="analytics-card2">
+                                <p></p>
+                                <div class="analytics-card-data">
+                                    <h3></h3>
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="adminstudentlist.html">
+                            <div class="analytics-card3">
+                                <p></p>
+                                <div class="analytics-card-data">
+                                    <h3></h3>
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <div class="page-body">
-                    <div class="upcomming-container">
-                        <div class="title-header">
-                            <h2>UPCOMING APPOINTMENTS</h2>
-                            <div class="search-container">
-                                <i class="bi bi-search"></i>
-                                <input type="text" class="search search-upcoming" placeholder="Search">
+                    <div class="graph-section">
+                        <div class="student-graph-section">
+                            <div class="filter-date">
+                                <div class="custom-dropdown">
+                                    <div class="selected">January</div>
+                                    <ul class="dropdown-options">
+                                        <li class="option" data-value="January">January</li>
+                                        <li class="option" data-value="February">February</li>
+                                        <li class="option" data-value="March">March</li>
+                                        <li class="option" data-value="April">April</li>
+                                        <li class="option" data-value="May">May</li>
+                                        <li class="option" data-value="June">June</li>
+                                        <li class="option" data-value="July">July</li>
+                                        <li class="option" data-value="August">August</li>
+                                        <li class="option" data-value="September">September</li>
+                                        <li class="option" data-value="October">October</li>
+                                        <li class="option" data-value="November">November</li>
+                                        <li class="option" data-value="December">December</li>
+                                    </ul>
+                                </div>
+                                <div class="custom-dropdown">
+                                    <div class="selected">2024</div>
+                                    <ul class="dropdown-options">
+                                        <!-- Populate dynamically with JavaScript -->
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="filter-container">
-                                <div class="selected" id="courseFilterSelected">All</div>
-                                <ul class="dropdown-options" id="courseFilterOptions">
-                                    <li class="option" data-value="">All</li>
-                                    <li class="option" data-value="TDC">TDC</li>
-                                    <li class="option" data-value="PDC-4Wheels">PDC-4Wheels</li>
-                                    <li class="option" data-value="PDC-Motors">PDC-Motors</li>
-                                </ul>
+                            <div class="student-graph">
+                                <canvas></canvas>
                             </div>
                         </div>
-                        <table class="table">
-                            <thead class="table-headers">
-                                <tr class="table-headers-title">
-                                    <th>NAME</th>
-                                    <th>COURSE</th>
-                                    <th>DATE</th>  
-                                    <th>TIME</th>
-                                </tr>
-                            </thead>
-                            <tbody class="upcoming-list">
-                                <!-- Appointment rows will be dynamically inserted here -->
-                            </tbody>
-                        </table>
-                        <!-- Pagination controls for Upcoming Appointments -->
-                        <div class="pagination-controls upcoming-pagination-controls"></div>
+                        <div class="instructor-graph-section">
+                            <div class="filter-date">
+                                <div class="custom-dropdown">
+                                    <div class="selected">January</div>
+                                    <ul class="dropdown-options">
+                                        <li class="option" data-value="January">January</li>
+                                        <li class="option" data-value="February">February</li>
+                                        <li class="option" data-value="March">March</li>
+                                        <li class="option" data-value="April">April</li>
+                                        <li class="option" data-value="May">May</li>
+                                        <li class="option" data-value="June">June</li>
+                                        <li class="option" data-value="July">July</li>
+                                        <li class="option" data-value="August">August</li>
+                                        <li class="option" data-value="September">September</li>
+                                        <li class="option" data-value="October">October</li>
+                                        <li class="option" data-value="November">November</li>
+                                        <li class="option" data-value="December">December</li>
+                                    </ul>
+                                </div>
+                                <div class="custom-dropdown">
+                                    <div class="selected">2024</div>
+                                    <ul class="dropdown-options">
+                                        <!-- Populate dynamically with JavaScript -->
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="instructor-graph">
+                                <canvas></canvas>
+                            </div>
+                        </div>
                     </div>
-                    <div class="cancelled-container">
-                        <div class="title-header">
-                            <h2>CANCELLED/RESCHEDULED APPOINTMENTS</h2>
-                            <div class="search-container">
-                                <i class="bi bi-search"></i>
-                                <input type="text" class="search search-cancelled" placeholder="Search">
+                    <div class="container-section">
+                        <div class="upcomming-container">
+                            <div class="title-header">
+                                <h2>UPCOMING APPOINTMENTS</h2>
+                                <div class="search-container">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" class="search search-upcoming" placeholder="Search">
+                                </div>
+                                <div class="filter-container">
+                                    <div class="selected" id="courseFilterSelected">All</div>
+                                    <ul class="dropdown-options" id="courseFilterOptions">
+                                        <li class="option" data-value="">All</li>
+                                        <li class="option" data-value="TDC">TDC</li>
+                                        <li class="option" data-value="PDC-4Wheels">PDC-4Wheels</li>
+                                        <li class="option" data-value="PDC-Motors">PDC-Motors</li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="filter-container">
-                                <div class="selected" id="cancelledCourseFilterSelected">All</div>
-                                <ul class="dropdown-options" id="cancelledCourseFilterOptions">
-                                    <li class="option" data-value="">All</li>
-                                    <li class="option" data-value="TDC">TDC</li>
-                                    <li class="option" data-value="PDC-4Wheels">PDC-4Wheels</li>
-                                    <li class="option" data-value="PDC-Motors">PDC-Motors</li>
-                                </ul>
-                            </div>
+                            <table class="table">
+                                <thead class="table-headers">
+                                    <tr class="table-headers-title">
+                                        <th>NAME</th>
+                                        <th>COURSE</th>
+                                        <th>DATE</th>  
+                                        <th>TIME</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="upcoming-list">
+                                    <!-- Appointment rows will be dynamically inserted here -->
+                                </tbody>
+                            </table>
+                            <!-- Pagination controls for Upcoming Appointments -->
+                            <div class="pagination-controls upcoming-pagination-controls"></div>
                         </div>
-                        <table class="table">
-                            <thead class="table-headers">
-                                <tr class="table-headers-title">
-                                    <th>NAME</th>
-                                    <th>COURSE</th>
-                                    <th>DATE</th>
-                                    <th>TIME</th>
-                                </tr>
-                            </thead>
-                            <tbody class="cancelled-list">
-                                <!-- Cancelled/Rescheduled rows will be dynamically inserted here -->
-                            </tbody>
-                        </table>
-                        <!-- Pagination controls for Cancelled/Rescheduled Appointments -->
-                        <div class="pagination-controls cancelled-pagination-controls"></div>
+                        <div class="cancelled-container">
+                            <div class="title-header">
+                                <h2>CANCELLED/RESCHEDULED APPOINTMENTS</h2>
+                                <div class="search-container">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" class="search search-cancelled" placeholder="Search">
+                                </div>
+                                <div class="filter-container">
+                                    <div class="selected" id="cancelledCourseFilterSelected">All</div>
+                                    <ul class="dropdown-options" id="cancelledCourseFilterOptions">
+                                        <li class="option" data-value="">All</li>
+                                        <li class="option" data-value="TDC">TDC</li>
+                                        <li class="option" data-value="PDC-4Wheels">PDC-4Wheels</li>
+                                        <li class="option" data-value="PDC-Motors">PDC-Motors</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <table class="table">
+                                <thead class="table-headers">
+                                    <tr class="table-headers-title">
+                                        <th>NAME</th>
+                                        <th>COURSE</th>
+                                        <th>DATE</th>
+                                        <th>TIME</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="cancelled-list">
+                                    <!-- Cancelled/Rescheduled rows will be dynamically inserted here -->
+                                </tbody>
+                            </table>
+                            <!-- Pagination controls for Cancelled/Rescheduled Appointments -->
+                            <div class="pagination-controls cancelled-pagination-controls"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -168,6 +250,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="JS/admindashboard.js"></script>
     <script src="JS/admincommon.js"></script>
 </body>

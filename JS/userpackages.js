@@ -1,6 +1,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
 import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js';
+import { serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -135,6 +136,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Enroll the user in a package
 document.getElementById('confirmEnrollButton').addEventListener('click', async () => {
   const packageId = document.getElementById('confirmEnrollButton').dataset.packageId;
   const packageName = document.getElementById('confirmEnrollButton').dataset.packageName;
@@ -153,7 +155,8 @@ document.getElementById('confirmEnrollButton').addEventListener('click', async (
             role: "student",
             packageName: packageName, // Store the package name
             packagePrice: selectedPackage.price, // Store the package price
-            packageType: selectedPackage.type // Store the package type
+            packageType: selectedPackage.type, // Store the package type
+            dateEnrolled: serverTimestamp() // Add the timestamp for enrollment
           });
           document.querySelectorAll('.enroll-now-button').forEach(btn => btn.disabled = true);
           userEnrolledPackage = packageName;
@@ -162,11 +165,11 @@ document.getElementById('confirmEnrollButton').addEventListener('click', async (
           showEnrollmentModal("Failed to enroll. Please try again.", "error");
         }
       } else {
-       
+        // Handle case where selected package is not found
       }
     }
   } else {
-   
+    // Handle case where user is not authenticated
   }
 
   // Hide the confirmation modal

@@ -26,7 +26,7 @@ let totalPagesCancelled = 1;
 let allBookingsCancelled = [];
 
 // Items per page
-const itemsPerPage = 10;
+const itemsPerPage = 6;
 const loader = document.getElementById('loader1');
 
 // Fetch and render the bookings
@@ -345,9 +345,315 @@ fetchBookings();
 
 // Call the function to update the appointments card on page load
 document.addEventListener('DOMContentLoaded', () => {
+    renderInstructorBarChart();
+    renderStudentBarChart();
     updateSalesCard();
     updateAppointmentsCard();
+    updateInstructorCard();
+    updateStudentCard();
 });
+
+// Default selected month and year for students and instructors
+let selectedStudentMonth = 'January';
+let selectedStudentYear = new Date().getFullYear();
+let selectedInstructorMonth = 'January';
+let selectedInstructorYear = new Date().getFullYear();
+
+// Function to populate year dropdown for students from 2020 to the current year
+const studentYearDropdown = document.querySelectorAll('.student-graph-section .filter-date .custom-dropdown')[1].querySelector('.dropdown-options');
+const currentYear = new Date().getFullYear();
+for (let year = 2022; year <= currentYear; year++) {
+    const yearOption = document.createElement('li');
+    yearOption.classList.add('option');
+    yearOption.setAttribute('data-value', year);
+    yearOption.textContent = year;
+    studentYearDropdown.appendChild(yearOption);
+}
+
+// Function to populate year dropdown for instructors from 2020 to the current year
+const instructorYearDropdown = document.querySelectorAll('.instructor-graph-section .filter-date .custom-dropdown')[1].querySelector('.dropdown-options');
+for (let year = 2022; year <= currentYear; year++) {
+    const yearOption = document.createElement('li');
+    yearOption.classList.add('option');
+    yearOption.setAttribute('data-value', year);
+    yearOption.textContent = year;
+    instructorYearDropdown.appendChild(yearOption);
+}
+
+// Event listeners for student dropdowns
+document.querySelectorAll('.student-graph-section .filter-date .custom-dropdown').forEach((dropdown, index) => {
+    const selected = dropdown.querySelector('.selected');
+    const options = dropdown.querySelector('.dropdown-options');
+
+    // Toggle dropdown visibility on click
+    selected.addEventListener('click', () => {
+        options.style.display = options.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Update the selected value and close the dropdown when an option is clicked
+    options.querySelectorAll('.option').forEach(option => {
+        option.addEventListener('click', () => {
+            selected.textContent = option.textContent;
+            options.style.display = 'none';
+
+            // Update selectedStudentMonth or selectedStudentYear based on the dropdown
+            if (index === 0) {
+                selectedStudentMonth = option.dataset.value;
+            } else {
+                selectedStudentYear = parseInt(option.dataset.value);
+            }
+            updateStudentChart(); // Call update function whenever student month or year changes
+        });
+    });
+});
+
+// Event listeners for instructor dropdowns
+document.querySelectorAll('.instructor-graph-section .filter-date .custom-dropdown').forEach((dropdown, index) => {
+    const selected = dropdown.querySelector('.selected');
+    const options = dropdown.querySelector('.dropdown-options');
+
+    // Toggle dropdown visibility on click
+    selected.addEventListener('click', () => {
+        options.style.display = options.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Update the selected value and close the dropdown when an option is clicked
+    options.querySelectorAll('.option').forEach(option => {
+        option.addEventListener('click', () => {
+            selected.textContent = option.textContent;
+            options.style.display = 'none';
+
+            // Update selectedInstructorMonth or selectedInstructorYear based on the dropdown
+            if (index === 0) {
+                selectedInstructorMonth = option.dataset.value;
+            } else {
+                selectedInstructorYear = parseInt(option.dataset.value);
+            }
+            updateInstructorChart(); // Call update function whenever instructor month or year changes
+        });
+    });
+});
+
+// Close the dropdown if clicked outside
+document.addEventListener('click', (event) => {
+    document.querySelectorAll('.filter-date .custom-dropdown').forEach(dropdown => {
+        const options = dropdown.querySelector('.dropdown-options');
+        if (!dropdown.contains(event.target)) {
+            options.style.display = 'none';
+        }
+    });
+});
+
+// Function to update the student chart based on selected month and year
+function updateStudentChart() {
+    renderStudentBarChart(selectedStudentMonth, selectedStudentYear);
+}
+
+// Function to update the instructor chart based on selected month and year
+function updateInstructorChart() {
+    renderInstructorBarChart(selectedInstructorMonth, selectedInstructorYear);
+}
+
+const currentDate = new Date();
+const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
+
+// Set default month and year in student dropdown
+document.querySelector('.student-graph-section .filter-date .custom-dropdown .selected').textContent = currentMonth;
+document.querySelectorAll('.student-graph-section .filter-date .custom-dropdown .selected')[1].textContent = currentYear;
+
+// Set default month and year in instructor dropdown
+document.querySelector('.instructor-graph-section .filter-date .custom-dropdown .selected').textContent = currentMonth;
+document.querySelectorAll('.instructor-graph-section .filter-date .custom-dropdown .selected')[1].textContent = currentYear;
+
+// Assign these as default values for dropdown filtering
+selectedStudentMonth = currentMonth;
+selectedStudentYear = currentYear;
+selectedInstructorMonth = currentMonth;
+selectedInstructorYear = currentYear;
+
+updateStudentChart();
+updateInstructorChart();
+
+// Function to render the student bar chart
+async function renderStudentBarChart(month, year) {
+    const ctx = document.querySelector('.student-graph canvas').getContext('2d');
+
+    if (window.studentBarChartInstance) {
+        window.studentBarChartInstance.destroy();
+    }
+
+    // Update labels based on selected month and year
+    const weeklyLabel = `Weekly`;
+    const monthlyLabel = `${month}`;
+    const yearlyLabel = `${year}`;
+
+    try {
+        // Fetch and filter data as before
+        const applicantsSnapshot = await getDocs(collection(db, "applicants"));
+        const students = [];
+        applicantsSnapshot.forEach(doc => {
+            const applicantData = doc.data();
+            if (applicantData.role === "student" && applicantData.dateEnrolled) {
+                students.push(applicantData.dateEnrolled.toDate());
+            }
+        });
+
+        const monthIndex = new Date(`${month} 1, ${year}`).getMonth();
+        const filteredStudents = students.filter(date => date.getMonth() === monthIndex && date.getFullYear() === year);
+
+        const weeklyCount = filteredStudents.filter(date => (new Date() - date) / (1000 * 60 * 60 * 24) <= 7).length;
+        const monthlyCount = filteredStudents.length;
+        const yearlyCount = students.filter(date => date.getFullYear() === year).length;
+
+        // Render the chart with dynamic labels
+        window.studentBarChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [weeklyLabel, monthlyLabel, yearlyLabel],
+                datasets: [{
+                    label: 'Students Added',
+                    data: [weeklyCount, monthlyCount, yearlyCount],
+                    backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(33, 102, 255, 0.6)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(54, 162, 235, 1)', 'rgba(33, 102, 255, 1)'],
+                    borderWidth: 1,
+                    barThickness: 100,
+                    borderRadius: 3,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Number of Students',
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        },
+                        beginAtZero: true
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time Period',
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'rectRounded',
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });        
+    } catch (error) {
+        console.error("Error rendering student bar chart:", error);
+    }
+}
+
+// Function to render the instructor bar chart
+async function renderInstructorBarChart(month, year) {
+    const ctx = document.querySelector('.instructor-graph canvas').getContext('2d');
+
+    if (window.instructorBarChartInstance) {
+        window.instructorBarChartInstance.destroy();
+    }
+
+    // Update labels based on selected month and year
+    const weeklyLabel = `Weekly`;
+    const monthlyLabel = `${month}`;
+    const yearlyLabel = `${year}`;
+
+    try {
+        const adminSnapshot = await getDocs(collection(db, "admin"));
+        const instructors = [];
+
+        adminSnapshot.forEach(doc => {
+            const adminData = doc.data();
+            if (adminData.role === "instructor" && adminData.dateCreated) {
+                instructors.push(new Date(adminData.dateCreated));
+            }
+        });
+
+        const monthIndex = new Date(`${month} 1, ${year}`).getMonth();
+        const filteredInstructors = instructors.filter(date =>
+            date.getMonth() === monthIndex && date.getFullYear() === year
+        );
+
+        const weeklyCount = filteredInstructors.filter(date => (new Date() - date) / (1000 * 60 * 60 * 24) <= 7).length;
+        const monthlyCount = filteredInstructors.length;
+        const yearlyCount = instructors.filter(date => date.getFullYear() === year).length;
+
+        window.instructorBarChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [weeklyLabel, monthlyLabel, yearlyLabel],
+                datasets: [{
+                    label: 'Instructors Added',
+                    data: [weeklyCount, monthlyCount, yearlyCount],
+                    backgroundColor: ['rgba(50, 150, 250, 0.6)', 'rgba(30, 100, 200, 0.6)', 'rgba(10, 50, 150, 0.6)'],
+                    borderColor: ['rgba(50, 150, 250, 1)', 'rgba(30, 100, 200, 1)', 'rgba(10, 50, 150, 1)'],
+                    borderWidth: 2,
+                    barThickness: 100,
+                    borderRadius: 5,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Number of Instructors',
+                            font: {
+                                size: 12,
+                                weight: 'bold',
+                            },
+                        },
+                        beginAtZero: true,
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time Period',
+                            font: {
+                                size: 12,
+                                weight: 'bold',
+                            },
+                        },
+                    },
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'rectRounded',
+                            font: {
+                                size: 11,
+                            },
+                        },
+                    },
+                },
+            },
+        });        
+    } catch (error) {
+        console.error("Error fetching instructor data for the chart:", error);
+    }
+}
 
 // Function to dynamically update the appointments card
 async function updateAppointmentsCard() {
@@ -421,5 +727,63 @@ async function updateSalesCard() {
     } catch (error) {
         console.error("Error fetching sales data: ", error);
         salesAmountElement.textContent = "Error";
+    }
+}
+
+// Function to dynamically update the instructors card
+async function updateInstructorCard() {
+    const instructorCardTitle = document.querySelector('.analytics-card2 p'); // Title in the instructor card
+    const instructorCardData = document.querySelector('.analytics-card2 h3'); // Number of instructors
+  
+    // Set the card title dynamically
+    instructorCardTitle.textContent = 'Number of Instructors';
+  
+    try {
+      // Fetch all admin users from Firestore
+      const adminSnapshot = await getDocs(collection(db, "admin"));
+      let instructorCount = 0;
+  
+      // Count the instructors based on their role
+      adminSnapshot.forEach(doc => {
+        const adminData = doc.data();
+        if (adminData.role === "instructor") {
+          instructorCount++;
+        }
+      });
+  
+      // Update the card with the count
+      instructorCardData.textContent = `${instructorCount}`;
+    } catch (error) {
+      console.error("Error fetching instructor data: ", error);
+      instructorCardData.textContent = "Error";
+    }
+}
+
+// Function to dynamically update the students card
+async function updateStudentCard() {
+    const studentCardTitle = document.querySelector('.analytics-card3 p');
+    const studentCardData = document.querySelector('.analytics-card3 h3');
+
+    // Set the card title dynamically
+    studentCardTitle.textContent = 'Number of Students';
+
+    try {
+        // Fetch all applicants from Firestore
+        const studentsSnapshot = await getDocs(collection(db, "applicants"));
+        let studentCount = 0;
+
+        // Filter documents with role "student"
+        studentsSnapshot.forEach(doc => {
+            const studentData = doc.data();
+            if (studentData.role === "student") {
+                studentCount++;
+            }
+        });
+
+        // Update the card with the count
+        studentCardData.textContent = `${studentCount}`;
+    } catch (error) {
+        console.error("Error fetching student data: ", error);
+        studentCardData.textContent = "Error";
     }
 }

@@ -801,10 +801,10 @@ function renderPackageBarChart(packageData) {
           datasets: [{
               label: 'Students per Package',
               data: data,
-              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              backgroundColor: 'rgba(75, 192, 192, 0.6)',
               borderColor: 'rgba(75, 192, 192, 1)',
               borderWidth: 1,
-              barThickness: 50, // Adjust the thickness of bars as needed
+              barThickness: 100, // Adjust the thickness of bars as needed
               borderRadius: 3, // Rounded corners on bars
           }]
       },
