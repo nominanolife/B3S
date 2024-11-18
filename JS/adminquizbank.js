@@ -126,8 +126,10 @@ async function fetchQuizQuestions(selectedLanguage = null) {
                 categoryBox.insertAdjacentHTML('beforeend', `
                     <div class="question">
                         <div class="question-header">
-                            <p>Language: ${question.language || "Not specified"}</p> <!-- Display language above question -->
-                            <p>Question ${questionIndex + 1}: ${question.question}</p>
+                            <div class="question-text">
+                                <h5>Language: ${question.language || "Not specified"}</h5> <!-- Display language above question -->
+                                <p>Question ${questionIndex + 1}: ${question.question}</p>
+                            </div>
                             <label class="custom-checkbox">
                                 <input type="checkbox" name="select_${category}_${questionIndex}" class="question-checkbox" data-quiz-id="${quizDoc.id}" data-question-index="${questionIndex}" ${question.active ? 'checked' : ''}> 
                                 <span class="checkbox-label"></span>

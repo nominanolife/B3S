@@ -387,11 +387,25 @@ h2 {
 
 .question-header {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
 }
 
-.question-header p {
+.question-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.question-text h5 {
+    font-family: Poppins;
+    font-size: 13px;
+    color: #2F2E2E;
+    margin: 0;
+}
+
+.question-text p {
     font-family: Poppins;
     font-size: 18px;
     font-weight: bold;
