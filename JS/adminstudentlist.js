@@ -280,6 +280,21 @@ function renderStudents() {
     return;
   }
 
+  // Sort studentsData by the latest booking date in descending order
+  studentsData.sort((a, b) => {
+    const latestBookingA = a.bookings?.reduce((maxDate, booking) => {
+      const bookingDate = new Date(booking.date);
+      return bookingDate > maxDate ? bookingDate : maxDate;
+    }, new Date(0)); // Default to epoch if no bookings
+
+    const latestBookingB = b.bookings?.reduce((maxDate, booking) => {
+      const bookingDate = new Date(booking.date);
+      return bookingDate > maxDate ? bookingDate : maxDate;
+    }, new Date(0)); // Default to epoch if no bookings
+
+    return latestBookingB - latestBookingA; // Sort by descending date
+  });
+
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   const paginatedStudents = filteredStudentsData.slice(start, end); // Paginated data
@@ -372,6 +387,7 @@ function renderStudents() {
 
   setupStatusToggleListeners(); // Call this after rendering the student list
 }
+
 
 function renderCourseStatus(course, booking) {
   // Return an empty column if there's no booking for this course
