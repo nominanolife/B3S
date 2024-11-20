@@ -240,7 +240,13 @@ document.addEventListener('DOMContentLoaded', async function () {
             case '2':
                 modalTitle.textContent = "Step 2 - Student Permit";
                 stepContent = `
-                            <div class="step-container">
+                    <div class="step-container">
+                        <h3>Create LTMS Account</h3>
+                        <ul>
+                            <li>Make sure you have already created an account in LTO's LTMS Online portal.</li>
+                        </ul>
+                    </div>
+                    <div class="step-container">
                         <h3>Prepare the Required Document</h3>
                         <p>Make sure to bring the following:</p>
                         <ul>
