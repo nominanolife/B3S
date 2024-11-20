@@ -6,16 +6,16 @@ from fuzzywuzzy import fuzz, process
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-from sentence_transformers import SentenceTransformer, util
 
 # Load Dataset
 data = pd.read_csv('questions.csv')
 
-# Load Sentence-BERT model for context-aware embeddings
-sentence_bert_model = SentenceTransformer('all-MiniLM-L6-v2')
+# Ensure all queries are strings and handle missing values
+data['Query'] = data['Query'].fillna('').astype(str)
 
-# Encode dataset queries using Sentence-BERT for efficient similarity comparison
-question_embeddings = sentence_bert_model.encode(data['Query'].tolist(), convert_to_tensor=True)
+# Train a Word2Vec model on the dataset queries
+sentences = [question.split() for question in data['Query']]
+word2vec_model = Word2Vec(sentences, vector_size=100, window=5, min_count=1, workers=4)
 
 # Initialize Flask App and enable CORS
 app = Flask(__name__)
@@ -24,36 +24,52 @@ CORS(app)
 # Initialize session memory for context
 previous_topic = None
 
-### Step 1: Exact Match Check ###
+### Step 1: Get Sentence Embeddings Using Word2Vec ###
+def get_sentence_vector(sentence, model):
+    words = sentence.split()
+    word_vectors = [model.wv[word] for word in words if word in model.wv]
+    
+    if word_vectors:
+        return np.mean(word_vectors, axis=0)
+    else:
+        return np.zeros(model.vector_size)
+
+### Step 2: Exact Match Check ###
 def exact_match(query, dataset):
     for index, row in dataset.iterrows():
         if query.lower() == row['Query'].lower():
             return row['Response']
     return None
 
-### Step 2: Dynamic Shortcut Handling with Fuzzy Matching ###
+### Step 3: Dynamic Shortcut Handling with Fuzzy Matching ###
 def dynamic_fuzzy_match(query, dataset, threshold=75):
     best_match = process.extractOne(query, dataset['Query'], scorer=fuzz.partial_ratio)
     if best_match and best_match[1] >= threshold:
         return dataset.loc[dataset['Query'] == best_match[0], 'Response'].values[0]
     return None
 
-### Step 3: Minimum Input Length Check ###
+### Step 4: Minimum Input Length Check ###
 def valid_query_length(query, min_length=3):
     return len(query) >= min_length
 
-### Step 4: BERT Embedding Match with Threshold ###
-def bert_match(query, dataset, model, embeddings, threshold=0.75):
-    query_embedding = model.encode(query, convert_to_tensor=True)
-    cosine_scores = util.pytorch_cos_sim(query_embedding, embeddings).squeeze(0)
-    best_score_index = cosine_scores.argmax().item()
+### Step 5: Fuzzy Match Using Word2Vec Embeddings with a Stricter Threshold ###
+def word2vec_match(query, dataset, model, threshold=0.90):
+    query_vector = get_sentence_vector(query, model)
+    best_similarity = 0
+    best_response = None
     
-    if cosine_scores[best_score_index] >= threshold:
-        return dataset.iloc[best_score_index]['Response']
-    return None
+    for index, row in dataset.iterrows():
+        dataset_query_vector = get_sentence_vector(row['Query'], model)
+        similarity = cosine_similarity([query_vector], [dataset_query_vector])[0][0]
+        
+        if similarity > best_similarity and similarity > threshold:
+            best_similarity = similarity
+            best_response = row['Response']
+    
+    return best_response
 
-### Step 5: Main Chatbot Function with Threshold Adjustments ###
-def chatbot_response(query, dataset, model, embeddings):
+### Step 6: Main Chatbot Function with Threshold Adjustments ###
+def chatbot_response(query, dataset, model):
     global previous_topic
 
     # Check if the query is valid (long enough)
@@ -70,8 +86,8 @@ def chatbot_response(query, dataset, model, embeddings):
     if dynamic_response:
         return dynamic_response
 
-    # If no fuzzy match, use BERT embeddings with a threshold
-    response = bert_match(query, dataset, model, embeddings, threshold=0.75)
+    # If no fuzzy match, use Word2Vec matching with stricter threshold
+    response = word2vec_match(query, dataset, model, threshold=0.90)
     
     if response:
         previous_topic = query  # Store the last matched topic
@@ -88,7 +104,7 @@ def chat():
         return jsonify({'error': 'Query not provided'}), 400
     
     # Get chatbot response
-    response = chatbot_response(user_query, data, sentence_bert_model, question_embeddings)
+    response = chatbot_response(user_query, data, word2vec_model)
     
     return jsonify({'response': response})
 
