@@ -223,3 +223,34 @@ h5 {
 .modal-body {
     font-size: 14px;
 }
+/* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 12px !important; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1 !important; /* Background of the scrollbar track */
+    border-radius: 10px !important; /* Optional: Rounded corners for the track */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #142A74 !important; /* Color of the scrollbar thumb */
+    border-radius: 10px !important; /* Optional: Rounded corners for the thumb */
+    border: 3px solid #f1f1f1 !important; /* Optional: Adds padding around the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #0e1d4d !important; /* Darker color on hover */
+}
+/* Add a scrollable container */
+.scrollable-container {
+    overflow-y: auto; /* Enables vertical scrolling */
+    max-height: 100vh; /* Ensures it doesn't overflow beyond viewport height */
+}
+
+/* Add styles for smaller screens */
+@media (max-width: 768px) {
+    .scrollable-container {
+        overflow-y: scroll; /* Forces the scroll bar to appear */
+    }
+}
