@@ -108,6 +108,7 @@ async function fetchInstructors() {
       const instructorData = instructorDoc.exists() ? instructorDoc.data() : {};
 
       const instructorDetails = {
+        profile: instructorData.imageUrl || 'Assets/default-profile.png',
         email: adminData.email || 'N/A',
         name: instructorData.name || 'N/A',
         courses: instructorData.courses ? instructorData.courses.join(' || ') : 'N/A',
@@ -116,7 +117,7 @@ async function fetchInstructors() {
       instructorsList.insertAdjacentHTML(
         'beforeend',
         `<tr>
-          <td><img src="${'Assets/default-profile.png'}">${instructorDetails.name}</td>
+          <td><img src="${instructorDetails.profile}" alt="${instructorDetails.name}" class="profile-image">${instructorDetails.name}</td>
           <td>${instructorDetails.email}</td>
           <td>${instructorDetails.courses}</td>
           <td class="table-row-content">
